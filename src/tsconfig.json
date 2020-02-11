@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "target": "esnext",
+    "sourceMap": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "outDir": "../js"
+  },
+  "exclude": [
+    "node_modules",
+    "./worker/*"
+  ]
+}

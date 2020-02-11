@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "target": "esnext",
+    "strict": true,
+    "alwaysStrict": true,
+    "outDir": "../../",
+    "lib": [ "es2015", "webworker" ],
+    "sourceMap": true
+  },
+  "files": [
+    "sw.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

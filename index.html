@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#317EFB"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Webpaint</title>
+    <link rel="stylesheet" href="painter.css">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('sw.js')
+                .then(function () {
+                    console.log("Service Worker registered.");
+                });
+        }
+    </script>
+    <script data-main="js/App" src="lib/require.js"></script>
+</head>
+<body>
+
+<div id="painter">
+    <div id="layers">
+    </div>
+    <div id="toolbar">
+        <div id="color-palette"></div>
+    </div>
+</div>
+
+<div id="gallery">
+</div>
+
+<div id="library">
+</div>
+
+</body>
+</html>
