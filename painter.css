@@ -39,7 +39,7 @@ body {
     background: #256235;
 }
 
-#gallery {
+#book {
     position: absolute;
     top: 0;
     left: 0;
@@ -49,7 +49,7 @@ body {
     padding: 20px;
 }
 
-#gallery img, #gallery div {
+#book img, #book div {
     width: 256px;
     height: 192px;
     float: left;
@@ -61,11 +61,8 @@ body {
     background: #CCC;
 }
 
-#gallery div {
+#book div {
     content: "+";
-}
-
-#painter{
 }
 
 #layers {

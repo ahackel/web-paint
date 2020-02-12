@@ -30,7 +30,7 @@ class App {
         this.libraryView.onBookSelected = (book: IBook) => this.openBook(book);
         this.activeView = this.libraryView;
 
-        this.bookView = new BookView("gallery");
+        this.bookView = new BookView("book");
         this.bookView.onImageSelected = (image: HTMLImageElement, event: MouseEvent) =>
             event.shiftKey ?
                 this.createNewImage(image) :

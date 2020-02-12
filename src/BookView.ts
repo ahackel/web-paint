@@ -14,10 +14,10 @@ export default class BookView extends View {
         }
 
         for (let page of book.pages) {
-            const img = new Image();
-            img.id = page.id;
-            img.src = page.overlay;
-            this.addImage(img);
+			ImageStorage.getThumbnail(page)
+				.then(img => {
+					this.addImage(img)
+				});
         }
     }
 
