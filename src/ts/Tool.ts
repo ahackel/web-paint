@@ -1,13 +1,13 @@
-import Point from "../Point";
-import Painter from "../Painter";
+import Point from "./Point";
+import PaintView from "./PaintView";
 
 export default abstract class Tool {
     mouse: Point;
     painting: boolean = false;
     pressure: number = 1;
-    painter: Painter;
+    painter: PaintView;
 
-    constructor(painter: Painter) {
+    constructor(painter: PaintView) {
         this.painter = painter;
         this.mouse = new Point(0,0);
     }

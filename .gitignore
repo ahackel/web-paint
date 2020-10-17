@@ -3,3 +3,8 @@ js
 .DS_Store
 sw.js
 sw.js.map
+/node_modules/
+/dist/
+/.cache/
+/.parcel-cache/
+/_old/

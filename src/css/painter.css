@@ -1,0 +1,153 @@
+body {
+    margin: 0;
+    touch-action: none;
+    background: #BBB;
+}
+
+.button {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    font-size: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    background: rgba(128, 128, 128, 0.25);
+    color: white;
+}
+
+.button:active {
+    background: cornflowerblue;
+}
+
+#library {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #BBB;
+    padding: 20px;
+}
+
+#library div.book {
+    width: 192px;
+    height: 256px;
+    float: left;
+    margin: 20px;
+    text-align: center;
+    line-height: 192px;
+    font-size: 50px;
+    color: white;
+    background: #256235;
+}
+
+.view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #BBB;
+}
+
+.book {
+    padding: 20px 50px;
+}
+
+.paint {
+    background: white;
+}
+
+.thumbnail {
+    width: 188px;
+    height: 140px;
+    float: left;
+    margin: 20px;
+    text-align: center;
+    line-height: 192px;
+    font-size: 50px;
+    color: #CCC;
+    background: white;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+}
+
+#layers {
+    margin: auto;
+    max-width: 134vh;
+    height: 75vw;
+    max-height: 100vh;
+    position: relative;
+    background: white;
+}
+
+#layers canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+#back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    transform: rotate(180deg);
+}
+
+#color-palette{
+    left: 10px;
+    bottom: 10px;
+}
+
+#tool-palette{
+    right: 10px;
+    bottom: 10px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 30px;
+}
+
+.palette {
+    position: absolute;
+    background: rgba(128, 128, 128, 0.25);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    transition: width 0.25s;
+    overflow: hidden;
+}
+
+.palette.collapsed{
+    width: 60px!important;
+}
+
+.palette.right-align {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.palette div {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    border-radius: 50%;
+    margin: 10px 10px 10px 0;
+    flex-shrink: 0;
+}
+
+.palette div:first-child{
+    margin: 10px 30px 10px 10px;
+}
+
+.palette.right-align div:first-child{
+    margin: 10px;
+}
+
+.palette.right-align div:last-child{
+    margin: 10px 10px 10px 20px;
+}

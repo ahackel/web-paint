@@ -1,8 +1,8 @@
-import Point from "./Point";
-import Tool from "./Tools/Tool";
+import Point from "../src/ts/Point";
+import Tool from "../src/ts/Tool";
 import PainterUtils from "./PainterUtils";
 import ImageMeta from "./ImageMeta";
-import ImageStorage from "./ImageStorage";
+import ImageStorage from "../src/ts/ImageStorage";
 
 export default class Painter {
     public strokeStyle: string | CanvasGradient | CanvasPattern = "#000";
@@ -227,6 +227,8 @@ export default class Painter {
     }
 
     saveImage() {
-        this.getLayer(0).canvas.toBlob(blob => ImageStorage.saveImage(this.imageId, blob as Blob, this.meta));
+        this.getLayer(0).canvas.toBlob(blob => {ImageStorage.saveImage(this.imageId, blob as Blob, this.meta));
     }
+
+
 }

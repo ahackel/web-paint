@@ -1,5 +1,5 @@
-import Tool from "./Tool";
-import Point from "../Point";
+import Tool from "../../src/ts/Tool";
+import Point from "../../src/ts/Point";
 import PainterUtils from "../PainterUtils";
 
 export default class EraserTool extends Tool {

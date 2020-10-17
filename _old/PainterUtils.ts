@@ -1,4 +1,4 @@
-import Point from "./Point";
+import Point from "../src/ts/Point";
 
 export default class PainterUtils {
 

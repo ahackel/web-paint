@@ -1,6 +1,6 @@
-import Tool from "./Tool";
+import Tool from "../../src/ts/Tool";
 import PainterUtils from "../PainterUtils";
-import Point from "../Point";
+import Point from "../../src/ts/Point";
 
 export default class CrayonTool extends Tool {
 

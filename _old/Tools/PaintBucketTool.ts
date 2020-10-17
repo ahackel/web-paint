@@ -1,4 +1,4 @@
-import Tool from "./Tool";
+import Tool from "../../src/ts/Tool";
 import PainterUtils from "../PainterUtils";
 
 export default class PaintBucketTool extends Tool{

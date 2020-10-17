@@ -1,5 +1,5 @@
-import {config, IBook} from "./config";
-import {View} from "./View";
+import {config, IBook} from "../src/ts/config";
+import {View} from "../src/ts/View";
 
 export default class LibraryView extends View {
 
