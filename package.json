@@ -2,8 +2,8 @@
   "name": "web-paint",
   "version": "1.0.0",
   "scripts": {
-    "start": "parcel serve ./src/index.html --dist-dir ./docs/ --public-url ./docs/",
-    "build": "parcel build ./src/index.html --dist-dir ./docs/ --public-url ./docs/"
+    "start": "parcel serve ./src/index.html --dist-dir docs --public-url ./",
+    "build": "parcel build ./src/index.html --dist-dir docs --public-url ./"
   },
   "devDependencies": {
     "parcel": "^2.0.0-nightly.425",
