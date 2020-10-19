@@ -1,5 +1,5 @@
 {
-  "name": "WebPaint",
+  "name": "Web Paint",
   "version": "1.0.0",
   "scripts": {
     "start": "parcel serve ./src/index.html -d docs",
