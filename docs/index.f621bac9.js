@@ -6,7 +6,7 @@
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
 
-(function(modules, cache, entry, globalName) {
+(function(modules, cache, entry, mainEntry, globalName) {
   /* eslint-disable no-undef */
   var globalObject =
     typeof globalThis !== 'undefined'
@@ -111,10 +111,10 @@
     newRequire(entry[i]);
   }
 
-  if (entry.length) {
+  if (mainEntry) {
     // Expose entry point to Node, AMD or browser globals
     // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
-    var mainExports = newRequire(entry[entry.length - 1]);
+    var mainExports = newRequire(mainEntry);
 
     // CommonJS
     if (typeof exports === 'object' && typeof module !== 'undefined') {
@@ -131,12 +131,12 @@
       this[globalName] = mainExports;
     }
   }
-})({"e9e5e3be1d42c1a9d4a3b0459d446546":[function(require,module,exports) {
+})({"179tT":[function(require,module,exports) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = 1234;
 var HMR_ENV_HASH = "d751713988987e9331980363e24189ce";
-module.bundle.HMR_BUNDLE_ID = "8c0589529c7316f82bb1ceac03a34aa3";
+module.bundle.HMR_BUNDLE_ID = "f621bac9be44b08df7e09844ea7fb1c0";
 /* global HMR_HOST, HMR_PORT, HMR_ENV_HASH */
 
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -159,13 +159,22 @@ function Module(moduleName) {
 }
 
 module.bundle.Module = Module;
-var checkedAssets, assetsToAccept, acceptedAssets; // eslint-disable-next-line no-redeclare
+var checkedAssets, assetsToAccept, acceptedAssets;
+
+function getHostname() {
+  return HMR_HOST || (location.protocol.indexOf('http') === 0 ? location.hostname : 'localhost');
+}
+
+function getPort() {
+  return HMR_PORT || location.port;
+} // eslint-disable-next-line no-redeclare
+
 
 var parent = module.bundle.parent;
 
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
-  var hostname = HMR_HOST || (location.protocol.indexOf('http') === 0 ? location.hostname : 'localhost');
-  var port = HMR_PORT || location.port;
+  var hostname = getHostname();
+  var port = getPort();
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
   var ws = new WebSocket(protocol + '://' + hostname + (port ? ':' + port : '') + '/');
 
@@ -317,7 +326,10 @@ function reloadCSS() {
     var links = document.querySelectorAll('link[rel="stylesheet"]');
 
     for (var i = 0; i < links.length; i++) {
-      var absolute = /^https?:\/\//i.test(links[i].getAttribute('href'));
+      var href = links[i].getAttribute('href');
+      var hostname = getHostname();
+      var servedFromHMRServer = hostname === 'localhost' ? new RegExp('^(https?:\\/\\/(0.0.0.0|127.0.0.1)|localhost):' + getPort()).test(href) : href.indexOf(hostname + ':' + getPort());
+      var absolute = /^https?:\/\//i.test(href) && href.indexOf(window.location.origin) !== 0 && !servedFromHMRServer;
 
       if (!absolute) {
         updateLink(links[i]);
@@ -407,9 +419,9 @@ function hmrAcceptRun(bundle, id) {
 
   acceptedAssets[id] = true;
 }
-},{}],"7a6406e25fa4c9f8d43f342e4f206e6b":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"2bb1ceac03a34aa3\":\"app.8c058952.js\",\"8e500f9e0c708b95\":\"brush.db934e3b.png\"}"));
-},{"./bundle-manifest":"ba8df6b71e73837c465d69bebde6e64d"}],"ba8df6b71e73837c465d69bebde6e64d":[function(require,module,exports) {
+},{}],"2Nz79":[function(require,module,exports) {
+require('./bundle-manifest').register(JSON.parse("{\"7urwF\":\"index.f621bac9.js\",\"3gMK8\":\"brush.6b7765f8.png\"}"));
+},{"./bundle-manifest":"5G1rV"}],"5G1rV":[function(require,module,exports) {
 "use strict";
 
 var mapping = {};
@@ -434,7 +446,7 @@ function resolve(id) {
 
 module.exports.register = register;
 module.exports.resolve = resolve;
-},{}],"35a9dbc6e59ddb3349eed941ffcebbf2":[function(require,module,exports) {
+},{}],"1Dgdz":[function(require,module,exports) {
 "use strict";
 
 var _BookView = _interopRequireDefault(require("./ts/BookView"));
@@ -539,7 +551,7 @@ class App {
 let app = new App(); // @_old-ignore
 
 globalThis.app = app;
-},{"./ts/BookView":"4dfeab220c3f13460bce0ca022657ba3","./ts/PaintView":"f1ff303ca650495ce5a4325c52278c36"}],"4dfeab220c3f13460bce0ca022657ba3":[function(require,module,exports) {
+},{"./ts/BookView":"2naNa","./ts/PaintView":"7mDLS"}],"2naNa":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -598,7 +610,7 @@ class BookView extends _View.View {
 }
 
 exports.default = BookView;
-},{"./ImageStorage":"26d7e8a87a7f85b892aab66e423464fa","./config":"5ab9ca4e3c3a69d8e83e2146e48ed294","./View":"e90b98325d23899c3027f9d56109624d"}],"26d7e8a87a7f85b892aab66e423464fa":[function(require,module,exports) {
+},{"./ImageStorage":"1binv","./config":"2Lcdn","./View":"75KvF"}],"1binv":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -678,7 +690,7 @@ exports.default = ImageStorage;
 _defineProperty(ImageStorage, "_imageStore", _localforage.default.createInstance({
   name: "ImageStore"
 }));
-},{"localforage":"ddeb1be01043eb8a3f5c399afdcc9a59"}],"ddeb1be01043eb8a3f5c399afdcc9a59":[function(require,module,exports) {
+},{"localforage":"6KKKs"}],"6KKKs":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 
@@ -3572,7 +3584,7 @@ var global = arguments[3];
     }]
   }, {}, [4])(4);
 });
-},{}],"5ab9ca4e3c3a69d8e83e2146e48ed294":[function(require,module,exports) {
+},{}],"2Lcdn":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3583,7 +3595,7 @@ const config = {
   PagesInBookCount: 16
 };
 exports.config = config;
-},{}],"e90b98325d23899c3027f9d56109624d":[function(require,module,exports) {
+},{}],"75KvF":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3619,7 +3631,7 @@ class View {
 }
 
 exports.View = View;
-},{}],"f1ff303ca650495ce5a4325c52278c36":[function(require,module,exports) {
+},{}],"7mDLS":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3808,7 +3820,7 @@ class PaintView extends _View.View {
 }
 
 exports.default = PaintView;
-},{"./View":"e90b98325d23899c3027f9d56109624d","./Point":"cd8706452ee4391ecec2cdb865e3a60e","./PenTool":"04029398efabc6507dc4231561dad4c3","./ImageStorage":"26d7e8a87a7f85b892aab66e423464fa","./ColorPalette":"f9f31be0bae43061fbec10ba97b70350","./ToolPalette":"76a594e24b97f10c00dff1fb60cfb232"}],"cd8706452ee4391ecec2cdb865e3a60e":[function(require,module,exports) {
+},{"./View":"75KvF","./Point":"6fP8g","./PenTool":"7z96h","./ImageStorage":"1binv","./ColorPalette":"7BEbO","./ToolPalette":"3BSLs"}],"6fP8g":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3839,7 +3851,7 @@ class Point {
 }
 
 exports.default = Point;
-},{}],"04029398efabc6507dc4231561dad4c3":[function(require,module,exports) {
+},{}],"7z96h":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3946,7 +3958,7 @@ class PenTool extends _Tool.default {
 }
 
 exports.default = PenTool;
-},{"./Tool":"8ac28eb17348ddf767ea89a41687484b","./Point":"cd8706452ee4391ecec2cdb865e3a60e","url:../img/brush.png":"ef37f65e4df67d6613f2f351b85ca263"}],"8ac28eb17348ddf767ea89a41687484b":[function(require,module,exports) {
+},{"./Tool":"4dPQX","./Point":"6fP8g","url:../img/brush.png":"27rr6"}],"4dPQX":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3973,9 +3985,9 @@ class Tool {
 }
 
 exports.default = Tool;
-},{"./Point":"cd8706452ee4391ecec2cdb865e3a60e"}],"ef37f65e4df67d6613f2f351b85ca263":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("2bb1ceac03a34aa3", "8e500f9e0c708b95");
-},{"./bundle-url":"2146da1905b95151ed14d455c784e7b7","./relative-path":"1b9943ef25c7bbdf0dd1b9fa91880a6c"}],"2146da1905b95151ed14d455c784e7b7":[function(require,module,exports) {
+},{"./Point":"6fP8g"}],"27rr6":[function(require,module,exports) {
+module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("7urwF", "3gMK8");
+},{"./bundle-url":"10N7P","./relative-path":"Q4PMS"}],"10N7P":[function(require,module,exports) {
 "use strict";
 
 /* globals document:readonly */
@@ -4021,7 +4033,7 @@ function getOrigin(url) {
 exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
 exports.getOrigin = getOrigin;
-},{}],"1b9943ef25c7bbdf0dd1b9fa91880a6c":[function(require,module,exports) {
+},{}],"Q4PMS":[function(require,module,exports) {
 "use strict";
 
 var resolve = require('./bundle-manifest').resolve;
@@ -4086,7 +4098,7 @@ function relative(from, to) {
 
 module.exports._dirname = dirname;
 module.exports._relative = relative;
-},{"./bundle-manifest":"ba8df6b71e73837c465d69bebde6e64d"}],"f9f31be0bae43061fbec10ba97b70350":[function(require,module,exports) {
+},{"./bundle-manifest":"5G1rV"}],"7BEbO":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4110,7 +4122,7 @@ class ColorPalette extends _Palette.Palette {
 }
 
 exports.default = ColorPalette;
-},{"./Palette":"389c342d174a92eeb80f5dd89eadd58d"}],"389c342d174a92eeb80f5dd89eadd58d":[function(require,module,exports) {
+},{"./Palette":"1IOXf"}],"1IOXf":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4204,7 +4216,7 @@ class Palette extends _View.View {
 }
 
 exports.Palette = Palette;
-},{"./View":"e90b98325d23899c3027f9d56109624d"}],"76a594e24b97f10c00dff1fb60cfb232":[function(require,module,exports) {
+},{"./View":"75KvF"}],"3BSLs":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4228,6 +4240,6 @@ class ToolPalette extends _Palette.Palette {
 }
 
 exports.default = ToolPalette;
-},{"./Palette":"389c342d174a92eeb80f5dd89eadd58d"}]},{},["e9e5e3be1d42c1a9d4a3b0459d446546","7a6406e25fa4c9f8d43f342e4f206e6b","35a9dbc6e59ddb3349eed941ffcebbf2"], null)
+},{"./Palette":"1IOXf"}]},{},["179tT","2Nz79","1Dgdz"], "1Dgdz", null)
 
-//# sourceMappingURL=app.8c058952.js.map
+//# sourceMappingURL=index.f621bac9.js.map

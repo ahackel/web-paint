@@ -1,12 +1,12 @@
 {
-  "name": "Web Paint",
+  "name": "web-paint",
   "version": "1.0.0",
   "scripts": {
-    "start": "parcel serve ./src/index.html -d docs",
-    "build": "parcel build ./src/index.html -d docs"
+    "start": "parcel serve ./src/index.html --dist-dir ./docs/ --public-url ./docs/",
+    "build": "parcel build ./src/index.html --dist-dir ./docs/ --public-url ./docs/"
   },
   "devDependencies": {
-    "parcel": "^2.0.0-beta.1",
+    "parcel": "^2.0.0-nightly.425",
     "typescript": "^4.0.3"
   },
   "dependencies": {
