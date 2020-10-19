@@ -7,3 +7,4 @@ sw.js.map
 /.cache/
 /.parcel-cache/
 /_old/
+/dist/
