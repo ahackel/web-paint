@@ -14,7 +14,7 @@ export default class PaintView extends View {
     height = 768 * this.scaleFactor;
     currentTool: Tool;
     strokeStyle: string | CanvasGradient | CanvasPattern = "#000";
-    lineWidth: number = 4;
+    lineWidth: number = 8;
     imageId: string;
 
     public readonly ctx: CanvasRenderingContext2D;
@@ -31,8 +31,8 @@ export default class PaintView extends View {
         canvas.width = this.width;
         canvas.height = this.height;
         this.ctx = <CanvasRenderingContext2D>canvas.getContext("2d", { alpha: true });
-        //ctx.imageSmoothingQuality = "high";
-        //ctx.imageSmoothingEnabled = true;
+        // this.ctx.imageSmoothingQuality = "high";
+        // this.ctx.imageSmoothingEnabled = true;
         this.addEventListeners();
         
         this._colorPalette = new ColorPalette("color-palette");
@@ -40,7 +40,7 @@ export default class PaintView extends View {
 
         this._toolPalette = new ToolPalette("tool-palette");
         this._toolPalette.onSelectionChanged = (option: string, index: number) => {
-            this.fill();
+            this.clear();
         };
 
         this.currentTool = new PenTool(this);
