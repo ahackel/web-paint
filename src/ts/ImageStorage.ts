@@ -21,10 +21,16 @@ export default class ImageStorage {
 				if (!img){
 					return Promise.resolve(null);
 				}
-				return img.decode()
-					.then(() => {
-						return Promise.resolve(img);
-					});
+				if (img.decode != null){
+					return img.decode()
+						.then(() => {
+							return Promise.resolve(img);
+						});
+				}
+				let p = new Promise((resolve, reject) => {
+					img.onload = () => resolve(img);
+				});
+				return p;
 			});
 	}
 

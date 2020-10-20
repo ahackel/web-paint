@@ -132,7 +132,7 @@
     }
   }
 })({"J10xL":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1VKh0\":\"index.4cd607c1.js\",\"54PPa\":\"brush.67e09586.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1VKh0\":\"index.3e0a360b.js\",\"54PPa\":\"brush.67e09586.png\"}"));
 },{"./bundle-manifest":"345Oh"}],"345Oh":[function(require,module,exports) {
 "use strict";
 
@@ -424,9 +424,18 @@ var ImageStorage = /*#__PURE__*/function () {
           return Promise.resolve(null);
         }
 
-        return img.decode().then(function () {
-          return Promise.resolve(img);
+        if (img.decode != null) {
+          return img.decode().then(function () {
+            return Promise.resolve(img);
+          });
+        }
+
+        var p = new Promise(function (resolve, reject) {
+          img.onload = function () {
+            return resolve(img);
+          };
         });
+        return p;
       });
     }
   }, {
@@ -4408,4 +4417,4 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 exports.default = ToolPalette;
 },{"./Palette":"3glfB"}]},{},["J10xL","18uPb"], "18uPb", null)
 
-//# sourceMappingURL=index.4cd607c1.js.map
+//# sourceMappingURL=index.3e0a360b.js.map
