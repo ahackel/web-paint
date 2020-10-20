@@ -3,20 +3,22 @@
   "version": "1.0.0",
   "scripts": {
     "start": "parcel serve ./src/index.html",
-    "build": "parcel build ./src/index.html --no-scope-hoist"
+    "build": "rm -rf docs; parcel build ./src/index.html --no-scope-hoist"
   },
   "devDependencies": {
     "parcel": "^2.0.0-nightly.425",
     "typescript": "^4.0.3"
   },
   "dependencies": {
+    "blueimp-canvas-to-blob": "^3.28.0",
     "localforage": "^1.9.0"
   },
   "main": "docs/index.html",
   "targets": {
     "main": {
       "minify": false,
-      "publicUrl": "./"
+      "publicUrl": "./",
+      "sourceMap": false
     }
   }
 }
