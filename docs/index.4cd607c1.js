@@ -132,7 +132,7 @@
     }
   }
 })({"J10xL":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1VKh0\":\"index.94a0c88d.js\",\"54PPa\":\"brush.67e09586.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1VKh0\":\"index.4cd607c1.js\",\"54PPa\":\"brush.67e09586.png\"}"));
 },{"./bundle-manifest":"345Oh"}],"345Oh":[function(require,module,exports) {
 "use strict";
 
@@ -271,9 +271,7 @@ var App = /*#__PURE__*/function () {
   return App;
 }();
 
-var app = new App(); // @_old-ignore
-
-globalThis.app = app;
+var app = new App();
 },{"./ts/BookView":"60est","./ts/PaintView":"D6Fjl"}],"60est":[function(require,module,exports) {
 "use strict";
 
@@ -3525,6 +3523,21 @@ var PaintView = /*#__PURE__*/function (_View) {
       return new _Point.default(x, y);
     });
 
+    _defineProperty(_assertThisInitialized(_this), "getTouchEventPosition", function (event) {
+      var target = event.target;
+      var rect = target.getBoundingClientRect();
+      var touch = event.touches[0];
+      var x = (touch.clientX - rect.left) / rect.width * _this.width;
+      var y = (touch.clientY - rect.top) / rect.height * _this.height;
+
+      if (_this.pixelPerfect) {
+        x = Math.round(x);
+        y = Math.round(y);
+      }
+
+      return new _Point.default(x, y);
+    });
+
     var backButton = document.getElementById("back-button");
     backButton.addEventListener('click', function (event) {
       return onBackClicked();
@@ -3564,18 +3577,34 @@ var PaintView = /*#__PURE__*/function (_View) {
       canvas.addEventListener('click', function (event) {
         return event.preventDefault();
       });
-      canvas.addEventListener('pointerdown', function (event) {
-        return _this2.pointerDown(event);
-      });
-      canvas.addEventListener('pointermove', function (event) {
-        return _this2.pointerMove(event);
-      });
-      canvas.addEventListener('pointerup', function (event) {
-        return _this2.pointerUp(event);
-      });
-      canvas.addEventListener('pointercancel', function (event) {
-        return _this2.pointerCancel(event);
-      });
+
+      if (window.PointerEvent != null) {
+        canvas.addEventListener('pointerdown', function (event) {
+          return _this2.pointerDown(event);
+        });
+        canvas.addEventListener('pointermove', function (event) {
+          return _this2.pointerMove(event);
+        });
+        canvas.addEventListener('pointerup', function (event) {
+          return _this2.pointerUp(event);
+        });
+        canvas.addEventListener('pointercancel', function (event) {
+          return _this2.pointerCancel(event);
+        });
+      } else {
+        canvas.addEventListener('touchstart', function (event) {
+          return _this2.touchStart(event);
+        });
+        canvas.addEventListener('touchmove', function (event) {
+          return _this2.touchMove(event);
+        });
+        canvas.addEventListener('touchend', function (event) {
+          return _this2.touchEnd(event);
+        });
+        canvas.addEventListener('touchcancel', function (event) {
+          return _this2.touchCancel(event);
+        });
+      }
     }
   }, {
     key: "getPointerEventPaintingFlag",
@@ -3648,6 +3677,67 @@ var PaintView = /*#__PURE__*/function (_View) {
       }
 
       event.preventDefault(); //console.log("pointer cancel", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
+    }
+  }, {
+    key: "touchStart",
+    value: function touchStart(event) {
+      this._colorPalette.collapse();
+
+      this._toolPalette.collapse();
+
+      if (!this.currentTool) {
+        return;
+      }
+
+      event.preventDefault();
+      this.currentTool.painting = true;
+      this.currentTool.pressure = 1;
+      this.currentTool.mouse = this.getTouchEventPosition(event);
+      this.currentTool.down();
+    }
+  }, {
+    key: "touchMove",
+    value: function touchMove(event) {
+      if (!this.currentTool) {
+        return;
+      }
+
+      event.preventDefault();
+      this.currentTool.painting = true;
+      this.currentTool.pressure = 1;
+      var newMouse = this.getTouchEventPosition(event);
+
+      var delta = _Point.default.distance(this.currentTool.mouse, newMouse);
+
+      if (delta > 3) {
+        this.currentTool.mouse = newMouse;
+        this.currentTool.move();
+      }
+    }
+  }, {
+    key: "touchEnd",
+    value: function touchEnd(event) {
+      if (!this.currentTool) {
+        return;
+      }
+
+      event.preventDefault();
+      this.currentTool.painting = true;
+
+      if (event.touches.length > 0) {
+        this.currentTool.mouse = this.getTouchEventPosition(event);
+      }
+
+      this.currentTool.up();
+    }
+  }, {
+    key: "touchCancel",
+    value: function touchCancel(event) {
+      if (!this.currentTool) {
+        return;
+      }
+
+      event.preventDefault();
     }
   }, {
     key: "clear",
@@ -4299,9 +4389,9 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, ToolPalette);
 
-    var tools = ["∙", "●", "✖︎"];
+    var tools = ["☐︎"];
     _this = _super.call(this, id, tools, true);
-    _this.SelectedIndex = 1;
+    _this.SelectedIndex = 0;
     return _this;
   }
 
@@ -4318,4 +4408,4 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 exports.default = ToolPalette;
 },{"./Palette":"3glfB"}]},{},["J10xL","18uPb"], "18uPb", null)
 
-//# sourceMappingURL=index.94a0c88d.js.map
+//# sourceMappingURL=index.4cd607c1.js.map

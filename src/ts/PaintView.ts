@@ -49,10 +49,19 @@ export default class PaintView extends View {
     private addEventListeners() {
         let canvas = this.ctx.canvas;
         canvas.addEventListener('click', event => event.preventDefault());
-        canvas.addEventListener('pointerdown', event => this.pointerDown(event));
-        canvas.addEventListener('pointermove', event => this.pointerMove(event));
-        canvas.addEventListener('pointerup', event => this.pointerUp(event));
-        canvas.addEventListener('pointercancel', event => this.pointerCancel(event));
+
+        if (window.PointerEvent != null){
+            canvas.addEventListener('pointerdown', event => this.pointerDown(event));
+            canvas.addEventListener('pointermove', event => this.pointerMove(event));
+            canvas.addEventListener('pointerup', event => this.pointerUp(event));
+            canvas.addEventListener('pointercancel', event => this.pointerCancel(event));
+        }
+        else{
+            canvas.addEventListener('touchstart', event => this.touchStart(event));
+            canvas.addEventListener('touchmove', event => this.touchMove(event));
+            canvas.addEventListener('touchend', event => this.touchEnd(event));
+            canvas.addEventListener('touchcancel', event => this.touchCancel(event));
+        }
     }
 
     private getPointerEventPosition = (event: PointerEvent) => {
@@ -67,7 +76,22 @@ export default class PaintView extends View {
             y = Math.round(y);
         }
         return new Point(x, y);
-    };
+    }
+
+    private getTouchEventPosition = (event: TouchEvent) => {
+        let target = <HTMLElement>event.target;
+        let rect = target.getBoundingClientRect();
+
+        var touch = event.touches[0];
+        let x = (touch.clientX - rect.left) / rect.width * this.width;
+        let y = (touch.clientY - rect.top) / rect.height * this.height;
+
+        if (this.pixelPerfect){
+            x = Math.round(x);
+            y = Math.round(y);
+        }
+        return new Point(x, y);
+    }
 
     private getPointerEventPaintingFlag(event: PointerEvent) {
         switch (event.pointerType) {
@@ -77,6 +101,7 @@ export default class PaintView extends View {
                 return event.buttons === 1;
         }
     }
+
     pointerDown(event: PointerEvent) {
         this._colorPalette.collapse();
         this._toolPalette.collapse();
@@ -139,6 +164,63 @@ export default class PaintView extends View {
         }
         event.preventDefault();
         //console.log("pointer cancel", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
+    }
+
+
+    touchStart(event: TouchEvent) {
+        this._colorPalette.collapse();
+        this._toolPalette.collapse();
+
+        if (!this.currentTool) {
+            return;
+        }
+
+        event.preventDefault();
+
+        this.currentTool.painting = true;
+        this.currentTool.pressure = 1;
+        this.currentTool.mouse = this.getTouchEventPosition(event);
+        this.currentTool.down();
+    }
+
+    touchMove(event: TouchEvent) {
+        if (!this.currentTool) {
+            return;
+        }
+
+        event.preventDefault();
+
+        this.currentTool.painting = true;
+        this.currentTool.pressure = 1;
+
+        let newMouse = this.getTouchEventPosition(event);
+        let delta = Point.distance(this.currentTool.mouse, newMouse);
+
+        if (delta > 3){
+            this.currentTool.mouse = newMouse;
+            this.currentTool.move();
+        }
+    }
+
+    touchEnd(event: TouchEvent) {
+        if (!this.currentTool) {
+            return;
+        }
+
+        event.preventDefault();
+
+        this.currentTool.painting = true;
+        if (event.touches.length > 0){
+            this.currentTool.mouse = this.getTouchEventPosition(event);
+        }
+        this.currentTool.up();
+    }
+
+    touchCancel(event: TouchEvent) {
+        if (!this.currentTool) {
+            return;
+        }
+        event.preventDefault();
     }
 
     clear() {

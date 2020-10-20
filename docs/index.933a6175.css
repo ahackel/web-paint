@@ -12,8 +12,8 @@ body {
     font-size: 30px;
     border-radius: 50%;
     cursor: pointer;
-    background: rgba(128, 128, 128, 0.25);
-    color: white;
+    background: rgba(255, 255, 255, 0.5);
+    color: black;
 }
 
 .button:active {
@@ -113,8 +113,8 @@ body {
 
 .palette {
     position: absolute;
-    background: rgba(128, 128, 128, 0.25);
-    color: white;
+    background: rgba(255, 255, 255, 0.5);
+    color: black;
     width: 60px;
     height: 60px;
     border-radius: 30px;
@@ -152,4 +152,4 @@ body {
     margin: 10px 10px 10px 20px;
 }
 
-/*# sourceMappingURL=index.a75110ac.css.map */
+/*# sourceMappingURL=index.933a6175.css.map */

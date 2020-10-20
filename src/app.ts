@@ -107,5 +107,3 @@ class App {
 }
 
 let app = new App();
-// @_old-ignore
-globalThis.app = app;
