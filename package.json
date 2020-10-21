@@ -20,5 +20,6 @@
       "publicUrl": "./",
       "sourceMap": false
     }
-  }
+  },
+  "browserslist": ["iOS 9"]
 }

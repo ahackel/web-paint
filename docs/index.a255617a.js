@@ -131,11 +131,8 @@
       this[globalName] = mainExports;
     }
   }
-})({"4SmSL":[function(require,module,exports) {
+})({"2L7EK":[function(require,module,exports) {
 var define;
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 !function (t) {
   "use strict";
 
@@ -194,8 +191,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     });
   })), "function" == typeof define && define.amd ? define(function () {
     return r;
-  }) : "object" == (typeof module === "undefined" ? "undefined" : _typeof(module)) && module.exports ? module.exports = r : t.dataURLtoBlob = r;
+  }) : "object" == typeof module && module.exports ? module.exports = r : t.dataURLtoBlob = r;
 }(window);
-},{}]},{},["4SmSL"], "4SmSL", null)
+},{}]},{},["2L7EK"], "2L7EK", null)
 
-//# sourceMappingURL=index.759d6586.js.map
+//# sourceMappingURL=index.a255617a.js.map

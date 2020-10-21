@@ -131,9 +131,9 @@
       this[globalName] = mainExports;
     }
   }
-})({"J10xL":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1VKh0\":\"index.3e0a360b.js\",\"54PPa\":\"brush.67e09586.png\"}"));
-},{"./bundle-manifest":"345Oh"}],"345Oh":[function(require,module,exports) {
+})({"4Kvfc":[function(require,module,exports) {
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.0771ec64.js\",\"7s5mZ\":\"brush.67e09586.png\"}"));
+},{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
 var mapping = {};
@@ -158,7 +158,7 @@ function resolve(id) {
 
 module.exports.register = register;
 module.exports.resolve = resolve;
-},{}],"18uPb":[function(require,module,exports) {
+},{}],"7FCh8":[function(require,module,exports) {
 "use strict";
 
 var _BookView = _interopRequireDefault(require("./ts/BookView"));
@@ -272,7 +272,7 @@ var App = /*#__PURE__*/function () {
 }();
 
 var app = new App();
-},{"./ts/BookView":"60est","./ts/PaintView":"D6Fjl"}],"60est":[function(require,module,exports) {
+},{"./ts/BookView":"6Xku3","./ts/PaintView":"EuLhU"}],"6Xku3":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -287,8 +287,6 @@ var _config = require("./config");
 var _View2 = require("./View");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -306,7 +304,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -376,7 +374,7 @@ var BookView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = BookView;
-},{"./ImageStorage":"31yxW","./config":"2Pkvn","./View":"24Gxw"}],"31yxW":[function(require,module,exports) {
+},{"./ImageStorage":"6j1mL","./config":"5f9CL","./View":"Jy3dT"}],"6j1mL":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -489,7 +487,7 @@ exports.default = ImageStorage;
 _defineProperty(ImageStorage, "_imageStore", _localforage.default.createInstance({
   name: "ImageStore"
 }));
-},{"localforage":"H9C8m"}],"H9C8m":[function(require,module,exports) {
+},{"localforage":"21iSG"}],"21iSG":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 
@@ -3383,7 +3381,7 @@ var global = arguments[3];
     }]
   }, {}, [4])(4);
 });
-},{}],"2Pkvn":[function(require,module,exports) {
+},{}],"5f9CL":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3394,7 +3392,7 @@ var config = {
   PagesInBookCount: 16
 };
 exports.config = config;
-},{}],"24Gxw":[function(require,module,exports) {
+},{}],"Jy3dT":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3444,7 +3442,7 @@ var View = /*#__PURE__*/function () {
 }();
 
 exports.View = View;
-},{}],"D6Fjl":[function(require,module,exports) {
+},{}],"EuLhU":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3466,8 +3464,6 @@ var _ToolPalette = _interopRequireDefault(require("./ToolPalette"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -3484,7 +3480,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -3798,7 +3794,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = PaintView;
-},{"./View":"24Gxw","./Point":"TChmd","./PenTool":"12nxg","./ImageStorage":"31yxW","./ColorPalette":"3wKCI","./ToolPalette":"7DPkU"}],"TChmd":[function(require,module,exports) {
+},{"./View":"Jy3dT","./Point":"PghYy","./PenTool":"70itr","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2"}],"PghYy":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3843,7 +3839,7 @@ var Point = /*#__PURE__*/function () {
 }();
 
 exports.default = Point;
-},{}],"12nxg":[function(require,module,exports) {
+},{}],"70itr":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3859,8 +3855,6 @@ var _brush = _interopRequireDefault(require("url:../img/brush.png"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -3873,7 +3867,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -3991,7 +3985,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PenTool;
-},{"./Tool":"7qOOj","./Point":"TChmd","url:../img/brush.png":"6fKZD"}],"7qOOj":[function(require,module,exports) {
+},{"./Tool":"1gBPM","./Point":"PghYy","url:../img/brush.png":"2HhD3"}],"1gBPM":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4019,9 +4013,9 @@ var Tool = function Tool(painter) {
 };
 
 exports.default = Tool;
-},{"./Point":"TChmd"}],"6fKZD":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("1VKh0", "54PPa");
-},{"./bundle-url":"6DN1D","./relative-path":"15JI3"}],"6DN1D":[function(require,module,exports) {
+},{"./Point":"PghYy"}],"2HhD3":[function(require,module,exports) {
+module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("1P9p3", "7s5mZ");
+},{"./bundle-url":"18KeT","./relative-path":"4f40J"}],"18KeT":[function(require,module,exports) {
 "use strict";
 
 /* globals document:readonly */
@@ -4067,7 +4061,7 @@ function getOrigin(url) {
 exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
 exports.getOrigin = getOrigin;
-},{}],"15JI3":[function(require,module,exports) {
+},{}],"4f40J":[function(require,module,exports) {
 "use strict";
 
 var resolve = require('./bundle-manifest').resolve;
@@ -4132,7 +4126,7 @@ function relative(from, to) {
 
 module.exports._dirname = dirname;
 module.exports._relative = relative;
-},{"./bundle-manifest":"345Oh"}],"3wKCI":[function(require,module,exports) {
+},{"./bundle-manifest":"2flPp"}],"5766w":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4141,8 +4135,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 var _Palette2 = require("./Palette");
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -4156,7 +4148,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -4191,7 +4183,7 @@ var ColorPalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = ColorPalette;
-},{"./Palette":"3glfB"}],"3glfB":[function(require,module,exports) {
+},{"./Palette":"5HhUq"}],"5HhUq":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4200,8 +4192,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.Palette = void 0;
 
 var _View2 = require("./View");
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 
@@ -4221,7 +4211,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -4356,7 +4346,7 @@ var Palette = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.Palette = Palette;
-},{"./View":"24Gxw"}],"7DPkU":[function(require,module,exports) {
+},{"./View":"Jy3dT"}],"01EL2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4365,8 +4355,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 var _Palette2 = require("./Palette");
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -4380,7 +4368,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
@@ -4415,6 +4403,6 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = ToolPalette;
-},{"./Palette":"3glfB"}]},{},["J10xL","18uPb"], "18uPb", null)
+},{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.3e0a360b.js.map
+//# sourceMappingURL=index.0771ec64.js.map
