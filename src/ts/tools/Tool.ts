@@ -1,5 +1,5 @@
-import Point from "./Point";
-import PaintView from "./PaintView";
+import Point from "../Point";
+import PaintView from "../PaintView";
 
 export default abstract class Tool {
     mouse: Point;

@@ -1,8 +1,8 @@
 import Tool from "./Tool";
-import Point from "./Point";
-import PaintView from "./PaintView";
+import Point from "../Point";
+import PaintView from "../PaintView";
 // @ts-ignore
-import brushPath from "url:../img/brush.png";
+import brushPath from "url:../../img/brush.png";
 
 export default class PenTool extends Tool {
 
@@ -32,17 +32,8 @@ export default class PenTool extends Tool {
     }
 
     down(): void {
-        // let ctx1 = this.painter.ctx;
-        // ctx1.beginPath();
-        // ctx1.moveTo(this.mouse.x, this.mouse.y);
-        // ctx1.strokeStyle = this.painter.strokeStyle;
-        // ctx1.lineWidth = this.painter.lineWidth;
-        // ctx1.lineCap = "round";
-        // ctx1.lineJoin = "round";
-
         this._brushCtx.fillStyle = this.painter.strokeStyle;
         this._brushCtx.fillRect(0, 0, 128, 128);
-
         this._lastPoint = this.mouse.copy();
         this.move();
     }
@@ -82,11 +73,6 @@ export default class PenTool extends Tool {
         let a = this.lerp(0.5, 1.5, this.pressure);
         ctx1.lineWidth = this.painter.lineWidth * a;
         ctx1.globalCompositeOperation = "darken";
-
-        // ctx1.quadraticCurveTo(this._lastPoint.x, this._lastPoint.y, midPoint.x, midPoint.y);
-        // ctx1.stroke();
-        // ctx1.beginPath();
-        // ctx1.moveTo(midPoint.x, midPoint.y);
 
         this.brushLine(ctx1, this._lastPoint.x, this._lastPoint.y, this.mouse.x, this.mouse.y);
 

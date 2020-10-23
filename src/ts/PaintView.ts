@@ -1,10 +1,11 @@
 import {View} from "./View";
 import Point from "./Point";
-import Tool from "./Tool";
-import PenTool from "./PenTool";
+import Tool from "./tools/Tool";
+import PenTool from "./tools/PenTool";
 import ImageStorage from "./ImageStorage";
 import ColorPalette from "./ColorPalette";
 import ToolPalette from "./ToolPalette";
+import PaintBucketTool from "./tools/PaintBucketTool";
 
 export default class PaintView extends View {
 
@@ -20,12 +21,16 @@ export default class PaintView extends View {
     public readonly ctx: CanvasRenderingContext2D;
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
+    private _tools: Tool[];
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
 
         let backButton = <HTMLDivElement>document.getElementById("back-button");
-        backButton.addEventListener('click', event => onBackClicked());
+        backButton.addEventListener('click', () => onBackClicked());
+
+        let clearButton = <HTMLDivElement>document.getElementById("clear-button");
+        clearButton.addEventListener('click', () => this.clear());
 
         let canvas = <HTMLCanvasElement>document.getElementById("canvas");
         canvas.width = this.width;
@@ -40,9 +45,14 @@ export default class PaintView extends View {
 
         this._toolPalette = new ToolPalette("tool-palette");
         this._toolPalette.onSelectionChanged = (option: string, index: number) => {
-            this.clear();
+            const toolCount = this._tools.length;
+            this.currentTool = this._tools[Math.min(index, toolCount - 1)];
         };
 
+        this._tools = [
+            new PenTool(this),
+            new PaintBucketTool(this)
+        ]
         this.currentTool = new PenTool(this);
     }
 
@@ -54,13 +64,13 @@ export default class PaintView extends View {
             canvas.addEventListener('pointerdown', event => this.pointerDown(event));
             canvas.addEventListener('pointermove', event => this.pointerMove(event));
             canvas.addEventListener('pointerup', event => this.pointerUp(event));
-            canvas.addEventListener('pointercancel', event => this.pointerCancel(event));
+            canvas.addEventListener('pointercancel', event => event.preventDefault());
         }
         else{
             canvas.addEventListener('touchstart', event => this.touchStart(event));
             canvas.addEventListener('touchmove', event => this.touchMove(event));
             canvas.addEventListener('touchend', event => this.touchEnd(event));
-            canvas.addEventListener('touchcancel', event => this.touchCancel(event));
+            canvas.addEventListener('touchcancel', event => event.preventDefault());
         }
     }
 
@@ -103,37 +113,47 @@ export default class PaintView extends View {
     }
 
     pointerDown(event: PointerEvent) {
-        this._colorPalette.collapse();
-        this._toolPalette.collapse();
-
-        if (!this.currentTool) {
-            return;
-        }
-
         event.preventDefault();
-
-        this.currentTool.painting = this.getPointerEventPaintingFlag(event);
-        this.currentTool.pressure = event.pressure;
-        this.currentTool.mouse = this.getPointerEventPosition(event);
-        this.currentTool.down();
-
-        //console.log("pointer down", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
+        this.down(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
     }
 
     pointerMove(event: PointerEvent) {
+        event.preventDefault();
+        this.move(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
+    }
+
+    pointerUp(event: PointerEvent) {
+        event.preventDefault();
+        this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+    }
+
+    touchStart(event: TouchEvent) {
+        event.preventDefault();
+        this.down(true, this.getTouchEventPosition(event), 1);
+    }
+
+    touchMove(event: TouchEvent) {
+        event.preventDefault();
+        this.move(true, this.getTouchEventPosition(event), 1);
+    }
+
+    touchEnd(event: TouchEvent) {
+        event.preventDefault();
+        this.up(true,event.touches.length > 0 ? this.getTouchEventPosition(event) : this.currentTool.mouse);
+    }
+
+    private move(isPainting: boolean, mouse: Point, pressure: number) {
         if (!this.currentTool) {
             return;
         }
 
-        event.preventDefault();
+        this.currentTool.painting = isPainting;
+        this.currentTool.pressure = pressure;
 
-        this.currentTool.painting = this.getPointerEventPaintingFlag(event);
-        this.currentTool.pressure = event.pressure;
-
-        let newMouse = this.getPointerEventPosition(event);
+        let newMouse = mouse;
         let delta = Point.distance(this.currentTool.mouse, newMouse);
 
-        if (delta > 3){
+        if (delta > 3) {
             this.currentTool.mouse = newMouse;
             this.currentTool.move();
         }
@@ -141,86 +161,39 @@ export default class PaintView extends View {
         //console.log("pointer move", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
     }
 
-    pointerUp(event: PointerEvent) {
+    private down(isPainting: boolean, mouse: Point, pressure: number) {
+        this._colorPalette.collapse();
+        // this._toolPalette.collapse();
+
         if (!this.currentTool) {
             return;
         }
 
         event.preventDefault();
 
-        this.currentTool.painting = this.getPointerEventPaintingFlag(event);
-        this.currentTool.mouse = this.getPointerEventPosition(event);
+        this.currentTool.painting = isPainting;
+        this.currentTool.pressure = pressure;
+        this.currentTool.mouse = mouse;
+        this.currentTool.down();
+
+        //console.log("pointer down", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
+    }
+
+    private up(isPainting: boolean, mouse: Point) {
+        if (!this.currentTool) {
+            return;
+        }
+
+        event.preventDefault();
+
+        this.currentTool.painting = isPainting;
+        this.currentTool.mouse = mouse;
         this.currentTool.up();
         //console.log("pointer up", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
 
         // if (this.strokeFinished){
         //     this.strokeFinished();
         // }
-    }
-
-    pointerCancel(event: PointerEvent) {
-        if (!this.currentTool) {
-            return;
-        }
-        event.preventDefault();
-        //console.log("pointer cancel", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
-    }
-
-
-    touchStart(event: TouchEvent) {
-        this._colorPalette.collapse();
-        this._toolPalette.collapse();
-
-        if (!this.currentTool) {
-            return;
-        }
-
-        event.preventDefault();
-
-        this.currentTool.painting = true;
-        this.currentTool.pressure = 1;
-        this.currentTool.mouse = this.getTouchEventPosition(event);
-        this.currentTool.down();
-    }
-
-    touchMove(event: TouchEvent) {
-        if (!this.currentTool) {
-            return;
-        }
-
-        event.preventDefault();
-
-        this.currentTool.painting = true;
-        this.currentTool.pressure = 1;
-
-        let newMouse = this.getTouchEventPosition(event);
-        let delta = Point.distance(this.currentTool.mouse, newMouse);
-
-        if (delta > 3){
-            this.currentTool.mouse = newMouse;
-            this.currentTool.move();
-        }
-    }
-
-    touchEnd(event: TouchEvent) {
-        if (!this.currentTool) {
-            return;
-        }
-
-        event.preventDefault();
-
-        this.currentTool.painting = true;
-        if (event.touches.length > 0){
-            this.currentTool.mouse = this.getTouchEventPosition(event);
-        }
-        this.currentTool.up();
-    }
-
-    touchCancel(event: TouchEvent) {
-        if (!this.currentTool) {
-            return;
-        }
-        event.preventDefault();
     }
 
     clear() {

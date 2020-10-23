@@ -1,4 +1,4 @@
-import Point from "../src/ts/Point";
+import Point from "./Point";
 
 export default class PainterUtils {
 
@@ -31,7 +31,7 @@ export default class PainterUtils {
         ctxA.putImageData(dataA, 0, 0);
     }
 
-    public static floodFill(imageCtx: CanvasRenderingContext2D, maskCtx: CanvasRenderingContext2D, startPosition: Point){
+    public static floodFill(imageCtx: CanvasRenderingContext2D, startPosition: Point, color: ){
         const width = imageCtx.canvas.width;
         const height = imageCtx.canvas.height;
         const imageData = imageCtx.getImageData(0, 0, width, height);
@@ -44,6 +44,7 @@ export default class PainterUtils {
         const m32 = new Uint32Array(maskData.data.buffer);
 
         const startIndex = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
+        const startColor = m32[startIndex];
 
         let stack: number[] = [];
         stack.push(startIndex);

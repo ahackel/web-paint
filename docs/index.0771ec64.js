@@ -4049,7 +4049,7 @@ function getBaseURL(url) {
 
 
 function getOrigin(url) {
-  var matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
+  let matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
 
   if (!matches) {
     throw new Error('Origin not found');
