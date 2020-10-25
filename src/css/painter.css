@@ -9,6 +9,7 @@ body {
     touch-action: none;
     background: #BBB;
     position: fixed;
+    touch-action: none;
 }
 
 .button {
@@ -21,6 +22,7 @@ body {
     cursor: pointer;
     background: rgba(255, 255, 255, 0.5);
     color: black;
+    touch-action: none;
 }
 
 .button:active {
@@ -56,6 +58,7 @@ body {
     bottom: 0;
     right: 0;
     background: #BBB;
+    touch-action: none;
 }
 
 .book {
