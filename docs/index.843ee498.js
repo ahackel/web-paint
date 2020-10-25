@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.dbc6246c.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.843ee498.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -354,7 +354,9 @@ var BookView = /*#__PURE__*/function (_View) {
 
       var element = document.createElement("div");
       element.classList.add("thumbnail");
-      element.addEventListener("click", function (event) {
+      element.addEventListener("mousedown", function (event) {
+        event.preventDefault();
+
         if (_this2.onImageSelected) {
           _this2.onImageSelected(id);
         }
@@ -3464,6 +3466,8 @@ var _ToolPalette = _interopRequireDefault(require("./ToolPalette"));
 
 var _PaintBucketTool = _interopRequireDefault(require("./tools/PaintBucketTool"));
 
+var _Palette = require("./Palette");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3546,12 +3550,15 @@ var PaintView = /*#__PURE__*/function (_View) {
     });
 
     var backButton = document.getElementById("back-button");
-    backButton.addEventListener('click', function () {
-      return onBackClicked();
+    backButton.addEventListener('mousedown', function (event) {
+      event.preventDefault();
+      onBackClicked();
     });
     var clearButton = document.getElementById("clear-button");
-    clearButton.addEventListener('click', function () {
-      return _this.clear();
+    clearButton.addEventListener('mousedown', function (event) {
+      event.preventDefault();
+
+      _this.clear();
     });
     var canvas = document.getElementById("canvas");
     canvas.width = _this.width;
@@ -3689,8 +3696,7 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "down",
     value: function down(isPainting, mouse, pressure) {
-      this._colorPalette.collapse(); // this._toolPalette.collapse();
-
+      _Palette.Palette.collapseAll();
 
       if (!this.currentTool) {
         return;
@@ -3767,7 +3773,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = PaintView;
-},{"./View":"Jy3dT","./Point":"PghYy","./tools/PenTool":"1c7G4","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2","./tools/PaintBucketTool":"4cR5x"}],"PghYy":[function(require,module,exports) {
+},{"./View":"Jy3dT","./Point":"PghYy","./tools/PenTool":"1c7G4","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2","./tools/PaintBucketTool":"4cR5x","./Palette":"5HhUq"}],"PghYy":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4135,7 +4141,7 @@ var ColorPalette = /*#__PURE__*/function (_Palette) {
 
     var colors = ["#FFFFFF", "#f5f60d", "#f5650a", "#d50406", "#f50695", "#330496", "#0306c5", "#0692f0", "#06a606", "#026405", "#643403", "#946434", "#b5b5b5", "#848484", "#444444", "#030303"];
     _this = _super.call(this, id, colors);
-    _this.SelectedIndex = 15;
+    _this.selectedIndex = 15;
     return _this;
   }
 
@@ -4192,18 +4198,23 @@ var Palette = /*#__PURE__*/function (_View) {
   var _super = _createSuper(Palette);
 
   _createClass(Palette, [{
-    key: "SelectedIndex",
+    key: "selectedIndex",
     get: function get() {
       return this._selectedIndex;
     },
     set: function set(value) {
       this._selectedIndex = value;
-      this.updateOption(this._selectedElement, this.SelectedOption);
+      this.updateOption(this._selectedElement, this.selectedOption);
     }
   }, {
-    key: "SelectedOption",
+    key: "selectedOption",
     get: function get() {
       return this._options[this._selectedIndex];
+    }
+  }, {
+    key: "isCollapsed",
+    get: function get() {
+      return this._element.classList.contains("collapsed");
     }
   }]);
 
@@ -4260,16 +4271,28 @@ var Palette = /*#__PURE__*/function (_View) {
     key: "collapse",
     value: function collapse() {
       this._element.classList.add("collapsed");
+
+      if (Palette._expandedPalette == this) {
+        Palette._expandedPalette = null;
+      }
     }
   }, {
     key: "expand",
     value: function expand() {
+      Palette.collapseAll();
+
       this._element.classList.remove("collapsed");
+
+      Palette._expandedPalette = this;
     }
   }, {
     key: "toggle",
     value: function toggle() {
-      this._element.classList.toggle("collapsed");
+      if (this.isCollapsed) {
+        this.expand();
+      } else {
+        this.collapse();
+      }
     }
   }, {
     key: "addSelectedOption",
@@ -4278,12 +4301,12 @@ var Palette = /*#__PURE__*/function (_View) {
 
       var element = document.createElement("div");
       this._selectedElement = element;
-      element.addEventListener("touchstart", function (event) {
+      element.addEventListener("mousedown", function (event) {
         event.preventDefault();
 
         _this2.toggle();
       });
-      this.updateOption(element, this.SelectedOption);
+      this.updateOption(element, this.selectedOption);
 
       this._element.appendChild(element);
     }
@@ -4293,9 +4316,9 @@ var Palette = /*#__PURE__*/function (_View) {
       var _this3 = this;
 
       var element = document.createElement("div");
-      element.addEventListener("touchstart", function (event) {
+      element.addEventListener("mousedown", function (event) {
         event.preventDefault();
-        _this3.SelectedIndex = index;
+        _this3.selectedIndex = index;
 
         _this3.collapse();
 
@@ -4310,6 +4333,13 @@ var Palette = /*#__PURE__*/function (_View) {
   }, {
     key: "updateOption",
     value: function updateOption(element, option) {}
+  }], [{
+    key: "collapseAll",
+    value: function collapseAll() {
+      var _Palette$_expandedPal;
+
+      (_Palette$_expandedPal = Palette._expandedPalette) === null || _Palette$_expandedPal === void 0 ? void 0 : _Palette$_expandedPal.collapse();
+    }
   }]);
 
   return Palette;
@@ -4362,7 +4392,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
     // '<i class="fas fa-fill-drip"></i>'
     ];
     _this = _super.call(this, id, tools, true);
-    _this.SelectedIndex = 0;
+    _this.selectedIndex = 0;
     return _this;
   }
 
@@ -4600,4 +4630,4 @@ var PainterUtils = /*#__PURE__*/function () {
 exports.default = PainterUtils;
 },{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.dbc6246c.js.map
+//# sourceMappingURL=index.843ee498.js.map

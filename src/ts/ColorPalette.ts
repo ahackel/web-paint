@@ -11,7 +11,7 @@ export default class ColorPalette extends Palette {
         ];
 
         super(id, colors);
-        this.SelectedIndex = 15;
+        this.selectedIndex = 15;
     }
 
     updateOption(element: HTMLDivElement, option: string) {

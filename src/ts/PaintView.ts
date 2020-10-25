@@ -6,6 +6,7 @@ import ImageStorage from "./ImageStorage";
 import ColorPalette from "./ColorPalette";
 import ToolPalette from "./ToolPalette";
 import PaintBucketTool from "./tools/PaintBucketTool";
+import {Palette} from "./Palette";
 
 export default class PaintView extends View {
 
@@ -27,10 +28,16 @@ export default class PaintView extends View {
         super(id);
 
         let backButton = <HTMLDivElement>document.getElementById("back-button");
-        backButton.addEventListener('click', () => onBackClicked());
+        backButton.addEventListener('mousedown', event => {
+            event.preventDefault();
+            onBackClicked();
+        });
 
         let clearButton = <HTMLDivElement>document.getElementById("clear-button");
-        clearButton.addEventListener('click', () => this.clear());
+        clearButton.addEventListener('mousedown', event => {
+            event.preventDefault();
+            this.clear();
+        });
 
         let canvas = <HTMLCanvasElement>document.getElementById("canvas");
         canvas.width = this.width;
@@ -162,8 +169,7 @@ export default class PaintView extends View {
     }
 
     private down(isPainting: boolean, mouse: Point, pressure: number) {
-        this._colorPalette.collapse();
-        // this._toolPalette.collapse();
+        Palette.collapseAll();
 
         if (!this.currentTool) {
             return;

@@ -1,7 +1,14 @@
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 body {
     margin: 0;
     touch-action: none;
     background: #BBB;
+    position: fixed;
 }
 
 .button {
@@ -43,7 +50,7 @@ body {
 }
 
 .view {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     bottom: 0;

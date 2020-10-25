@@ -13,7 +13,7 @@ export default class ToolPalette extends Palette {
         ];
 
         super(id, tools, true);
-        this.SelectedIndex = 0;
+        this.selectedIndex = 0;
     }
 
     updateOption(element: HTMLDivElement, option: string) {

@@ -5,13 +5,16 @@ export class Palette extends View {
     private _selectedElement: HTMLDivElement;
     private _options: string[];
     private _selectedIndex: number;
+    
+    private static _expandedPalette: Palette;
 
-    get SelectedIndex(){ return this._selectedIndex }
-    set SelectedIndex(value){
+    get selectedIndex(){ return this._selectedIndex }
+    set selectedIndex(value){
         this._selectedIndex = value;
-        this.updateOption(this._selectedElement, this.SelectedOption);
+        this.updateOption(this._selectedElement, this.selectedOption);
     }
-    get SelectedOption(){ return this._options[this._selectedIndex] }
+    get selectedOption(){ return this._options[this._selectedIndex] }
+    get isCollapsed(){ return this._element.classList.contains("collapsed") }
 
     constructor(id: string, options: string[], rightAlign: boolean = false) {
         super(id);
@@ -35,34 +38,48 @@ export class Palette extends View {
         this.show();
         this.collapse();
     }
+    
+    static collapseAll() {
+        Palette._expandedPalette?.collapse();
+    }
 
     collapse() {
         this._element.classList.add("collapsed");
+        if (Palette._expandedPalette == this){
+            Palette._expandedPalette = null;
+        }
     }
 
     expand() {
+        Palette.collapseAll();
         this._element.classList.remove("collapsed");
+        Palette._expandedPalette = this;
     }
 
     toggle() {
-        this._element.classList.toggle("collapsed");
+        if (this.isCollapsed){
+            this.expand();
+        }
+        else {
+            this.collapse();
+        }
     }
 
     addSelectedOption() {
         let element = <HTMLDivElement>document.createElement("div");
         this._selectedElement = element;
-        element.addEventListener("touchstart", event => {
+        element.addEventListener("mousedown", event => {
             event.preventDefault();
             this.toggle(); });
-        this.updateOption(element, this.SelectedOption);
+        this.updateOption(element, this.selectedOption);
         this._element.appendChild(element);
     }
 
     addOption(index: number, option: string) {
         let element = <HTMLDivElement>document.createElement("div");
-        element.addEventListener("touchstart", event => {
+        element.addEventListener("mousedown", event => {
             event.preventDefault();
-            this.SelectedIndex = index;
+            this.selectedIndex = index;
             this.collapse();
             if (this.onSelectionChanged) {
                 this.onSelectionChanged(option, index);

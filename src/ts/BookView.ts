@@ -28,7 +28,8 @@ export default class BookView extends View {
     private addImage(id: string) {
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("thumbnail");
-        element.addEventListener("click", event => {
+        element.addEventListener("mousedown", event => {
+            event.preventDefault();
             if (this.onImageSelected) {
                 this.onImageSelected(id);
             }
