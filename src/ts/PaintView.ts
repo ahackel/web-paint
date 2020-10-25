@@ -37,7 +37,7 @@ export default class PaintView extends View {
         canvas.height = this.height;
         this.ctx = <CanvasRenderingContext2D>canvas.getContext("2d", { alpha: true });
         // this.ctx.imageSmoothingQuality = "high";
-        // this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingEnabled = false;
         this.addEventListeners();
         
         this._colorPalette = new ColorPalette("color-palette");

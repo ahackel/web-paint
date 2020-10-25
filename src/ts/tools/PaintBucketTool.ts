@@ -5,7 +5,7 @@ export default class PaintBucketTool extends Tool{
 
     down() {
         let ctx = this.painter.ctx;
-        PainterUtils.floodFill(ctx, ctx, this.mouse);
+        PainterUtils.floodFill(ctx, this.mouse, <string>this.painter.strokeStyle);
     }
 
     move() {

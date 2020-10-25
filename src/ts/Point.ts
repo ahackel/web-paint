@@ -20,4 +20,8 @@ export default class Point {
         let dy = a.y - b.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
+    
+    round(){
+        return new Point(Math.round(this.x), Math.round(this.y));
+    }
 }

@@ -30,80 +30,108 @@ export default class PainterUtils {
         }
         ctxA.putImageData(dataA, 0, 0);
     }
+    
+    public static stringToColor(h: string): number{
+        let r = 0, g = 0, b = 0;
 
-    public static floodFill(imageCtx: CanvasRenderingContext2D, startPosition: Point, color: ){
+        if (h.length == 4) {
+            r = parseInt(h[1] + h[1], 16);
+            g = parseInt(h[2] + h[2], 16);
+            b = parseInt(h[3] + h[3], 16);
+        } 
+        else  {
+            r = parseInt(h[1] + h[2], 16);
+            g = parseInt(h[3] + h[4], 16);
+            b = parseInt(h[5] + h[6], 16);
+        }
+
+        return 0xFF000000 + r + (g << 8) + (b << 16);
+    }
+ 
+    public static floodFill(imageCtx: CanvasRenderingContext2D, startPosition: Point, color: string){
         const width = imageCtx.canvas.width;
         const height = imageCtx.canvas.height;
         const imageData = imageCtx.getImageData(0, 0, width, height);
-        const maskData = maskCtx.createImageData(width, height);
 
-        const white = 0xFFFFFFFF;
+        const i32 = new Uint32Array(imageData.data.buffer);
 
-        // Use 32bit buffer for single pixel read writes
-        const i32 = new Uint8ClampedArray(imageData.data.buffer);
-        const m32 = new Uint32Array(maskData.data.buffer);
+        startPosition = startPosition.round();
+        const startIndex: number = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
+        const startColor: number = i32[startIndex];
+        const fillColor: number = this.stringToColor(color);
 
-        const startIndex = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
-        const startColor = m32[startIndex];
+        let stack: Point[] = [];
+        stack.push(startPosition);
 
-        let stack: number[] = [];
-        stack.push(startIndex);
+        while (stack.length > 0)
+        {
+            let pos = stack.pop();
 
-        let index;
-        while (stack.length > 0) {
-            index = <number>stack.pop();
-
-            if (m32[index] !== 0) {
+            if (isBorderPixel(pos.x, pos.y)) {
                 continue;
             }
 
-            let minX = index % width;
-            let maxX = minX + 1;
-            const y = Math.floor(index / width);
-
-            while (minX >= 0){
-                index = minX + y * width;
-                if (isBorderPixel(index)){
-                    break;
-                }
-                m32[index] = white;
-                minX--;
-            }
-
-            while (maxX < width){
-                index = maxX + y * width;
-                if (isBorderPixel(index)){
-                    break;
-                }
-                m32[index] = white;
-                maxX++;
-            }
-
-            for (let x = minX + 1; x < maxX; x++){
-                if (y > 0) {
-                    index = x + (y - 1) * width;
-                    if (m32[index] === 0 && !isBorderPixel(index)){
-                        stack.push(index)
-                    }
-                }
-                if (y < height - 1) {
-                    index = x + (y + 1) * width;
-                    if (m32[index] === 0 && !isBorderPixel(index)){
-                        stack.push(index)
-                    }
-                }
-            }
+            const minX = scanLeft(pos.x, pos.y);
+            const maxX = scanRight(pos.x, pos.y);
+            addToStack(minX, maxX, pos.y - 1);
+            addToStack(minX, maxX, pos.y + 1);
         }
 
-        maskCtx.putImageData(maskData, 0, 0);
+        imageCtx.putImageData(imageData, 0, 0);
 
-        function isBorderPixel(index: number) {
-            // const r = i32[index * 4 + 0];
-            // const g = i32[index * 4 + 1];
-            // const b = i32[index * 4 + 2];
-            const a = i32[index * 4 + 3];
-            // const value = r + b + g;
-            return a === 255;
+
+        function scanLeft(x: number, y: number): number
+        {
+            let minX = x;
+            while (minX >= 0)
+            {
+                if (isBorderPixel(minX, y)){
+                    break;
+                }
+
+                i32[minX + y * width] = fillColor;
+                minX -= 1;
+            }
+
+            return minX + 1;
+        }
+
+        function scanRight(x: number, y: number): number
+        {
+            let maxX: number = x + 1;
+            while (maxX < width)
+            {
+                if (isBorderPixel(maxX, y)){
+                    break;
+                }
+
+                i32[maxX + y * width] = fillColor;
+                maxX += 1;
+            }
+
+            return maxX - 1;
+        }
+        
+        function addToStack(minX: number, maxX: number, y: number)
+        {
+            if (y < 0 || y >= height)
+            {
+                return;
+            }
+
+            for (let cx = minX; cx <= maxX; cx++)
+            {
+                if (isBorderPixel(cx, y)){
+                    continue;
+
+                }
+                stack.push(new Point(cx, y));
+            }
+ 
+        }       
+
+        function isBorderPixel(x: number, y: number) {
+            return i32[x + y * width] !== startColor;
         }
     }
 }

@@ -6,10 +6,10 @@ export default class ToolPalette extends Palette {
         let tools: string[] = [
             '<i class="fas fa-brush"></i>',
             '<i class="fas fa-paint-roller"></i>',
-            '<i class="fas fa-eraser"></i>',
-            '<i class="fas fa-pencil-alt"></i>',
-            '<i class="fas fa-palette"></i>',
-            '<i class="fas fa-fill-drip"></i>'
+            // '<i class="fas fa-eraser"></i>',
+            // '<i class="fas fa-pencil-alt"></i>',
+            // '<i class="fas fa-palette"></i>',
+            // '<i class="fas fa-fill-drip"></i>'
         ];
 
         super(id, tools, true);

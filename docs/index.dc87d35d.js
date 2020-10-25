@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.0771ec64.js\",\"7s5mZ\":\"brush.67e09586.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.dc87d35d.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -3454,13 +3454,15 @@ var _View2 = require("./View");
 
 var _Point = _interopRequireDefault(require("./Point"));
 
-var _PenTool = _interopRequireDefault(require("./PenTool"));
+var _PenTool = _interopRequireDefault(require("./tools/PenTool"));
 
 var _ImageStorage = _interopRequireDefault(require("./ImageStorage"));
 
 var _ColorPalette = _interopRequireDefault(require("./ColorPalette"));
 
 var _ToolPalette = _interopRequireDefault(require("./ToolPalette"));
+
+var _PaintBucketTool = _interopRequireDefault(require("./tools/PaintBucketTool"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3544,8 +3546,12 @@ var PaintView = /*#__PURE__*/function (_View) {
     });
 
     var backButton = document.getElementById("back-button");
-    backButton.addEventListener('click', function (event) {
+    backButton.addEventListener('click', function () {
       return onBackClicked();
+    });
+    var clearButton = document.getElementById("clear-button");
+    clearButton.addEventListener('click', function () {
+      return _this.clear();
     });
     var canvas = document.getElementById("canvas");
     canvas.width = _this.width;
@@ -3553,7 +3559,8 @@ var PaintView = /*#__PURE__*/function (_View) {
     _this.ctx = canvas.getContext("2d", {
       alpha: true
     }); // this.ctx.imageSmoothingQuality = "high";
-    // this.ctx.imageSmoothingEnabled = true;
+
+    _this.ctx.imageSmoothingEnabled = false;
 
     _this.addEventListeners();
 
@@ -3566,9 +3573,11 @@ var PaintView = /*#__PURE__*/function (_View) {
     _this._toolPalette = new _ToolPalette.default("tool-palette");
 
     _this._toolPalette.onSelectionChanged = function (option, index) {
-      _this.clear();
+      var toolCount = _this._tools.length;
+      _this.currentTool = _this._tools[Math.min(index, toolCount - 1)];
     };
 
+    _this._tools = [new _PenTool.default(_assertThisInitialized(_this)), new _PaintBucketTool.default(_assertThisInitialized(_this))];
     _this.currentTool = new _PenTool.default(_assertThisInitialized(_this));
     return _this;
   }
@@ -3594,7 +3603,7 @@ var PaintView = /*#__PURE__*/function (_View) {
           return _this2.pointerUp(event);
         });
         canvas.addEventListener('pointercancel', function (event) {
-          return _this2.pointerCancel(event);
+          return event.preventDefault();
         });
       } else {
         canvas.addEventListener('touchstart', function (event) {
@@ -3607,7 +3616,7 @@ var PaintView = /*#__PURE__*/function (_View) {
           return _this2.touchEnd(event);
         });
         canvas.addEventListener('touchcancel', function (event) {
-          return _this2.touchCancel(event);
+          return event.preventDefault();
         });
       }
     }
@@ -3625,31 +3634,49 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "pointerDown",
     value: function pointerDown(event) {
-      this._colorPalette.collapse();
-
-      this._toolPalette.collapse();
-
-      if (!this.currentTool) {
-        return;
-      }
-
       event.preventDefault();
-      this.currentTool.painting = this.getPointerEventPaintingFlag(event);
-      this.currentTool.pressure = event.pressure;
-      this.currentTool.mouse = this.getPointerEventPosition(event);
-      this.currentTool.down(); //console.log("pointer down", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
+      this.down(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
     }
   }, {
     key: "pointerMove",
     value: function pointerMove(event) {
+      event.preventDefault();
+      this.move(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
+    }
+  }, {
+    key: "pointerUp",
+    value: function pointerUp(event) {
+      event.preventDefault();
+      this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+    }
+  }, {
+    key: "touchStart",
+    value: function touchStart(event) {
+      event.preventDefault();
+      this.down(true, this.getTouchEventPosition(event), 1);
+    }
+  }, {
+    key: "touchMove",
+    value: function touchMove(event) {
+      event.preventDefault();
+      this.move(true, this.getTouchEventPosition(event), 1);
+    }
+  }, {
+    key: "touchEnd",
+    value: function touchEnd(event) {
+      event.preventDefault();
+      this.up(true, event.touches.length > 0 ? this.getTouchEventPosition(event) : this.currentTool.mouse);
+    }
+  }, {
+    key: "move",
+    value: function move(isPainting, mouse, pressure) {
       if (!this.currentTool) {
         return;
       }
 
-      event.preventDefault();
-      this.currentTool.painting = this.getPointerEventPaintingFlag(event);
-      this.currentTool.pressure = event.pressure;
-      var newMouse = this.getPointerEventPosition(event);
+      this.currentTool.painting = isPainting;
+      this.currentTool.pressure = pressure;
+      var newMouse = mouse;
 
       var delta = _Point.default.distance(this.currentTool.mouse, newMouse);
 
@@ -3660,89 +3687,35 @@ var PaintView = /*#__PURE__*/function (_View) {
 
     }
   }, {
-    key: "pointerUp",
-    value: function pointerUp(event) {
+    key: "down",
+    value: function down(isPainting, mouse, pressure) {
+      this._colorPalette.collapse(); // this._toolPalette.collapse();
+
+
       if (!this.currentTool) {
         return;
       }
 
       event.preventDefault();
-      this.currentTool.painting = this.getPointerEventPaintingFlag(event);
-      this.currentTool.mouse = this.getPointerEventPosition(event);
+      this.currentTool.painting = isPainting;
+      this.currentTool.pressure = pressure;
+      this.currentTool.mouse = mouse;
+      this.currentTool.down(); //console.log("pointer down", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
+    }
+  }, {
+    key: "up",
+    value: function up(isPainting, mouse) {
+      if (!this.currentTool) {
+        return;
+      }
+
+      event.preventDefault();
+      this.currentTool.painting = isPainting;
+      this.currentTool.mouse = mouse;
       this.currentTool.up(); //console.log("pointer up", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
       // if (this.strokeFinished){
       //     this.strokeFinished();
       // }
-    }
-  }, {
-    key: "pointerCancel",
-    value: function pointerCancel(event) {
-      if (!this.currentTool) {
-        return;
-      }
-
-      event.preventDefault(); //console.log("pointer cancel", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
-    }
-  }, {
-    key: "touchStart",
-    value: function touchStart(event) {
-      this._colorPalette.collapse();
-
-      this._toolPalette.collapse();
-
-      if (!this.currentTool) {
-        return;
-      }
-
-      event.preventDefault();
-      this.currentTool.painting = true;
-      this.currentTool.pressure = 1;
-      this.currentTool.mouse = this.getTouchEventPosition(event);
-      this.currentTool.down();
-    }
-  }, {
-    key: "touchMove",
-    value: function touchMove(event) {
-      if (!this.currentTool) {
-        return;
-      }
-
-      event.preventDefault();
-      this.currentTool.painting = true;
-      this.currentTool.pressure = 1;
-      var newMouse = this.getTouchEventPosition(event);
-
-      var delta = _Point.default.distance(this.currentTool.mouse, newMouse);
-
-      if (delta > 3) {
-        this.currentTool.mouse = newMouse;
-        this.currentTool.move();
-      }
-    }
-  }, {
-    key: "touchEnd",
-    value: function touchEnd(event) {
-      if (!this.currentTool) {
-        return;
-      }
-
-      event.preventDefault();
-      this.currentTool.painting = true;
-
-      if (event.touches.length > 0) {
-        this.currentTool.mouse = this.getTouchEventPosition(event);
-      }
-
-      this.currentTool.up();
-    }
-  }, {
-    key: "touchCancel",
-    value: function touchCancel(event) {
-      if (!this.currentTool) {
-        return;
-      }
-
-      event.preventDefault();
     }
   }, {
     key: "clear",
@@ -3794,7 +3767,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = PaintView;
-},{"./View":"Jy3dT","./Point":"PghYy","./PenTool":"70itr","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2"}],"PghYy":[function(require,module,exports) {
+},{"./View":"Jy3dT","./Point":"PghYy","./tools/PenTool":"1c7G4","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2","./tools/PaintBucketTool":"4cR5x"}],"PghYy":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3821,6 +3794,11 @@ var Point = /*#__PURE__*/function () {
     value: function copy() {
       return new Point(this.x, this.y);
     }
+  }, {
+    key: "round",
+    value: function round() {
+      return new Point(Math.round(this.x), Math.round(this.y));
+    }
   }], [{
     key: "add",
     value: function add(a, b) {
@@ -3839,7 +3817,7 @@ var Point = /*#__PURE__*/function () {
 }();
 
 exports.default = Point;
-},{}],"70itr":[function(require,module,exports) {
+},{}],"1c7G4":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3849,9 +3827,9 @@ exports.default = void 0;
 
 var _Tool2 = _interopRequireDefault(require("./Tool"));
 
-var _Point = _interopRequireDefault(require("./Point"));
+var _Point = _interopRequireDefault(require("../Point"));
 
-var _brush = _interopRequireDefault(require("url:../img/brush.png"));
+var _brush = _interopRequireDefault(require("url:../../img/brush.png"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3921,13 +3899,6 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   _createClass(PenTool, [{
     key: "down",
     value: function down() {
-      // let ctx1 = this.painter.ctx;
-      // ctx1.beginPath();
-      // ctx1.moveTo(this.mouse.x, this.mouse.y);
-      // ctx1.strokeStyle = this.painter.strokeStyle;
-      // ctx1.lineWidth = this.painter.lineWidth;
-      // ctx1.lineCap = "round";
-      // ctx1.lineJoin = "round";
       this._brushCtx.fillStyle = this.painter.strokeStyle;
 
       this._brushCtx.fillRect(0, 0, 128, 128);
@@ -3968,11 +3939,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
       var midPoint = new _Point.default((this.mouse.x + this._lastPoint.x) * 0.5, (this.mouse.y + this._lastPoint.y) * 0.5);
       var a = this.lerp(0.5, 1.5, this.pressure);
       ctx1.lineWidth = this.painter.lineWidth * a;
-      ctx1.globalCompositeOperation = "darken"; // ctx1.quadraticCurveTo(this._lastPoint.x, this._lastPoint.y, midPoint.x, midPoint.y);
-      // ctx1.stroke();
-      // ctx1.beginPath();
-      // ctx1.moveTo(midPoint.x, midPoint.y);
-
+      ctx1.globalCompositeOperation = "darken";
       this.brushLine(ctx1, this._lastPoint.x, this._lastPoint.y, this.mouse.x, this.mouse.y);
       this._lastPoint = this.mouse.copy();
     }
@@ -3985,7 +3952,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PenTool;
-},{"./Tool":"1gBPM","./Point":"PghYy","url:../img/brush.png":"2HhD3"}],"1gBPM":[function(require,module,exports) {
+},{"./Tool":"3Y0IK","../Point":"PghYy","url:../../img/brush.png":"2HhD3"}],"3Y0IK":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3993,7 +3960,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _Point = _interopRequireDefault(require("./Point"));
+var _Point = _interopRequireDefault(require("../Point"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4013,7 +3980,7 @@ var Tool = function Tool(painter) {
 };
 
 exports.default = Tool;
-},{"./Point":"PghYy"}],"2HhD3":[function(require,module,exports) {
+},{"../Point":"PghYy"}],"2HhD3":[function(require,module,exports) {
 module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("1P9p3", "7s5mZ");
 },{"./bundle-url":"18KeT","./relative-path":"4f40J"}],"18KeT":[function(require,module,exports) {
 "use strict";
@@ -4386,7 +4353,11 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, ToolPalette);
 
-    var tools = ["☐︎"];
+    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-paint-roller"></i>' // '<i class="fas fa-eraser"></i>',
+    // '<i class="fas fa-pencil-alt"></i>',
+    // '<i class="fas fa-palette"></i>',
+    // '<i class="fas fa-fill-drip"></i>'
+    ];
     _this = _super.call(this, id, tools, true);
     _this.SelectedIndex = 0;
     return _this;
@@ -4395,7 +4366,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
   _createClass(ToolPalette, [{
     key: "updateOption",
     value: function updateOption(element, option) {
-      element.innerText = option;
+      element.innerHTML = option;
     }
   }]);
 
@@ -4403,6 +4374,227 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = ToolPalette;
-},{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
+},{"./Palette":"5HhUq"}],"4cR5x":[function(require,module,exports) {
+"use strict";
 
-//# sourceMappingURL=index.0771ec64.js.map
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _Tool2 = _interopRequireDefault(require("./Tool"));
+
+var _PainterUtils = _interopRequireDefault(require("../PainterUtils"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var PaintBucketTool = /*#__PURE__*/function (_Tool) {
+  _inherits(PaintBucketTool, _Tool);
+
+  var _super = _createSuper(PaintBucketTool);
+
+  function PaintBucketTool() {
+    _classCallCheck(this, PaintBucketTool);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(PaintBucketTool, [{
+    key: "down",
+    value: function down() {
+      var ctx = this.painter.ctx;
+
+      _PainterUtils.default.floodFill(ctx, this.mouse, this.painter.strokeStyle);
+    }
+  }, {
+    key: "move",
+    value: function move() {}
+  }, {
+    key: "up",
+    value: function up() {}
+  }]);
+
+  return PaintBucketTool;
+}(_Tool2.default);
+
+exports.default = PaintBucketTool;
+},{"./Tool":"3Y0IK","../PainterUtils":"4R6wA"}],"4R6wA":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _Point = _interopRequireDefault(require("./Point"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var PainterUtils = /*#__PURE__*/function () {
+  function PainterUtils() {
+    _classCallCheck(this, PainterUtils);
+  }
+
+  _createClass(PainterUtils, null, [{
+    key: "createNewImageId",
+    value: function createNewImageId() {
+      return Date.now().toString();
+    }
+  }, {
+    key: "lerp",
+    value: function lerp(a, b, alpha) {
+      return a * (1 - alpha) + b * alpha;
+    }
+  }, {
+    key: "lerpCanvas",
+    value: function lerpCanvas(ctxA, ctxB, ctxMask) {
+      var width = ctxA.canvas.width;
+      var height = ctxA.canvas.height;
+      var dataA = ctxA.getImageData(0, 0, width, height);
+      var dataB = ctxB.getImageData(0, 0, width, height);
+      var dataMask = ctxMask.getImageData(0, 0, width, height);
+      var a32 = new Uint8ClampedArray(dataA.data.buffer);
+      var b32 = new Uint8ClampedArray(dataB.data.buffer);
+      var m32 = new Uint8ClampedArray(dataMask.data.buffer);
+
+      for (var i = 0; i < width * height; i++) {
+        var a = m32[i * 4 + 3] / 255;
+        a32[i * 4 + 0] = (1 - a) * a32[i * 4 + 0] + a * b32[i * 4 + 0];
+        a32[i * 4 + 1] = (1 - a) * a32[i * 4 + 1] + a * b32[i * 4 + 1];
+        a32[i * 4 + 2] = (1 - a) * a32[i * 4 + 2] + a * b32[i * 4 + 2];
+        a32[i * 4 + 3] = (1 - a) * a32[i * 4 + 3] + a * b32[i * 4 + 3];
+      }
+
+      ctxA.putImageData(dataA, 0, 0);
+    }
+  }, {
+    key: "stringToColor",
+    value: function stringToColor(h) {
+      var r = 0,
+          g = 0,
+          b = 0;
+
+      if (h.length == 4) {
+        r = parseInt(h[1] + h[1], 16);
+        g = parseInt(h[2] + h[2], 16);
+        b = parseInt(h[3] + h[3], 16);
+      } else {
+        r = parseInt(h[1] + h[2], 16);
+        g = parseInt(h[3] + h[4], 16);
+        b = parseInt(h[5] + h[6], 16);
+      }
+
+      return 0xFF000000 + r + (g << 8) + (b << 16);
+    }
+  }, {
+    key: "floodFill",
+    value: function floodFill(imageCtx, startPosition, color) {
+      var width = imageCtx.canvas.width;
+      var height = imageCtx.canvas.height;
+      var imageData = imageCtx.getImageData(0, 0, width, height);
+      var i32 = new Uint32Array(imageData.data.buffer);
+      startPosition = startPosition.round();
+      var startIndex = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
+      var startColor = i32[startIndex];
+      var fillColor = this.stringToColor(color);
+      var stack = [];
+      stack.push(startPosition);
+
+      while (stack.length > 0) {
+        var pos = stack.pop();
+
+        if (isBorderPixel(pos.x, pos.y)) {
+          continue;
+        }
+
+        var minX = scanLeft(pos.x, pos.y);
+        var maxX = scanRight(pos.x, pos.y);
+        addToStack(minX, maxX, pos.y - 1);
+        addToStack(minX, maxX, pos.y + 1);
+      }
+
+      imageCtx.putImageData(imageData, 0, 0);
+
+      function scanLeft(x, y) {
+        var minX = x;
+
+        while (minX >= 0) {
+          if (isBorderPixel(minX, y)) {
+            break;
+          }
+
+          i32[minX + y * width] = fillColor;
+          minX -= 1;
+        }
+
+        return minX + 1;
+      }
+
+      function scanRight(x, y) {
+        var maxX = x + 1;
+
+        while (maxX < width) {
+          if (isBorderPixel(maxX, y)) {
+            break;
+          }
+
+          i32[maxX + y * width] = fillColor;
+          maxX += 1;
+        }
+
+        return maxX - 1;
+      }
+
+      function addToStack(minX, maxX, y) {
+        if (y < 0 || y >= height) {
+          return;
+        }
+
+        for (var cx = minX; cx <= maxX; cx++) {
+          if (isBorderPixel(cx, y)) {
+            continue;
+          }
+
+          stack.push(new _Point.default(cx, y));
+        }
+      }
+
+      function isBorderPixel(x, y) {
+        return i32[x + y * width] !== startColor;
+      }
+    }
+  }]);
+
+  return PainterUtils;
+}();
+
+exports.default = PainterUtils;
+},{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
+
+//# sourceMappingURL=index.dc87d35d.js.map
