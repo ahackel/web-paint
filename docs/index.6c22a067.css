@@ -9,6 +9,7 @@ body {
     touch-action: none;
     background: #BBB;
     position: fixed;
+    overflow: hidden;
     touch-action: none;
 }
 
@@ -59,6 +60,7 @@ body {
     right: 0;
     background: #BBB;
     touch-action: none;
+    overflow: hidden;
 }
 
 .book {
@@ -168,4 +170,4 @@ body {
     margin: 10px 10px 10px 20px;
 }
 
-/*# sourceMappingURL=index.e582201c.css.map */
+/*# sourceMappingURL=index.6c22a067.css.map */
