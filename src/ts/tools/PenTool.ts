@@ -9,13 +9,15 @@ export default class PenTool extends Tool {
     private _lastPoint: Point = new Point(0, 0);
     private _brush: HTMLImageElement;
     private _brushCtx: CanvasRenderingContext2D;
+    private _operation: string;
 
     private lerp(a: number, b: number, alpha: number): number{
         return a * (1 - alpha) + b * alpha;
     }
 
-    constructor(painter: PaintView) {
+    constructor(painter: PaintView, operation: string = "darken") {
         super(painter);
+        this._operation = operation;
 
         this._brush = new Image();
         this._brush.onload = () => {
@@ -72,7 +74,7 @@ export default class PenTool extends Tool {
 
         let a = this.lerp(0.5, 1.5, this.pressure);
         ctx1.lineWidth = this.painter.lineWidth * a;
-        ctx1.globalCompositeOperation = "darken";
+        ctx1.globalCompositeOperation = this._operation;
 
         this.brushLine(ctx1, this._lastPoint.x, this._lastPoint.y, this.mouse.x, this.mouse.y);
 

@@ -58,6 +58,7 @@ export default class PaintView extends View {
 
         this._tools = [
             new PenTool(this),
+            new PenTool(this, "destination-out"),
             new PaintBucketTool(this)
         ]
         this.currentTool = new PenTool(this);

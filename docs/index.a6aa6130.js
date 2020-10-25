@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.843ee498.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.a6aa6130.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -3584,7 +3584,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       _this.currentTool = _this._tools[Math.min(index, toolCount - 1)];
     };
 
-    _this._tools = [new _PenTool.default(_assertThisInitialized(_this)), new _PaintBucketTool.default(_assertThisInitialized(_this))];
+    _this._tools = [new _PenTool.default(_assertThisInitialized(_this)), new _PenTool.default(_assertThisInitialized(_this), "destination-out"), new _PaintBucketTool.default(_assertThisInitialized(_this))];
     _this.currentTool = new _PenTool.default(_assertThisInitialized(_this));
     return _this;
   }
@@ -3876,12 +3876,15 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   function PenTool(painter) {
     var _this;
 
+    var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "darken";
+
     _classCallCheck(this, PenTool);
 
     _this = _super.call(this, painter);
 
     _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _Point.default(0, 0));
 
+    _this._operation = operation;
     _this._brush = new Image();
 
     _this._brush.onload = function () {
@@ -3945,7 +3948,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
       var midPoint = new _Point.default((this.mouse.x + this._lastPoint.x) * 0.5, (this.mouse.y + this._lastPoint.y) * 0.5);
       var a = this.lerp(0.5, 1.5, this.pressure);
       ctx1.lineWidth = this.painter.lineWidth * a;
-      ctx1.globalCompositeOperation = "darken";
+      ctx1.globalCompositeOperation = this._operation;
       this.brushLine(ctx1, this._lastPoint.x, this._lastPoint.y, this.mouse.x, this.mouse.y);
       this._lastPoint = this.mouse.copy();
     }
@@ -4386,8 +4389,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, ToolPalette);
 
-    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-paint-roller"></i>' // '<i class="fas fa-eraser"></i>',
-    // '<i class="fas fa-pencil-alt"></i>',
+    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-eraser"></i>', '<i class="fas fa-paint-roller"></i>' // '<i class="fas fa-pencil-alt"></i>',
     // '<i class="fas fa-palette"></i>',
     // '<i class="fas fa-fill-drip"></i>'
     ];
@@ -4630,4 +4632,4 @@ var PainterUtils = /*#__PURE__*/function () {
 exports.default = PainterUtils;
 },{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.843ee498.js.map
+//# sourceMappingURL=index.a6aa6130.js.map
