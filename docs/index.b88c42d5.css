@@ -4,13 +4,13 @@
     user-select: none;
 }
 
+html,
 body {
     margin: 0;
     touch-action: none;
     background: #BBB;
     position: fixed;
     overflow: hidden;
-    touch-action: none;
 }
 
 .button {
@@ -170,4 +170,4 @@ body {
     margin: 10px 10px 10px 20px;
 }
 
-/*# sourceMappingURL=index.6c22a067.css.map */
+/*# sourceMappingURL=index.b88c42d5.css.map */

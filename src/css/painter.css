@@ -4,13 +4,13 @@
     user-select: none;
 }
 
+html,
 body {
     margin: 0;
     touch-action: none;
     background: #BBB;
     position: fixed;
     overflow: hidden;
-    touch-action: none;
 }
 
 .button {
