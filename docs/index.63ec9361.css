@@ -11,6 +11,8 @@ body {
     background: #BBB;
     position: fixed;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 .button {
@@ -170,4 +172,4 @@ body {
     margin: 10px 10px 10px 20px;
 }
 
-/*# sourceMappingURL=index.b88c42d5.css.map */
+/*# sourceMappingURL=index.63ec9361.css.map */

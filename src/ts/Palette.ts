@@ -40,7 +40,9 @@ export class Palette extends View {
     }
     
     static collapseAll() {
-        Palette._expandedPalette?.collapse();
+        if (Palette._expandedPalette){
+            Palette._expandedPalette.collapse();
+        }
     }
 
     collapse() {

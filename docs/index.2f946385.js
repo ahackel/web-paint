@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.a6aa6130.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.2f946385.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -4339,9 +4339,9 @@ var Palette = /*#__PURE__*/function (_View) {
   }], [{
     key: "collapseAll",
     value: function collapseAll() {
-      var _Palette$_expandedPal;
-
-      (_Palette$_expandedPal = Palette._expandedPalette) === null || _Palette$_expandedPal === void 0 ? void 0 : _Palette$_expandedPal.collapse();
+      if (Palette._expandedPalette) {
+        Palette._expandedPalette.collapse();
+      }
     }
   }]);
 
@@ -4632,4 +4632,4 @@ var PainterUtils = /*#__PURE__*/function () {
 exports.default = PainterUtils;
 },{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.a6aa6130.js.map
+//# sourceMappingURL=index.2f946385.js.map
