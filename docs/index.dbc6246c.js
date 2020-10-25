@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.dc87d35d.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.dbc6246c.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -4278,7 +4278,9 @@ var Palette = /*#__PURE__*/function (_View) {
 
       var element = document.createElement("div");
       this._selectedElement = element;
-      element.addEventListener("click", function (event) {
+      element.addEventListener("touchstart", function (event) {
+        event.preventDefault();
+
         _this2.toggle();
       });
       this.updateOption(element, this.SelectedOption);
@@ -4291,7 +4293,8 @@ var Palette = /*#__PURE__*/function (_View) {
       var _this3 = this;
 
       var element = document.createElement("div");
-      element.addEventListener("click", function (event) {
+      element.addEventListener("touchstart", function (event) {
+        event.preventDefault();
         _this3.SelectedIndex = index;
 
         _this3.collapse();
@@ -4597,4 +4600,4 @@ var PainterUtils = /*#__PURE__*/function () {
 exports.default = PainterUtils;
 },{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.dc87d35d.js.map
+//# sourceMappingURL=index.dbc6246c.js.map
