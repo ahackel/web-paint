@@ -10,13 +10,15 @@ export default class PenTool extends Tool {
     private _brush: HTMLImageElement;
     private _brushCtx: CanvasRenderingContext2D;
     private _operation: string;
+    private _brushSize: number;
 
     private lerp(a: number, b: number, alpha: number): number{
         return a * (1 - alpha) + b * alpha;
     }
 
-    constructor(painter: PaintView, operation: string = "darken") {
+    constructor(painter: PaintView, brushSize: number = 20, operation: string = "darken") {
         super(painter);
+        this._brushSize = brushSize;
         this._operation = operation;
 
         this._brush = new Image();
@@ -42,11 +44,10 @@ export default class PenTool extends Tool {
 
     brushLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
 
-        let brushSize = 20,
-            diffX = Math.abs(x2 - x1),
+        let diffX = Math.abs(x2 - x1),
             diffY = Math.abs(y2 - y1),
             dist = Math.sqrt(diffX * diffX + diffY * diffY) || 1,
-            step = 0.5 * brushSize / dist,
+            step = 0.5 * this._brushSize / dist,
             i = 0,
             t = 0,
             b, x, y;
@@ -55,7 +56,7 @@ export default class PenTool extends Tool {
             t = Math.max(0, Math.min(1, i / dist));
             x = x1 + (x2 - x1) * t;
             y = y1 + (y2 - y1) * t;
-            ctx.drawImage(this._brushCtx.canvas, x - brushSize * 0.5, y - brushSize * 0.5, brushSize, brushSize);
+            ctx.drawImage(this._brushCtx.canvas, x - this._brushSize * 0.5, y - this._brushSize * 0.5, this._brushSize, this._brushSize);
             i += step
         }
     }

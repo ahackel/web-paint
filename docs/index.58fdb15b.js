@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.9f6bd3a3.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.58fdb15b.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -3600,8 +3600,8 @@ var PaintView = /*#__PURE__*/function (_View) {
       _this.currentTool = _this._tools[Math.min(index, toolCount - 1)];
     };
 
-    _this._tools = [new _PenTool.default(_assertThisInitialized(_this)), new _PenTool.default(_assertThisInitialized(_this), "destination-out"), new _PaintBucketTool.default(_assertThisInitialized(_this))];
-    _this.currentTool = new _PenTool.default(_assertThisInitialized(_this));
+    _this._tools = [new _PenTool.default(_assertThisInitialized(_this), 20, "source-over"), new _PenTool.default(_assertThisInitialized(_this), 30, "darken"), new _PenTool.default(_assertThisInitialized(_this), 40, "destination-out"), new _PaintBucketTool.default(_assertThisInitialized(_this))];
+    _this.currentTool = _this._tools[0];
     return _this;
   }
 
@@ -3892,7 +3892,8 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   function PenTool(painter) {
     var _this;
 
-    var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "darken";
+    var brushSize = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 20;
+    var operation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "darken";
 
     _classCallCheck(this, PenTool);
 
@@ -3900,6 +3901,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 
     _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _Point.default(0, 0));
 
+    _this._brushSize = brushSize;
     _this._operation = operation;
     _this._brush = new Image();
 
@@ -3934,11 +3936,10 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   }, {
     key: "brushLine",
     value: function brushLine(ctx, x1, y1, x2, y2) {
-      var brushSize = 20,
-          diffX = Math.abs(x2 - x1),
+      var diffX = Math.abs(x2 - x1),
           diffY = Math.abs(y2 - y1),
           dist = Math.sqrt(diffX * diffX + diffY * diffY) || 1,
-          step = 0.5 * brushSize / dist,
+          step = 0.5 * this._brushSize / dist,
           i = 0,
           t = 0,
           b,
@@ -3949,7 +3950,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
         t = Math.max(0, Math.min(1, i / dist));
         x = x1 + (x2 - x1) * t;
         y = y1 + (y2 - y1) * t;
-        ctx.drawImage(this._brushCtx.canvas, x - brushSize * 0.5, y - brushSize * 0.5, brushSize, brushSize);
+        ctx.drawImage(this._brushCtx.canvas, x - this._brushSize * 0.5, y - this._brushSize * 0.5, this._brushSize, this._brushSize);
         i += step;
       }
     }
@@ -4404,8 +4405,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, ToolPalette);
 
-    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-eraser"></i>', '<i class="fas fa-paint-roller"></i>' // '<i class="fas fa-pencil-alt"></i>',
-    // '<i class="fas fa-palette"></i>',
+    var tools = ['<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-brush"></i>', '<i class="fas fa-eraser"></i>', '<i class="fas fa-paint-roller"></i>' // '<i class="fas fa-palette"></i>',
     // '<i class="fas fa-fill-drip"></i>'
     ];
     _this = _super.call(this, id, tools, true);
@@ -4647,4 +4647,4 @@ var PainterUtils = /*#__PURE__*/function () {
 exports.default = PainterUtils;
 },{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.9f6bd3a3.js.map
+//# sourceMappingURL=index.58fdb15b.js.map

@@ -53,11 +53,12 @@ export default class PaintView extends View {
         };
 
         this._tools = [
-            new PenTool(this),
-            new PenTool(this, "destination-out"),
+            new PenTool(this, 20, "source-over"),
+            new PenTool(this, 30, "darken"),
+            new PenTool(this, 40, "destination-out"),
             new PaintBucketTool(this)
         ]
-        this.currentTool = new PenTool(this);
+        this.currentTool = this._tools[0];
     }
 
     private addEventListeners() {
