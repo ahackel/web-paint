@@ -19,28 +19,42 @@ export default class BookView extends View {
     }
 
     private updateImages() {
-        this.clear();
         for (let i: number = 0; i < config.PagesInBookCount; i++) {
-            this.addImage("image" + i);
+            this.loadImage("image" + i);
         }
     }
 
     private addImage(id: string) {
         let element = <HTMLDivElement>document.createElement("div");
+        element.id = id;
         element.classList.add("thumbnail");
-        element.addEventListener("mousedown", event => {
+        element.addEventListener("touchstart", () => {});
+        element.addEventListener("click", event => {
             event.preventDefault();
             if (this.onImageSelected) {
                 this.onImageSelected(id);
             }
         });
         this._element.appendChild(element);
+        this.loadImage(id);
+    }
 
+    private loadImage(id: string) {
+        let thumbnail = document.getElementById(id);
+        
+        if (!thumbnail){
+            this.addImage(id);
+            return;
+        }
+        
         ImageStorage.loadImage(id)
             .then(img => {
-                if (img){
-                    element.appendChild(img);
-                    //element.style.backgroundImage = 'url(' + img.src + ')';
+                if (img) {
+                    if (thumbnail.childElementCount > 0){
+                        thumbnail.removeChild(thumbnail.firstChild);
+                    }
+                    img.draggable = false;
+                    thumbnail.appendChild(img);
                 }
             });
     }

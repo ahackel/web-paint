@@ -28,16 +28,12 @@ export default class PaintView extends View {
         super(id);
 
         let backButton = <HTMLDivElement>document.getElementById("back-button");
-        backButton.addEventListener('mousedown', event => {
-            event.preventDefault();
-            onBackClicked();
-        });
+        backButton.addEventListener('touchstart', () => {});
+        backButton.addEventListener('click', () => onBackClicked());
 
         let clearButton = <HTMLDivElement>document.getElementById("clear-button");
-        clearButton.addEventListener('mousedown', event => {
-            event.preventDefault();
-            this.clear();
-        });
+        clearButton.addEventListener('touchstart', () => {});
+        clearButton.addEventListener('click', () => this.clear());
 
         let canvas = <HTMLCanvasElement>document.getElementById("canvas");
         canvas.width = this.width;

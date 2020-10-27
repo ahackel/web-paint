@@ -35,9 +35,12 @@ class App {
 
         this.bookView = new BookView("book");
         this.bookView.onImageSelected = (id: string) => {
-            this.openView(this.paintView);
-            this.paintView.loadImage(id);
+            this.paintView.loadImage(id)
+                .then(() => {
+                    this.openView(this.paintView);
+                });
         }
+        
         // this.bookView.onDeleteImage = (image: HTMLImageElement) => this.deleteImage(image)
 
         this.paintView = new PaintView("paint",() => {

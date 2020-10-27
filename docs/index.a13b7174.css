@@ -4,15 +4,20 @@
     user-select: none;
 }
 
-/*html,*/
-body {
+html,
+body{
     margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
     touch-action: none;
     background: #BBB;
     position: fixed;
-    /*overflow: hidden;*/
-    /*width: 100%;*/
-    /*height: 100%;*/
+    overflow: hidden;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 .button {
@@ -83,11 +88,18 @@ body {
     font-size: 50px;
     color: #CCC;
     background: white;
+    border-radius: 4px;
+}
+
+.thumbnail:active {
+    top: 4px;
+    position: relative;
 }
 
 .thumbnail img {
     width: 100%;
     height: 100%;
+    border-radius: 4px;
 }
 
 #layers {
@@ -172,4 +184,4 @@ body {
     margin: 10px 10px 10px 20px;
 }
 
-/*# sourceMappingURL=index.77cf27c9.css.map */
+/*# sourceMappingURL=index.a13b7174.css.map */

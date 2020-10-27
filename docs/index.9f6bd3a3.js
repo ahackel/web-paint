@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.2f946385.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.9f6bd3a3.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -195,9 +195,9 @@ var App = /*#__PURE__*/function () {
     this.bookView = new _BookView.default("book");
 
     this.bookView.onImageSelected = function (id) {
-      _this.openView(_this.paintView);
-
-      _this.paintView.loadImage(id);
+      _this.paintView.loadImage(id).then(function () {
+        _this.openView(_this.paintView);
+      });
     }; // this.bookView.onDeleteImage = (image: HTMLImageElement) => this.deleteImage(image)
 
 
@@ -341,10 +341,8 @@ var BookView = /*#__PURE__*/function (_View) {
   }, {
     key: "updateImages",
     value: function updateImages() {
-      this.clear();
-
       for (var i = 0; i < _config.config.PagesInBookCount; i++) {
-        this.addImage("image" + i);
+        this.loadImage("image" + i);
       }
     }
   }, {
@@ -353,8 +351,10 @@ var BookView = /*#__PURE__*/function (_View) {
       var _this2 = this;
 
       var element = document.createElement("div");
+      element.id = id;
       element.classList.add("thumbnail");
-      element.addEventListener("mousedown", function (event) {
+      element.addEventListener("touchstart", function () {});
+      element.addEventListener("click", function (event) {
         event.preventDefault();
 
         if (_this2.onImageSelected) {
@@ -364,9 +364,26 @@ var BookView = /*#__PURE__*/function (_View) {
 
       this._element.appendChild(element);
 
+      this.loadImage(id);
+    }
+  }, {
+    key: "loadImage",
+    value: function loadImage(id) {
+      var thumbnail = document.getElementById(id);
+
+      if (!thumbnail) {
+        this.addImage(id);
+        return;
+      }
+
       _ImageStorage.default.loadImage(id).then(function (img) {
         if (img) {
-          element.appendChild(img); //element.style.backgroundImage = 'url(' + img.src + ')';
+          if (thumbnail.childElementCount > 0) {
+            thumbnail.removeChild(thumbnail.firstChild);
+          }
+
+          img.draggable = false;
+          thumbnail.appendChild(img);
         }
       });
     }
@@ -3550,15 +3567,14 @@ var PaintView = /*#__PURE__*/function (_View) {
     });
 
     var backButton = document.getElementById("back-button");
-    backButton.addEventListener('mousedown', function (event) {
-      event.preventDefault();
-      onBackClicked();
+    backButton.addEventListener('touchstart', function () {});
+    backButton.addEventListener('click', function () {
+      return onBackClicked();
     });
     var clearButton = document.getElementById("clear-button");
-    clearButton.addEventListener('mousedown', function (event) {
-      event.preventDefault();
-
-      _this.clear();
+    clearButton.addEventListener('touchstart', function () {});
+    clearButton.addEventListener('click', function () {
+      return _this.clear();
     });
     var canvas = document.getElementById("canvas");
     canvas.width = _this.width;
@@ -4304,10 +4320,9 @@ var Palette = /*#__PURE__*/function (_View) {
 
       var element = document.createElement("div");
       this._selectedElement = element;
-      element.addEventListener("mousedown", function (event) {
-        event.preventDefault();
-
-        _this2.toggle();
+      element.addEventListener("touchstart", function () {});
+      element.addEventListener("click", function () {
+        return _this2.toggle();
       });
       this.updateOption(element, this.selectedOption);
 
@@ -4319,8 +4334,8 @@ var Palette = /*#__PURE__*/function (_View) {
       var _this3 = this;
 
       var element = document.createElement("div");
-      element.addEventListener("mousedown", function (event) {
-        event.preventDefault();
+      element.addEventListener("touchstart", function () {});
+      element.addEventListener("click", function () {
         _this3.selectedIndex = index;
 
         _this3.collapse();
@@ -4632,4 +4647,4 @@ var PainterUtils = /*#__PURE__*/function () {
 exports.default = PainterUtils;
 },{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.2f946385.js.map
+//# sourceMappingURL=index.9f6bd3a3.js.map

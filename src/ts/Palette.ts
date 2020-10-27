@@ -70,17 +70,16 @@ export class Palette extends View {
     addSelectedOption() {
         let element = <HTMLDivElement>document.createElement("div");
         this._selectedElement = element;
-        element.addEventListener("mousedown", event => {
-            event.preventDefault();
-            this.toggle(); });
+        element.addEventListener("touchstart", () => {});
+        element.addEventListener("click", () => this.toggle());
         this.updateOption(element, this.selectedOption);
         this._element.appendChild(element);
     }
 
     addOption(index: number, option: string) {
         let element = <HTMLDivElement>document.createElement("div");
-        element.addEventListener("mousedown", event => {
-            event.preventDefault();
+        element.addEventListener("touchstart", () => {});
+        element.addEventListener("click", () => {
             this.selectedIndex = index;
             this.collapse();
             if (this.onSelectionChanged) {
