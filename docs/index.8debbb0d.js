@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.58fdb15b.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.8debbb0d.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -192,6 +192,7 @@ var App = /*#__PURE__*/function () {
     // this.libraryView.onBookSelected = (book: IBook) => this.openBook(book);
     // this.activeView = this.libraryView;
     //
+    this.preventOverScroll();
     this.bookView = new _BookView.default("book");
 
     this.bookView.onImageSelected = function (id) {
@@ -232,6 +233,13 @@ var App = /*#__PURE__*/function () {
   }
 
   _createClass(App, [{
+    key: "preventOverScroll",
+    value: function preventOverScroll() {
+      document.ontouchmove = function (event) {
+        event.preventDefault();
+      };
+    }
+  }, {
     key: "openView",
     value: function openView(view) {
       if (this.activeView) {
@@ -4647,4 +4655,4 @@ var PainterUtils = /*#__PURE__*/function () {
 exports.default = PainterUtils;
 },{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.58fdb15b.js.map
+//# sourceMappingURL=index.8debbb0d.js.map

@@ -32,6 +32,7 @@ class App {
         // this.libraryView.onBookSelected = (book: IBook) => this.openBook(book);
         // this.activeView = this.libraryView;
         //
+        this.preventOverScroll();
 
         this.bookView = new BookView("book");
         this.bookView.onImageSelected = (id: string) => {
@@ -72,6 +73,10 @@ class App {
         // this.colorPalette = new ColorPalette("color-palette");
         // this.colorPalette.selectionChanged = () => this.painter.strokeStyle = this.colorPalette.selectedColor
         this.openView(this.bookView);
+    }
+
+    private preventOverScroll() {
+        document.ontouchmove = event => { event.preventDefault();}
     }
 
     openView(view: View){
