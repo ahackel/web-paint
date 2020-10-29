@@ -24,6 +24,7 @@ export default class PaintView extends View {
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
     private _tools: Tool[];
+    private _currentTouchId: number = 0;
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
@@ -92,11 +93,10 @@ export default class PaintView extends View {
         return new Point(x, y);
     }
 
-    private getTouchEventPosition = (event: TouchEvent) => {
+    private getTouchEventPosition = (touch: Touch) => {
         let target = <HTMLElement>event.target;
         let rect = target.getBoundingClientRect();
 
-        var touch = event.touches[0];
         let x = (touch.clientX - rect.left) / rect.width * this.width;
         let y = (touch.clientY - rect.top) / rect.height * this.height;
 
@@ -118,32 +118,80 @@ export default class PaintView extends View {
 
     pointerDown(event: PointerEvent) {
         event.preventDefault();
+        if (event.pointerType == 'touch' && this._currentTouchId !== 0){
+            return;
+        }
+
+        if (event.pointerType != 'touch' && event.buttons !== 1){
+            return;
+        }
+
+        this._currentTouchId = event.pointerId;
         this.down(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
     }
 
     pointerMove(event: PointerEvent) {
         event.preventDefault();
-        this.move(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
+        if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId){
+            return;
+        }
+
+        if (event.pointerType != 'touch' && event.buttons !== 1){
+            return;
+        }
+
+        this.move(true, this.getPointerEventPosition(event), event.pressure);
     }
 
     pointerUp(event: PointerEvent) {
         event.preventDefault();
+        if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId){
+            return;
+        }
+
+        if (event.pointerType != 'touch' && event.buttons !== 1){
+            return;
+        }
+
         this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+        this._currentTouchId = 0;
     }
 
     touchStart(event: TouchEvent) {
         event.preventDefault();
-        this.down(true, this.getTouchEventPosition(event), 1);
+        if (this._currentTouchId !== 0){
+            return;
+        }
+        this._currentTouchId = event.targetTouches[0].identifier;
+        this.down(true, this.getTouchEventPosition(event.targetTouches[0]), 1);
     }
 
     touchMove(event: TouchEvent) {
         event.preventDefault();
-        this.move(true, this.getTouchEventPosition(event), 1);
+        let touch = this.findTouch(event.targetTouches, this._currentTouchId);
+        if (touch == null){
+            return;
+        }
+        this.move(true, this.getTouchEventPosition(touch), 1);
     }
 
     touchEnd(event: TouchEvent) {
         event.preventDefault();
-        this.up(true,event.touches.length > 0 ? this.getTouchEventPosition(event) : this.currentTool.mouse);
+        let touch = this.findTouch(event.targetTouches, this._currentTouchId);
+        if (touch != null){
+            return;
+        }
+        this.up(true,event.touches.length > 0 ? this.getTouchEventPosition(touch) : this.currentTool.mouse);
+        this._currentTouchId = 0;
+    }
+
+    private findTouch(touches: TouchList, id: number){
+        for (let i = 0; i < touches.length; i++) {
+            if (touches[i].identifier == id){
+                return touches[i];
+            }
+        }
+        return null;
     }
 
     private move(isPainting: boolean, mouse: Point, pressure: number) {
@@ -221,6 +269,11 @@ export default class PaintView extends View {
 
     saveImage() {
         this.ctx.canvas.toBlob(blob => ImageStorage.saveImage(this.imageId, blob as Blob));
+    }
+
+    show(){
+        super.show();
+        this._currentTouchId = 0;
     }
 
     hide(){

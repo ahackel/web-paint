@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.82beabbd.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.ca6f190e.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -3765,6 +3765,8 @@ var PaintView = /*#__PURE__*/function (_View) {
 
     _defineProperty(_assertThisInitialized(_this), "lineWidth", 8);
 
+    _defineProperty(_assertThisInitialized(_this), "_currentTouchId", 0);
+
     _defineProperty(_assertThisInitialized(_this), "getPointerEventPosition", function (event) {
       var target = event.target;
       var rect = target.getBoundingClientRect();
@@ -3779,10 +3781,9 @@ var PaintView = /*#__PURE__*/function (_View) {
       return new _Point.default(x, y);
     });
 
-    _defineProperty(_assertThisInitialized(_this), "getTouchEventPosition", function (event) {
+    _defineProperty(_assertThisInitialized(_this), "getTouchEventPosition", function (touch) {
       var target = event.target;
       var rect = target.getBoundingClientRect();
-      var touch = event.touches[0];
       var x = (touch.clientX - rect.left) / rect.width * _this.width;
       var y = (touch.clientY - rect.top) / rect.height * _this.height;
 
@@ -3888,37 +3889,96 @@ var PaintView = /*#__PURE__*/function (_View) {
     key: "pointerDown",
     value: function pointerDown(event) {
       event.preventDefault();
+
+      if (event.pointerType == 'touch' && this._currentTouchId !== 0) {
+        return;
+      }
+
+      if (event.pointerType != 'touch' && event.buttons !== 1) {
+        return;
+      }
+
+      this._currentTouchId = event.pointerId;
       this.down(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
     }
   }, {
     key: "pointerMove",
     value: function pointerMove(event) {
       event.preventDefault();
-      this.move(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
+
+      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
+        return;
+      }
+
+      if (event.pointerType != 'touch' && event.buttons !== 1) {
+        return;
+      }
+
+      this.move(true, this.getPointerEventPosition(event), event.pressure);
     }
   }, {
     key: "pointerUp",
     value: function pointerUp(event) {
       event.preventDefault();
+
+      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
+        return;
+      }
+
+      if (event.pointerType != 'touch' && event.buttons !== 1) {
+        return;
+      }
+
       this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+      this._currentTouchId = 0;
     }
   }, {
     key: "touchStart",
     value: function touchStart(event) {
       event.preventDefault();
-      this.down(true, this.getTouchEventPosition(event), 1);
+
+      if (this._currentTouchId !== 0) {
+        return;
+      }
+
+      this._currentTouchId = event.targetTouches[0].identifier;
+      this.down(true, this.getTouchEventPosition(event.targetTouches[0]), 1);
     }
   }, {
     key: "touchMove",
     value: function touchMove(event) {
       event.preventDefault();
-      this.move(true, this.getTouchEventPosition(event), 1);
+      var touch = this.findTouch(event.targetTouches, this._currentTouchId);
+
+      if (touch == null) {
+        return;
+      }
+
+      this.move(true, this.getTouchEventPosition(touch), 1);
     }
   }, {
     key: "touchEnd",
     value: function touchEnd(event) {
       event.preventDefault();
-      this.up(true, event.touches.length > 0 ? this.getTouchEventPosition(event) : this.currentTool.mouse);
+      var touch = this.findTouch(event.targetTouches, this._currentTouchId);
+
+      if (touch != null) {
+        return;
+      }
+
+      this.up(true, event.touches.length > 0 ? this.getTouchEventPosition(touch) : this.currentTool.mouse);
+      this._currentTouchId = 0;
+    }
+  }, {
+    key: "findTouch",
+    value: function findTouch(touches, id) {
+      for (var i = 0; i < touches.length; i++) {
+        if (touches[i].identifier == id) {
+          return touches[i];
+        }
+      }
+
+      return null;
     }
   }, {
     key: "move",
@@ -4003,6 +4063,13 @@ var PaintView = /*#__PURE__*/function (_View) {
       this.ctx.canvas.toBlob(function (blob) {
         return _ImageStorage.default.saveImage(_this4.imageId, blob);
       });
+    }
+  }, {
+    key: "show",
+    value: function show() {
+      _get(_getPrototypeOf(PaintView.prototype), "show", this).call(this);
+
+      this._currentTouchId = 0;
     }
   }, {
     key: "hide",
@@ -4648,4 +4715,4 @@ var PaintBucketTool = /*#__PURE__*/function (_Tool) {
 exports.default = PaintBucketTool;
 },{"../Utils":"3yp1p"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.82beabbd.js.map
+//# sourceMappingURL=index.ca6f190e.js.map
