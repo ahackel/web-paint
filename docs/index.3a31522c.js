@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.ca6f190e.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.3a31522c.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -4225,7 +4225,35 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PenTool;
-},{"../Point":"PghYy","url:../../img/brush.png":"2HhD3"}],"2HhD3":[function(require,module,exports) {
+},{"./Tool":"3Y0IK","../Point":"PghYy","url:../../img/brush.png":"2HhD3"}],"3Y0IK":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _Point = _interopRequireDefault(require("../Point"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var Tool = function Tool(painter) {
+  _classCallCheck(this, Tool);
+
+  _defineProperty(this, "painting", false);
+
+  _defineProperty(this, "pressure", 1);
+
+  this.painter = painter;
+  this.mouse = new _Point.default(0, 0);
+};
+
+exports.default = Tool;
+},{"../Point":"PghYy"}],"2HhD3":[function(require,module,exports) {
 module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("1P9p3", "7s5mZ");
 },{"./bundle-url":"18KeT","./relative-path":"4f40J"}],"18KeT":[function(require,module,exports) {
 "use strict";
@@ -4713,6 +4741,6 @@ var PaintBucketTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PaintBucketTool;
-},{"../Utils":"3yp1p"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
+},{"./Tool":"3Y0IK","../Utils":"3yp1p"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.ca6f190e.js.map
+//# sourceMappingURL=index.3a31522c.js.map
