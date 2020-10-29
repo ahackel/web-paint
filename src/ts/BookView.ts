@@ -1,6 +1,7 @@
 import ImageStorage from "./ImageStorage";
 import {config} from "./config";
 import {View} from "./View";
+import Utils from "./Utils";
 
 export default class BookView extends View {
 
@@ -28,8 +29,7 @@ export default class BookView extends View {
         let element = <HTMLDivElement>document.createElement("div");
         element.id = id;
         element.classList.add("thumbnail");
-        element.addEventListener("touchstart", () => {});
-        element.addEventListener("click", event => {
+        Utils.addFastClick(element, event => {
             event.preventDefault();
             if (this.onImageSelected) {
                 this.onImageSelected(id);

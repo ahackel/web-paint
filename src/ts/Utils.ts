@@ -1,6 +1,12 @@
 import Point from "./Point";
 
-export default class PainterUtils {
+export default class Utils {
+
+    public static addFastClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
+        element.addEventListener("touchstart", event => event.preventDefault());
+        element.addEventListener("touchend", callback);
+        element.addEventListener("click", callback);
+    }
 
     public static createNewImageId(): string {
         return Date.now().toString();

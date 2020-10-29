@@ -7,6 +7,7 @@ import ColorPalette from "./ColorPalette";
 import ToolPalette from "./ToolPalette";
 import PaintBucketTool from "./tools/PaintBucketTool";
 import {Palette} from "./Palette";
+import Utils from "./Utils";
 
 export default class PaintView extends View {
 
@@ -28,12 +29,10 @@ export default class PaintView extends View {
         super(id);
 
         let backButton = <HTMLDivElement>document.getElementById("back-button");
-        backButton.addEventListener('touchstart', () => {});
-        backButton.addEventListener('click', () => onBackClicked());
+        Utils.addFastClick(backButton, () => onBackClicked());
 
         let clearButton = <HTMLDivElement>document.getElementById("clear-button");
-        clearButton.addEventListener('touchstart', () => {});
-        clearButton.addEventListener('click', () => this.clear());
+        Utils.addFastClick(clearButton, () => this.clear());
 
         let canvas = <HTMLCanvasElement>document.getElementById("canvas");
         canvas.width = this.width;

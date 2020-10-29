@@ -1,4 +1,5 @@
 import {View} from "./View";
+import Utils from "./Utils";
 
 export class Palette extends View {
     public onSelectionChanged: Function | undefined;
@@ -70,16 +71,14 @@ export class Palette extends View {
     addSelectedOption() {
         let element = <HTMLDivElement>document.createElement("div");
         this._selectedElement = element;
-        element.addEventListener("touchstart", () => {});
-        element.addEventListener("click", () => this.toggle());
+        Utils.addFastClick(element, () => this.toggle());
         this.updateOption(element, this.selectedOption);
         this._element.appendChild(element);
     }
 
     addOption(index: number, option: string) {
         let element = <HTMLDivElement>document.createElement("div");
-        element.addEventListener("touchstart", () => {});
-        element.addEventListener("click", () => {
+        Utils.addFastClick(element, () => {
             this.selectedIndex = index;
             this.collapse();
             if (this.onSelectionChanged) {
