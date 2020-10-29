@@ -1,11 +1,11 @@
 import Tool from "./Tool";
-import PainterUtils from "../PainterUtils";
+import Utils from "../Utils";
 
 export default class PaintBucketTool extends Tool{
 
     down() {
         let ctx = this.painter.ctx;
-        PainterUtils.floodFill(ctx, this.mouse, <string>this.painter.strokeStyle);
+        Utils.floodFill(ctx, this.mouse, <string>this.painter.strokeStyle);
     }
 
     move() {

@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.8debbb0d.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.82beabbd.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -294,6 +294,8 @@ var _config = require("./config");
 
 var _View2 = require("./View");
 
+var _Utils = _interopRequireDefault(require("./Utils"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -361,8 +363,8 @@ var BookView = /*#__PURE__*/function (_View) {
       var element = document.createElement("div");
       element.id = id;
       element.classList.add("thumbnail");
-      element.addEventListener("touchstart", function () {});
-      element.addEventListener("click", function (event) {
+
+      _Utils.default.addFastClick(element, function (event) {
         event.preventDefault();
 
         if (_this2.onImageSelected) {
@@ -401,7 +403,7 @@ var BookView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = BookView;
-},{"./ImageStorage":"6j1mL","./config":"5f9CL","./View":"Jy3dT"}],"6j1mL":[function(require,module,exports) {
+},{"./ImageStorage":"6j1mL","./config":"5f9CL","./View":"Jy3dT","./Utils":"3yp1p"}],"6j1mL":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3469,6 +3471,222 @@ var View = /*#__PURE__*/function () {
 }();
 
 exports.View = View;
+},{}],"3yp1p":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _Point = _interopRequireDefault(require("./Point"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Utils = /*#__PURE__*/function () {
+  function Utils() {
+    _classCallCheck(this, Utils);
+  }
+
+  _createClass(Utils, null, [{
+    key: "addFastClick",
+    value: function addFastClick(element, callback) {
+      element.addEventListener("touchstart", function (event) {
+        return event.preventDefault();
+      });
+      element.addEventListener("touchend", callback);
+      element.addEventListener("click", callback);
+    }
+  }, {
+    key: "createNewImageId",
+    value: function createNewImageId() {
+      return Date.now().toString();
+    }
+  }, {
+    key: "lerp",
+    value: function lerp(a, b, alpha) {
+      return a * (1 - alpha) + b * alpha;
+    }
+  }, {
+    key: "lerpCanvas",
+    value: function lerpCanvas(ctxA, ctxB, ctxMask) {
+      var width = ctxA.canvas.width;
+      var height = ctxA.canvas.height;
+      var dataA = ctxA.getImageData(0, 0, width, height);
+      var dataB = ctxB.getImageData(0, 0, width, height);
+      var dataMask = ctxMask.getImageData(0, 0, width, height);
+      var a32 = new Uint8ClampedArray(dataA.data.buffer);
+      var b32 = new Uint8ClampedArray(dataB.data.buffer);
+      var m32 = new Uint8ClampedArray(dataMask.data.buffer);
+
+      for (var i = 0; i < width * height; i++) {
+        var a = m32[i * 4 + 3] / 255;
+        a32[i * 4 + 0] = (1 - a) * a32[i * 4 + 0] + a * b32[i * 4 + 0];
+        a32[i * 4 + 1] = (1 - a) * a32[i * 4 + 1] + a * b32[i * 4 + 1];
+        a32[i * 4 + 2] = (1 - a) * a32[i * 4 + 2] + a * b32[i * 4 + 2];
+        a32[i * 4 + 3] = (1 - a) * a32[i * 4 + 3] + a * b32[i * 4 + 3];
+      }
+
+      ctxA.putImageData(dataA, 0, 0);
+    }
+  }, {
+    key: "stringToColor",
+    value: function stringToColor(h) {
+      var r = 0,
+          g = 0,
+          b = 0;
+
+      if (h.length == 4) {
+        r = parseInt(h[1] + h[1], 16);
+        g = parseInt(h[2] + h[2], 16);
+        b = parseInt(h[3] + h[3], 16);
+      } else {
+        r = parseInt(h[1] + h[2], 16);
+        g = parseInt(h[3] + h[4], 16);
+        b = parseInt(h[5] + h[6], 16);
+      }
+
+      return 0xFF000000 + r + (g << 8) + (b << 16);
+    }
+  }, {
+    key: "floodFill",
+    value: function floodFill(imageCtx, startPosition, color) {
+      var width = imageCtx.canvas.width;
+      var height = imageCtx.canvas.height;
+      var imageData = imageCtx.getImageData(0, 0, width, height);
+      var i32 = new Uint32Array(imageData.data.buffer);
+      startPosition = startPosition.round();
+      var startIndex = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
+      var startColor = i32[startIndex];
+      var fillColor = this.stringToColor(color);
+      var stack = [];
+      stack.push(startPosition);
+
+      while (stack.length > 0) {
+        var pos = stack.pop();
+
+        if (isBorderPixel(pos.x, pos.y)) {
+          continue;
+        }
+
+        var minX = scanLeft(pos.x, pos.y);
+        var maxX = scanRight(pos.x, pos.y);
+        addToStack(minX, maxX, pos.y - 1);
+        addToStack(minX, maxX, pos.y + 1);
+      }
+
+      imageCtx.putImageData(imageData, 0, 0);
+
+      function scanLeft(x, y) {
+        var minX = x;
+
+        while (minX >= 0) {
+          if (isBorderPixel(minX, y)) {
+            break;
+          }
+
+          i32[minX + y * width] = fillColor;
+          minX -= 1;
+        }
+
+        return minX + 1;
+      }
+
+      function scanRight(x, y) {
+        var maxX = x + 1;
+
+        while (maxX < width) {
+          if (isBorderPixel(maxX, y)) {
+            break;
+          }
+
+          i32[maxX + y * width] = fillColor;
+          maxX += 1;
+        }
+
+        return maxX - 1;
+      }
+
+      function addToStack(minX, maxX, y) {
+        if (y < 0 || y >= height) {
+          return;
+        }
+
+        for (var cx = minX; cx <= maxX; cx++) {
+          if (isBorderPixel(cx, y)) {
+            continue;
+          }
+
+          stack.push(new _Point.default(cx, y));
+        }
+      }
+
+      function isBorderPixel(x, y) {
+        return i32[x + y * width] !== startColor;
+      }
+    }
+  }]);
+
+  return Utils;
+}();
+
+exports.default = Utils;
+},{"./Point":"PghYy"}],"PghYy":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Point = /*#__PURE__*/function () {
+  function Point(x, y) {
+    _classCallCheck(this, Point);
+
+    this.x = x;
+    this.y = y;
+  }
+
+  _createClass(Point, [{
+    key: "copy",
+    value: function copy() {
+      return new Point(this.x, this.y);
+    }
+  }, {
+    key: "round",
+    value: function round() {
+      return new Point(Math.round(this.x), Math.round(this.y));
+    }
+  }], [{
+    key: "add",
+    value: function add(a, b) {
+      return new Point(a.x + b.x, a.y + b.y);
+    }
+  }, {
+    key: "distance",
+    value: function distance(a, b) {
+      var dx = a.x - b.x;
+      var dy = a.y - b.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+  }]);
+
+  return Point;
+}();
+
+exports.default = Point;
 },{}],"EuLhU":[function(require,module,exports) {
 "use strict";
 
@@ -3492,6 +3710,8 @@ var _ToolPalette = _interopRequireDefault(require("./ToolPalette"));
 var _PaintBucketTool = _interopRequireDefault(require("./tools/PaintBucketTool"));
 
 var _Palette = require("./Palette");
+
+var _Utils = _interopRequireDefault(require("./Utils"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3575,15 +3795,17 @@ var PaintView = /*#__PURE__*/function (_View) {
     });
 
     var backButton = document.getElementById("back-button");
-    backButton.addEventListener('touchstart', function () {});
-    backButton.addEventListener('click', function () {
+
+    _Utils.default.addFastClick(backButton, function () {
       return onBackClicked();
     });
+
     var clearButton = document.getElementById("clear-button");
-    clearButton.addEventListener('touchstart', function () {});
-    clearButton.addEventListener('click', function () {
+
+    _Utils.default.addFastClick(clearButton, function () {
       return _this.clear();
     });
+
     var canvas = document.getElementById("canvas");
     canvas.width = _this.width;
     canvas.height = _this.height;
@@ -3797,57 +4019,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = PaintView;
-},{"./View":"Jy3dT","./Point":"PghYy","./tools/PenTool":"1c7G4","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2","./tools/PaintBucketTool":"4cR5x","./Palette":"5HhUq"}],"PghYy":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var Point = /*#__PURE__*/function () {
-  function Point(x, y) {
-    _classCallCheck(this, Point);
-
-    this.x = x;
-    this.y = y;
-  }
-
-  _createClass(Point, [{
-    key: "copy",
-    value: function copy() {
-      return new Point(this.x, this.y);
-    }
-  }, {
-    key: "round",
-    value: function round() {
-      return new Point(Math.round(this.x), Math.round(this.y));
-    }
-  }], [{
-    key: "add",
-    value: function add(a, b) {
-      return new Point(a.x + b.x, a.y + b.y);
-    }
-  }, {
-    key: "distance",
-    value: function distance(a, b) {
-      var dx = a.x - b.x;
-      var dy = a.y - b.y;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-  }]);
-
-  return Point;
-}();
-
-exports.default = Point;
-},{}],"1c7G4":[function(require,module,exports) {
+},{"./View":"Jy3dT","./Point":"PghYy","./tools/PenTool":"1c7G4","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2","./tools/PaintBucketTool":"4cR5x","./Palette":"5HhUq","./Utils":"3yp1p"}],"1c7G4":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3986,35 +4158,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PenTool;
-},{"./Tool":"3Y0IK","../Point":"PghYy","url:../../img/brush.png":"2HhD3"}],"3Y0IK":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _Point = _interopRequireDefault(require("../Point"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var Tool = function Tool(painter) {
-  _classCallCheck(this, Tool);
-
-  _defineProperty(this, "painting", false);
-
-  _defineProperty(this, "pressure", 1);
-
-  this.painter = painter;
-  this.mouse = new _Point.default(0, 0);
-};
-
-exports.default = Tool;
-},{"../Point":"PghYy"}],"2HhD3":[function(require,module,exports) {
+},{"../Point":"PghYy","url:../../img/brush.png":"2HhD3"}],"2HhD3":[function(require,module,exports) {
 module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("1P9p3", "7s5mZ");
 },{"./bundle-url":"18KeT","./relative-path":"4f40J"}],"18KeT":[function(require,module,exports) {
 "use strict";
@@ -4194,6 +4338,10 @@ exports.Palette = void 0;
 
 var _View2 = require("./View");
 
+var _Utils = _interopRequireDefault(require("./Utils"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -4329,10 +4477,11 @@ var Palette = /*#__PURE__*/function (_View) {
 
       var element = document.createElement("div");
       this._selectedElement = element;
-      element.addEventListener("touchstart", function () {});
-      element.addEventListener("click", function () {
+
+      _Utils.default.addFastClick(element, function () {
         return _this2.toggle();
       });
+
       this.updateOption(element, this.selectedOption);
 
       this._element.appendChild(element);
@@ -4343,8 +4492,8 @@ var Palette = /*#__PURE__*/function (_View) {
       var _this3 = this;
 
       var element = document.createElement("div");
-      element.addEventListener("touchstart", function () {});
-      element.addEventListener("click", function () {
+
+      _Utils.default.addFastClick(element, function () {
         _this3.selectedIndex = index;
 
         _this3.collapse();
@@ -4353,6 +4502,7 @@ var Palette = /*#__PURE__*/function (_View) {
           _this3.onSelectionChanged(option, index);
         }
       });
+
       this.updateOption(element, option);
 
       this._element.appendChild(element);
@@ -4373,7 +4523,7 @@ var Palette = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.Palette = Palette;
-},{"./View":"Jy3dT"}],"01EL2":[function(require,module,exports) {
+},{"./View":"Jy3dT","./Utils":"3yp1p"}],"01EL2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4442,7 +4592,7 @@ exports.default = void 0;
 
 var _Tool2 = _interopRequireDefault(require("./Tool"));
 
-var _PainterUtils = _interopRequireDefault(require("../PainterUtils"));
+var _Utils = _interopRequireDefault(require("../Utils"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4482,7 +4632,7 @@ var PaintBucketTool = /*#__PURE__*/function (_Tool) {
     value: function down() {
       var ctx = this.painter.ctx;
 
-      _PainterUtils.default.floodFill(ctx, this.mouse, this.painter.strokeStyle);
+      _Utils.default.floodFill(ctx, this.mouse, this.painter.strokeStyle);
     }
   }, {
     key: "move",
@@ -4496,163 +4646,6 @@ var PaintBucketTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PaintBucketTool;
-},{"./Tool":"3Y0IK","../PainterUtils":"4R6wA"}],"4R6wA":[function(require,module,exports) {
-"use strict";
+},{"../Utils":"3yp1p"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _Point = _interopRequireDefault(require("./Point"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var PainterUtils = /*#__PURE__*/function () {
-  function PainterUtils() {
-    _classCallCheck(this, PainterUtils);
-  }
-
-  _createClass(PainterUtils, null, [{
-    key: "createNewImageId",
-    value: function createNewImageId() {
-      return Date.now().toString();
-    }
-  }, {
-    key: "lerp",
-    value: function lerp(a, b, alpha) {
-      return a * (1 - alpha) + b * alpha;
-    }
-  }, {
-    key: "lerpCanvas",
-    value: function lerpCanvas(ctxA, ctxB, ctxMask) {
-      var width = ctxA.canvas.width;
-      var height = ctxA.canvas.height;
-      var dataA = ctxA.getImageData(0, 0, width, height);
-      var dataB = ctxB.getImageData(0, 0, width, height);
-      var dataMask = ctxMask.getImageData(0, 0, width, height);
-      var a32 = new Uint8ClampedArray(dataA.data.buffer);
-      var b32 = new Uint8ClampedArray(dataB.data.buffer);
-      var m32 = new Uint8ClampedArray(dataMask.data.buffer);
-
-      for (var i = 0; i < width * height; i++) {
-        var a = m32[i * 4 + 3] / 255;
-        a32[i * 4 + 0] = (1 - a) * a32[i * 4 + 0] + a * b32[i * 4 + 0];
-        a32[i * 4 + 1] = (1 - a) * a32[i * 4 + 1] + a * b32[i * 4 + 1];
-        a32[i * 4 + 2] = (1 - a) * a32[i * 4 + 2] + a * b32[i * 4 + 2];
-        a32[i * 4 + 3] = (1 - a) * a32[i * 4 + 3] + a * b32[i * 4 + 3];
-      }
-
-      ctxA.putImageData(dataA, 0, 0);
-    }
-  }, {
-    key: "stringToColor",
-    value: function stringToColor(h) {
-      var r = 0,
-          g = 0,
-          b = 0;
-
-      if (h.length == 4) {
-        r = parseInt(h[1] + h[1], 16);
-        g = parseInt(h[2] + h[2], 16);
-        b = parseInt(h[3] + h[3], 16);
-      } else {
-        r = parseInt(h[1] + h[2], 16);
-        g = parseInt(h[3] + h[4], 16);
-        b = parseInt(h[5] + h[6], 16);
-      }
-
-      return 0xFF000000 + r + (g << 8) + (b << 16);
-    }
-  }, {
-    key: "floodFill",
-    value: function floodFill(imageCtx, startPosition, color) {
-      var width = imageCtx.canvas.width;
-      var height = imageCtx.canvas.height;
-      var imageData = imageCtx.getImageData(0, 0, width, height);
-      var i32 = new Uint32Array(imageData.data.buffer);
-      startPosition = startPosition.round();
-      var startIndex = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
-      var startColor = i32[startIndex];
-      var fillColor = this.stringToColor(color);
-      var stack = [];
-      stack.push(startPosition);
-
-      while (stack.length > 0) {
-        var pos = stack.pop();
-
-        if (isBorderPixel(pos.x, pos.y)) {
-          continue;
-        }
-
-        var minX = scanLeft(pos.x, pos.y);
-        var maxX = scanRight(pos.x, pos.y);
-        addToStack(minX, maxX, pos.y - 1);
-        addToStack(minX, maxX, pos.y + 1);
-      }
-
-      imageCtx.putImageData(imageData, 0, 0);
-
-      function scanLeft(x, y) {
-        var minX = x;
-
-        while (minX >= 0) {
-          if (isBorderPixel(minX, y)) {
-            break;
-          }
-
-          i32[minX + y * width] = fillColor;
-          minX -= 1;
-        }
-
-        return minX + 1;
-      }
-
-      function scanRight(x, y) {
-        var maxX = x + 1;
-
-        while (maxX < width) {
-          if (isBorderPixel(maxX, y)) {
-            break;
-          }
-
-          i32[maxX + y * width] = fillColor;
-          maxX += 1;
-        }
-
-        return maxX - 1;
-      }
-
-      function addToStack(minX, maxX, y) {
-        if (y < 0 || y >= height) {
-          return;
-        }
-
-        for (var cx = minX; cx <= maxX; cx++) {
-          if (isBorderPixel(cx, y)) {
-            continue;
-          }
-
-          stack.push(new _Point.default(cx, y));
-        }
-      }
-
-      function isBorderPixel(x, y) {
-        return i32[x + y * width] !== startColor;
-      }
-    }
-  }]);
-
-  return PainterUtils;
-}();
-
-exports.default = PainterUtils;
-},{"./Point":"PghYy"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
-
-//# sourceMappingURL=index.8debbb0d.js.map
+//# sourceMappingURL=index.82beabbd.js.map
