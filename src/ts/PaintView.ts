@@ -8,6 +8,7 @@ import ToolPalette from "./ToolPalette";
 import PaintBucketTool from "./tools/PaintBucketTool";
 import {Palette} from "./Palette";
 import Utils from "./Utils";
+import SizePalette from "./SizePalette";
 
 export default class PaintView extends View {
 
@@ -17,12 +18,14 @@ export default class PaintView extends View {
     height = 768 * this.scaleFactor;
     currentTool: Tool;
     strokeStyle: string | CanvasGradient | CanvasPattern = "#000";
+    brushSize: number = 24;
     lineWidth: number = 8;
     imageId: string;
 
     public readonly ctx: CanvasRenderingContext2D;
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
+    private _sizePalette: SizePalette;
     private _tools: Tool[];
     private _currentTouchId: number = 0;
 
@@ -52,10 +55,15 @@ export default class PaintView extends View {
             this.currentTool = this._tools[Math.min(index, toolCount - 1)];
         };
 
+        this._sizePalette = new SizePalette("size-palette");
+        this._sizePalette.onSelectionChanged = (brushSize: number) => {
+            this.brushSize = brushSize;
+        };
+
         this._tools = [
-            new PenTool(this, 20, "source-over"),
-            new PenTool(this, 30, "darken"),
-            new PenTool(this, 40, "destination-out"),
+            new PenTool(this, "darken"),
+            new PenTool(this, "source-over"),
+            new PenTool(this, "destination-out"),
             new PaintBucketTool(this)
         ]
         this.currentTool = this._tools[0];

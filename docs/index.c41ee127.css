@@ -28,11 +28,11 @@ body {
     cursor: pointer;
     background: rgba(255, 255, 255, 0.5);
     color: black;
-    touch-action: none;
+    transition: transform 0.25s;
 }
 
 .button:active {
-    background: cornflowerblue;
+    transform: scale(0.9);
 }
 
 #library {
@@ -72,7 +72,7 @@ body {
     padding: 20px 50px;
 }
 
-.paint {
+.paint canvas {
     background: white;
 }
 
@@ -87,11 +87,11 @@ body {
     color: #CCC;
     background: white;
     border-radius: 4px;
+    transition: transform 0.25s;
 }
 
 .thumbnail:active {
-    top: 4px;
-    position: relative;
+    transform: scale(0.9);
 }
 
 .thumbnail img {
@@ -119,67 +119,81 @@ body {
     position: absolute;
     top: 10px;
     left: 10px;
-    transform: rotate(180deg);
 }
 
-#clear-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-#color-palette{
+.toolbar {
+    background: lightgray;
+    width: 60px;
+    height: 240px;
+    border-radius: 30px;
+    position: fixed;
     left: 10px;
-    bottom: 10px;
+    top: 50%;
+    margin-top: -120px;
 }
 
-#tool-palette{
-    right: 10px;
-    bottom: 10px;
-    line-height: 40px;
+.toolbar .button {
+    display: inline-block;
+    background: transparent;
+}
+
+.palette {
+    position: relative;
+    padding: 5px;
+    transition: transform 0.25s;
+    display: inline-block;
+    float: left;
     text-align: center;
     font-size: 30px;
 }
 
-.palette {
+.palette.collapsed:active {
+    transform: scale(0.9);
+}
+
+.palette .options{
+    margin-top: -110px;
+    width: 200px;
+    height: 200px;
     position: absolute;
-    background: rgba(255, 255, 255, 0.5);
-    color: black;
-    width: 60px;
-    height: 60px;
+    display: block;
+    background: lightgray;
     border-radius: 30px;
-    transition: width 0.25s;
-    overflow: hidden;
+    padding: 10px;
+    left: 90px;
+    top: 50%;
+    transition: transform 0.15s;
 }
 
-.palette.collapsed{
-    width: 60px!important;
+.palette.collapsed .options{
+    transform: scale(0.0);
 }
 
-.palette.right-align {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.palette div {
+.palette .option {
     width: 40px;
     height: 40px;
+    line-height: 40px;
     display: inline-block;
     border-radius: 50%;
-    margin: 10px 10px 10px 0;
-    flex-shrink: 0;
+    margin: 5px;
+    float: left;
+    transition: transform 0.25s;
 }
 
-.palette div:first-child{
-    margin: 10px 30px 10px 10px;
+.palette .option:active {
+    transform: scale(0.9);
 }
 
-.palette.right-align div:first-child{
-    margin: 10px;
+.palette .options .arrow {
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    margin-top: -20px;
+    width: 0;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right: 20px solid lightgray;
 }
 
-.palette.right-align div:last-child{
-    margin: 10px 10px 10px 20px;
-}
-
-/*# sourceMappingURL=index.6318aef8.css.map */
+/*# sourceMappingURL=index.c41ee127.css.map */

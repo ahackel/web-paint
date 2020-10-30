@@ -4,6 +4,7 @@ import Utils from "./Utils";
 export class Palette extends View {
     public onSelectionChanged: Function | undefined;
     private _selectedElement: HTMLDivElement;
+    private _optionsElement: HTMLDivElement;
     private _options: string[];
     private _selectedIndex: number;
     
@@ -17,25 +18,14 @@ export class Palette extends View {
     get selectedOption(){ return this._options[this._selectedIndex] }
     get isCollapsed(){ return this._element.classList.contains("collapsed") }
 
-    constructor(id: string, options: string[], rightAlign: boolean = false) {
+    constructor(id: string, options: any[], rightAlign: boolean = false) {
         super(id);
         this._options = options;
         this._selectedIndex = 0;
 
-        if (!rightAlign){
-            this.addSelectedOption();
-        }
-        let i: number = 0;
-        for (let option of this._options){
-            this.addOption(i, option);
-            i ++;
-        }
-        if (rightAlign){
-            this.addSelectedOption();
-            this._element.classList.add("right-align");
-        }
+        this.addSelectedOption();
+        this.addOptions();
 
-        this._element.style.width = 80 + 50 * this._options.length + "px";
         this.show();
         this.collapse();
     }
@@ -70,14 +60,37 @@ export class Palette extends View {
 
     addSelectedOption() {
         let element = <HTMLDivElement>document.createElement("div");
+        element.classList.add("option");
         this._selectedElement = element;
         Utils.addFastClick(element, () => this.toggle());
         this.updateOption(element, this.selectedOption);
         this._element.appendChild(element);
     }
 
-    addOption(index: number, option: string) {
+    addOptions(){
         let element = <HTMLDivElement>document.createElement("div");
+        element.classList.add("options");
+        this._optionsElement = element;
+
+        this.addArrow();
+
+        let i: number = 0;
+        for (let option of this._options){
+            this.addOption(i, option);
+            i ++;
+        }
+        this._element.appendChild(element);
+    }
+
+    addArrow(){
+        let element = <HTMLDivElement>document.createElement("div");
+        element.classList.add("arrow");
+        this._optionsElement.appendChild(element);
+    }
+
+    addOption(index: number, option: any) {
+        let element = <HTMLDivElement>document.createElement("div");
+        element.classList.add("option");
         Utils.addFastClick(element, () => {
             this.selectedIndex = index;
             this.collapse();
@@ -86,9 +99,9 @@ export class Palette extends View {
             }
         });
         this.updateOption(element, option);
-        this._element.appendChild(element);
+        this._optionsElement.appendChild(element);
     }
 
-    updateOption(element: HTMLDivElement, option: string){
+    updateOption(element: HTMLDivElement, option: any){
     }
 }
