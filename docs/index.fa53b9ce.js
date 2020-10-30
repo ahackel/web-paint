@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.4110510a.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.fa53b9ce.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -4676,7 +4676,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, ToolPalette);
 
-    var tools = ['<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-brush"></i>', '<i class="fas fa-eraser"></i>', '<i class="fas fa-paint-roller"></i>' // '<i class="fas fa-palette"></i>',
+    var tools = ['<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-brush"></i>', '<i class="fas fa-eraser"></i>', '<i class="fas fa-fill-drip"></i>' // '<i class="fas fa-palette"></i>',
     // '<i class="fas fa-fill-drip"></i>'
     ];
     _this = _super.call(this, id, tools, true);
@@ -4819,4 +4819,4 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
 exports.default = SizePalette;
 },{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.4110510a.js.map
+//# sourceMappingURL=index.fa53b9ce.js.map
