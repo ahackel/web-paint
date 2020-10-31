@@ -35,51 +35,36 @@ body {
     transform: scale(0.9);
 }
 
-#library {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: #BBB;
-    padding: 20px;
-}
-
-#library div.book {
-    width: 192px;
-    height: 256px;
-    float: left;
-    margin: 20px;
-    text-align: center;
-    line-height: 192px;
-    font-size: 50px;
-    color: white;
-    background: #256235;
-}
-
 .view {
+    display: flex;
     position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    width: 100%;
+    height: 100%;
     background: #BBB;
     touch-action: none;
     overflow: hidden;
 }
 
 .book {
-    padding: 20px 50px;
+    padding: 20px 0;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+}
+
+.paint{
+    align-items: center;
 }
 
 .paint canvas {
+    position: absolute;
     background: white;
+    height: 100%;
+    z-index: -1;
 }
 
 .thumbnail {
-    width: 188px;
-    height: 140px;
-    float: left;
+    position: relative;
     margin: 20px;
     text-align: center;
     line-height: 192px;
@@ -88,6 +73,7 @@ body {
     background: white;
     border-radius: 4px;
     transition: transform 0.25s;
+    flex-shrink: 0;
 }
 
 .thumbnail:active {
@@ -95,24 +81,12 @@ body {
 }
 
 .thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     border-radius: 4px;
-}
-
-#layers {
-    margin: auto;
-    max-width: 134vh;
-    height: 75vw;
-    max-height: 100vh;
-    position: relative;
-    background: white;
-}
-
-#layers canvas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
 }
 
 #back-button {
@@ -122,14 +96,11 @@ body {
 }
 
 .toolbar {
+    display: flex;
+    flex-direction: column;
     background: lightgray;
-    width: 60px;
-    height: 240px;
     border-radius: 30px;
-    position: fixed;
-    left: 10px;
-    top: 50%;
-    margin-top: -120px;
+    margin-left: 10px;
 }
 
 .toolbar .button {
@@ -152,16 +123,13 @@ body {
 }
 
 .palette .options{
-    margin-top: -110px;
-    width: 200px;
-    height: 200px;
     position: absolute;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
     background: lightgray;
     border-radius: 30px;
     padding: 10px;
     left: 90px;
-    top: 50%;
     transition: transform 0.15s;
 }
 
@@ -196,13 +164,10 @@ body {
     border-right: 20px solid lightgray;
 }
 
-#tool-palette .options {
-    height: 50px;
-    margin-top: -35px;
+.hidden {
+    display: none;
 }
 
-#size-palette .options {
-    width: 150px;
-    height: 50px;
-    margin-top: -35px;
+.disabled {
+    opacity: 0.25;
 }

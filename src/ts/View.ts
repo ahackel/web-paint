@@ -17,10 +17,10 @@ export class View {
 	}
 
 	show():void {
-		this._element.hidden = false;
+		this._element.classList.remove("hidden");
 	}
 
 	hide():void {
-		this._element.hidden = true;
+		this._element.classList.add("hidden");
 	}
 }

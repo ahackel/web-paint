@@ -14,8 +14,8 @@ export default class PaintView extends View {
 
     pixelPerfect = true;
     scaleFactor = 1;
-    width = 1024 * this.scaleFactor;
-    height = 768 * this.scaleFactor;
+    width: number;
+    height: number;
     currentTool: Tool;
     strokeStyle: string | CanvasGradient | CanvasPattern = "#000";
     brushSize: number = 24;
@@ -28,15 +28,23 @@ export default class PaintView extends View {
     private _sizePalette: SizePalette;
     private _tools: Tool[];
     private _currentTouchId: number = 0;
+    private _undoBuffer: ImageData;
+    private _undoButton: HTMLDivElement;
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
+
+        this.width = window.screen.width;
+        this.height = window.screen.height;
 
         let backButton = <HTMLDivElement>document.getElementById("back-button");
         Utils.addFastClick(backButton, () => onBackClicked());
 
         let clearButton = <HTMLDivElement>document.getElementById("clear-button");
-        Utils.addFastClick(clearButton, () => this.clear());
+        Utils.addFastClick(clearButton, () => this.clear(true));
+
+        this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
+        Utils.addFastClick(this._undoButton, () => this.undo());
 
         let canvas = <HTMLCanvasElement>document.getElementById("canvas");
         canvas.width = this.width;
@@ -68,6 +76,7 @@ export default class PaintView extends View {
         ]
         this.currentTool = this._tools[0];
     }
+
 
     private addEventListeners() {
         let canvas = this.ctx.canvas;
@@ -230,6 +239,7 @@ export default class PaintView extends View {
 
         event.preventDefault();
 
+        this.registerUndo();
         this.currentTool.painting = isPainting;
         this.currentTool.pressure = pressure;
         this.currentTool.mouse = mouse;
@@ -255,13 +265,39 @@ export default class PaintView extends View {
         // }
     }
 
-    clear() {
+    clear(registerUndo: boolean = false) {
+        if (registerUndo){
+            this.registerUndo();
+        }
         this.ctx.clearRect(0,0, this.width, this.height);
     }
 
     fill() {
         this.ctx.fillStyle = this.strokeStyle;
         this.ctx.fillRect(0,0, this.width, this.height);
+    }
+
+    registerUndo(){
+        this._undoBuffer = this.ctx.getImageData(0, 0, this.width, this.height);
+        this.updateUndoButtonState();
+    }
+
+    clearUndoBuffer(){
+        this._undoBuffer = null;
+        this.updateUndoButtonState();
+    }
+
+    updateUndoButtonState(){
+        this._undoButton.classList.toggle("disabled", this._undoBuffer == null);
+    }
+
+    undo() {
+        if (!this._undoBuffer){
+            return;
+        }
+        let undoBuffer = this._undoBuffer;
+        this.registerUndo();
+        this.ctx.putImageData(undoBuffer, 0, 0);
     }
 
     loadImage(id: string) {
@@ -282,6 +318,7 @@ export default class PaintView extends View {
     show(){
         super.show();
         this._currentTouchId = 0;
+        this.clearUndoBuffer();
     }
 
     hide(){

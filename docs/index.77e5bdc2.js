@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.fa53b9ce.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.77e5bdc2.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -363,6 +363,8 @@ var BookView = /*#__PURE__*/function (_View) {
       var element = document.createElement("div");
       element.id = id;
       element.classList.add("thumbnail");
+      element.style.width = "".concat(window.screen.width * 0.18, "px");
+      element.style.height = "".concat(window.screen.height * 0.18, "px");
 
       _Utils.default.addFastClick(element, function (event) {
         event.preventDefault();
@@ -3458,12 +3460,12 @@ var View = /*#__PURE__*/function () {
   }, {
     key: "show",
     value: function show() {
-      this._element.hidden = false;
+      this._element.classList.remove("hidden");
     }
   }, {
     key: "hide",
     value: function hide() {
-      this._element.hidden = true;
+      this._element.classList.add("hidden");
     }
   }]);
 
@@ -3759,10 +3761,6 @@ var PaintView = /*#__PURE__*/function (_View) {
 
     _defineProperty(_assertThisInitialized(_this), "scaleFactor", 1);
 
-    _defineProperty(_assertThisInitialized(_this), "width", 1024 * _this.scaleFactor);
-
-    _defineProperty(_assertThisInitialized(_this), "height", 768 * _this.scaleFactor);
-
     _defineProperty(_assertThisInitialized(_this), "strokeStyle", "#000");
 
     _defineProperty(_assertThisInitialized(_this), "brushSize", 24);
@@ -3799,6 +3797,8 @@ var PaintView = /*#__PURE__*/function (_View) {
       return new _Point.default(x, y);
     });
 
+    _this.width = window.screen.width;
+    _this.height = window.screen.height;
     var backButton = document.getElementById("back-button");
 
     _Utils.default.addFastClick(backButton, function () {
@@ -3808,7 +3808,13 @@ var PaintView = /*#__PURE__*/function (_View) {
     var clearButton = document.getElementById("clear-button");
 
     _Utils.default.addFastClick(clearButton, function () {
-      return _this.clear();
+      return _this.clear(true);
+    });
+
+    _this._undoButton = document.getElementById("undo-button");
+
+    _Utils.default.addFastClick(_this._undoButton, function () {
+      return _this.undo();
     });
 
     var canvas = document.getElementById("canvas");
@@ -4019,6 +4025,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       }
 
       event.preventDefault();
+      this.registerUndo();
       this.currentTool.painting = isPainting;
       this.currentTool.pressure = pressure;
       this.currentTool.mouse = mouse;
@@ -4042,6 +4049,12 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "clear",
     value: function clear() {
+      var registerUndo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      if (registerUndo) {
+        this.registerUndo();
+      }
+
       this.ctx.clearRect(0, 0, this.width, this.height);
     }
   }, {
@@ -4049,6 +4062,34 @@ var PaintView = /*#__PURE__*/function (_View) {
     value: function fill() {
       this.ctx.fillStyle = this.strokeStyle;
       this.ctx.fillRect(0, 0, this.width, this.height);
+    }
+  }, {
+    key: "registerUndo",
+    value: function registerUndo() {
+      this._undoBuffer = this.ctx.getImageData(0, 0, this.width, this.height);
+      this.updateUndoButtonState();
+    }
+  }, {
+    key: "clearUndoBuffer",
+    value: function clearUndoBuffer() {
+      this._undoBuffer = null;
+      this.updateUndoButtonState();
+    }
+  }, {
+    key: "updateUndoButtonState",
+    value: function updateUndoButtonState() {
+      this._undoButton.classList.toggle("disabled", this._undoBuffer == null);
+    }
+  }, {
+    key: "undo",
+    value: function undo() {
+      if (!this._undoBuffer) {
+        return;
+      }
+
+      var undoBuffer = this._undoBuffer;
+      this.registerUndo();
+      this.ctx.putImageData(undoBuffer, 0, 0);
     }
   }, {
     key: "loadImage",
@@ -4080,6 +4121,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       _get(_getPrototypeOf(PaintView.prototype), "show", this).call(this);
 
       this._currentTouchId = 0;
+      this.clearUndoBuffer();
     }
   }, {
     key: "hide",
@@ -4569,6 +4611,8 @@ var Palette = /*#__PURE__*/function (_View) {
     value: function addOptions() {
       var element = document.createElement("div");
       element.classList.add("options");
+      element.style.width = Math.min(4, this._options.length) * 50 + "px";
+      element.style.top = Math.ceil(this._options.length / 4) * -25 + 20 + "px";
       this._optionsElement = element;
       this.addArrow();
       var i = 0;
@@ -4819,4 +4863,4 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
 exports.default = SizePalette;
 },{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.fa53b9ce.js.map
+//# sourceMappingURL=index.77e5bdc2.js.map
