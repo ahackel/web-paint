@@ -58,8 +58,10 @@ body {
 
 .paint canvas {
     position: absolute;
+    left: 0;
+    top: 0;
     background: white;
-    height: 100%;
+    width: 100%;
     z-index: -1;
 }
 
@@ -172,4 +174,4 @@ body {
     opacity: 0.25;
 }
 
-/*# sourceMappingURL=index.fb0fe980.css.map */
+/*# sourceMappingURL=index.9b16effe.css.map */

@@ -34,8 +34,8 @@ export default class PaintView extends View {
     constructor(id: string, onBackClicked: Function) {
         super(id);
 
-        this.width = window.screen.width;
-        this.height = window.screen.height;
+        this.width = window.screen.availWidth;
+        this.height = window.screen.availHeight;
 
         let backButton = <HTMLDivElement>document.getElementById("back-button");
         Utils.addFastClick(backButton, () => onBackClicked());
@@ -226,8 +226,6 @@ export default class PaintView extends View {
             this.currentTool.mouse = newMouse;
             this.currentTool.move();
         }
-
-        //console.log("pointer move", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
     }
 
     private down(isPainting: boolean, mouse: Point, pressure: number) {
@@ -244,8 +242,6 @@ export default class PaintView extends View {
         this.currentTool.pressure = pressure;
         this.currentTool.mouse = mouse;
         this.currentTool.down();
-
-        //console.log("pointer down", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
     }
 
     private up(isPainting: boolean, mouse: Point) {
@@ -258,11 +254,6 @@ export default class PaintView extends View {
         this.currentTool.painting = isPainting;
         this.currentTool.mouse = mouse;
         this.currentTool.up();
-        //console.log("pointer up", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
-
-        // if (this.strokeFinished){
-        //     this.strokeFinished();
-        // }
     }
 
     clear(registerUndo: boolean = false) {

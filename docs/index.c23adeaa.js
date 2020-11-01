@@ -132,7 +132,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.77e5bdc2.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.c23adeaa.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -363,8 +363,8 @@ var BookView = /*#__PURE__*/function (_View) {
       var element = document.createElement("div");
       element.id = id;
       element.classList.add("thumbnail");
-      element.style.width = "".concat(window.screen.width * 0.18, "px");
-      element.style.height = "".concat(window.screen.height * 0.18, "px");
+      element.style.width = "".concat(window.screen.availWidth * 0.18, "px");
+      element.style.height = "".concat(window.screen.availHeight * 0.18, "px");
 
       _Utils.default.addFastClick(element, function (event) {
         event.preventDefault();
@@ -3797,8 +3797,8 @@ var PaintView = /*#__PURE__*/function (_View) {
       return new _Point.default(x, y);
     });
 
-    _this.width = window.screen.width;
-    _this.height = window.screen.height;
+    _this.width = window.screen.availWidth;
+    _this.height = window.screen.availHeight;
     var backButton = document.getElementById("back-button");
 
     _Utils.default.addFastClick(backButton, function () {
@@ -4012,8 +4012,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       if (delta > 3) {
         this.currentTool.mouse = newMouse;
         this.currentTool.move();
-      } //console.log("pointer move", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
-
+      }
     }
   }, {
     key: "down",
@@ -4029,7 +4028,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       this.currentTool.painting = isPainting;
       this.currentTool.pressure = pressure;
       this.currentTool.mouse = mouse;
-      this.currentTool.down(); //console.log("pointer down", this.currentTool.mouse, this.currentTool.painting, event.pointerType, event.pressure);
+      this.currentTool.down();
     }
   }, {
     key: "up",
@@ -4041,10 +4040,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       event.preventDefault();
       this.currentTool.painting = isPainting;
       this.currentTool.mouse = mouse;
-      this.currentTool.up(); //console.log("pointer up", this.currentTool.mouse, this.currentTool.painting, event.pointerType);
-      // if (this.strokeFinished){
-      //     this.strokeFinished();
-      // }
+      this.currentTool.up();
     }
   }, {
     key: "clear",
@@ -4863,4 +4859,4 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
 exports.default = SizePalette;
 },{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
 
-//# sourceMappingURL=index.77e5bdc2.js.map
+//# sourceMappingURL=index.c23adeaa.js.map
