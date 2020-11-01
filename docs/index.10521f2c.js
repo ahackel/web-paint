@@ -6,7 +6,7 @@
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
 
-(function(modules, cache, entry, mainEntry, globalName) {
+(function(modules, cache, entry, mainEntry, parcelRequireName, globalName) {
   /* eslint-disable no-undef */
   var globalObject =
     typeof globalThis !== 'undefined'
@@ -22,8 +22,8 @@
 
   // Save the require from previous bundle to this closure if any
   var previousRequire =
-    typeof globalObject.parcelRequire === 'function' &&
-    globalObject.parcelRequire;
+    typeof globalObject[parcelRequireName] === 'function' &&
+    globalObject[parcelRequireName];
   // Do not use `require` to prevent Webpack from trying to bundle this call
   var nodeRequire =
     typeof module !== 'undefined' &&
@@ -37,7 +37,8 @@
         // cache jump to the current global require ie. the last bundle
         // that was added to the page.
         var currentRequire =
-          typeof parcelRequire === 'function' && parcelRequire;
+          typeof globalObject[parcelRequireName] === 'function' &&
+          globalObject[parcelRequireName];
         if (!jumped && currentRequire) {
           return currentRequire(name, true);
         }
@@ -105,7 +106,13 @@
     ];
   };
 
-  globalObject.parcelRequire = newRequire;
+  Object.defineProperty(newRequire, 'root', {
+    get: function() {
+      return globalObject[parcelRequireName];
+    },
+  });
+
+  globalObject[parcelRequireName] = newRequire;
 
   for (var i = 0; i < entry.length; i++) {
     newRequire(entry[i]);
@@ -132,7 +139,7 @@
     }
   }
 })({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.c23adeaa.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.10521f2c.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
 },{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
 "use strict";
 
@@ -4857,6 +4864,6 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = SizePalette;
-},{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", null)
+},{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", "parcelRequireb491")
 
-//# sourceMappingURL=index.c23adeaa.js.map
+//# sourceMappingURL=index.10521f2c.js.map
