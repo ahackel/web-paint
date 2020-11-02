@@ -63,6 +63,7 @@ body {
     background: white;
     width: 100%;
     z-index: -1;
+    image-rendering: pixelated;
 }
 
 .thumbnail {

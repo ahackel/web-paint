@@ -138,34 +138,7 @@
       this[globalName] = mainExports;
     }
   }
-})({"4Kvfc":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"1P9p3\":\"index.10521f2c.js\",\"7s5mZ\":\"brush.a8225430.png\"}"));
-},{"./bundle-manifest":"2flPp"}],"2flPp":[function(require,module,exports) {
-"use strict";
-
-var mapping = {};
-
-function register(pairs) {
-  var keys = Object.keys(pairs);
-
-  for (var i = 0; i < keys.length; i++) {
-    mapping[keys[i]] = pairs[keys[i]];
-  }
-}
-
-function resolve(id) {
-  var resolved = mapping[id];
-
-  if (resolved == null) {
-    throw new Error('Could not resolve bundle with id ' + id);
-  }
-
-  return resolved;
-}
-
-module.exports.register = register;
-module.exports.resolve = resolve;
-},{}],"7FCh8":[function(require,module,exports) {
+})({"7FCh8":[function(require,module,exports) {
 "use strict";
 
 var _BookView = _interopRequireDefault(require("./ts/BookView"));
@@ -3523,6 +3496,36 @@ var Utils = /*#__PURE__*/function () {
       return a * (1 - alpha) + b * alpha;
     }
   }, {
+    key: "clamp",
+    value: function clamp(lower, upper, n) {
+      return Math.min(upper, Math.max(lower, n));
+    }
+  }, {
+    key: "lerpColor",
+    value: function lerpColor(color1, color2, alpha) {
+      if (alpha == 0) {
+        return color1;
+      }
+
+      if (alpha == 1) {
+        return color2;
+      }
+
+      var aa = (color1 & 0xff000000) >> 24;
+      var ba = (color1 & 0x00ff0000) >> 16;
+      var ga = (color1 & 0x0000ff00) >> 8;
+      var ra = color1 & 0x000000ff;
+      var ab = (color2 & 0xff000000) >> 24;
+      var bb = (color2 & 0x00ff0000) >> 16;
+      var gb = (color2 & 0x0000ff00) >> 8;
+      var rb = color2 & 0x000000ff;
+      var r = Math.floor(Utils.lerp(ra, rb, alpha));
+      var g = Math.floor(Utils.lerp(ga, gb, alpha));
+      var b = Math.floor(Utils.lerp(ba, bb, alpha));
+      var a = Math.floor(Utils.lerp(aa, ab, alpha));
+      return r + (g << 8) + (b << 16) + (a << 24);
+    }
+  }, {
     key: "lerpCanvas",
     value: function lerpCanvas(ctxA, ctxB, ctxMask) {
       var width = ctxA.canvas.width;
@@ -3566,21 +3569,28 @@ var Utils = /*#__PURE__*/function () {
   }, {
     key: "floodFill",
     value: function floodFill(imageCtx, startPosition, color) {
+      var threshold = 0.9;
       var width = imageCtx.canvas.width;
       var height = imageCtx.canvas.height;
       var imageData = imageCtx.getImageData(0, 0, width, height);
       var i32 = new Uint32Array(imageData.data.buffer);
+      var i8 = new Uint8ClampedArray(imageData.data.buffer);
       startPosition = startPosition.round();
       var startIndex = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
       var startColor = i32[startIndex];
-      var fillColor = this.stringToColor(color);
+      var fillColor = Utils.stringToColor(color);
+      var startR = i8[startIndex * 4];
+      var startG = i8[startIndex * 4 + 1];
+      var startB = i8[startIndex * 4 + 2];
+      var startA = i8[startIndex * 4 + 3];
       var stack = [];
       stack.push(startPosition);
 
       while (stack.length > 0) {
         var pos = stack.pop();
+        var difference = getDifference(pos.x, pos.y);
 
-        if (isBorderPixel(pos.x, pos.y)) {
+        if (difference > threshold) {
           continue;
         }
 
@@ -3596,11 +3606,13 @@ var Utils = /*#__PURE__*/function () {
         var minX = x;
 
         while (minX >= 0) {
-          if (isBorderPixel(minX, y)) {
+          var _difference = getDifference(minX, y);
+
+          if (_difference > threshold) {
             break;
           }
 
-          i32[minX + y * width] = fillColor;
+          i32[minX + y * width] = Utils.lerpColor(fillColor, i32[minX + y * width], _difference);
           minX -= 1;
         }
 
@@ -3611,11 +3623,13 @@ var Utils = /*#__PURE__*/function () {
         var maxX = x + 1;
 
         while (maxX < width) {
-          if (isBorderPixel(maxX, y)) {
+          var _difference2 = getDifference(maxX, y);
+
+          if (_difference2 > threshold) {
             break;
           }
 
-          i32[maxX + y * width] = fillColor;
+          i32[maxX + y * width] = Utils.lerpColor(fillColor, i32[maxX + y * width], _difference2);
           maxX += 1;
         }
 
@@ -3628,7 +3642,9 @@ var Utils = /*#__PURE__*/function () {
         }
 
         for (var cx = minX; cx <= maxX; cx++) {
-          if (isBorderPixel(cx, y)) {
+          var _difference3 = getDifference(cx, y);
+
+          if (_difference3 > threshold) {
             continue;
           }
 
@@ -3636,8 +3652,14 @@ var Utils = /*#__PURE__*/function () {
         }
       }
 
-      function isBorderPixel(x, y) {
-        return i32[x + y * width] !== startColor;
+      function getDifference(x, y) {
+        var index = (x + y * width) * 4;
+        var r = i8[index];
+        var g = i8[index + 1];
+        var b = i8[index + 2];
+        var a = i8[index + 3];
+        var difference = Math.max(Math.abs(r - startR), Math.abs(g - startG), Math.abs(b - startB), Math.abs(a - startA));
+        return difference / 255;
       }
     }
   }]);
@@ -3689,6 +3711,11 @@ var Point = /*#__PURE__*/function () {
       var dx = a.x - b.x;
       var dy = a.y - b.y;
       return Math.sqrt(dx * dx + dy * dy);
+    }
+  }, {
+    key: "lerp",
+    value: function lerp(p1, p2, a) {
+      return new Point(p1.x * (1 - a) + p2.x * a, p1.y * (1 - a) + p2.y * a);
     }
   }]);
 
@@ -3752,6 +3779,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+var Pressure = require('pressure');
+
 var PaintView = /*#__PURE__*/function (_View) {
   _inherits(PaintView, _View);
 
@@ -3770,9 +3799,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 
     _defineProperty(_assertThisInitialized(_this), "strokeStyle", "#000");
 
-    _defineProperty(_assertThisInitialized(_this), "brushSize", 24);
-
-    _defineProperty(_assertThisInitialized(_this), "lineWidth", 8);
+    _defineProperty(_assertThisInitialized(_this), "lineWidth", 24);
 
     _defineProperty(_assertThisInitialized(_this), "_currentTouchId", 0);
 
@@ -3850,8 +3877,8 @@ var PaintView = /*#__PURE__*/function (_View) {
 
     _this._sizePalette = new _SizePalette.default("size-palette");
 
-    _this._sizePalette.onSelectionChanged = function (brushSize) {
-      _this.brushSize = brushSize;
+    _this._sizePalette.onSelectionChanged = function (lineWidth) {
+      _this.lineWidth = lineWidth;
     };
 
     _this._tools = [new _PenTool.default(_assertThisInitialized(_this), "darken"), new _PenTool.default(_assertThisInitialized(_this), "source-over"), new _PenTool.default(_assertThisInitialized(_this), "destination-out"), new _PaintBucketTool.default(_assertThisInitialized(_this))];
@@ -3895,7 +3922,11 @@ var PaintView = /*#__PURE__*/function (_View) {
         canvas.addEventListener('touchcancel', function (event) {
           return event.preventDefault();
         });
-      }
+      } //canvas.addEventListener('touchforcechanged', event => this.pressureChanged(<TouchEvent>event))
+      // Pressure.set(canvas, {
+      //     change: (force: number, event: Event) => this.pressureChanged(force)
+      // })
+
     }
   }, {
     key: "getPointerEventPaintingFlag",
@@ -3911,6 +3942,7 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "pointerDown",
     value: function pointerDown(event) {
+      console.log("down");
       event.preventDefault();
 
       if (event.pointerType == 'touch' && this._currentTouchId !== 0) {
@@ -3922,7 +3954,8 @@ var PaintView = /*#__PURE__*/function (_View) {
       }
 
       this._currentTouchId = event.pointerId;
-      this.down(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
+      var pressure = event.pointerType == "pen" ? _Utils.default.clamp(0.3, 1, event.pressure * 2) : 1;
+      this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
   }, {
     key: "pointerMove",
@@ -3937,7 +3970,8 @@ var PaintView = /*#__PURE__*/function (_View) {
         return;
       }
 
-      this.move(true, this.getPointerEventPosition(event), event.pressure);
+      var pressure = event.pointerType == "pen" ? _Utils.default.clamp(0.3, 1, event.pressure * 2) : 1;
+      this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
   }, {
     key: "pointerUp",
@@ -3956,6 +3990,14 @@ var PaintView = /*#__PURE__*/function (_View) {
       this._currentTouchId = 0;
     }
   }, {
+    key: "pressureChanged",
+    value: function pressureChanged(force) {
+      var pressure = _Utils.default.clamp(0.3, 1, force * 2);
+
+      this.currentTool.pressure = Math.max(pressure, this.currentTool.pressure);
+      this.currentTool.pressureChanged();
+    }
+  }, {
     key: "touchStart",
     value: function touchStart(event) {
       event.preventDefault();
@@ -3965,7 +4007,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       }
 
       this._currentTouchId = event.targetTouches[0].identifier;
-      this.down(true, this.getTouchEventPosition(event.targetTouches[0]), 1);
+      this.down(event.timeStamp, true, this.getTouchEventPosition(event.targetTouches[0]), 1);
     }
   }, {
     key: "touchMove",
@@ -3977,7 +4019,7 @@ var PaintView = /*#__PURE__*/function (_View) {
         return;
       }
 
-      this.move(true, this.getTouchEventPosition(touch), 1);
+      this.move(event.timeStamp, true, this.getTouchEventPosition(touch), 1);
     }
   }, {
     key: "touchEnd",
@@ -4005,7 +4047,7 @@ var PaintView = /*#__PURE__*/function (_View) {
     }
   }, {
     key: "move",
-    value: function move(isPainting, mouse, pressure) {
+    value: function move(timeStamp, isPainting, mouse, pressure) {
       if (!this.currentTool) {
         return;
       }
@@ -4016,14 +4058,18 @@ var PaintView = /*#__PURE__*/function (_View) {
 
       var delta = _Point.default.distance(this.currentTool.mouse, newMouse);
 
-      if (delta > 3) {
+      if (delta > 2) {
+        var timeDelta = timeStamp - this._timeStamp;
+        this._timeStamp = timeStamp;
+        var speed = delta / timeDelta;
+        this.currentTool.speed = _Utils.default.lerp(this.currentTool.speed, speed, 0.2);
         this.currentTool.mouse = newMouse;
         this.currentTool.move();
       }
     }
   }, {
     key: "down",
-    value: function down(isPainting, mouse, pressure) {
+    value: function down(timeStamp, isPainting, mouse, pressure) {
       _Palette.Palette.collapseAll();
 
       if (!this.currentTool) {
@@ -4032,6 +4078,8 @@ var PaintView = /*#__PURE__*/function (_View) {
 
       event.preventDefault();
       this.registerUndo();
+      this._timeStamp = timeStamp;
+      this.currentTool.speed = 1;
       this.currentTool.painting = isPainting;
       this.currentTool.pressure = pressure;
       this.currentTool.mouse = mouse;
@@ -4086,12 +4134,18 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "undo",
     value: function undo() {
+      var swapBuffers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
       if (!this._undoBuffer) {
         return;
       }
 
       var undoBuffer = this._undoBuffer;
-      this.registerUndo();
+
+      if (swapBuffers) {
+        this.registerUndo();
+      }
+
       this.ctx.putImageData(undoBuffer, 0, 0);
     }
   }, {
@@ -4141,7 +4195,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = PaintView;
-},{"./View":"Jy3dT","./Point":"PghYy","./tools/PenTool":"1c7G4","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2","./tools/PaintBucketTool":"4cR5x","./Palette":"5HhUq","./Utils":"3yp1p","./SizePalette":"5lSFa"}],"1c7G4":[function(require,module,exports) {
+},{"./View":"Jy3dT","./Point":"PghYy","./tools/PenTool":"1c7G4","./ImageStorage":"6j1mL","./ColorPalette":"5766w","./ToolPalette":"01EL2","./tools/PaintBucketTool":"4cR5x","./Palette":"5HhUq","./Utils":"3yp1p","./SizePalette":"5lSFa","pressure":"1yMz2"}],"1c7G4":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4153,7 +4207,7 @@ var _Tool2 = _interopRequireDefault(require("./Tool"));
 
 var _Point = _interopRequireDefault(require("../Point"));
 
-var _brush = _interopRequireDefault(require("url:../../img/brush.png"));
+var _Utils = _interopRequireDefault(require("../Utils"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4203,18 +4257,9 @@ var PenTool = /*#__PURE__*/function (_Tool) {
     _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _Point.default(0, 0));
 
     _this._operation = operation;
-    _this._brush = new Image();
-
-    _this._brush.onload = function () {
-      _this._brushCtx.drawImage(_this._brush, 0, 0);
-
-      _this._brushCtx.globalCompositeOperation = "source-in";
-    };
-
-    _this._brush.src = _brush.default;
     var brushCanvas = document.createElement("canvas");
-    brushCanvas.width = 128;
-    brushCanvas.height = 128;
+    brushCanvas.width = _this.painter.width;
+    brushCanvas.height = _this.painter.height;
     _this._brushCtx = brushCanvas.getContext("2d", {
       alpha: true
     });
@@ -4226,60 +4271,139 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   _createClass(PenTool, [{
     key: "down",
     value: function down() {
-      this._brushCtx.fillStyle = this.painter.strokeStyle;
-
-      this._brushCtx.fillRect(0, 0, 128, 128);
+      var _this2 = this;
 
       this._lastPoint = this.mouse.copy();
-      this.move();
+      this._points = [this._lastPoint];
+      this._widths = [this.getWidth()];
+      var ctx = this._brushCtx;
+      ctx.strokeStyle = this.painter.strokeStyle;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      this.painter.ctx.globalCompositeOperation = this._operation;
+      window.webkitRequestAnimationFrame(function () {
+        return _this2.drawPath();
+      });
     }
   }, {
-    key: "brushLine",
-    value: function brushLine(ctx, x1, y1, x2, y2) {
-      var brushSize = this.painter.brushSize;
-      var diffX = Math.abs(x2 - x1),
-          diffY = Math.abs(y2 - y1),
-          dist = Math.sqrt(diffX * diffX + diffY * diffY) || 1,
-          step = 0.5 * brushSize / dist,
-          i = 0,
-          t = 0,
-          b,
-          x,
-          y;
+    key: "drawPath",
+    value: function drawPath() {
+      var ctx = this._brushCtx;
 
-      while (i <= dist) {
-        t = Math.max(0, Math.min(1, i / dist));
-        x = x1 + (x2 - x1) * t;
-        y = y1 + (y2 - y1) * t;
-        ctx.drawImage(this._brushCtx.canvas, x - brushSize * 0.5, y - brushSize * 0.5, brushSize, brushSize);
-        i += step;
+      if (this._points.length > 0) {
+        this.painter.undo(false);
+        ctx.clearRect(0, 0, this.painter.width, this.painter.height);
+        var point = this._points[0];
+        var oldPoint = point;
+
+        for (var i = 0; i < this._points.length; i++) {
+          var lastPoint = this._points[Math.max(0, i - 1)];
+
+          point = this._points[i];
+          var midPoint = new _Point.default((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
+          ctx.lineWidth = this._widths[i];
+          ctx.beginPath();
+          ctx.moveTo(oldPoint.x, oldPoint.y);
+          ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
+          ctx.stroke();
+          oldPoint = midPoint;
+        }
+
+        ctx.moveTo(oldPoint.x, oldPoint.y);
+        ctx.quadraticCurveTo(point.x, point.y, this._lastPoint.x, this._lastPoint.y);
+        ctx.stroke();
+        var radius = this.getWidth() * 0.5;
+        ctx.beginPath();
+        ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+        this.painter.ctx.drawImage(ctx.canvas, 0, 0);
       }
-    }
+    } // brushLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
+    //
+    //     const brushSize = this.painter.brushSize;
+    //     let diffX = Math.abs(x2 - x1),
+    //         diffY = Math.abs(y2 - y1),
+    //         dist = Math.sqrt(diffX * diffX + diffY * diffY) || 1,
+    //         step = 0.5 * brushSize / dist,
+    //         i = 0,
+    //         t = 0,
+    //         b, x, y;
+    //
+    //     while (i <= dist) {
+    //         t = Math.max(0, Math.min(1, i / dist));
+    //         x = x1 + (x2 - x1) * t;
+    //         y = y1 + (y2 - y1) * t;
+    //         ctx.drawImage(this._brushCtx.canvas, x - brushSize * 0.5, y - brushSize * 0.5, brushSize, brushSize);
+    //         i += step
+    //     }
+    // }
+
   }, {
     key: "move",
     value: function move() {
+      var _this3 = this;
+
       if (!this.painting) {
         return;
+      } // let ctx1 = this.painter.ctx;
+      //
+      // let midPoint = new Point(
+      //     (this.mouse.x + this._lastPoint.x) * 0.5,
+      //     (this.mouse.y + this._lastPoint.y) * 0.5,
+      //     );
+      //
+      // let a = this.lerp(0.5, 1.5, this.pressure);
+      // ctx1.lineWidth = this.painter.lineWidth * a;
+      // ctx1.globalCompositeOperation = "darken";
+      //
+      // ctx1.quadraticCurveTo(this._lastPoint.x, this._lastPoint.y, midPoint.x, midPoint.y);
+      // ctx1.stroke();
+      // ctx1.beginPath();
+      // ctx1.moveTo(midPoint.x, midPoint.y);
+      //
+
+
+      this._lastPoint = this.mouse.copy();
+
+      var delta = _Point.default.distance(this._points[this._points.length - 1], this._lastPoint);
+
+      var width = this.getWidth();
+
+      if (delta > width * 0.25) {
+        this._points.push(this._lastPoint);
+
+        this._widths.push(width);
       }
 
-      var ctx1 = this.painter.ctx;
-      var midPoint = new _Point.default((this.mouse.x + this._lastPoint.x) * 0.5, (this.mouse.y + this._lastPoint.y) * 0.5);
-      var a = this.lerp(0.5, 1.5, this.pressure);
-      ctx1.lineWidth = this.painter.lineWidth * a;
-      ctx1.globalCompositeOperation = this._operation;
-      this.brushLine(ctx1, this._lastPoint.x, this._lastPoint.y, this.mouse.x, this.mouse.y);
-      this._lastPoint = this.mouse.copy();
+      window.webkitRequestAnimationFrame(function () {
+        return _this3.drawPath();
+      });
     }
   }, {
     key: "up",
     value: function up() {}
+  }, {
+    key: "pressureChanged",
+    value: function pressureChanged() {
+      var _this4 = this;
+
+      window.webkitRequestAnimationFrame(function () {
+        return _this4.drawPath();
+      });
+    }
+  }, {
+    key: "getWidth",
+    value: function getWidth() {
+      return this.painter.lineWidth * _Utils.default.clamp(0.3, 1, this.pressure / this.speed);
+    }
   }]);
 
   return PenTool;
 }(_Tool2.default);
 
 exports.default = PenTool;
-},{"./Tool":"3Y0IK","../Point":"PghYy","url:../../img/brush.png":"2HhD3"}],"3Y0IK":[function(require,module,exports) {
+},{"./Tool":"3Y0IK","../Point":"PghYy","../Utils":"3yp1p"}],"3Y0IK":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4307,120 +4431,7 @@ var Tool = function Tool(painter) {
 };
 
 exports.default = Tool;
-},{"../Point":"PghYy"}],"2HhD3":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("1P9p3", "7s5mZ");
-},{"./bundle-url":"18KeT","./relative-path":"4f40J"}],"18KeT":[function(require,module,exports) {
-"use strict";
-
-/* globals document:readonly */
-var bundleURL = null;
-
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-
-  return bundleURL;
-}
-
-function getBundleURL() {
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
-
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
-} // TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
-
-
-function getOrigin(url) {
-  let matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
-
-  if (!matches) {
-    throw new Error('Origin not found');
-  }
-
-  return matches[0];
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-exports.getOrigin = getOrigin;
-},{}],"4f40J":[function(require,module,exports) {
-"use strict";
-
-var resolve = require('./bundle-manifest').resolve;
-
-module.exports = function (fromId, toId) {
-  return relative(dirname(resolve(fromId)), resolve(toId));
-};
-
-function dirname(_filePath) {
-  if (_filePath === '') {
-    return '.';
-  }
-
-  var filePath = _filePath[_filePath.length - 1] === '/' ? _filePath.slice(0, _filePath.length - 1) : _filePath;
-  var slashIndex = filePath.lastIndexOf('/');
-  return slashIndex === -1 ? '.' : filePath.slice(0, slashIndex);
-}
-
-function relative(from, to) {
-  if (from === to) {
-    return '';
-  }
-
-  var fromParts = from.split('/');
-
-  if (fromParts[0] === '.') {
-    fromParts.shift();
-  }
-
-  var toParts = to.split('/');
-
-  if (toParts[0] === '.') {
-    toParts.shift();
-  } // Find where path segments diverge.
-
-
-  var i;
-  var divergeIndex;
-
-  for (i = 0; (i < toParts.length || i < fromParts.length) && divergeIndex == null; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      divergeIndex = i;
-    }
-  } // If there are segments from "from" beyond the point of divergence,
-  // return back up the path to that point using "..".
-
-
-  var parts = [];
-
-  for (i = 0; i < fromParts.length - divergeIndex; i++) {
-    parts.push('..');
-  } // If there are segments from "to" beyond the point of divergence,
-  // continue using the remaining segments.
-
-
-  if (toParts.length > divergeIndex) {
-    parts.push.apply(parts, toParts.slice(divergeIndex));
-  }
-
-  return parts.join('/');
-}
-
-module.exports._dirname = dirname;
-module.exports._relative = relative;
-},{"./bundle-manifest":"2flPp"}],"5766w":[function(require,module,exports) {
+},{"../Point":"PghYy"}],"5766w":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4864,6 +4875,353 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = SizePalette;
-},{"./Palette":"5HhUq"}]},{},["4Kvfc","7FCh8"], "7FCh8", "parcelRequireb491")
+},{"./Palette":"5HhUq"}],"1yMz2":[function(require,module,exports) {
+var define;
+// Pressure v2.2.0 | Created By Stuart Yamartino | MIT License | 2015 - 2020
+!function (e, t) {
+  "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? module.exports = t() : e.Pressure = t();
+}(this, function () {
+  "use strict";
 
-//# sourceMappingURL=index.10521f2c.js.map
+  function i(e) {
+    return (i = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
+      return typeof e;
+    } : function (e) {
+      return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+    })(e);
+  }
+
+  function e(e, t) {
+    if ("function" != typeof t && null !== t) throw new TypeError("Super expression must either be null or a function");
+    e.prototype = Object.create(t && t.prototype, {
+      constructor: {
+        value: e,
+        writable: !0,
+        configurable: !0
+      }
+    }), t && s(e, t);
+  }
+
+  function s(e, t) {
+    return (s = Object.setPrototypeOf || function (e, t) {
+      return e.__proto__ = t, e;
+    })(e, t);
+  }
+
+  function t(s) {
+    var n = function () {
+      if ("undefined" == typeof Reflect || !Reflect.construct) return !1;
+      if (Reflect.construct.sham) return !1;
+      if ("function" == typeof Proxy) return !0;
+
+      try {
+        return Date.prototype.toString.call(Reflect.construct(Date, [], function () {})), !0;
+      } catch (e) {
+        return !1;
+      }
+    }();
+
+    return function () {
+      var e,
+          t = r(s);
+      return e = n ? (e = r(this).constructor, Reflect.construct(t, arguments, e)) : t.apply(this, arguments), t = this, !(e = e) || "object" !== i(e) && "function" != typeof e ? function (e) {
+        if (void 0 !== e) return e;
+        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+      }(t) : e;
+    };
+  }
+
+  function r(e) {
+    return (r = Object.setPrototypeOf ? Object.getPrototypeOf : function (e) {
+      return e.__proto__ || Object.getPrototypeOf(e);
+    })(e);
+  }
+
+  function o(e, t) {
+    if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
+  }
+
+  function n(e, t) {
+    for (var s = 0; s < t.length; s++) {
+      var n = t[s];
+      n.enumerable = n.enumerable || !1, n.configurable = !0, "value" in n && (n.writable = !0), Object.defineProperty(e, n.key, n);
+    }
+  }
+
+  function u(e, t, s) {
+    return t && n(e.prototype, t), s && n(e, s), e;
+  }
+
+  var h = {
+    set: function (e, t, s) {
+      y(e, t, s);
+    },
+    config: function (e) {
+      p.set(e);
+    },
+    map: function () {
+      return v.apply(null, arguments);
+    }
+  },
+      c = function () {
+    function n(e, t, s) {
+      o(this, n), this.routeEvents(e, t, s), this.preventSelect(e, s);
+    }
+
+    return u(n, [{
+      key: "routeEvents",
+      value: function (e, t, s) {
+        var n = p.get("only", s);
+        this.adapter = !b || "mouse" !== n && null !== n ? !m || "pointer" !== n && null !== n ? !g || "touch" !== n && null !== n ? new l(e, t).bindUnsupportedEvent() : new d(e, t, s).bindEvents() : new f(e, t, s).bindEvents() : new a(e, t, s).bindEvents();
+      }
+    }, {
+      key: "preventSelect",
+      value: function (e, t) {
+        p.get("preventSelect", t) && (e.style.webkitTouchCallout = "none", e.style.webkitUserSelect = "none", e.style.khtmlUserSelect = "none", e.style.MozUserSelect = "none", e.style.msUserSelect = "none", e.style.userSelect = "none");
+      }
+    }]), n;
+  }(),
+      l = function () {
+    function n(e, t, s) {
+      o(this, n), this.el = e, this.block = t, this.options = s, this.pressed = !1, this.deepPressed = !1, this.nativeSupport = !1, this.runningPolyfill = !1, this.runKey = Math.random();
+    }
+
+    return u(n, [{
+      key: "setPressed",
+      value: function (e) {
+        this.pressed = e;
+      }
+    }, {
+      key: "setDeepPressed",
+      value: function (e) {
+        this.deepPressed = e;
+      }
+    }, {
+      key: "isPressed",
+      value: function () {
+        return this.pressed;
+      }
+    }, {
+      key: "isDeepPressed",
+      value: function () {
+        return this.deepPressed;
+      }
+    }, {
+      key: "add",
+      value: function (e, t) {
+        this.el.addEventListener(e, t, !1);
+      }
+    }, {
+      key: "runClosure",
+      value: function (e) {
+        e in this.block && this.block[e].apply(this.el, Array.prototype.slice.call(arguments, 1));
+      }
+    }, {
+      key: "fail",
+      value: function (e, t) {
+        p.get("polyfill", this.options) ? this.runKey === t && this.runPolyfill(e) : this.runClosure("unsupported", e);
+      }
+    }, {
+      key: "bindUnsupportedEvent",
+      value: function () {
+        var t = this;
+        this.add(g ? "touchstart" : "mousedown", function (e) {
+          return t.runClosure("unsupported", e);
+        });
+      }
+    }, {
+      key: "_startPress",
+      value: function (e) {
+        !1 === this.isPressed() && (this.runningPolyfill = !1, this.setPressed(!0), this.runClosure("start", e));
+      }
+    }, {
+      key: "_startDeepPress",
+      value: function (e) {
+        this.isPressed() && !1 === this.isDeepPressed() && (this.setDeepPressed(!0), this.runClosure("startDeepPress", e));
+      }
+    }, {
+      key: "_changePress",
+      value: function (e, t) {
+        this.nativeSupport = !0, this.runClosure("change", e, t);
+      }
+    }, {
+      key: "_endDeepPress",
+      value: function () {
+        this.isPressed() && this.isDeepPressed() && (this.setDeepPressed(!1), this.runClosure("endDeepPress"));
+      }
+    }, {
+      key: "_endPress",
+      value: function () {
+        !1 === this.runningPolyfill ? (this.isPressed() && (this._endDeepPress(), this.setPressed(!1), this.runClosure("end")), this.runKey = Math.random(), this.nativeSupport = !1) : this.setPressed(!1);
+      }
+    }, {
+      key: "deepPress",
+      value: function (e, t) {
+        .5 <= e ? this._startDeepPress(t) : this._endDeepPress();
+      }
+    }, {
+      key: "runPolyfill",
+      value: function (e) {
+        this.increment = 0 === p.get("polyfillSpeedUp", this.options) ? 1 : 10 / p.get("polyfillSpeedUp", this.options), this.decrement = 0 === p.get("polyfillSpeedDown", this.options) ? 1 : 10 / p.get("polyfillSpeedDown", this.options), this.setPressed(!0), this.runClosure("start", e), !1 === this.runningPolyfill && this.loopPolyfillForce(0, e);
+      }
+    }, {
+      key: "loopPolyfillForce",
+      value: function (e, t) {
+        !1 === this.nativeSupport && (this.isPressed() ? (this.runningPolyfill = !0, e = 1 < e + this.increment ? 1 : e + this.increment, this.runClosure("change", e, t), this.deepPress(e, t), setTimeout(this.loopPolyfillForce.bind(this, e, t), 10)) : ((e = e - this.decrement < 0 ? 0 : e - this.decrement) < .5 && this.isDeepPressed() && (this.setDeepPressed(!1), this.runClosure("endDeepPress")), 0 === e ? (this.runningPolyfill = !1, this.setPressed(!0), this._endPress()) : (this.runClosure("change", e, t), this.deepPress(e, t), setTimeout(this.loopPolyfillForce.bind(this, e, t), 10))));
+      }
+    }]), n;
+  }(),
+      a = function () {
+    e(i, l);
+    var n = t(i);
+
+    function i(e, t, s) {
+      return o(this, i), n.call(this, e, t, s);
+    }
+
+    return u(i, [{
+      key: "bindEvents",
+      value: function () {
+        this.add("webkitmouseforcewillbegin", this._startPress.bind(this)), this.add("mousedown", this.support.bind(this)), this.add("webkitmouseforcechanged", this.change.bind(this)), this.add("webkitmouseforcedown", this._startDeepPress.bind(this)), this.add("webkitmouseforceup", this._endDeepPress.bind(this)), this.add("mouseleave", this._endPress.bind(this)), this.add("mouseup", this._endPress.bind(this));
+      }
+    }, {
+      key: "support",
+      value: function (e) {
+        !1 === this.isPressed() && this.fail(e, this.runKey);
+      }
+    }, {
+      key: "change",
+      value: function (e) {
+        this.isPressed() && 0 < e.webkitForce && this._changePress(this.normalizeForce(e.webkitForce), e);
+      }
+    }, {
+      key: "normalizeForce",
+      value: function (e) {
+        return this.reachOne(v(e, 1, 3, 0, 1));
+      }
+    }, {
+      key: "reachOne",
+      value: function (e) {
+        return .995 < e ? 1 : e;
+      }
+    }]), i;
+  }(),
+      d = function () {
+    e(i, l);
+    var n = t(i);
+
+    function i(e, t, s) {
+      return o(this, i), n.call(this, e, t, s);
+    }
+
+    return u(i, [{
+      key: "bindEvents",
+      value: function () {
+        k ? (this.add("touchforcechange", this.start.bind(this)), this.add("touchstart", this.support.bind(this, 0))) : this.add("touchstart", this.startLegacy.bind(this)), this.add("touchend", this._endPress.bind(this));
+      }
+    }, {
+      key: "start",
+      value: function (e) {
+        0 < e.touches.length && (this._startPress(e), this.touch = this.selectTouch(e), this.touch && this._changePress(this.touch.force, e));
+      }
+    }, {
+      key: "support",
+      value: function (e, t, s) {
+        s = 2 < arguments.length && void 0 !== s ? s : this.runKey;
+        !1 === this.isPressed() && (e <= 6 ? (e++, setTimeout(this.support.bind(this, e, t, s), 10)) : this.fail(t, s));
+      }
+    }, {
+      key: "startLegacy",
+      value: function (e) {
+        this.initialForce = e.touches[0].force, this.supportLegacy(0, e, this.runKey, this.initialForce);
+      }
+    }, {
+      key: "supportLegacy",
+      value: function (e, t, s, n) {
+        n !== this.initialForce ? (this._startPress(t), this.loopForce(t)) : e <= 6 ? (e++, setTimeout(this.supportLegacy.bind(this, e, t, s, n), 10)) : this.fail(t, s);
+      }
+    }, {
+      key: "loopForce",
+      value: function (e) {
+        this.isPressed() && (this.touch = this.selectTouch(e), setTimeout(this.loopForce.bind(this, e), 10), this._changePress(this.touch.force, e));
+      }
+    }, {
+      key: "selectTouch",
+      value: function (e) {
+        if (1 === e.touches.length) return this.returnTouch(e.touches[0], e);
+
+        for (var t = 0; t < e.touches.length; t++) if (e.touches[t].target === this.el || this.el.contains(e.touches[t].target)) return this.returnTouch(e.touches[t], e);
+      }
+    }, {
+      key: "returnTouch",
+      value: function (e, t) {
+        return this.deepPress(e.force, t), e;
+      }
+    }]), i;
+  }(),
+      f = function () {
+    e(i, l);
+    var n = t(i);
+
+    function i(e, t, s) {
+      return o(this, i), n.call(this, e, t, s);
+    }
+
+    return u(i, [{
+      key: "bindEvents",
+      value: function () {
+        this.add("pointerdown", this.support.bind(this)), this.add("pointermove", this.change.bind(this)), this.add("pointerup", this._endPress.bind(this)), this.add("pointerleave", this._endPress.bind(this));
+      }
+    }, {
+      key: "support",
+      value: function (e) {
+        !1 === this.isPressed() && (0 === e.pressure || .5 === e.pressure || 1 < e.pressure ? this.fail(e, this.runKey) : (this._startPress(e), this._changePress(e.pressure, e)));
+      }
+    }, {
+      key: "change",
+      value: function (e) {
+        this.isPressed() && 0 < e.pressure && .5 !== e.pressure && (this._changePress(e.pressure, e), this.deepPress(e.pressure, e));
+      }
+    }]), i;
+  }(),
+      p = {
+    polyfill: !0,
+    polyfillSpeedUp: 1e3,
+    polyfillSpeedDown: 0,
+    preventSelect: !0,
+    only: null,
+    get: function (e, t) {
+      return (t.hasOwnProperty(e) ? t : this)[e];
+    },
+    set: function (e) {
+      for (var t in e) e.hasOwnProperty(t) && this.hasOwnProperty(t) && "get" != t && "set" != t && (this[t] = e[t]);
+    }
+  },
+      y = function (e, t, s) {
+    var n = 2 < arguments.length && void 0 !== s ? s : {};
+    if ("string" == typeof e || e instanceof String) for (var i = document.querySelectorAll(e), r = 0; r < i.length; r++) new c(i[r], t, n);else if (P(e)) new c(e, t, n);else for (r = 0; r < e.length; r++) new c(e[r], t, n);
+  },
+      P = function (e) {
+    return "object" === ("undefined" == typeof HTMLElement ? "undefined" : i(HTMLElement)) ? e instanceof HTMLElement : e && "object" === i(e) && null !== e && 1 === e.nodeType && "string" == typeof e.nodeName;
+  },
+      v = function (e, t, s, n, i) {
+    return (e - t) * (i - n) / (s - t) + n;
+  },
+      b = !1,
+      g = !1,
+      m = !1,
+      w = !1,
+      k = !1;
+
+  if ("undefined" != typeof window) {
+    if ("undefined" != typeof Touch) try {
+      (Touch.prototype.hasOwnProperty("force") || "force" in new Touch()) && (w = !0);
+    } catch (e) {}
+    g = "ontouchstart" in window.document && w, b = "onmousemove" in window.document && "onwebkitmouseforcechanged" in window.document && !g, m = "onpointermove" in window.document, k = "ontouchforcechange" in window.document;
+  }
+
+  return h;
+});
+},{}]},{},["7FCh8"], "7FCh8", "parcelRequireb491")
+
+//# sourceMappingURL=index.694f0658.js.map

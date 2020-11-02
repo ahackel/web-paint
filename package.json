@@ -12,7 +12,8 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
     "blueimp-canvas-to-blob": "^3.28.0",
-    "localforage": "^1.9.0"
+    "localforage": "^1.9.0",
+    "pressure": "^2.2.0"
   },
   "main": "docs/index.html",
   "targets": {

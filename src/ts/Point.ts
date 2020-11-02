@@ -20,6 +20,12 @@ export default class Point {
         let dy = a.y - b.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
+
+    static lerp(p1: Point, p2: Point, a: number){
+        return new Point(
+            p1.x * (1 - a) + p2.x * a,
+            p1.y * (1 - a) + p2.y * a);
+    }
     
     round(){
         return new Point(Math.round(this.x), Math.round(this.y));

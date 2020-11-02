@@ -16,6 +16,37 @@ export default class Utils {
         return a * (1 - alpha) + b * alpha;
     }
 
+    public static clamp(lower: number, upper: number, n: number): number{
+        return Math.min(upper, Math.max(lower, n));
+    }
+
+    public static lerpColor(color1: number, color2: number, alpha: number): number{
+        if (alpha == 0){
+            return color1;
+        }
+
+        if (alpha == 1){
+            return color2;
+        }
+
+        const aa = (color1 & 0xff000000) >> 24;
+        const ba = (color1 & 0x00ff0000) >> 16;
+        const ga = (color1 & 0x0000ff00) >> 8;
+        const ra = (color1 & 0x000000ff);
+
+        const ab = (color2 & 0xff000000) >> 24;
+        const bb = (color2 & 0x00ff0000) >> 16;
+        const gb = (color2 & 0x0000ff00) >> 8;
+        const rb = (color2 & 0x000000ff);
+
+        const r = Math.floor(Utils.lerp(ra, rb, alpha));
+        const g = Math.floor(Utils.lerp(ga, gb, alpha));
+        const b = Math.floor(Utils.lerp(ba, bb, alpha));
+        const a = Math.floor(Utils.lerp(aa, ab, alpha));
+
+        return r + (g << 8) + (b << 16) + (a << 24);
+    }
+
     public static lerpCanvas(ctxA: CanvasRenderingContext2D, ctxB: CanvasRenderingContext2D, ctxMask: CanvasRenderingContext2D) {
         const width = ctxA.canvas.width;
         const height = ctxA.canvas.height;
@@ -37,7 +68,7 @@ export default class Utils {
         ctxA.putImageData(dataA, 0, 0);
     }
     
-    public static stringToColor(h: string): number{
+    public static stringToColor(h: string): number {
         let r = 0, g = 0, b = 0;
 
         if (h.length == 4) {
@@ -55,16 +86,22 @@ export default class Utils {
     }
  
     public static floodFill(imageCtx: CanvasRenderingContext2D, startPosition: Point, color: string){
+        const threshold = 0.9;
         const width = imageCtx.canvas.width;
         const height = imageCtx.canvas.height;
         const imageData = imageCtx.getImageData(0, 0, width, height);
 
         const i32 = new Uint32Array(imageData.data.buffer);
+        const i8 = new Uint8ClampedArray(imageData.data.buffer);
 
         startPosition = startPosition.round();
         const startIndex: number = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
         const startColor: number = i32[startIndex];
-        const fillColor: number = this.stringToColor(color);
+        const fillColor = Utils.stringToColor(color);
+        const startR = i8[startIndex * 4];
+        const startG = i8[startIndex * 4 + 1];
+        const startB = i8[startIndex * 4 + 2];
+        const startA = i8[startIndex * 4 + 3];
 
         let stack: Point[] = [];
         stack.push(startPosition);
@@ -73,7 +110,8 @@ export default class Utils {
         {
             let pos = stack.pop();
 
-            if (isBorderPixel(pos.x, pos.y)) {
+            const difference = getDifference(pos.x, pos.y);
+            if (difference > threshold){
                 continue;
             }
 
@@ -91,11 +129,12 @@ export default class Utils {
             let minX = x;
             while (minX >= 0)
             {
-                if (isBorderPixel(minX, y)){
+                const difference = getDifference(minX, y);
+                if (difference > threshold){
                     break;
                 }
 
-                i32[minX + y * width] = fillColor;
+                i32[minX + y * width] = Utils.lerpColor(fillColor, i32[minX + y * width], difference);
                 minX -= 1;
             }
 
@@ -107,11 +146,12 @@ export default class Utils {
             let maxX: number = x + 1;
             while (maxX < width)
             {
-                if (isBorderPixel(maxX, y)){
+                const difference = getDifference(maxX, y);
+                if (difference > threshold){
                     break;
                 }
 
-                i32[maxX + y * width] = fillColor;
+                i32[maxX + y * width] = Utils.lerpColor(fillColor, i32[maxX + y * width], difference);
                 maxX += 1;
             }
 
@@ -127,17 +167,25 @@ export default class Utils {
 
             for (let cx = minX; cx <= maxX; cx++)
             {
-                if (isBorderPixel(cx, y)){
+                const difference = getDifference(cx, y);
+                if (difference > threshold){
                     continue;
-
                 }
                 stack.push(new Point(cx, y));
             }
  
         }       
 
-        function isBorderPixel(x: number, y: number) {
-            return i32[x + y * width] !== startColor;
+        function getDifference(x: number, y: number) {
+            let index = (x + y * width) * 4;
+            let r = i8[index];
+            let g = i8[index + 1];
+            let b = i8[index + 2];
+            let a = i8[index + 3];
+
+            let difference =
+                Math.max(Math.abs(r - startR), Math.abs(g - startG), Math.abs(b - startB), Math.abs(a - startA));
+            return difference / 255;
         }
     }
 }

@@ -9,6 +9,7 @@ import PaintBucketTool from "./tools/PaintBucketTool";
 import {Palette} from "./Palette";
 import Utils from "./Utils";
 import SizePalette from "./SizePalette";
+var Pressure = require('pressure');
 
 export default class PaintView extends View {
 
@@ -18,8 +19,7 @@ export default class PaintView extends View {
     height: number;
     currentTool: Tool;
     strokeStyle: string | CanvasGradient | CanvasPattern = "#000";
-    brushSize: number = 24;
-    lineWidth: number = 8;
+    lineWidth: number = 24;
     imageId: string;
 
     public readonly ctx: CanvasRenderingContext2D;
@@ -30,6 +30,7 @@ export default class PaintView extends View {
     private _currentTouchId: number = 0;
     private _undoBuffer: ImageData;
     private _undoButton: HTMLDivElement;
+    private _timeStamp: number;
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
@@ -64,8 +65,8 @@ export default class PaintView extends View {
         };
 
         this._sizePalette = new SizePalette("size-palette");
-        this._sizePalette.onSelectionChanged = (brushSize: number) => {
-            this.brushSize = brushSize;
+        this._sizePalette.onSelectionChanged = (lineWidth: number) => {
+            this.lineWidth = lineWidth;
         };
 
         this._tools = [
@@ -94,6 +95,10 @@ export default class PaintView extends View {
             canvas.addEventListener('touchend', event => this.touchEnd(event));
             canvas.addEventListener('touchcancel', event => event.preventDefault());
         }
+        //canvas.addEventListener('touchforcechanged', event => this.pressureChanged(<TouchEvent>event))
+        // Pressure.set(canvas, {
+        //     change: (force: number, event: Event) => this.pressureChanged(force)
+        // })
     }
 
     private getPointerEventPosition = (event: PointerEvent) => {
@@ -134,6 +139,7 @@ export default class PaintView extends View {
     }
 
     pointerDown(event: PointerEvent) {
+        console.log("down");
         event.preventDefault();
         if (event.pointerType == 'touch' && this._currentTouchId !== 0){
             return;
@@ -144,7 +150,8 @@ export default class PaintView extends View {
         }
 
         this._currentTouchId = event.pointerId;
-        this.down(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event), event.pressure);
+        let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
+        this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
 
     pointerMove(event: PointerEvent) {
@@ -157,7 +164,8 @@ export default class PaintView extends View {
             return;
         }
 
-        this.move(true, this.getPointerEventPosition(event), event.pressure);
+        let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
+        this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
 
     pointerUp(event: PointerEvent) {
@@ -174,13 +182,19 @@ export default class PaintView extends View {
         this._currentTouchId = 0;
     }
 
+    pressureChanged(force: number){
+        let pressure = Utils.clamp(0.3, 1, force * 2);
+        this.currentTool.pressure = Math.max(pressure, this.currentTool.pressure);
+        this.currentTool.pressureChanged();
+    }
+
     touchStart(event: TouchEvent) {
         event.preventDefault();
         if (this._currentTouchId !== 0){
             return;
         }
         this._currentTouchId = event.targetTouches[0].identifier;
-        this.down(true, this.getTouchEventPosition(event.targetTouches[0]), 1);
+        this.down(event.timeStamp,true, this.getTouchEventPosition(event.targetTouches[0]), 1);
     }
 
     touchMove(event: TouchEvent) {
@@ -189,7 +203,7 @@ export default class PaintView extends View {
         if (touch == null){
             return;
         }
-        this.move(true, this.getTouchEventPosition(touch), 1);
+        this.move(event.timeStamp, true, this.getTouchEventPosition(touch), 1);
     }
 
     touchEnd(event: TouchEvent) {
@@ -211,10 +225,11 @@ export default class PaintView extends View {
         return null;
     }
 
-    private move(isPainting: boolean, mouse: Point, pressure: number) {
+    private move(timeStamp: number, isPainting: boolean, mouse: Point, pressure: number) {
         if (!this.currentTool) {
             return;
         }
+
 
         this.currentTool.painting = isPainting;
         this.currentTool.pressure = pressure;
@@ -222,13 +237,18 @@ export default class PaintView extends View {
         let newMouse = mouse;
         let delta = Point.distance(this.currentTool.mouse, newMouse);
 
-        if (delta > 3) {
+        if (delta > 2) {
+            let timeDelta = timeStamp - this._timeStamp;
+            this._timeStamp = timeStamp;
+            let speed = delta / timeDelta;
+
+            this.currentTool.speed = Utils.lerp(this.currentTool.speed, speed, 0.2);
             this.currentTool.mouse = newMouse;
             this.currentTool.move();
         }
     }
 
-    private down(isPainting: boolean, mouse: Point, pressure: number) {
+    private down(timeStamp: number, isPainting: boolean, mouse: Point, pressure: number) {
         Palette.collapseAll();
 
         if (!this.currentTool) {
@@ -238,6 +258,8 @@ export default class PaintView extends View {
         event.preventDefault();
 
         this.registerUndo();
+        this._timeStamp = timeStamp;
+        this.currentTool.speed = 1;
         this.currentTool.painting = isPainting;
         this.currentTool.pressure = pressure;
         this.currentTool.mouse = mouse;
@@ -282,12 +304,14 @@ export default class PaintView extends View {
         this._undoButton.classList.toggle("disabled", this._undoBuffer == null);
     }
 
-    undo() {
+    undo(swapBuffers = true) {
         if (!this._undoBuffer){
             return;
         }
         let undoBuffer = this._undoBuffer;
-        this.registerUndo();
+        if (swapBuffers){
+            this.registerUndo();
+        }
         this.ctx.putImageData(undoBuffer, 0, 0);
     }
 

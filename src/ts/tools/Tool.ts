@@ -6,6 +6,7 @@ export default abstract class Tool {
     painting: boolean = false;
     pressure: number = 1;
     painter: PaintView;
+    speed: number;
 
     constructor(painter: PaintView) {
         this.painter = painter;
@@ -15,4 +16,5 @@ export default abstract class Tool {
     abstract down(): void;
     abstract move(): void;
     abstract up(): void;
+    abstract pressureChanged(): void;
 }

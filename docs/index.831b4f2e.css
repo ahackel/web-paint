@@ -63,6 +63,7 @@ body {
     background: white;
     width: 100%;
     z-index: -1;
+    image-rendering: pixelated;
 }
 
 .thumbnail {
@@ -174,4 +175,4 @@ body {
     opacity: 0.25;
 }
 
-/*# sourceMappingURL=index.9b16effe.css.map */
+/*# sourceMappingURL=index.831b4f2e.css.map */
