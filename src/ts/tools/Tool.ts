@@ -17,4 +17,5 @@ export default abstract class Tool {
     abstract move(): void;
     abstract up(): void;
     abstract pressureChanged(): void;
+    abstract tick(delta: number): void;
 }

@@ -13,9 +13,21 @@ export default class PenTool extends Tool {
     private _operation: string;
     private _points: Point[];
     private _widths: number[];
+    private _random: number[];
+    private _drawPathRequested: boolean;
 
     private lerp(a: number, b: number, alpha: number): number{
         return a * (1 - alpha) + b * alpha;
+    }
+    
+    private random(index: number){
+        if (!this._random){
+            this._random = [];
+            for (let i = 0; i < 200; i++) {
+                this._random.push(Math.random());
+            }
+        }
+        return this._random[index % this._random.length];
     }
 
     constructor(painter: PaintView, operation: string = "darken") {
@@ -41,7 +53,18 @@ export default class PenTool extends Tool {
         ctx.lineJoin = "round";
         this.painter.ctx.globalCompositeOperation = this._operation;
 
-        window.webkitRequestAnimationFrame(() => this.drawPath());
+        this.requestDrawPath();
+    }
+    
+    tick(delta: number) {
+        if (this._drawPathRequested){
+            this.drawPath();
+            this._drawPathRequested = false;
+        }
+    }
+
+    requestDrawPath(){
+        this._drawPathRequested = true;
     }
 
     drawPath(){
@@ -55,7 +78,9 @@ export default class PenTool extends Tool {
 
             for (let i = 0; i < this._points.length; i++){
                 let lastPoint = this._points[Math.max(0, i - 1)];
-                point = this._points[i];
+                point = this._points[i].copy();
+                // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+                // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
 
                 let midPoint = new Point(
                     (point.x + lastPoint.x) * 0.5,
@@ -79,69 +104,31 @@ export default class PenTool extends Tool {
             ctx.fillStyle = ctx.strokeStyle;
             ctx.fill();
 
+            this.painter.ctx.globalAlpha = 0.9;
             this.painter.ctx.drawImage(ctx.canvas, 0, 0);
+            this.painter.ctx.globalAlpha = 1;
         }
     }
-
-    // brushLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
-    //
-    //     const brushSize = this.painter.brushSize;
-    //     let diffX = Math.abs(x2 - x1),
-    //         diffY = Math.abs(y2 - y1),
-    //         dist = Math.sqrt(diffX * diffX + diffY * diffY) || 1,
-    //         step = 0.5 * brushSize / dist,
-    //         i = 0,
-    //         t = 0,
-    //         b, x, y;
-    //
-    //     while (i <= dist) {
-    //         t = Math.max(0, Math.min(1, i / dist));
-    //         x = x1 + (x2 - x1) * t;
-    //         y = y1 + (y2 - y1) * t;
-    //         ctx.drawImage(this._brushCtx.canvas, x - brushSize * 0.5, y - brushSize * 0.5, brushSize, brushSize);
-    //         i += step
-    //     }
-    // }
 
     move(): void {
         if (!this.painting) {
             return;
         }
 
-        // let ctx1 = this.painter.ctx;
-        //
-        // let midPoint = new Point(
-        //     (this.mouse.x + this._lastPoint.x) * 0.5,
-        //     (this.mouse.y + this._lastPoint.y) * 0.5,
-        //     );
-        //
-        // let a = this.lerp(0.5, 1.5, this.pressure);
-        // ctx1.lineWidth = this.painter.lineWidth * a;
-        // ctx1.globalCompositeOperation = "darken";
-        //
-        // ctx1.quadraticCurveTo(this._lastPoint.x, this._lastPoint.y, midPoint.x, midPoint.y);
-        // ctx1.stroke();
-        // ctx1.beginPath();
-        // ctx1.moveTo(midPoint.x, midPoint.y);
-        //
-
         this._lastPoint = this.mouse.copy();
-        let delta = Point.distance(this._points[this._points.length - 1], this._lastPoint);
-
         let width = this.getWidth();
-        if (delta > width * 0.25) {
-            this._points.push(this._lastPoint);
-            this._widths.push(width);
-        }
+        this._points.push(this._lastPoint);
+        const lastWidth = this._widths[this._widths.length - 1];
+        this._widths.push(Utils.clamp(lastWidth - 1, lastWidth + 1, width));
 
-        window.webkitRequestAnimationFrame(() => this.drawPath());
+        this.requestDrawPath();
     }
 
     up(): void {
     }
 
     pressureChanged(){
-        window.webkitRequestAnimationFrame(() => this.drawPath());
+        this.requestDrawPath();
     }
 
     getWidth(){

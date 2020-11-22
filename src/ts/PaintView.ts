@@ -31,6 +31,7 @@ export default class PaintView extends View {
     private _undoBuffer: ImageData;
     private _undoButton: HTMLDivElement;
     private _timeStamp: number;
+    private _tickTimeStamp: number;
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
@@ -334,6 +335,7 @@ export default class PaintView extends View {
         super.show();
         this._currentTouchId = 0;
         this.clearUndoBuffer();
+        window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
     }
 
     hide(){
@@ -341,5 +343,21 @@ export default class PaintView extends View {
             this.saveImage();
         }
         super.hide();
+    }
+
+    private tick(timeStamp: number) {
+        if (!this.isVisible()){
+            return;
+        }
+
+        window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
+
+        if (!this.currentTool) {
+            return;
+        }
+        
+        let delta = timeStamp - this._tickTimeStamp;
+        this._tickTimeStamp = timeStamp;
+        this.currentTool.tick(delta);
     }
 }
