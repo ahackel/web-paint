@@ -2,6 +2,11 @@ import {Palette} from "./Palette";
 
 export default class ColorPalette extends Palette {
 
+    get color() { return this.selectedOption }
+    set color(value: string) { this.selectedOption = value }
+
+    // 16 color Mac palette
+    // https://en.wikipedia.org/wiki/List_of_software_palettes#Apple_Macintosh_default_16-color_palette
     constructor(id: string){
         let colors: string[] = [
             "#FFFFFF", "#f5f60d", "#f5650a", "#d50406",
@@ -13,7 +18,7 @@ export default class ColorPalette extends Palette {
         super(id, colors);
         this.selectedIndex = 15;
     }
-
+    
     updateOption(element: HTMLDivElement, option: string) {
         element.style.background = option;
     }

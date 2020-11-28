@@ -1,12 +1,13 @@
-import {View} from "./View";
-import Utils from "./Utils";
+import {View} from "../views/View";
+import Utils from "../utils/Utils";
 
+// base class for palettes
 export class Palette extends View {
     public onSelectionChanged: Function | undefined;
     private _selectedElement: HTMLDivElement;
     private _optionsElement: HTMLDivElement;
-    private _options: string[];
     private _selectedIndex: number;
+    protected _options: any[];
     
     private static _expandedPalette: Palette;
 
@@ -15,7 +16,16 @@ export class Palette extends View {
         this._selectedIndex = value;
         this.updateOption(this._selectedElement, this.selectedOption);
     }
+    
     get selectedOption(){ return this._options[this._selectedIndex] }
+    set selectedOption(value){
+        let index = this._options.indexOf(value);
+        if (index === -1){
+            return;
+        }
+        this.selectedIndex = index;
+    }
+    
     get isCollapsed(){ return this._element.classList.contains("collapsed") }
 
     constructor(id: string, options: any[], rightAlign: boolean = false) {

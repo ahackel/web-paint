@@ -1,45 +1,24 @@
 import Tool from "./Tool";
-import Point from "../Point";
-import PaintView from "../PaintView";
+import Point from "../utils/Point";
+import PaintView from "../views/PaintView";
+import Utils from "../utils/Utils";
+
 // @ts-ignore
 import brushPath from "url:../../img/brush.png";
-import Utils from "../Utils";
 
+// Paints lines with varying stroke width
 export default class PenTool extends Tool {
 
     private _lastPoint: Point = new Point(0, 0);
-    private _brush: HTMLImageElement;
-    private _brushCtx: CanvasRenderingContext2D;
-    private _operation: string;
     private _points: Point[];
     private _widths: number[];
-    private _random: number[];
     private _drawPathRequested: boolean;
-
-    private lerp(a: number, b: number, alpha: number): number{
-        return a * (1 - alpha) + b * alpha;
-    }
     
-    private random(index: number){
-        if (!this._random){
-            this._random = [];
-            for (let i = 0; i < 200; i++) {
-                this._random.push(Math.random());
-            }
-        }
-        return this._random[index % this._random.length];
-    }
+    private readonly _operation: string;
 
     constructor(painter: PaintView, operation: string = "darken") {
         super(painter);
         this._operation = operation;
-
-        let brushCanvas = document.createElement("canvas");
-        brushCanvas.width = this.painter.width;
-        brushCanvas.height = this.painter.height;
-        this._brushCtx = <CanvasRenderingContext2D>brushCanvas.getContext("2d", { alpha: true });
-        this._brushCtx.imageSmoothingQuality = "high";
-        this._brushCtx.imageSmoothingEnabled = true;
     }
 
     down(): void {
@@ -47,8 +26,8 @@ export default class PenTool extends Tool {
         this._points = [this._lastPoint];
         this._widths = [this.getWidth()];
 
-        let ctx = this._brushCtx;
-        ctx.strokeStyle = this.painter.strokeStyle;
+        let ctx = this.getBufferCtx();
+        ctx.strokeStyle = this.color;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
         this.painter.ctx.globalCompositeOperation = this._operation;
@@ -68,7 +47,7 @@ export default class PenTool extends Tool {
     }
 
     drawPath(){
-        let ctx = this._brushCtx;
+        let ctx = this.getBufferCtx();
         if (this._points.length > 0){
             this.painter.undo(false);
             ctx.clearRect(0, 0, this.painter.width, this.painter.height);
@@ -104,7 +83,7 @@ export default class PenTool extends Tool {
             ctx.fillStyle = ctx.strokeStyle;
             ctx.fill();
 
-            this.painter.ctx.globalAlpha = 0.9;
+            this.painter.ctx.globalAlpha = this.opacity;
             this.painter.ctx.drawImage(ctx.canvas, 0, 0);
             this.painter.ctx.globalAlpha = 1;
         }
@@ -132,6 +111,6 @@ export default class PenTool extends Tool {
     }
 
     getWidth(){
-        return this.painter.lineWidth * Utils.clamp(0.3, 1, this.pressure / this.speed);
+        return this.lineWidth * Utils.clamp(0.3, 1, this.pressure / this.speed);
     }
 }

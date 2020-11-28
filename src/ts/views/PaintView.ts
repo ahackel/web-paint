@@ -1,14 +1,15 @@
 import {View} from "./View";
-import Point from "./Point";
-import Tool from "./tools/Tool";
-import PenTool from "./tools/PenTool";
-import ImageStorage from "./ImageStorage";
-import ColorPalette from "./ColorPalette";
-import ToolPalette from "./ToolPalette";
-import PaintBucketTool from "./tools/PaintBucketTool";
-import {Palette} from "./Palette";
-import Utils from "./Utils";
-import SizePalette from "./SizePalette";
+import Tool from "../tools/Tool";
+import ColorPalette from "../palettes/ColorPalette";
+import ToolPalette from "../palettes/ToolPalette";
+import SizePalette from "../palettes/SizePalette";
+import Utils from "../utils/Utils";
+import PenTool from "../tools/PenTool";
+import PaintBucketTool from "../tools/PaintBucketTool";
+import Point from "../utils/Point";
+import {Palette} from "../palettes/Palette";
+import ImageStorage from "../storage/ImageStorage";
+
 var Pressure = require('pressure');
 
 export default class PaintView extends View {
@@ -18,9 +19,11 @@ export default class PaintView extends View {
     width: number;
     height: number;
     currentTool: Tool;
-    strokeStyle: string | CanvasGradient | CanvasPattern = "#000";
-    lineWidth: number = 24;
     imageId: string;
+    
+    color: string;
+    opacity: number;
+    lineWidth: number;
 
     public readonly ctx: CanvasRenderingContext2D;
     private _colorPalette: ColorPalette;
@@ -57,7 +60,8 @@ export default class PaintView extends View {
         this.addEventListeners();
         
         this._colorPalette = new ColorPalette("color-palette");
-        this._colorPalette.onSelectionChanged = (color: string) => this.strokeStyle = color;
+        this._colorPalette.onSelectionChanged = (color: string) => this.color = color;
+        this.color = this._colorPalette.color;
 
         this._toolPalette = new ToolPalette("tool-palette");
         this._toolPalette.onSelectionChanged = (option: string, index: number) => {
@@ -69,6 +73,7 @@ export default class PaintView extends View {
         this._sizePalette.onSelectionChanged = (lineWidth: number) => {
             this.lineWidth = lineWidth;
         };
+        this.lineWidth = this._sizePalette.size;
 
         this._tools = [
             new PenTool(this, "darken"),
@@ -130,7 +135,7 @@ export default class PaintView extends View {
         return new Point(x, y);
     }
 
-    private getPointerEventPaintingFlag(event: PointerEvent) {
+    private static getPointerEventPaintingFlag(event: PointerEvent) {
         switch (event.pointerType) {
             case "touch":
                 return true;
@@ -179,7 +184,7 @@ export default class PaintView extends View {
             return;
         }
 
-        this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+        this.up(PaintView.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
         this._currentTouchId = 0;
     }
 
@@ -200,7 +205,7 @@ export default class PaintView extends View {
 
     touchMove(event: TouchEvent) {
         event.preventDefault();
-        let touch = this.findTouch(event.targetTouches, this._currentTouchId);
+        let touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
         if (touch == null){
             return;
         }
@@ -209,7 +214,7 @@ export default class PaintView extends View {
 
     touchEnd(event: TouchEvent) {
         event.preventDefault();
-        let touch = this.findTouch(event.targetTouches, this._currentTouchId);
+        let touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
         if (touch != null){
             return;
         }
@@ -217,7 +222,7 @@ export default class PaintView extends View {
         this._currentTouchId = 0;
     }
 
-    private findTouch(touches: TouchList, id: number){
+    private static findTouch(touches: TouchList, id: number){
         for (let i = 0; i < touches.length; i++) {
             if (touches[i].identifier == id){
                 return touches[i];
@@ -286,10 +291,10 @@ export default class PaintView extends View {
         this.ctx.clearRect(0,0, this.width, this.height);
     }
 
-    fill() {
-        this.ctx.fillStyle = this.strokeStyle;
-        this.ctx.fillRect(0,0, this.width, this.height);
-    }
+    // fill() {
+    //     this.ctx.fillStyle = this.strokeStyle;
+    //     this.ctx.fillRect(0,0, this.width, this.height);
+    // }
 
     registerUndo(){
         this._undoBuffer = this.ctx.getImageData(0, 0, this.width, this.height);

@@ -1,7 +1,8 @@
-import ImageStorage from "./ImageStorage";
-import {config} from "./config";
 import {View} from "./View";
-import Utils from "./Utils";
+import {config} from "../config";
+import Utils from "../utils/Utils";
+import ImageStorage from "../storage/ImageStorage";
+
 
 export default class BookView extends View {
 
@@ -9,7 +10,7 @@ export default class BookView extends View {
 
     constructor(id: string) {
         super(id);
-        this._element.addEventListener("imagesaved", event => {
+        this._element.addEventListener("imagesaved", () => {
             this.updateImages();
         })
     }
