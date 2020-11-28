@@ -4589,7 +4589,7 @@ readers do not read off random characters that represent icons */
   font-weight: 400;
   font-display: block;
   src: url("fa-brands-400.27b28c58.eot");
-  src: url("fa-brands-400.27b28c58.eot?#iefix") format("embedded-opentype"), url("fa-brands-400.1f1a6800.woff2") format("woff2"), url("fa-brands-400.772ea6d3.woff") format("woff"), url("fa-brands-400.9d96cb8e.ttf") format("truetype"), url("fa-brands-400.59c672e9.svg#fontawesome") format("svg"); }
+  src: url("fa-brands-400.27b28c58.eot") format("embedded-opentype"), url("fa-brands-400.1f1a6800.woff2") format("woff2"), url("fa-brands-400.772ea6d3.woff") format("woff"), url("fa-brands-400.9d96cb8e.ttf") format("truetype"), url("fa-brands-400.59c672e9.svg") format("svg"); }
 
 .fab {
   font-family: 'Font Awesome 5 Brands';
@@ -4600,7 +4600,7 @@ readers do not read off random characters that represent icons */
   font-weight: 400;
   font-display: block;
   src: url("fa-regular-400.76cd6318.eot");
-  src: url("fa-regular-400.76cd6318.eot?#iefix") format("embedded-opentype"), url("fa-regular-400.4081da62.woff2") format("woff2"), url("fa-regular-400.dce6d396.woff") format("woff"), url("fa-regular-400.ea1bc541.ttf") format("truetype"), url("fa-regular-400.8757ef8a.svg#fontawesome") format("svg"); }
+  src: url("fa-regular-400.76cd6318.eot") format("embedded-opentype"), url("fa-regular-400.4081da62.woff2") format("woff2"), url("fa-regular-400.dce6d396.woff") format("woff"), url("fa-regular-400.ea1bc541.ttf") format("truetype"), url("fa-regular-400.8757ef8a.svg") format("svg"); }
 
 .far {
   font-family: 'Font Awesome 5 Free';
@@ -4611,11 +4611,10 @@ readers do not read off random characters that represent icons */
   font-weight: 900;
   font-display: block;
   src: url("fa-solid-900.8f7a0587.eot");
-  src: url("fa-solid-900.8f7a0587.eot?#iefix") format("embedded-opentype"), url("fa-solid-900.72677105.woff2") format("woff2"), url("fa-solid-900.1eee1053.woff") format("woff"), url("fa-solid-900.a92950d4.ttf") format("truetype"), url("fa-solid-900.dbcb4c61.svg#fontawesome") format("svg"); }
+  src: url("fa-solid-900.8f7a0587.eot") format("embedded-opentype"), url("fa-solid-900.72677105.woff2") format("woff2"), url("fa-solid-900.1eee1053.woff") format("woff"), url("fa-solid-900.a92950d4.ttf") format("truetype"), url("fa-solid-900.dbcb4c61.svg") format("svg"); }
 
 .fa,
 .fas {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900; }
 
-/*# sourceMappingURL=index.cee964d0.css.map */

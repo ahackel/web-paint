@@ -138,7 +138,7 @@
       this[globalName] = mainExports;
     }
   }
-})({"7Jhnx":[function(require,module,exports) {
+})({"3BdaW":[function(require,module,exports) {
 "use strict";
 
 var _BookView = _interopRequireDefault(require("./views/BookView"));
@@ -197,7 +197,7 @@ var App = /*#__PURE__*/function () {
 }();
 
 var app = new App();
-},{"./views/BookView":"6vibo","./views/PaintView":"76MK5"}],"6vibo":[function(require,module,exports) {
+},{"./views/BookView":"6NHsO","./views/PaintView":"5JgBx"}],"6NHsO":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -322,7 +322,7 @@ var BookView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = BookView;
-},{"./View":"5saFO","../config":"5f9CL","../utils/Utils":"07zNF","../storage/ImageStorage":"3aA1f"}],"5saFO":[function(require,module,exports) {
+},{"./View":"5r9H0","../config":"6Yi6r","../utils/Utils":"18Pyl","../storage/ImageStorage":"rhr8I"}],"5r9H0":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -380,7 +380,7 @@ var View = /*#__PURE__*/function () {
 }();
 
 exports.View = View;
-},{}],"5f9CL":[function(require,module,exports) {
+},{}],"6Yi6r":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -391,7 +391,7 @@ var config = {
   PagesInBookCount: 16
 };
 exports.config = config;
-},{}],"07zNF":[function(require,module,exports) {
+},{}],"18Pyl":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -615,7 +615,7 @@ var Utils = /*#__PURE__*/function () {
 }();
 
 exports.default = Utils;
-},{"./Point":"3iFpc"}],"3iFpc":[function(require,module,exports) {
+},{"./Point":"5wCBB"}],"5wCBB":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -670,7 +670,7 @@ var Point = /*#__PURE__*/function () {
 }();
 
 exports.default = Point;
-},{}],"3aA1f":[function(require,module,exports) {
+},{}],"rhr8I":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -777,7 +777,7 @@ var ImageStorage = /*#__PURE__*/function () {
 exports.default = ImageStorage;
 
 _defineProperty(ImageStorage, "_adapter", new _LocalForageAdapter.default());
-},{"./LocalForageAdapter":"4PsSU","../utils/Utils":"07zNF"}],"4PsSU":[function(require,module,exports) {
+},{"./LocalForageAdapter":"4WDoV","../utils/Utils":"18Pyl"}],"4WDoV":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -862,7 +862,7 @@ var LocalForageAdapter = /*#__PURE__*/function (_StorageAdapter) {
 }(_StorageAdapter2.default);
 
 exports.default = LocalForageAdapter;
-},{"localforage":"21iSG","./StorageAdapter":"6KZua"}],"21iSG":[function(require,module,exports) {
+},{"localforage":"78f6t","./StorageAdapter":"2Lui6"}],"78f6t":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 
@@ -3756,7 +3756,7 @@ var global = arguments[3];
     }]
   }, {}, [4])(4);
 });
-},{}],"6KZua":[function(require,module,exports) {
+},{}],"2Lui6":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3771,7 +3771,7 @@ var StorageAdapter = function StorageAdapter() {
 };
 
 exports.default = StorageAdapter;
-},{}],"76MK5":[function(require,module,exports) {
+},{}],"5JgBx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4265,7 +4265,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.default = PaintView;
-},{"./View":"5saFO","../palettes/ColorPalette":"5CHbp","../palettes/ToolPalette":"p296R","../palettes/SizePalette":"64wxU","../utils/Utils":"07zNF","../tools/PenTool":"1c7G4","../tools/PaintBucketTool":"4cR5x","../utils/Point":"3iFpc","../palettes/Palette":"2ZXrU","../storage/ImageStorage":"3aA1f","pressure":"1yMz2"}],"5CHbp":[function(require,module,exports) {
+},{"./View":"5r9H0","../palettes/ColorPalette":"3Sxx5","../palettes/ToolPalette":"4QJIz","../palettes/SizePalette":"5GzuZ","../utils/Utils":"18Pyl","../tools/PenTool":"4rq5y","../tools/PaintBucketTool":"3U3Oz","../utils/Point":"5wCBB","../palettes/Palette":"478CM","../storage/ImageStorage":"rhr8I","pressure":"2AVgj"}],"3Sxx5":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4334,7 +4334,7 @@ var ColorPalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = ColorPalette;
-},{"./Palette":"2ZXrU"}],"2ZXrU":[function(require,module,exports) {
+},{"./Palette":"478CM"}],"478CM":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4550,7 +4550,7 @@ var Palette = /*#__PURE__*/function (_View) {
 }(_View2.View);
 
 exports.Palette = Palette;
-},{"../views/View":"5saFO","../utils/Utils":"07zNF"}],"p296R":[function(require,module,exports) {
+},{"../views/View":"5r9H0","../utils/Utils":"18Pyl"}],"4QJIz":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4609,7 +4609,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = ToolPalette;
-},{"./Palette":"2ZXrU"}],"64wxU":[function(require,module,exports) {
+},{"./Palette":"478CM"}],"5GzuZ":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4677,7 +4677,7 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
 }(_Palette2.Palette);
 
 exports.default = SizePalette;
-},{"./Palette":"2ZXrU"}],"1c7G4":[function(require,module,exports) {
+},{"./Palette":"478CM"}],"4rq5y":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4838,7 +4838,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PenTool;
-},{"./Tool":"3Y0IK","../utils/Point":"3iFpc","../utils/Utils":"07zNF"}],"3Y0IK":[function(require,module,exports) {
+},{"./Tool":"QgEt2","../utils/Point":"5wCBB","../utils/Utils":"18Pyl"}],"QgEt2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4932,7 +4932,7 @@ var Tool = /*#__PURE__*/function () {
 }();
 
 exports.default = Tool;
-},{"../utils/Point":"3iFpc"}],"4cR5x":[function(require,module,exports) {
+},{"../utils/Point":"5wCBB"}],"3U3Oz":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4991,7 +4991,7 @@ var PaintBucketTool = /*#__PURE__*/function (_Tool) {
 }(_Tool2.default);
 
 exports.default = PaintBucketTool;
-},{"./Tool":"3Y0IK","../utils/Utils":"07zNF"}],"1yMz2":[function(require,module,exports) {
+},{"./Tool":"QgEt2","../utils/Utils":"18Pyl"}],"2AVgj":[function(require,module,exports) {
 var define;
 // Pressure v2.2.0 | Created By Stuart Yamartino | MIT License | 2015 - 2020
 !function (e, t) {
@@ -5338,6 +5338,5 @@ var define;
 
   return h;
 });
-},{}]},{},["7Jhnx"], "7Jhnx", "parcelRequireb491")
+},{}]},{},["3BdaW"], "3BdaW", "parcelRequireb491")
 
-//# sourceMappingURL=index.012020ef.js.map
