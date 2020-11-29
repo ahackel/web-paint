@@ -1,15 +1,18 @@
 import {View} from "./views/View";
 import BookView from "./views/BookView";
 import PaintView from "./views/PaintView";
+import ImageStorage from "./storage/ImageStorage";
+import DropboxAuthView from "./views/DropboxAuthView";
 
 class App {
     private activeView: View;
     private bookView: BookView;
     private paintView: PaintView;
+    private dropboxAuthView: DropboxAuthView;
 
     constructor() {
         App.preventOverScroll();
-
+        
         this.bookView = new BookView("book");
         this.bookView.onImageSelected = (id: string) => {
             this.paintView.loadImage(id)
@@ -21,8 +24,9 @@ class App {
         this.paintView = new PaintView("paint",() => {
             this.openView(this.bookView);
         });
-        
-        this.openView(this.bookView);
+
+        this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
+        this.openView(ImageStorage.adapter.isAuthenticated ? this.bookView : this.dropboxAuthView);
     }
 
     private static preventOverScroll() {

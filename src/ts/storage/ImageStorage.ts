@@ -1,9 +1,12 @@
 import LocalForageAdapter from "./LocalForageAdapter";
 import Utils from "../utils/Utils";
+import DropboxAdapter from "./DropboxAdapter";
 
 export default class ImageStorage {
 
-	private static _adapter = new LocalForageAdapter();
+	private static _adapter = new DropboxAdapter();
+	
+	public static get adapter() { return this._adapter }
 
 	private static loadImageFromStore(id: string): Promise<HTMLImageElement> {
 		if (!id) {
