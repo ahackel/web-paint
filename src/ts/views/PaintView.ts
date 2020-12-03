@@ -186,7 +186,7 @@ export default class PaintView extends View {
         }
 
         // normalize pressure:
-        let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
+        let pressure = event.pointerType == "pen" ? Utils.clamp(0.5, 1, event.pressure * 2) : 1;
         this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
 
