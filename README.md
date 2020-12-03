@@ -1,8 +1,8 @@
 # Web-paint
 > This is a personal painting web-app.
 
-## Build version
-A build version can be found here:
+## Built version
+A built version can be found here:
 https://andreashackel.de/web-paint/
 
 ## installation
