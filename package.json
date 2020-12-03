@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "scripts": {
     "start": "parcel serve ./src/index.html",
-    "build": "rm -rf docs; parcel build ./src/index.html --no-scope-hoist"
+    "build": "parcel build ./src/index.html"
   },
   "devDependencies": {
-    "parcel": "^2.0.0-nightly.462",
+    "parcel": "^2.0.0-nightly.465",
     "typescript": "^4.1.2"
   },
   "dependencies": {
@@ -21,7 +21,10 @@
     "main": {
       "minify": false,
       "publicUrl": "./",
-      "sourceMap": false
+      "sourceMap": false,
+      "includeNodeModules": {
+        "dropbox": false
+      }
     }
   },
   "browserslist": [

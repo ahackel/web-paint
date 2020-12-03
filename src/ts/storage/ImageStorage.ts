@@ -4,7 +4,7 @@ import DropboxAdapter from "./DropboxAdapter";
 
 export default class ImageStorage {
 
-	private static _adapter = new DropboxAdapter();
+	private static _adapter = new LocalForageAdapter();
 	
 	public static get adapter() { return this._adapter }
 

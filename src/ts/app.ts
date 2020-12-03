@@ -25,8 +25,12 @@ class App {
             this.openView(this.bookView);
         });
 
-        this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
-        this.openView(ImageStorage.adapter.isAuthenticated ? this.bookView : this.dropboxAuthView);
+
+        // Dropbox integration is not working yet:
+        // this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
+        // this.openView(ImageStorage.adapter.isAuthenticated ? this.bookView : this.dropboxAuthView);
+
+        this.openView(this.bookView);
     }
 
     private static preventOverScroll() {
