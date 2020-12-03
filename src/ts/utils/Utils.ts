@@ -8,6 +8,28 @@ export default class Utils {
         element.addEventListener("click", callback);
     }
 
+    public static addLongClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any, delay: number = 1500){
+        
+        let timer: any;
+        let caller = this;
+        let called: boolean = false;
+        
+        element.addEventListener("touchstart", event => {
+            timer = setTimeout(() => {
+                callback.call(caller, event);
+                called = true;
+            }, delay);
+        });
+        element.addEventListener("touchend", event => {
+            if (called){
+                event.stopImmediatePropagation();
+            }
+            else{
+                clearTimeout(timer);
+            }
+        });
+    }
+
     public static DispatchEventToAllElements(event: Event) {
         const elements = document.getElementsByTagName("*");
         for (let i = 0; i < elements.length; i++) {
