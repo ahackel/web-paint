@@ -1,7 +1,7 @@
 (function () {
   // ASSET: src/lib/canvas-to-blob.min.js
-  var $3ce38b75d22cba225b19b5e849f02b6b$exports = {};
-  var $3ce38b75d22cba225b19b5e849f02b6b$var$define;
+  var $5376460cefecf698f89f1b57efacae67$exports = {};
+  var $5376460cefecf698f89f1b57efacae67$var$define;
   !function (t) {
     var a = t.HTMLCanvasElement && t.HTMLCanvasElement.prototype,
         b = t.Blob && function () {
@@ -56,8 +56,8 @@
       setTimeout(function () {
         t(r(n.toDataURL(e, o)));
       });
-    })), "function" == typeof $3ce38b75d22cba225b19b5e849f02b6b$var$define && $3ce38b75d22cba225b19b5e849f02b6b$var$define.amd ? $3ce38b75d22cba225b19b5e849f02b6b$var$define(function () {
+    })), "function" == typeof $5376460cefecf698f89f1b57efacae67$var$define && $5376460cefecf698f89f1b57efacae67$var$define.amd ? $5376460cefecf698f89f1b57efacae67$var$define(function () {
       return r;
-    }) : "object" == "object" && $3ce38b75d22cba225b19b5e849f02b6b$exports ? $3ce38b75d22cba225b19b5e849f02b6b$exports = r : t.dataURLtoBlob = r;
+    }) : "object" == "object" && $5376460cefecf698f89f1b57efacae67$exports ? $5376460cefecf698f89f1b57efacae67$exports = r : t.dataURLtoBlob = r;
   }(window);
 })();

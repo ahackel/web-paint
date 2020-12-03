@@ -21,10 +21,7 @@
     "main": {
       "minify": false,
       "publicUrl": "./",
-      "sourceMap": false,
-      "includeNodeModules": {
-        "dropbox": false
-      }
+      "sourceMap": false
     }
   },
   "browserslist": [

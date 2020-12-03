@@ -10,22 +10,21 @@ import Point from "../utils/Point";
 import {Palette} from "../palettes/Palette";
 import ImageStorage from "../storage/ImageStorage";
 
-var Pressure = require('pressure');
+// var Pressure = require('pressure');
 
 export default class PaintView extends View {
-
-    pixelPerfect = true;
-    scaleFactor = 1;
-    width: number;
-    height: number;
-    currentTool: Tool;
-    imageId: string;
+    public readonly pixelPerfect = false;   // Make sure to perform painting operations on rounded pixel positions
+    public readonly imageSmoothing = true;  // Whether to use smooth pixel filtering or to draw hard pixel edges
+    public readonly scaleFactor = 1;
+    public readonly width: number;
+    public readonly height: number;
     
-    color: string;
-    opacity: number;
-    lineWidth: number;
-
-    public readonly ctx: CanvasRenderingContext2D;
+    private _currentTool: Tool;
+    private _imageId: string;
+    private _color: string;
+    private _opacity: number;
+    private _lineWidth: number;
+    private _ctx: CanvasRenderingContext2D;
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
     private _sizePalette: SizePalette;
@@ -36,12 +35,25 @@ export default class PaintView extends View {
     private _timeStamp: number;
     private _tickTimeStamp: number;
 
+    get color(): string { return this._color; }
+    get opacity(): number { return this._opacity; }
+    get lineWidth(): number { return this._lineWidth; }
+    get ctx(): CanvasRenderingContext2D { return this._ctx; }
+
     constructor(id: string, onBackClicked: Function) {
         super(id);
 
         this.width = window.screen.availWidth;
         this.height = window.screen.availHeight;
+        
+        this.createButtons(onBackClicked);
+        this.createCtx();
+        this.addEventListeners();
+        this.createPalettes();
+        this.createTools();
+    }
 
+    private createButtons(onBackClicked: Function) {
         let backButton = <HTMLDivElement>document.getElementById("back-button");
         Utils.addFastClick(backButton, () => onBackClicked());
 
@@ -50,43 +62,47 @@ export default class PaintView extends View {
 
         this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
         Utils.addFastClick(this._undoButton, () => this.undo());
+    }
 
+    private createCtx() {
         let canvas = <HTMLCanvasElement>document.getElementById("canvas");
         canvas.width = this.width;
         canvas.height = this.height;
-        this.ctx = <CanvasRenderingContext2D>canvas.getContext("2d", { alpha: true });
-        // this.ctx.imageSmoothingQuality = "high";
-        this.ctx.imageSmoothingEnabled = false;
-        this.addEventListeners();
-        
-        this._colorPalette = new ColorPalette("color-palette");
-        this._colorPalette.onSelectionChanged = (color: string) => this.color = color;
-        this.color = this._colorPalette.color;
+        this._ctx = <CanvasRenderingContext2D>canvas.getContext("2d", {alpha: true});
+        this._ctx.imageSmoothingQuality = "high";
+        this._ctx.imageSmoothingEnabled = this.imageSmoothing;
+    }
 
-        this._toolPalette = new ToolPalette("tool-palette");
-        this._toolPalette.onSelectionChanged = (option: string, index: number) => {
-            const toolCount = this._tools.length;
-            this.currentTool = this._tools[Math.min(index, toolCount - 1)];
-        };
-
-        this._sizePalette = new SizePalette("size-palette");
-        this._sizePalette.onSelectionChanged = (lineWidth: number) => {
-            this.lineWidth = lineWidth;
-        };
-        this.lineWidth = this._sizePalette.size;
-
+    private createTools() {
         this._tools = [
             new PenTool(this, "darken"),
             new PenTool(this, "source-over"),
             new PenTool(this, "destination-out"),
             new PaintBucketTool(this)
         ]
-        this.currentTool = this._tools[0];
+        this._currentTool = this._tools[0];
     }
 
+    private createPalettes() {
+        this._colorPalette = new ColorPalette("color-palette");
+        this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
+        this._color = this._colorPalette.color;
+
+        this._toolPalette = new ToolPalette("tool-palette");
+        this._toolPalette.onSelectionChanged = (option: string, index: number) => {
+            const toolCount = this._tools.length;
+            this._currentTool = this._tools[Math.min(index, toolCount - 1)];
+        };
+
+        this._sizePalette = new SizePalette("size-palette");
+        this._sizePalette.onSelectionChanged = (lineWidth: number) => {
+            this._lineWidth = lineWidth;
+        };
+        this._lineWidth = this._sizePalette.size;
+    }
 
     private addEventListeners() {
-        let canvas = this.ctx.canvas;
+        let canvas = this._ctx.canvas;
         canvas.addEventListener('click', event => event.preventDefault());
 
         if (window.PointerEvent != null){
@@ -122,8 +138,8 @@ export default class PaintView extends View {
     }
 
     private getTouchEventPosition = (touch: Touch) => {
-        let target = <HTMLElement>event.target;
-        let rect = target.getBoundingClientRect();
+        let canvas = this._ctx.canvas;
+        let rect = canvas.getBoundingClientRect();
 
         let x = (touch.clientX - rect.left) / rect.width * this.width;
         let y = (touch.clientY - rect.top) / rect.height * this.height;
@@ -135,17 +151,7 @@ export default class PaintView extends View {
         return new Point(x, y);
     }
 
-    private static getPointerEventPaintingFlag(event: PointerEvent) {
-        switch (event.pointerType) {
-            case "touch":
-                return true;
-            default:
-                return event.buttons === 1;
-        }
-    }
-
     pointerDown(event: PointerEvent) {
-        console.log("down");
         event.preventDefault();
         if (event.pointerType == 'touch' && this._currentTouchId !== 0){
             return;
@@ -188,10 +194,12 @@ export default class PaintView extends View {
         this._currentTouchId = 0;
     }
 
+    private static getPointerEventPaintingFlag = (e: PointerEvent) => e.pointerType === "touch" ? true : e.buttons === 1;
+
     pressureChanged(force: number){
         let pressure = Utils.clamp(0.3, 1, force * 2);
-        this.currentTool.pressure = Math.max(pressure, this.currentTool.pressure);
-        this.currentTool.pressureChanged();
+        this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
+        this._currentTool.pressureChanged();
     }
 
     touchStart(event: TouchEvent) {
@@ -218,7 +226,7 @@ export default class PaintView extends View {
         if (touch != null){
             return;
         }
-        this.up(true,event.touches.length > 0 ? this.getTouchEventPosition(touch) : this.currentTool.mouse);
+        this.up(true,event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
         this._currentTouchId = 0;
     }
 
@@ -232,72 +240,62 @@ export default class PaintView extends View {
     }
 
     private move(timeStamp: number, isPainting: boolean, mouse: Point, pressure: number) {
-        if (!this.currentTool) {
+        if (!this._currentTool) {
             return;
         }
 
-
-        this.currentTool.painting = isPainting;
-        this.currentTool.pressure = pressure;
+        this._currentTool.painting = isPainting;
+        this._currentTool.pressure = pressure;
 
         let newMouse = mouse;
-        let delta = Point.distance(this.currentTool.mouse, newMouse);
+        let delta = Point.distance(this._currentTool.mouse, newMouse);
 
         if (delta > 2) {
             let timeDelta = timeStamp - this._timeStamp;
             this._timeStamp = timeStamp;
             let speed = delta / timeDelta;
 
-            this.currentTool.speed = Utils.lerp(this.currentTool.speed, speed, 0.2);
-            this.currentTool.mouse = newMouse;
-            this.currentTool.move();
+            this._currentTool.speed = Utils.lerp(this._currentTool.speed, speed, 0.2);
+            this._currentTool.mouse = newMouse;
+            this._currentTool.move();
         }
     }
 
     private down(timeStamp: number, isPainting: boolean, mouse: Point, pressure: number) {
         Palette.collapseAll();
 
-        if (!this.currentTool) {
+        if (!this._currentTool) {
             return;
         }
-
-        event.preventDefault();
 
         this.registerUndo();
         this._timeStamp = timeStamp;
-        this.currentTool.speed = 1;
-        this.currentTool.painting = isPainting;
-        this.currentTool.pressure = pressure;
-        this.currentTool.mouse = mouse;
-        this.currentTool.down();
+        this._currentTool.speed = 1;
+        this._currentTool.painting = isPainting;
+        this._currentTool.pressure = pressure;
+        this._currentTool.mouse = mouse;
+        this._currentTool.down();
     }
 
     private up(isPainting: boolean, mouse: Point) {
-        if (!this.currentTool) {
+        if (!this._currentTool) {
             return;
         }
 
-        event.preventDefault();
-
-        this.currentTool.painting = isPainting;
-        this.currentTool.mouse = mouse;
-        this.currentTool.up();
+        this._currentTool.painting = isPainting;
+        this._currentTool.mouse = mouse;
+        this._currentTool.up();
     }
 
     clear(registerUndo: boolean = false) {
         if (registerUndo){
             this.registerUndo();
         }
-        this.ctx.clearRect(0,0, this.width, this.height);
+        this._ctx.clearRect(0,0, this.width, this.height);
     }
 
-    // fill() {
-    //     this.ctx.fillStyle = this.strokeStyle;
-    //     this.ctx.fillRect(0,0, this.width, this.height);
-    // }
-
     registerUndo(){
-        this._undoBuffer = this.ctx.getImageData(0, 0, this.width, this.height);
+        this._undoBuffer = this._ctx.getImageData(0, 0, this.width, this.height);
         this.updateUndoButtonState();
     }
 
@@ -318,22 +316,22 @@ export default class PaintView extends View {
         if (swapBuffers){
             this.registerUndo();
         }
-        this.ctx.putImageData(undoBuffer, 0, 0);
+        this._ctx.putImageData(undoBuffer, 0, 0);
     }
 
     loadImage(id: string) {
         return ImageStorage.loadImage(id)
             .then(image => {
-                this.imageId = id;
+                this._imageId = id;
                 this.clear();
                 if (image){
-                    this.ctx.drawImage(image, 0, 0);
+                    this._ctx.drawImage(image, 0, 0);
                 }
             })
     }
 
     saveImage() {
-        this.ctx.canvas.toBlob(blob => ImageStorage.saveImage(this.imageId, blob as Blob));
+        this._ctx.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
     }
 
     show(){
@@ -344,7 +342,7 @@ export default class PaintView extends View {
     }
 
     hide(){
-        if (this.imageId){
+        if (this._imageId){
             this.saveImage();
         }
         super.hide();
@@ -357,12 +355,12 @@ export default class PaintView extends View {
 
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
 
-        if (!this.currentTool) {
+        if (!this._currentTool) {
             return;
         }
         
         let delta = timeStamp - this._tickTimeStamp;
         this._tickTimeStamp = timeStamp;
-        this.currentTool.tick(delta);
+        this._currentTool.tick(delta);
     }
 }

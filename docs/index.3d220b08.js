@@ -5,13 +5,13 @@
 
   var $parcel$global = typeof globalThis !== 'undefined' ? globalThis : typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : {};
 
-  function $b55217c53974e449d6af4517b7e83dad$var$_classCallCheck(instance, Constructor) {
+  function $d3eac75d1d23780ebee32bc0c4afa186$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $b55217c53974e449d6af4517b7e83dad$var$_defineProperties(target, props) {
+  function $d3eac75d1d23780ebee32bc0c4afa186$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -21,13 +21,13 @@
     }
   }
 
-  function $b55217c53974e449d6af4517b7e83dad$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $b55217c53974e449d6af4517b7e83dad$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $b55217c53974e449d6af4517b7e83dad$var$_defineProperties(Constructor, staticProps);
+  function $d3eac75d1d23780ebee32bc0c4afa186$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $d3eac75d1d23780ebee32bc0c4afa186$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $d3eac75d1d23780ebee32bc0c4afa186$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $b55217c53974e449d6af4517b7e83dad$var$_defineProperty(obj, key, value) {
+  function $d3eac75d1d23780ebee32bc0c4afa186$var$_defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -42,12 +42,12 @@
     return obj;
   }
 
-  var $b55217c53974e449d6af4517b7e83dad$export$View = /*#__PURE__*/function () {
+  var $d3eac75d1d23780ebee32bc0c4afa186$export$View = /*#__PURE__*/function () {
     function View(id) {
       var _this = this;
 
-      $b55217c53974e449d6af4517b7e83dad$var$_classCallCheck(this, View);
-      $b55217c53974e449d6af4517b7e83dad$var$_defineProperty(this, "isVisible", function () {
+      $d3eac75d1d23780ebee32bc0c4afa186$var$_classCallCheck(this, View);
+      $d3eac75d1d23780ebee32bc0c4afa186$var$_defineProperty(this, "isVisible", function () {
         return !_this._element.classList.contains("hidden");
       });
       this._element = document.getElementById(id);
@@ -59,7 +59,7 @@
       this.hide();
     }
 
-    $b55217c53974e449d6af4517b7e83dad$var$_createClass(View, [{
+    $d3eac75d1d23780ebee32bc0c4afa186$var$_createClass(View, [{
       key: "clear",
       value: function clear() {
         while (this._element.hasChildNodes()) {
@@ -80,17 +80,17 @@
     return View;
   }();
 
-  var $4bf743b0e649d033edab122c0a7f322c$export$config = {
+  var $5fc2015d2ec57910e0fe1a0af2b9f617$export$config = {
     PagesInBookCount: 16
   };
 
-  function $cbbe4396c0898fac82b1de2ef9426b74$var$_classCallCheck(instance, Constructor) {
+  function $92dd1d4feee990cfd982aa729623e7fc$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $cbbe4396c0898fac82b1de2ef9426b74$var$_defineProperties(target, props) {
+  function $92dd1d4feee990cfd982aa729623e7fc$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -100,20 +100,20 @@
     }
   }
 
-  function $cbbe4396c0898fac82b1de2ef9426b74$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $cbbe4396c0898fac82b1de2ef9426b74$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $cbbe4396c0898fac82b1de2ef9426b74$var$_defineProperties(Constructor, staticProps);
+  function $92dd1d4feee990cfd982aa729623e7fc$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $92dd1d4feee990cfd982aa729623e7fc$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $92dd1d4feee990cfd982aa729623e7fc$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  var $cbbe4396c0898fac82b1de2ef9426b74$export$default = /*#__PURE__*/function () {
+  var $92dd1d4feee990cfd982aa729623e7fc$export$default = /*#__PURE__*/function () {
     function Point(x, y) {
-      $cbbe4396c0898fac82b1de2ef9426b74$var$_classCallCheck(this, Point);
+      $92dd1d4feee990cfd982aa729623e7fc$var$_classCallCheck(this, Point);
       this.x = x;
       this.y = y;
     }
 
-    $cbbe4396c0898fac82b1de2ef9426b74$var$_createClass(Point, [{
+    $92dd1d4feee990cfd982aa729623e7fc$var$_createClass(Point, [{
       key: "copy",
       value: function copy() {
         return new Point(this.x, this.y);
@@ -144,13 +144,13 @@
     return Point;
   }();
 
-  function $76facc79e01b981640fff813eee16c5d$var$_classCallCheck(instance, Constructor) {
+  function $221dd0966d34bf75372b465b73e7e2f6$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $76facc79e01b981640fff813eee16c5d$var$_defineProperties(target, props) {
+  function $221dd0966d34bf75372b465b73e7e2f6$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -160,18 +160,18 @@
     }
   }
 
-  function $76facc79e01b981640fff813eee16c5d$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $76facc79e01b981640fff813eee16c5d$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $76facc79e01b981640fff813eee16c5d$var$_defineProperties(Constructor, staticProps);
+  function $221dd0966d34bf75372b465b73e7e2f6$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $221dd0966d34bf75372b465b73e7e2f6$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $221dd0966d34bf75372b465b73e7e2f6$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  var $76facc79e01b981640fff813eee16c5d$export$default = /*#__PURE__*/function () {
+  var $221dd0966d34bf75372b465b73e7e2f6$export$default = /*#__PURE__*/function () {
     function Utils() {
-      $76facc79e01b981640fff813eee16c5d$var$_classCallCheck(this, Utils);
+      $221dd0966d34bf75372b465b73e7e2f6$var$_classCallCheck(this, Utils);
     }
 
-    $76facc79e01b981640fff813eee16c5d$var$_createClass(Utils, null, [{
+    $221dd0966d34bf75372b465b73e7e2f6$var$_createClass(Utils, null, [{
       key: "addFastClick",
       value: function addFastClick(element, callback) {
         element.addEventListener("touchstart", function (event) {
@@ -352,7 +352,7 @@
               continue;
             }
 
-            stack.push(new $cbbe4396c0898fac82b1de2ef9426b74$export$default(cx, y));
+            stack.push(new $92dd1d4feee990cfd982aa729623e7fc$export$default(cx, y));
           }
         }
 
@@ -371,8 +371,8 @@
   }();
 
   // ASSET: node_modules/localforage/dist/localforage.js
-  var $dd75ca93237d76ad4e3e3e9f09a1be80$exports = {};
-  var $dd75ca93237d76ad4e3e3e9f09a1be80$var$define;
+  var $5be39d0b94c676191667b851cdda5eff$exports = {};
+  var $5be39d0b94c676191667b851cdda5eff$var$define;
 
   /*!
       localForage -- Offline Storage, Improved
@@ -381,10 +381,10 @@
       (c) 2013-2017 Mozilla, Apache License 2.0
   */
   (function (f) {
-    if (typeof $dd75ca93237d76ad4e3e3e9f09a1be80$exports === "object" && "object" !== "undefined") {
-      $dd75ca93237d76ad4e3e3e9f09a1be80$exports = f();
-    } else if (typeof $dd75ca93237d76ad4e3e3e9f09a1be80$var$define === "function" && $dd75ca93237d76ad4e3e3e9f09a1be80$var$define.amd) {
-      $dd75ca93237d76ad4e3e3e9f09a1be80$var$define([], f);
+    if (typeof $5be39d0b94c676191667b851cdda5eff$exports === "object" && "object" !== "undefined") {
+      $5be39d0b94c676191667b851cdda5eff$exports = f();
+    } else if (typeof $5be39d0b94c676191667b851cdda5eff$var$define === "function" && $5be39d0b94c676191667b851cdda5eff$var$define.amd) {
+      $5be39d0b94c676191667b851cdda5eff$var$define([], f);
     } else {
       var g;
 
@@ -3257,23 +3257,23 @@
     }, {}, [4])(4);
   });
 
-  function $c5844f7a366be03614965a8b831ec7fe$var$_classCallCheck(instance, Constructor) {
+  function $9f4fd4601ff9dcabae1a1f81d524739e$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  var $c5844f7a366be03614965a8b831ec7fe$export$default = function StorageAdapter() {
-    $c5844f7a366be03614965a8b831ec7fe$var$_classCallCheck(this, StorageAdapter);
+  var $9f4fd4601ff9dcabae1a1f81d524739e$export$default = function StorageAdapter() {
+    $9f4fd4601ff9dcabae1a1f81d524739e$var$_classCallCheck(this, StorageAdapter);
   };
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_classCallCheck(instance, Constructor) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_defineProperties(target, props) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -3283,13 +3283,13 @@
     }
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $081009f67d2dbbfdd92e6cde639efe4e$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $081009f67d2dbbfdd92e6cde639efe4e$var$_defineProperties(Constructor, staticProps);
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $aa0a411373d79b5229b0bd30297d14aa$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $aa0a411373d79b5229b0bd30297d14aa$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_inherits(subClass, superClass) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -3301,44 +3301,44 @@
         configurable: true
       }
     });
-    if (superClass) $081009f67d2dbbfdd92e6cde639efe4e$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $aa0a411373d79b5229b0bd30297d14aa$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_setPrototypeOf(o, p) {
-    $081009f67d2dbbfdd92e6cde639efe4e$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_setPrototypeOf(o, p) {
+    $aa0a411373d79b5229b0bd30297d14aa$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $081009f67d2dbbfdd92e6cde639efe4e$var$_setPrototypeOf(o, p);
+    return $aa0a411373d79b5229b0bd30297d14aa$var$_setPrototypeOf(o, p);
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $081009f67d2dbbfdd92e6cde639efe4e$var$_isNativeReflectConstruct();
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $aa0a411373d79b5229b0bd30297d14aa$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $081009f67d2dbbfdd92e6cde639efe4e$var$_getPrototypeOf(Derived),
+      var Super = $aa0a411373d79b5229b0bd30297d14aa$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $081009f67d2dbbfdd92e6cde639efe4e$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $aa0a411373d79b5229b0bd30297d14aa$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $081009f67d2dbbfdd92e6cde639efe4e$var$_possibleConstructorReturn(this, result);
+      return $aa0a411373d79b5229b0bd30297d14aa$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_possibleConstructorReturn(self, call) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $081009f67d2dbbfdd92e6cde639efe4e$var$_assertThisInitialized(self);
+    return $aa0a411373d79b5229b0bd30297d14aa$var$_assertThisInitialized(self);
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_assertThisInitialized(self) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -3346,7 +3346,7 @@
     return self;
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_isNativeReflectConstruct() {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -3359,14 +3359,14 @@
     }
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_getPrototypeOf(o) {
-    $081009f67d2dbbfdd92e6cde639efe4e$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_getPrototypeOf(o) {
+    $aa0a411373d79b5229b0bd30297d14aa$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $081009f67d2dbbfdd92e6cde639efe4e$var$_getPrototypeOf(o);
+    return $aa0a411373d79b5229b0bd30297d14aa$var$_getPrototypeOf(o);
   }
 
-  function $081009f67d2dbbfdd92e6cde639efe4e$var$_defineProperty(obj, key, value) {
+  function $aa0a411373d79b5229b0bd30297d14aa$var$_defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -3381,30 +3381,30 @@
     return obj;
   }
 
-  var $dd75ca93237d76ad4e3e3e9f09a1be80$$interop$default = $parcel$interopDefault($dd75ca93237d76ad4e3e3e9f09a1be80$exports);
+  var $5be39d0b94c676191667b851cdda5eff$$interop$default = $parcel$interopDefault($5be39d0b94c676191667b851cdda5eff$exports);
 
-  var $081009f67d2dbbfdd92e6cde639efe4e$export$default = /*#__PURE__*/function (_StorageAdapter) {
-    $081009f67d2dbbfdd92e6cde639efe4e$var$_inherits(LocalForageAdapter, _StorageAdapter);
+  var $aa0a411373d79b5229b0bd30297d14aa$export$default = /*#__PURE__*/function (_StorageAdapter) {
+    $aa0a411373d79b5229b0bd30297d14aa$var$_inherits(LocalForageAdapter, _StorageAdapter);
 
-    var _super = $081009f67d2dbbfdd92e6cde639efe4e$var$_createSuper(LocalForageAdapter);
+    var _super = $aa0a411373d79b5229b0bd30297d14aa$var$_createSuper(LocalForageAdapter);
 
     function LocalForageAdapter() {
       var _this;
 
-      $081009f67d2dbbfdd92e6cde639efe4e$var$_classCallCheck(this, LocalForageAdapter);
+      $aa0a411373d79b5229b0bd30297d14aa$var$_classCallCheck(this, LocalForageAdapter);
 
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
 
       _this = _super.call.apply(_super, [this].concat(args));
-      $081009f67d2dbbfdd92e6cde639efe4e$var$_defineProperty($081009f67d2dbbfdd92e6cde639efe4e$var$_assertThisInitialized(_this), "_imageStore", $dd75ca93237d76ad4e3e3e9f09a1be80$$interop$default.createInstance({
+      $aa0a411373d79b5229b0bd30297d14aa$var$_defineProperty($aa0a411373d79b5229b0bd30297d14aa$var$_assertThisInitialized(_this), "_imageStore", $5be39d0b94c676191667b851cdda5eff$$interop$default.createInstance({
         name: "ImageStore"
       }));
       return _this;
     }
 
-    $081009f67d2dbbfdd92e6cde639efe4e$var$_createClass(LocalForageAdapter, [{
+    $aa0a411373d79b5229b0bd30297d14aa$var$_createClass(LocalForageAdapter, [{
       key: "getItem",
       value: function getItem(id) {
         return this._imageStore.getItem(id);
@@ -3426,15 +3426,15 @@
       }
     }]);
     return LocalForageAdapter;
-  }($c5844f7a366be03614965a8b831ec7fe$export$default);
+  }($9f4fd4601ff9dcabae1a1f81d524739e$export$default);
 
-  function $9d7b99ce9706525b026da3b6c97af2e6$var$_classCallCheck(instance, Constructor) {
+  function $45b85264923af8e8796436f758852a1d$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $9d7b99ce9706525b026da3b6c97af2e6$var$_defineProperties(target, props) {
+  function $45b85264923af8e8796436f758852a1d$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -3444,13 +3444,13 @@
     }
   }
 
-  function $9d7b99ce9706525b026da3b6c97af2e6$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $9d7b99ce9706525b026da3b6c97af2e6$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $9d7b99ce9706525b026da3b6c97af2e6$var$_defineProperties(Constructor, staticProps);
+  function $45b85264923af8e8796436f758852a1d$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $45b85264923af8e8796436f758852a1d$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $45b85264923af8e8796436f758852a1d$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $9d7b99ce9706525b026da3b6c97af2e6$var$_defineProperty(obj, key, value) {
+  function $45b85264923af8e8796436f758852a1d$var$_defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -3465,12 +3465,12 @@
     return obj;
   }
 
-  var $9d7b99ce9706525b026da3b6c97af2e6$export$default = /*#__PURE__*/function () {
+  var $45b85264923af8e8796436f758852a1d$export$default = /*#__PURE__*/function () {
     function ImageStorage() {
-      $9d7b99ce9706525b026da3b6c97af2e6$var$_classCallCheck(this, ImageStorage);
+      $45b85264923af8e8796436f758852a1d$var$_classCallCheck(this, ImageStorage);
     }
 
-    $9d7b99ce9706525b026da3b6c97af2e6$var$_createClass(ImageStorage, null, [{
+    $45b85264923af8e8796436f758852a1d$var$_createClass(ImageStorage, null, [{
       key: "loadImageFromStore",
       value: function loadImageFromStore(id) {
         var _this = this;
@@ -3522,7 +3522,7 @@
       value: function saveImage(id, blob) {
         return this._adapter.setItem(id, blob).then(function () {
           var event = new Event("imagesaved");
-          $76facc79e01b981640fff813eee16c5d$export$default.DispatchEventToAllElements(event);
+          $221dd0966d34bf75372b465b73e7e2f6$export$default.DispatchEventToAllElements(event);
         });
       }
     }, {
@@ -3550,15 +3550,15 @@
     return ImageStorage;
   }();
 
-  $9d7b99ce9706525b026da3b6c97af2e6$var$_defineProperty($9d7b99ce9706525b026da3b6c97af2e6$export$default, "_adapter", new $081009f67d2dbbfdd92e6cde639efe4e$export$default());
+  $45b85264923af8e8796436f758852a1d$var$_defineProperty($45b85264923af8e8796436f758852a1d$export$default, "_adapter", new $aa0a411373d79b5229b0bd30297d14aa$export$default());
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_classCallCheck(instance, Constructor) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_defineProperties(target, props) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -3568,18 +3568,18 @@
     }
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $4e40f5e202f9935207b4e0c7dfbc78fe$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $4e40f5e202f9935207b4e0c7dfbc78fe$var$_defineProperties(Constructor, staticProps);
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $fbd0856aa08e3c6b67392ef9297a413c$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $fbd0856aa08e3c6b67392ef9297a413c$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_get(target, property, receiver) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_get(target, property, receiver) {
     if (typeof Reflect !== "undefined" && Reflect.get) {
-      $4e40f5e202f9935207b4e0c7dfbc78fe$var$_get = Reflect.get;
+      $fbd0856aa08e3c6b67392ef9297a413c$var$_get = Reflect.get;
     } else {
-      $4e40f5e202f9935207b4e0c7dfbc78fe$var$_get = function _get(target, property, receiver) {
-        var base = $4e40f5e202f9935207b4e0c7dfbc78fe$var$_superPropBase(target, property);
+      $fbd0856aa08e3c6b67392ef9297a413c$var$_get = function _get(target, property, receiver) {
+        var base = $fbd0856aa08e3c6b67392ef9297a413c$var$_superPropBase(target, property);
         if (!base) return;
         var desc = Object.getOwnPropertyDescriptor(base, property);
 
@@ -3591,19 +3591,19 @@
       };
     }
 
-    return $4e40f5e202f9935207b4e0c7dfbc78fe$var$_get(target, property, receiver || target);
+    return $fbd0856aa08e3c6b67392ef9297a413c$var$_get(target, property, receiver || target);
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_superPropBase(object, property) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_superPropBase(object, property) {
     while (!Object.prototype.hasOwnProperty.call(object, property)) {
-      object = $4e40f5e202f9935207b4e0c7dfbc78fe$var$_getPrototypeOf(object);
+      object = $fbd0856aa08e3c6b67392ef9297a413c$var$_getPrototypeOf(object);
       if (object === null) break;
     }
 
     return object;
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_inherits(subClass, superClass) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -3615,44 +3615,44 @@
         configurable: true
       }
     });
-    if (superClass) $4e40f5e202f9935207b4e0c7dfbc78fe$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $fbd0856aa08e3c6b67392ef9297a413c$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_setPrototypeOf(o, p) {
-    $4e40f5e202f9935207b4e0c7dfbc78fe$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_setPrototypeOf(o, p) {
+    $fbd0856aa08e3c6b67392ef9297a413c$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $4e40f5e202f9935207b4e0c7dfbc78fe$var$_setPrototypeOf(o, p);
+    return $fbd0856aa08e3c6b67392ef9297a413c$var$_setPrototypeOf(o, p);
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $4e40f5e202f9935207b4e0c7dfbc78fe$var$_isNativeReflectConstruct();
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $fbd0856aa08e3c6b67392ef9297a413c$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $4e40f5e202f9935207b4e0c7dfbc78fe$var$_getPrototypeOf(Derived),
+      var Super = $fbd0856aa08e3c6b67392ef9297a413c$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $4e40f5e202f9935207b4e0c7dfbc78fe$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $fbd0856aa08e3c6b67392ef9297a413c$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $4e40f5e202f9935207b4e0c7dfbc78fe$var$_possibleConstructorReturn(this, result);
+      return $fbd0856aa08e3c6b67392ef9297a413c$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_possibleConstructorReturn(self, call) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $4e40f5e202f9935207b4e0c7dfbc78fe$var$_assertThisInitialized(self);
+    return $fbd0856aa08e3c6b67392ef9297a413c$var$_assertThisInitialized(self);
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_assertThisInitialized(self) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -3660,7 +3660,7 @@
     return self;
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_isNativeReflectConstruct() {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -3673,22 +3673,22 @@
     }
   }
 
-  function $4e40f5e202f9935207b4e0c7dfbc78fe$var$_getPrototypeOf(o) {
-    $4e40f5e202f9935207b4e0c7dfbc78fe$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $fbd0856aa08e3c6b67392ef9297a413c$var$_getPrototypeOf(o) {
+    $fbd0856aa08e3c6b67392ef9297a413c$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $4e40f5e202f9935207b4e0c7dfbc78fe$var$_getPrototypeOf(o);
+    return $fbd0856aa08e3c6b67392ef9297a413c$var$_getPrototypeOf(o);
   }
 
-  var $4e40f5e202f9935207b4e0c7dfbc78fe$export$default = /*#__PURE__*/function (_View) {
-    $4e40f5e202f9935207b4e0c7dfbc78fe$var$_inherits(BookView, _View);
+  var $fbd0856aa08e3c6b67392ef9297a413c$export$default = /*#__PURE__*/function (_View) {
+    $fbd0856aa08e3c6b67392ef9297a413c$var$_inherits(BookView, _View);
 
-    var _super = $4e40f5e202f9935207b4e0c7dfbc78fe$var$_createSuper(BookView);
+    var _super = $fbd0856aa08e3c6b67392ef9297a413c$var$_createSuper(BookView);
 
     function BookView(id) {
       var _this;
 
-      $4e40f5e202f9935207b4e0c7dfbc78fe$var$_classCallCheck(this, BookView);
+      $fbd0856aa08e3c6b67392ef9297a413c$var$_classCallCheck(this, BookView);
       _this = _super.call(this, id);
 
       _this._element.addEventListener("imagesaved", function () {
@@ -3698,16 +3698,16 @@
       return _this;
     }
 
-    $4e40f5e202f9935207b4e0c7dfbc78fe$var$_createClass(BookView, [{
+    $fbd0856aa08e3c6b67392ef9297a413c$var$_createClass(BookView, [{
       key: "show",
       value: function show() {
-        $4e40f5e202f9935207b4e0c7dfbc78fe$var$_get($4e40f5e202f9935207b4e0c7dfbc78fe$var$_getPrototypeOf(BookView.prototype), "show", this).call(this);
+        $fbd0856aa08e3c6b67392ef9297a413c$var$_get($fbd0856aa08e3c6b67392ef9297a413c$var$_getPrototypeOf(BookView.prototype), "show", this).call(this);
         this.updateImages();
       }
     }, {
       key: "updateImages",
       value: function updateImages() {
-        for (var i = 0; i < $4bf743b0e649d033edab122c0a7f322c$export$config.PagesInBookCount; i++) {
+        for (var i = 0; i < $5fc2015d2ec57910e0fe1a0af2b9f617$export$config.PagesInBookCount; i++) {
           this.loadImage("image" + i);
         }
       }
@@ -3721,7 +3721,7 @@
         element.classList.add("thumbnail");
         element.style.width = "".concat(window.screen.availWidth * 0.18, "px");
         element.style.height = "".concat(window.screen.availHeight * 0.18, "px");
-        $76facc79e01b981640fff813eee16c5d$export$default.addFastClick(element, function (event) {
+        $221dd0966d34bf75372b465b73e7e2f6$export$default.addFastClick(element, function (event) {
           event.preventDefault();
 
           if (_this2.onImageSelected) {
@@ -3743,7 +3743,7 @@
           return;
         }
 
-        $9d7b99ce9706525b026da3b6c97af2e6$export$default.loadImage(id).then(function (img) {
+        $45b85264923af8e8796436f758852a1d$export$default.loadImage(id).then(function (img) {
           if (img) {
             if (thumbnail.childElementCount > 0) {
               thumbnail.removeChild(thumbnail.firstChild);
@@ -3756,13 +3756,13 @@
       }
     }]);
     return BookView;
-  }($b55217c53974e449d6af4517b7e83dad$export$View);
+  }($d3eac75d1d23780ebee32bc0c4afa186$export$View);
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_createForOfIteratorHelper(o, allowArrayLike) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_createForOfIteratorHelper(o, allowArrayLike) {
     var it;
 
     if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
-      if (Array.isArray(o) || (it = $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (Array.isArray(o) || (it = $ce376429613efd4c16f9ea972259e9b5$var$_unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
         if (it) o = it;
         var i = 0;
 
@@ -3815,16 +3815,16 @@
     };
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_unsupportedIterableToArray(o, minLen) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_unsupportedIterableToArray(o, minLen) {
     if (!o) return;
-    if (typeof o === "string") return $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_arrayLikeToArray(o, minLen);
+    if (typeof o === "string") return $ce376429613efd4c16f9ea972259e9b5$var$_arrayLikeToArray(o, minLen);
     var n = Object.prototype.toString.call(o).slice(8, -1);
     if (n === "Object" && o.constructor) n = o.constructor.name;
     if (n === "Map" || n === "Set") return Array.from(o);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_arrayLikeToArray(o, minLen);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return $ce376429613efd4c16f9ea972259e9b5$var$_arrayLikeToArray(o, minLen);
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_arrayLikeToArray(arr, len) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_arrayLikeToArray(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
 
     for (var i = 0, arr2 = new Array(len); i < len; i++) {
@@ -3834,13 +3834,13 @@
     return arr2;
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_classCallCheck(instance, Constructor) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_defineProperties(target, props) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -3850,13 +3850,13 @@
     }
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_defineProperties(Constructor, staticProps);
+  function $ce376429613efd4c16f9ea972259e9b5$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $ce376429613efd4c16f9ea972259e9b5$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $ce376429613efd4c16f9ea972259e9b5$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_inherits(subClass, superClass) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -3868,44 +3868,44 @@
         configurable: true
       }
     });
-    if (superClass) $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $ce376429613efd4c16f9ea972259e9b5$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_setPrototypeOf(o, p) {
-    $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_setPrototypeOf(o, p) {
+    $ce376429613efd4c16f9ea972259e9b5$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_setPrototypeOf(o, p);
+    return $ce376429613efd4c16f9ea972259e9b5$var$_setPrototypeOf(o, p);
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_isNativeReflectConstruct();
+  function $ce376429613efd4c16f9ea972259e9b5$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $ce376429613efd4c16f9ea972259e9b5$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_getPrototypeOf(Derived),
+      var Super = $ce376429613efd4c16f9ea972259e9b5$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $ce376429613efd4c16f9ea972259e9b5$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_possibleConstructorReturn(this, result);
+      return $ce376429613efd4c16f9ea972259e9b5$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_possibleConstructorReturn(self, call) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_assertThisInitialized(self);
+    return $ce376429613efd4c16f9ea972259e9b5$var$_assertThisInitialized(self);
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_assertThisInitialized(self) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -3913,7 +3913,7 @@
     return self;
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_isNativeReflectConstruct() {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -3926,20 +3926,20 @@
     }
   }
 
-  function $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_getPrototypeOf(o) {
-    $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $ce376429613efd4c16f9ea972259e9b5$var$_getPrototypeOf(o) {
+    $ce376429613efd4c16f9ea972259e9b5$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_getPrototypeOf(o);
+    return $ce376429613efd4c16f9ea972259e9b5$var$_getPrototypeOf(o);
   }
 
   // base class for palettes
-  var $38bd97d63c1eee2f4a34aa3bc26b6dcd$export$Palette = /*#__PURE__*/function (_View) {
-    $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_inherits(Palette, _View);
+  var $ce376429613efd4c16f9ea972259e9b5$export$Palette = /*#__PURE__*/function (_View) {
+    $ce376429613efd4c16f9ea972259e9b5$var$_inherits(Palette, _View);
 
-    var _super = $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_createSuper(Palette);
+    var _super = $ce376429613efd4c16f9ea972259e9b5$var$_createSuper(Palette);
 
-    $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_createClass(Palette, [{
+    $ce376429613efd4c16f9ea972259e9b5$var$_createClass(Palette, [{
       key: "selectedIndex",
       get: function get() {
         return this._selectedIndex;
@@ -3973,7 +3973,7 @@
       var _this;
 
       var rightAlign = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_classCallCheck(this, Palette);
+      $ce376429613efd4c16f9ea972259e9b5$var$_classCallCheck(this, Palette);
       _this = _super.call(this, id);
       _this._options = options;
       _this._selectedIndex = 0;
@@ -3989,7 +3989,7 @@
       return _this;
     }
 
-    $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_createClass(Palette, [{
+    $ce376429613efd4c16f9ea972259e9b5$var$_createClass(Palette, [{
       key: "collapse",
       value: function collapse() {
         this._element.classList.add("collapsed");
@@ -4024,7 +4024,7 @@
         var element = document.createElement("div");
         element.classList.add("option");
         this._selectedElement = element;
-        $76facc79e01b981640fff813eee16c5d$export$default.addFastClick(element, function () {
+        $221dd0966d34bf75372b465b73e7e2f6$export$default.addFastClick(element, function () {
           return _this2.toggle();
         });
         this.updateOption(element, this.selectedOption);
@@ -4042,7 +4042,7 @@
         this.addArrow();
         var i = 0;
 
-        var _iterator = $38bd97d63c1eee2f4a34aa3bc26b6dcd$var$_createForOfIteratorHelper(this._options),
+        var _iterator = $ce376429613efd4c16f9ea972259e9b5$var$_createForOfIteratorHelper(this._options),
             _step;
 
         try {
@@ -4074,7 +4074,7 @@
 
         var element = document.createElement("div");
         element.classList.add("option");
-        $76facc79e01b981640fff813eee16c5d$export$default.addFastClick(element, function () {
+        $221dd0966d34bf75372b465b73e7e2f6$export$default.addFastClick(element, function () {
           _this3.selectedIndex = index;
 
           _this3.collapse();
@@ -4099,15 +4099,15 @@
       }
     }]);
     return Palette;
-  }($b55217c53974e449d6af4517b7e83dad$export$View);
+  }($d3eac75d1d23780ebee32bc0c4afa186$export$View);
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_classCallCheck(instance, Constructor) {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_defineProperties(target, props) {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -4117,13 +4117,13 @@
     }
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $33365f9a62d9c131a13d79ff917d1f16$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $33365f9a62d9c131a13d79ff917d1f16$var$_defineProperties(Constructor, staticProps);
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $5dca99d43a8c97d91bd7a455231d3c8c$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $5dca99d43a8c97d91bd7a455231d3c8c$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_inherits(subClass, superClass) {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -4135,44 +4135,44 @@
         configurable: true
       }
     });
-    if (superClass) $33365f9a62d9c131a13d79ff917d1f16$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $5dca99d43a8c97d91bd7a455231d3c8c$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_setPrototypeOf(o, p) {
-    $33365f9a62d9c131a13d79ff917d1f16$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_setPrototypeOf(o, p) {
+    $5dca99d43a8c97d91bd7a455231d3c8c$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $33365f9a62d9c131a13d79ff917d1f16$var$_setPrototypeOf(o, p);
+    return $5dca99d43a8c97d91bd7a455231d3c8c$var$_setPrototypeOf(o, p);
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $33365f9a62d9c131a13d79ff917d1f16$var$_isNativeReflectConstruct();
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $5dca99d43a8c97d91bd7a455231d3c8c$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $33365f9a62d9c131a13d79ff917d1f16$var$_getPrototypeOf(Derived),
+      var Super = $5dca99d43a8c97d91bd7a455231d3c8c$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $33365f9a62d9c131a13d79ff917d1f16$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $5dca99d43a8c97d91bd7a455231d3c8c$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $33365f9a62d9c131a13d79ff917d1f16$var$_possibleConstructorReturn(this, result);
+      return $5dca99d43a8c97d91bd7a455231d3c8c$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_possibleConstructorReturn(self, call) {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $33365f9a62d9c131a13d79ff917d1f16$var$_assertThisInitialized(self);
+    return $5dca99d43a8c97d91bd7a455231d3c8c$var$_assertThisInitialized(self);
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_assertThisInitialized(self) {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -4180,7 +4180,7 @@
     return self;
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_isNativeReflectConstruct() {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -4193,19 +4193,19 @@
     }
   }
 
-  function $33365f9a62d9c131a13d79ff917d1f16$var$_getPrototypeOf(o) {
-    $33365f9a62d9c131a13d79ff917d1f16$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $5dca99d43a8c97d91bd7a455231d3c8c$var$_getPrototypeOf(o) {
+    $5dca99d43a8c97d91bd7a455231d3c8c$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $33365f9a62d9c131a13d79ff917d1f16$var$_getPrototypeOf(o);
+    return $5dca99d43a8c97d91bd7a455231d3c8c$var$_getPrototypeOf(o);
   }
 
-  var $33365f9a62d9c131a13d79ff917d1f16$export$default = /*#__PURE__*/function (_Palette) {
-    $33365f9a62d9c131a13d79ff917d1f16$var$_inherits(ColorPalette, _Palette);
+  var $5dca99d43a8c97d91bd7a455231d3c8c$export$default = /*#__PURE__*/function (_Palette) {
+    $5dca99d43a8c97d91bd7a455231d3c8c$var$_inherits(ColorPalette, _Palette);
 
-    var _super = $33365f9a62d9c131a13d79ff917d1f16$var$_createSuper(ColorPalette);
+    var _super = $5dca99d43a8c97d91bd7a455231d3c8c$var$_createSuper(ColorPalette);
 
-    $33365f9a62d9c131a13d79ff917d1f16$var$_createClass(ColorPalette, [{
+    $5dca99d43a8c97d91bd7a455231d3c8c$var$_createClass(ColorPalette, [{
       key: "color",
       get: function get() {
         return this.selectedOption;
@@ -4220,29 +4220,29 @@
     function ColorPalette(id) {
       var _this;
 
-      $33365f9a62d9c131a13d79ff917d1f16$var$_classCallCheck(this, ColorPalette);
+      $5dca99d43a8c97d91bd7a455231d3c8c$var$_classCallCheck(this, ColorPalette);
       var colors = ["#FFFFFF", "#f5f60d", "#f5650a", "#d50406", "#f50695", "#330496", "#0306c5", "#0692f0", "#06a606", "#026405", "#643403", "#946434", "#b5b5b5", "#848484", "#444444", "#030303"];
       _this = _super.call(this, id, colors);
       _this.selectedIndex = 15;
       return _this;
     }
 
-    $33365f9a62d9c131a13d79ff917d1f16$var$_createClass(ColorPalette, [{
+    $5dca99d43a8c97d91bd7a455231d3c8c$var$_createClass(ColorPalette, [{
       key: "updateOption",
       value: function updateOption(element, option) {
         element.style.background = option;
       }
     }]);
     return ColorPalette;
-  }($38bd97d63c1eee2f4a34aa3bc26b6dcd$export$Palette);
+  }($ce376429613efd4c16f9ea972259e9b5$export$Palette);
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_classCallCheck(instance, Constructor) {
+  function $9fd885faf3605f16c885551b80589177$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_defineProperties(target, props) {
+  function $9fd885faf3605f16c885551b80589177$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -4252,13 +4252,13 @@
     }
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $aaa5a867d0e2a6eb781ac92ec71fb686$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $aaa5a867d0e2a6eb781ac92ec71fb686$var$_defineProperties(Constructor, staticProps);
+  function $9fd885faf3605f16c885551b80589177$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $9fd885faf3605f16c885551b80589177$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $9fd885faf3605f16c885551b80589177$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_inherits(subClass, superClass) {
+  function $9fd885faf3605f16c885551b80589177$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -4270,44 +4270,44 @@
         configurable: true
       }
     });
-    if (superClass) $aaa5a867d0e2a6eb781ac92ec71fb686$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $9fd885faf3605f16c885551b80589177$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_setPrototypeOf(o, p) {
-    $aaa5a867d0e2a6eb781ac92ec71fb686$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $9fd885faf3605f16c885551b80589177$var$_setPrototypeOf(o, p) {
+    $9fd885faf3605f16c885551b80589177$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $aaa5a867d0e2a6eb781ac92ec71fb686$var$_setPrototypeOf(o, p);
+    return $9fd885faf3605f16c885551b80589177$var$_setPrototypeOf(o, p);
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $aaa5a867d0e2a6eb781ac92ec71fb686$var$_isNativeReflectConstruct();
+  function $9fd885faf3605f16c885551b80589177$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $9fd885faf3605f16c885551b80589177$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $aaa5a867d0e2a6eb781ac92ec71fb686$var$_getPrototypeOf(Derived),
+      var Super = $9fd885faf3605f16c885551b80589177$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $aaa5a867d0e2a6eb781ac92ec71fb686$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $9fd885faf3605f16c885551b80589177$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $aaa5a867d0e2a6eb781ac92ec71fb686$var$_possibleConstructorReturn(this, result);
+      return $9fd885faf3605f16c885551b80589177$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_possibleConstructorReturn(self, call) {
+  function $9fd885faf3605f16c885551b80589177$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $aaa5a867d0e2a6eb781ac92ec71fb686$var$_assertThisInitialized(self);
+    return $9fd885faf3605f16c885551b80589177$var$_assertThisInitialized(self);
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_assertThisInitialized(self) {
+  function $9fd885faf3605f16c885551b80589177$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -4315,7 +4315,7 @@
     return self;
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_isNativeReflectConstruct() {
+  function $9fd885faf3605f16c885551b80589177$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -4328,22 +4328,22 @@
     }
   }
 
-  function $aaa5a867d0e2a6eb781ac92ec71fb686$var$_getPrototypeOf(o) {
-    $aaa5a867d0e2a6eb781ac92ec71fb686$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $9fd885faf3605f16c885551b80589177$var$_getPrototypeOf(o) {
+    $9fd885faf3605f16c885551b80589177$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $aaa5a867d0e2a6eb781ac92ec71fb686$var$_getPrototypeOf(o);
+    return $9fd885faf3605f16c885551b80589177$var$_getPrototypeOf(o);
   }
 
-  var $aaa5a867d0e2a6eb781ac92ec71fb686$export$default = /*#__PURE__*/function (_Palette) {
-    $aaa5a867d0e2a6eb781ac92ec71fb686$var$_inherits(ToolPalette, _Palette);
+  var $9fd885faf3605f16c885551b80589177$export$default = /*#__PURE__*/function (_Palette) {
+    $9fd885faf3605f16c885551b80589177$var$_inherits(ToolPalette, _Palette);
 
-    var _super = $aaa5a867d0e2a6eb781ac92ec71fb686$var$_createSuper(ToolPalette);
+    var _super = $9fd885faf3605f16c885551b80589177$var$_createSuper(ToolPalette);
 
     function ToolPalette(id) {
       var _this;
 
-      $aaa5a867d0e2a6eb781ac92ec71fb686$var$_classCallCheck(this, ToolPalette);
+      $9fd885faf3605f16c885551b80589177$var$_classCallCheck(this, ToolPalette);
       var tools = ['<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-brush"></i>', '<i class="fas fa-eraser"></i>', '<i class="fas fa-fill-drip"></i>' // '<i class="fas fa-palette"></i>',
       // '<i class="fas fa-fill-drip"></i>'
       ];
@@ -4352,22 +4352,22 @@
       return _this;
     }
 
-    $aaa5a867d0e2a6eb781ac92ec71fb686$var$_createClass(ToolPalette, [{
+    $9fd885faf3605f16c885551b80589177$var$_createClass(ToolPalette, [{
       key: "updateOption",
       value: function updateOption(element, option) {
         element.innerHTML = option;
       }
     }]);
     return ToolPalette;
-  }($38bd97d63c1eee2f4a34aa3bc26b6dcd$export$Palette);
+  }($ce376429613efd4c16f9ea972259e9b5$export$Palette);
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_classCallCheck(instance, Constructor) {
+  function $ec78efd7806a8105310c4515b254a117$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_defineProperties(target, props) {
+  function $ec78efd7806a8105310c4515b254a117$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -4377,13 +4377,13 @@
     }
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $a74713ca782cd2d0a1034028338ec42d$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $a74713ca782cd2d0a1034028338ec42d$var$_defineProperties(Constructor, staticProps);
+  function $ec78efd7806a8105310c4515b254a117$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $ec78efd7806a8105310c4515b254a117$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $ec78efd7806a8105310c4515b254a117$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_inherits(subClass, superClass) {
+  function $ec78efd7806a8105310c4515b254a117$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -4395,44 +4395,44 @@
         configurable: true
       }
     });
-    if (superClass) $a74713ca782cd2d0a1034028338ec42d$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $ec78efd7806a8105310c4515b254a117$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_setPrototypeOf(o, p) {
-    $a74713ca782cd2d0a1034028338ec42d$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $ec78efd7806a8105310c4515b254a117$var$_setPrototypeOf(o, p) {
+    $ec78efd7806a8105310c4515b254a117$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $a74713ca782cd2d0a1034028338ec42d$var$_setPrototypeOf(o, p);
+    return $ec78efd7806a8105310c4515b254a117$var$_setPrototypeOf(o, p);
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $a74713ca782cd2d0a1034028338ec42d$var$_isNativeReflectConstruct();
+  function $ec78efd7806a8105310c4515b254a117$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $ec78efd7806a8105310c4515b254a117$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $a74713ca782cd2d0a1034028338ec42d$var$_getPrototypeOf(Derived),
+      var Super = $ec78efd7806a8105310c4515b254a117$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $a74713ca782cd2d0a1034028338ec42d$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $ec78efd7806a8105310c4515b254a117$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $a74713ca782cd2d0a1034028338ec42d$var$_possibleConstructorReturn(this, result);
+      return $ec78efd7806a8105310c4515b254a117$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_possibleConstructorReturn(self, call) {
+  function $ec78efd7806a8105310c4515b254a117$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $a74713ca782cd2d0a1034028338ec42d$var$_assertThisInitialized(self);
+    return $ec78efd7806a8105310c4515b254a117$var$_assertThisInitialized(self);
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_assertThisInitialized(self) {
+  function $ec78efd7806a8105310c4515b254a117$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -4440,7 +4440,7 @@
     return self;
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_isNativeReflectConstruct() {
+  function $ec78efd7806a8105310c4515b254a117$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -4453,19 +4453,19 @@
     }
   }
 
-  function $a74713ca782cd2d0a1034028338ec42d$var$_getPrototypeOf(o) {
-    $a74713ca782cd2d0a1034028338ec42d$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $ec78efd7806a8105310c4515b254a117$var$_getPrototypeOf(o) {
+    $ec78efd7806a8105310c4515b254a117$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $a74713ca782cd2d0a1034028338ec42d$var$_getPrototypeOf(o);
+    return $ec78efd7806a8105310c4515b254a117$var$_getPrototypeOf(o);
   }
 
-  var $a74713ca782cd2d0a1034028338ec42d$export$default = /*#__PURE__*/function (_Palette) {
-    $a74713ca782cd2d0a1034028338ec42d$var$_inherits(SizePalette, _Palette);
+  var $ec78efd7806a8105310c4515b254a117$export$default = /*#__PURE__*/function (_Palette) {
+    $ec78efd7806a8105310c4515b254a117$var$_inherits(SizePalette, _Palette);
 
-    var _super = $a74713ca782cd2d0a1034028338ec42d$var$_createSuper(SizePalette);
+    var _super = $ec78efd7806a8105310c4515b254a117$var$_createSuper(SizePalette);
 
-    $a74713ca782cd2d0a1034028338ec42d$var$_createClass(SizePalette, [{
+    $ec78efd7806a8105310c4515b254a117$var$_createClass(SizePalette, [{
       key: "size",
       get: function get() {
         return this.selectedOption;
@@ -4478,14 +4478,14 @@
     function SizePalette(id) {
       var _this;
 
-      $a74713ca782cd2d0a1034028338ec42d$var$_classCallCheck(this, SizePalette);
+      $ec78efd7806a8105310c4515b254a117$var$_classCallCheck(this, SizePalette);
       var sizes = [8, 24, 40];
       _this = _super.call(this, id, sizes, true);
       _this.selectedIndex = 1;
       return _this;
     }
 
-    $a74713ca782cd2d0a1034028338ec42d$var$_createClass(SizePalette, [{
+    $ec78efd7806a8105310c4515b254a117$var$_createClass(SizePalette, [{
       key: "updateOption",
       value: function updateOption(element, option) {
         element.innerHTML = '<i class="fas fa-circle"></i>';
@@ -4493,15 +4493,15 @@
       }
     }]);
     return SizePalette;
-  }($38bd97d63c1eee2f4a34aa3bc26b6dcd$export$Palette);
+  }($ce376429613efd4c16f9ea972259e9b5$export$Palette);
 
-  function $9051b9155544e44e5f3413e5eeab97e8$var$_classCallCheck(instance, Constructor) {
+  function $4f3eec839bb639ad45af0704a1b1c031$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $9051b9155544e44e5f3413e5eeab97e8$var$_defineProperties(target, props) {
+  function $4f3eec839bb639ad45af0704a1b1c031$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -4511,13 +4511,13 @@
     }
   }
 
-  function $9051b9155544e44e5f3413e5eeab97e8$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $9051b9155544e44e5f3413e5eeab97e8$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $9051b9155544e44e5f3413e5eeab97e8$var$_defineProperties(Constructor, staticProps);
+  function $4f3eec839bb639ad45af0704a1b1c031$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $4f3eec839bb639ad45af0704a1b1c031$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $4f3eec839bb639ad45af0704a1b1c031$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $9051b9155544e44e5f3413e5eeab97e8$var$_defineProperty(obj, key, value) {
+  function $4f3eec839bb639ad45af0704a1b1c031$var$_defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -4533,8 +4533,8 @@
   }
 
   // Base class for all tools
-  var $9051b9155544e44e5f3413e5eeab97e8$export$default = /*#__PURE__*/function () {
-    $9051b9155544e44e5f3413e5eeab97e8$var$_createClass(Tool, [{
+  var $4f3eec839bb639ad45af0704a1b1c031$export$default = /*#__PURE__*/function () {
+    $4f3eec839bb639ad45af0704a1b1c031$var$_createClass(Tool, [{
       key: "color",
       get: function get() {
         return this.painter.color;
@@ -4552,16 +4552,16 @@
     }]);
 
     function Tool(painter) {
-      $9051b9155544e44e5f3413e5eeab97e8$var$_classCallCheck(this, Tool);
-      $9051b9155544e44e5f3413e5eeab97e8$var$_defineProperty(this, "painting", false);
-      $9051b9155544e44e5f3413e5eeab97e8$var$_defineProperty(this, "pressure", 1);
+      $4f3eec839bb639ad45af0704a1b1c031$var$_classCallCheck(this, Tool);
+      $4f3eec839bb639ad45af0704a1b1c031$var$_defineProperty(this, "painting", false);
+      $4f3eec839bb639ad45af0704a1b1c031$var$_defineProperty(this, "pressure", 1);
       this.painter = painter;
-      this.mouse = new $cbbe4396c0898fac82b1de2ef9426b74$export$default(0, 0);
+      this.mouse = new $92dd1d4feee990cfd982aa729623e7fc$export$default(0, 0);
     } // creates a context to draw the current stroke to so we can draw the complete stroke with a different
     // operation. The buffer can be shared by different tools.
 
 
-    $9051b9155544e44e5f3413e5eeab97e8$var$_createClass(Tool, [{
+    $4f3eec839bb639ad45af0704a1b1c031$var$_createClass(Tool, [{
       key: "createBufferCtx",
       value: function createBufferCtx() {
         var brushCanvas = document.createElement("canvas");
@@ -4601,13 +4601,13 @@
     return Tool;
   }();
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_classCallCheck(instance, Constructor) {
+  function $6acec9c96facd444f912da51a32889dd$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_defineProperties(target, props) {
+  function $6acec9c96facd444f912da51a32889dd$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -4617,13 +4617,13 @@
     }
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $5e2ac87a58e89dcc38eb0f97787fa782$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $5e2ac87a58e89dcc38eb0f97787fa782$var$_defineProperties(Constructor, staticProps);
+  function $6acec9c96facd444f912da51a32889dd$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $6acec9c96facd444f912da51a32889dd$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $6acec9c96facd444f912da51a32889dd$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_inherits(subClass, superClass) {
+  function $6acec9c96facd444f912da51a32889dd$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -4635,44 +4635,44 @@
         configurable: true
       }
     });
-    if (superClass) $5e2ac87a58e89dcc38eb0f97787fa782$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $6acec9c96facd444f912da51a32889dd$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_setPrototypeOf(o, p) {
-    $5e2ac87a58e89dcc38eb0f97787fa782$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $6acec9c96facd444f912da51a32889dd$var$_setPrototypeOf(o, p) {
+    $6acec9c96facd444f912da51a32889dd$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $5e2ac87a58e89dcc38eb0f97787fa782$var$_setPrototypeOf(o, p);
+    return $6acec9c96facd444f912da51a32889dd$var$_setPrototypeOf(o, p);
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $5e2ac87a58e89dcc38eb0f97787fa782$var$_isNativeReflectConstruct();
+  function $6acec9c96facd444f912da51a32889dd$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $6acec9c96facd444f912da51a32889dd$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $5e2ac87a58e89dcc38eb0f97787fa782$var$_getPrototypeOf(Derived),
+      var Super = $6acec9c96facd444f912da51a32889dd$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $5e2ac87a58e89dcc38eb0f97787fa782$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $6acec9c96facd444f912da51a32889dd$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $5e2ac87a58e89dcc38eb0f97787fa782$var$_possibleConstructorReturn(this, result);
+      return $6acec9c96facd444f912da51a32889dd$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_possibleConstructorReturn(self, call) {
+  function $6acec9c96facd444f912da51a32889dd$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $5e2ac87a58e89dcc38eb0f97787fa782$var$_assertThisInitialized(self);
+    return $6acec9c96facd444f912da51a32889dd$var$_assertThisInitialized(self);
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_assertThisInitialized(self) {
+  function $6acec9c96facd444f912da51a32889dd$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -4680,7 +4680,7 @@
     return self;
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_isNativeReflectConstruct() {
+  function $6acec9c96facd444f912da51a32889dd$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -4693,14 +4693,14 @@
     }
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_getPrototypeOf(o) {
-    $5e2ac87a58e89dcc38eb0f97787fa782$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $6acec9c96facd444f912da51a32889dd$var$_getPrototypeOf(o) {
+    $6acec9c96facd444f912da51a32889dd$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $5e2ac87a58e89dcc38eb0f97787fa782$var$_getPrototypeOf(o);
+    return $6acec9c96facd444f912da51a32889dd$var$_getPrototypeOf(o);
   }
 
-  function $5e2ac87a58e89dcc38eb0f97787fa782$var$_defineProperty(obj, key, value) {
+  function $6acec9c96facd444f912da51a32889dd$var$_defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -4716,23 +4716,23 @@
   }
 
   // Paints lines with varying stroke width
-  var $5e2ac87a58e89dcc38eb0f97787fa782$export$default = /*#__PURE__*/function (_Tool) {
-    $5e2ac87a58e89dcc38eb0f97787fa782$var$_inherits(PenTool, _Tool);
+  var $6acec9c96facd444f912da51a32889dd$export$default = /*#__PURE__*/function (_Tool) {
+    $6acec9c96facd444f912da51a32889dd$var$_inherits(PenTool, _Tool);
 
-    var _super = $5e2ac87a58e89dcc38eb0f97787fa782$var$_createSuper(PenTool);
+    var _super = $6acec9c96facd444f912da51a32889dd$var$_createSuper(PenTool);
 
     function PenTool(painter) {
       var _this;
 
       var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "darken";
-      $5e2ac87a58e89dcc38eb0f97787fa782$var$_classCallCheck(this, PenTool);
+      $6acec9c96facd444f912da51a32889dd$var$_classCallCheck(this, PenTool);
       _this = _super.call(this, painter);
-      $5e2ac87a58e89dcc38eb0f97787fa782$var$_defineProperty($5e2ac87a58e89dcc38eb0f97787fa782$var$_assertThisInitialized(_this), "_lastPoint", new $cbbe4396c0898fac82b1de2ef9426b74$export$default(0, 0));
+      $6acec9c96facd444f912da51a32889dd$var$_defineProperty($6acec9c96facd444f912da51a32889dd$var$_assertThisInitialized(_this), "_lastPoint", new $92dd1d4feee990cfd982aa729623e7fc$export$default(0, 0));
       _this._operation = operation;
       return _this;
     }
 
-    $5e2ac87a58e89dcc38eb0f97787fa782$var$_createClass(PenTool, [{
+    $6acec9c96facd444f912da51a32889dd$var$_createClass(PenTool, [{
       key: "down",
       value: function down() {
         this._lastPoint = this.mouse.copy();
@@ -4775,7 +4775,7 @@
             point = this._points[i].copy(); // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
             // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
 
-            var midPoint = new $cbbe4396c0898fac82b1de2ef9426b74$export$default((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
+            var midPoint = new $92dd1d4feee990cfd982aa729623e7fc$export$default((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
             ctx.lineWidth = this._widths[i];
             ctx.beginPath();
             ctx.moveTo(oldPoint.x, oldPoint.y);
@@ -4811,7 +4811,7 @@
 
         var lastWidth = this._widths[this._widths.length - 1];
 
-        this._widths.push($76facc79e01b981640fff813eee16c5d$export$default.clamp(lastWidth - 1, lastWidth + 1, width));
+        this._widths.push($221dd0966d34bf75372b465b73e7e2f6$export$default.clamp(lastWidth - 1, lastWidth + 1, width));
 
         this.requestDrawPath();
       }
@@ -4826,19 +4826,19 @@
     }, {
       key: "getWidth",
       value: function getWidth() {
-        return this.lineWidth * $76facc79e01b981640fff813eee16c5d$export$default.clamp(0.3, 1, this.pressure / this.speed);
+        return this.lineWidth * $221dd0966d34bf75372b465b73e7e2f6$export$default.clamp(0.3, 1, this.pressure / this.speed);
       }
     }]);
     return PenTool;
-  }($9051b9155544e44e5f3413e5eeab97e8$export$default);
+  }($4f3eec839bb639ad45af0704a1b1c031$export$default);
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_classCallCheck(instance, Constructor) {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_defineProperties(target, props) {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -4848,13 +4848,13 @@
     }
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $2715d4a8c42a51df25ae9eee2dabbdbc$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $2715d4a8c42a51df25ae9eee2dabbdbc$var$_defineProperties(Constructor, staticProps);
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_inherits(subClass, superClass) {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -4866,44 +4866,44 @@
         configurable: true
       }
     });
-    if (superClass) $2715d4a8c42a51df25ae9eee2dabbdbc$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_setPrototypeOf(o, p) {
-    $2715d4a8c42a51df25ae9eee2dabbdbc$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_setPrototypeOf(o, p) {
+    $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $2715d4a8c42a51df25ae9eee2dabbdbc$var$_setPrototypeOf(o, p);
+    return $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_setPrototypeOf(o, p);
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $2715d4a8c42a51df25ae9eee2dabbdbc$var$_isNativeReflectConstruct();
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $2715d4a8c42a51df25ae9eee2dabbdbc$var$_getPrototypeOf(Derived),
+      var Super = $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $2715d4a8c42a51df25ae9eee2dabbdbc$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $2715d4a8c42a51df25ae9eee2dabbdbc$var$_possibleConstructorReturn(this, result);
+      return $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_possibleConstructorReturn(self, call) {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $2715d4a8c42a51df25ae9eee2dabbdbc$var$_assertThisInitialized(self);
+    return $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_assertThisInitialized(self);
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_assertThisInitialized(self) {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -4911,7 +4911,7 @@
     return self;
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_isNativeReflectConstruct() {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -4924,41 +4924,41 @@
     }
   }
 
-  function $2715d4a8c42a51df25ae9eee2dabbdbc$var$_getPrototypeOf(o) {
-    $2715d4a8c42a51df25ae9eee2dabbdbc$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_getPrototypeOf(o) {
+    $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $2715d4a8c42a51df25ae9eee2dabbdbc$var$_getPrototypeOf(o);
+    return $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_getPrototypeOf(o);
   }
 
   // Fills an area with the selected color 
-  var $2715d4a8c42a51df25ae9eee2dabbdbc$export$default = /*#__PURE__*/function (_Tool) {
-    $2715d4a8c42a51df25ae9eee2dabbdbc$var$_inherits(PaintBucketTool, _Tool);
+  var $0b7612a3c8ef25d3ffb929cb842ce3e6$export$default = /*#__PURE__*/function (_Tool) {
+    $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_inherits(PaintBucketTool, _Tool);
 
-    var _super = $2715d4a8c42a51df25ae9eee2dabbdbc$var$_createSuper(PaintBucketTool);
+    var _super = $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_createSuper(PaintBucketTool);
 
     function PaintBucketTool() {
-      $2715d4a8c42a51df25ae9eee2dabbdbc$var$_classCallCheck(this, PaintBucketTool);
+      $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_classCallCheck(this, PaintBucketTool);
       return _super.apply(this, arguments);
     }
 
-    $2715d4a8c42a51df25ae9eee2dabbdbc$var$_createClass(PaintBucketTool, [{
+    $0b7612a3c8ef25d3ffb929cb842ce3e6$var$_createClass(PaintBucketTool, [{
       key: "down",
       value: function down() {
         var ctx = this.painter.ctx;
-        $76facc79e01b981640fff813eee16c5d$export$default.floodFill(ctx, this.mouse, this.painter.color);
+        $221dd0966d34bf75372b465b73e7e2f6$export$default.floodFill(ctx, this.mouse, this.painter.color);
       }
     }]);
     return PaintBucketTool;
-  }($9051b9155544e44e5f3413e5eeab97e8$export$default);
+  }($4f3eec839bb639ad45af0704a1b1c031$export$default);
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_classCallCheck(instance, Constructor) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_defineProperties(target, props) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -4968,18 +4968,18 @@
     }
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $36d7232bce2bb14202d938e6eac079be$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $36d7232bce2bb14202d938e6eac079be$var$_defineProperties(Constructor, staticProps);
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_get(target, property, receiver) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_get(target, property, receiver) {
     if (typeof Reflect !== "undefined" && Reflect.get) {
-      $36d7232bce2bb14202d938e6eac079be$var$_get = Reflect.get;
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_get = Reflect.get;
     } else {
-      $36d7232bce2bb14202d938e6eac079be$var$_get = function _get(target, property, receiver) {
-        var base = $36d7232bce2bb14202d938e6eac079be$var$_superPropBase(target, property);
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_get = function _get(target, property, receiver) {
+        var base = $5458ccc97f312ae7eb3d522c6e47d7ad$var$_superPropBase(target, property);
         if (!base) return;
         var desc = Object.getOwnPropertyDescriptor(base, property);
 
@@ -4991,19 +4991,19 @@
       };
     }
 
-    return $36d7232bce2bb14202d938e6eac079be$var$_get(target, property, receiver || target);
+    return $5458ccc97f312ae7eb3d522c6e47d7ad$var$_get(target, property, receiver || target);
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_superPropBase(object, property) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_superPropBase(object, property) {
     while (!Object.prototype.hasOwnProperty.call(object, property)) {
-      object = $36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf(object);
+      object = $5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf(object);
       if (object === null) break;
     }
 
     return object;
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_inherits(subClass, superClass) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
@@ -5015,44 +5015,44 @@
         configurable: true
       }
     });
-    if (superClass) $36d7232bce2bb14202d938e6eac079be$var$_setPrototypeOf(subClass, superClass);
+    if (superClass) $5458ccc97f312ae7eb3d522c6e47d7ad$var$_setPrototypeOf(subClass, superClass);
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_setPrototypeOf(o, p) {
-    $36d7232bce2bb14202d938e6eac079be$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_setPrototypeOf(o, p) {
+    $5458ccc97f312ae7eb3d522c6e47d7ad$var$_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
 
-    return $36d7232bce2bb14202d938e6eac079be$var$_setPrototypeOf(o, p);
+    return $5458ccc97f312ae7eb3d522c6e47d7ad$var$_setPrototypeOf(o, p);
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_createSuper(Derived) {
-    var hasNativeReflectConstruct = $36d7232bce2bb14202d938e6eac079be$var$_isNativeReflectConstruct();
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_createSuper(Derived) {
+    var hasNativeReflectConstruct = $5458ccc97f312ae7eb3d522c6e47d7ad$var$_isNativeReflectConstruct();
     return function _createSuperInternal() {
-      var Super = $36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf(Derived),
+      var Super = $5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf(Derived),
           result;
 
       if (hasNativeReflectConstruct) {
-        var NewTarget = $36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf(this).constructor;
+        var NewTarget = $5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf(this).constructor;
         result = Reflect.construct(Super, arguments, NewTarget);
       } else {
         result = Super.apply(this, arguments);
       }
 
-      return $36d7232bce2bb14202d938e6eac079be$var$_possibleConstructorReturn(this, result);
+      return $5458ccc97f312ae7eb3d522c6e47d7ad$var$_possibleConstructorReturn(this, result);
     };
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_possibleConstructorReturn(self, call) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
     }
 
-    return $36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(self);
+    return $5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(self);
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(self) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
@@ -5060,7 +5060,7 @@
     return self;
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_isNativeReflectConstruct() {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -5073,14 +5073,14 @@
     }
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf(o) {
-    $36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf(o) {
+    $5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
-    return $36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf(o);
+    return $5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf(o);
   }
 
-  function $36d7232bce2bb14202d938e6eac079be$var$_defineProperty(obj, key, value) {
+  function $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -5096,11 +5096,11 @@
   }
 
   // ASSET: node_modules/pressure/dist/pressure.min.js
-  var $93e86ad3d9d55ad434d8b3db1a60b9ac$exports = {};
-  var $93e86ad3d9d55ad434d8b3db1a60b9ac$var$define;
+  var $82efb3e6c5ce86c6f1c8c9224c5c3389$exports = {};
+  var $82efb3e6c5ce86c6f1c8c9224c5c3389$var$define;
   !function (e, t) {
-    "function" == typeof $93e86ad3d9d55ad434d8b3db1a60b9ac$var$define && $93e86ad3d9d55ad434d8b3db1a60b9ac$var$define.amd ? $93e86ad3d9d55ad434d8b3db1a60b9ac$var$define([], t) : "object" == typeof $93e86ad3d9d55ad434d8b3db1a60b9ac$exports ? $93e86ad3d9d55ad434d8b3db1a60b9ac$exports = t() : e.Pressure = t();
-  }($93e86ad3d9d55ad434d8b3db1a60b9ac$exports, function () {
+    "function" == typeof $82efb3e6c5ce86c6f1c8c9224c5c3389$var$define && $82efb3e6c5ce86c6f1c8c9224c5c3389$var$define.amd ? $82efb3e6c5ce86c6f1c8c9224c5c3389$var$define([], t) : "object" == typeof $82efb3e6c5ce86c6f1c8c9224c5c3389$exports ? $82efb3e6c5ce86c6f1c8c9224c5c3389$exports = t() : e.Pressure = t();
+  }($82efb3e6c5ce86c6f1c8c9224c5c3389$exports, function () {
     function i(e) {
       return (i = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
         return typeof e;
@@ -5441,20 +5441,20 @@
     return h;
   });
 
-  var $36d7232bce2bb14202d938e6eac079be$export$default = /*#__PURE__*/function (_View) {
-    $36d7232bce2bb14202d938e6eac079be$var$_inherits(PaintView, _View);
+  var $5458ccc97f312ae7eb3d522c6e47d7ad$export$default = /*#__PURE__*/function (_View) {
+    $5458ccc97f312ae7eb3d522c6e47d7ad$var$_inherits(PaintView, _View);
 
-    var _super = $36d7232bce2bb14202d938e6eac079be$var$_createSuper(PaintView);
+    var _super = $5458ccc97f312ae7eb3d522c6e47d7ad$var$_createSuper(PaintView);
 
     function PaintView(id, onBackClicked) {
       var _this;
 
-      $36d7232bce2bb14202d938e6eac079be$var$_classCallCheck(this, PaintView);
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_classCallCheck(this, PaintView);
       _this = _super.call(this, id);
-      $36d7232bce2bb14202d938e6eac079be$var$_defineProperty($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "pixelPerfect", true);
-      $36d7232bce2bb14202d938e6eac079be$var$_defineProperty($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "scaleFactor", 1);
-      $36d7232bce2bb14202d938e6eac079be$var$_defineProperty($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "_currentTouchId", 0);
-      $36d7232bce2bb14202d938e6eac079be$var$_defineProperty($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "getPointerEventPosition", function (event) {
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperty($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "pixelPerfect", true);
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperty($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "scaleFactor", 1);
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperty($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "_currentTouchId", 0);
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperty($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "getPointerEventPosition", function (event) {
         var target = event.target;
         var rect = target.getBoundingClientRect();
         var x = (event.clientX - rect.left) / rect.width * _this.width;
@@ -5465,9 +5465,9 @@
           y = Math.round(y);
         }
 
-        return new $cbbe4396c0898fac82b1de2ef9426b74$export$default(x, y);
+        return new $92dd1d4feee990cfd982aa729623e7fc$export$default(x, y);
       });
-      $36d7232bce2bb14202d938e6eac079be$var$_defineProperty($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "getTouchEventPosition", function (touch) {
+      $5458ccc97f312ae7eb3d522c6e47d7ad$var$_defineProperty($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "getTouchEventPosition", function (touch) {
         var target = event.target;
         var rect = target.getBoundingClientRect();
         var x = (touch.clientX - rect.left) / rect.width * _this.width;
@@ -5478,20 +5478,20 @@
           y = Math.round(y);
         }
 
-        return new $cbbe4396c0898fac82b1de2ef9426b74$export$default(x, y);
+        return new $92dd1d4feee990cfd982aa729623e7fc$export$default(x, y);
       });
       _this.width = window.screen.availWidth;
       _this.height = window.screen.availHeight;
       var backButton = document.getElementById("back-button");
-      $76facc79e01b981640fff813eee16c5d$export$default.addFastClick(backButton, function () {
+      $221dd0966d34bf75372b465b73e7e2f6$export$default.addFastClick(backButton, function () {
         return onBackClicked();
       });
       var clearButton = document.getElementById("clear-button");
-      $76facc79e01b981640fff813eee16c5d$export$default.addFastClick(clearButton, function () {
+      $221dd0966d34bf75372b465b73e7e2f6$export$default.addFastClick(clearButton, function () {
         return _this.clear(true);
       });
       _this._undoButton = document.getElementById("undo-button");
-      $76facc79e01b981640fff813eee16c5d$export$default.addFastClick(_this._undoButton, function () {
+      $221dd0966d34bf75372b465b73e7e2f6$export$default.addFastClick(_this._undoButton, function () {
         return _this.undo();
       });
       var canvas = document.getElementById("canvas");
@@ -5505,33 +5505,33 @@
 
       _this.addEventListeners();
 
-      _this._colorPalette = new $33365f9a62d9c131a13d79ff917d1f16$export$default("color-palette");
+      _this._colorPalette = new $5dca99d43a8c97d91bd7a455231d3c8c$export$default("color-palette");
 
       _this._colorPalette.onSelectionChanged = function (color) {
         return _this.color = color;
       };
 
       _this.color = _this._colorPalette.color;
-      _this._toolPalette = new $aaa5a867d0e2a6eb781ac92ec71fb686$export$default("tool-palette");
+      _this._toolPalette = new $9fd885faf3605f16c885551b80589177$export$default("tool-palette");
 
       _this._toolPalette.onSelectionChanged = function (option, index) {
         var toolCount = _this._tools.length;
         _this.currentTool = _this._tools[Math.min(index, toolCount - 1)];
       };
 
-      _this._sizePalette = new $a74713ca782cd2d0a1034028338ec42d$export$default("size-palette");
+      _this._sizePalette = new $ec78efd7806a8105310c4515b254a117$export$default("size-palette");
 
       _this._sizePalette.onSelectionChanged = function (lineWidth) {
         _this.lineWidth = lineWidth;
       };
 
       _this.lineWidth = _this._sizePalette.size;
-      _this._tools = [new $5e2ac87a58e89dcc38eb0f97787fa782$export$default($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "darken"), new $5e2ac87a58e89dcc38eb0f97787fa782$export$default($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "source-over"), new $5e2ac87a58e89dcc38eb0f97787fa782$export$default($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this), "destination-out"), new $2715d4a8c42a51df25ae9eee2dabbdbc$export$default($36d7232bce2bb14202d938e6eac079be$var$_assertThisInitialized(_this))];
+      _this._tools = [new $6acec9c96facd444f912da51a32889dd$export$default($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "darken"), new $6acec9c96facd444f912da51a32889dd$export$default($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "source-over"), new $6acec9c96facd444f912da51a32889dd$export$default($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this), "destination-out"), new $0b7612a3c8ef25d3ffb929cb842ce3e6$export$default($5458ccc97f312ae7eb3d522c6e47d7ad$var$_assertThisInitialized(_this))];
       _this.currentTool = _this._tools[0];
       return _this;
     }
 
-    $36d7232bce2bb14202d938e6eac079be$var$_createClass(PaintView, [{
+    $5458ccc97f312ae7eb3d522c6e47d7ad$var$_createClass(PaintView, [{
       key: "addEventListeners",
       value: function addEventListeners() {
         var _this2 = this;
@@ -5588,7 +5588,7 @@
         }
 
         this._currentTouchId = event.pointerId;
-        var pressure = event.pointerType == "pen" ? $76facc79e01b981640fff813eee16c5d$export$default.clamp(0.3, 1, event.pressure * 2) : 1;
+        var pressure = event.pointerType == "pen" ? $221dd0966d34bf75372b465b73e7e2f6$export$default.clamp(0.3, 1, event.pressure * 2) : 1;
         this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
       }
     }, {
@@ -5604,7 +5604,7 @@
           return;
         }
 
-        var pressure = event.pointerType == "pen" ? $76facc79e01b981640fff813eee16c5d$export$default.clamp(0.3, 1, event.pressure * 2) : 1;
+        var pressure = event.pointerType == "pen" ? $221dd0966d34bf75372b465b73e7e2f6$export$default.clamp(0.3, 1, event.pressure * 2) : 1;
         this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
       }
     }, {
@@ -5626,7 +5626,7 @@
     }, {
       key: "pressureChanged",
       value: function pressureChanged(force) {
-        var pressure = $76facc79e01b981640fff813eee16c5d$export$default.clamp(0.3, 1, force * 2);
+        var pressure = $221dd0966d34bf75372b465b73e7e2f6$export$default.clamp(0.3, 1, force * 2);
         this.currentTool.pressure = Math.max(pressure, this.currentTool.pressure);
         this.currentTool.pressureChanged();
       }
@@ -5677,13 +5677,13 @@
         this.currentTool.painting = isPainting;
         this.currentTool.pressure = pressure;
         var newMouse = mouse;
-        var delta = $cbbe4396c0898fac82b1de2ef9426b74$export$default.distance(this.currentTool.mouse, newMouse);
+        var delta = $92dd1d4feee990cfd982aa729623e7fc$export$default.distance(this.currentTool.mouse, newMouse);
 
         if (delta > 2) {
           var timeDelta = timeStamp - this._timeStamp;
           this._timeStamp = timeStamp;
           var speed = delta / timeDelta;
-          this.currentTool.speed = $76facc79e01b981640fff813eee16c5d$export$default.lerp(this.currentTool.speed, speed, 0.2);
+          this.currentTool.speed = $221dd0966d34bf75372b465b73e7e2f6$export$default.lerp(this.currentTool.speed, speed, 0.2);
           this.currentTool.mouse = newMouse;
           this.currentTool.move();
         }
@@ -5691,7 +5691,7 @@
     }, {
       key: "down",
       value: function down(timeStamp, isPainting, mouse, pressure) {
-        $38bd97d63c1eee2f4a34aa3bc26b6dcd$export$Palette.collapseAll();
+        $ce376429613efd4c16f9ea972259e9b5$export$Palette.collapseAll();
 
         if (!this.currentTool) {
           return;
@@ -5772,7 +5772,7 @@
       value: function loadImage(id) {
         var _this3 = this;
 
-        return $9d7b99ce9706525b026da3b6c97af2e6$export$default.loadImage(id).then(function (image) {
+        return $45b85264923af8e8796436f758852a1d$export$default.loadImage(id).then(function (image) {
           _this3.imageId = id;
 
           _this3.clear();
@@ -5788,7 +5788,7 @@
         var _this4 = this;
 
         this.ctx.canvas.toBlob(function (blob) {
-          return $9d7b99ce9706525b026da3b6c97af2e6$export$default.saveImage(_this4.imageId, blob);
+          return $45b85264923af8e8796436f758852a1d$export$default.saveImage(_this4.imageId, blob);
         });
       }
     }, {
@@ -5796,7 +5796,7 @@
       value: function show() {
         var _this5 = this;
 
-        $36d7232bce2bb14202d938e6eac079be$var$_get($36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf(PaintView.prototype), "show", this).call(this);
+        $5458ccc97f312ae7eb3d522c6e47d7ad$var$_get($5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf(PaintView.prototype), "show", this).call(this);
         this._currentTouchId = 0;
         this.clearUndoBuffer();
         window.requestAnimationFrame(function (timeStamp) {
@@ -5810,7 +5810,7 @@
           this.saveImage();
         }
 
-        $36d7232bce2bb14202d938e6eac079be$var$_get($36d7232bce2bb14202d938e6eac079be$var$_getPrototypeOf(PaintView.prototype), "hide", this).call(this);
+        $5458ccc97f312ae7eb3d522c6e47d7ad$var$_get($5458ccc97f312ae7eb3d522c6e47d7ad$var$_getPrototypeOf(PaintView.prototype), "hide", this).call(this);
       }
     }, {
       key: "tick",
@@ -5857,15 +5857,15 @@
       }
     }]);
     return PaintView;
-  }($b55217c53974e449d6af4517b7e83dad$export$View);
+  }($d3eac75d1d23780ebee32bc0c4afa186$export$View);
 
-  function $4751b04dd2ba0ce75e876d8669cb6b10$var$_classCallCheck(instance, Constructor) {
+  function $d76f0f067c4ff05480bca5de47cb0951$var$_classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  function $4751b04dd2ba0ce75e876d8669cb6b10$var$_defineProperties(target, props) {
+  function $d76f0f067c4ff05480bca5de47cb0951$var$_defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
       descriptor.enumerable = descriptor.enumerable || false;
@@ -5875,19 +5875,19 @@
     }
   }
 
-  function $4751b04dd2ba0ce75e876d8669cb6b10$var$_createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) $4751b04dd2ba0ce75e876d8669cb6b10$var$_defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) $4751b04dd2ba0ce75e876d8669cb6b10$var$_defineProperties(Constructor, staticProps);
+  function $d76f0f067c4ff05480bca5de47cb0951$var$_createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) $d76f0f067c4ff05480bca5de47cb0951$var$_defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) $d76f0f067c4ff05480bca5de47cb0951$var$_defineProperties(Constructor, staticProps);
     return Constructor;
   }
 
-  var $4751b04dd2ba0ce75e876d8669cb6b10$var$App = /*#__PURE__*/function () {
+  var $d76f0f067c4ff05480bca5de47cb0951$var$App = /*#__PURE__*/function () {
     function App() {
       var _this = this;
 
-      $4751b04dd2ba0ce75e876d8669cb6b10$var$_classCallCheck(this, App);
+      $d76f0f067c4ff05480bca5de47cb0951$var$_classCallCheck(this, App);
       App.preventOverScroll();
-      this.bookView = new $4e40f5e202f9935207b4e0c7dfbc78fe$export$default("book");
+      this.bookView = new $fbd0856aa08e3c6b67392ef9297a413c$export$default("book");
 
       this.bookView.onImageSelected = function (id) {
         _this.paintView.loadImage(id).then(function () {
@@ -5895,7 +5895,7 @@
         });
       };
 
-      this.paintView = new $36d7232bce2bb14202d938e6eac079be$export$default("paint", function () {
+      this.paintView = new $5458ccc97f312ae7eb3d522c6e47d7ad$export$default("paint", function () {
         _this.openView(_this.bookView);
       }); // Dropbox integration is not working yet:
       // this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
@@ -5904,7 +5904,7 @@
       this.openView(this.bookView);
     }
 
-    $4751b04dd2ba0ce75e876d8669cb6b10$var$_createClass(App, [{
+    $d76f0f067c4ff05480bca5de47cb0951$var$_createClass(App, [{
       key: "openView",
       value: function openView(view) {
         if (this.activeView) {
@@ -5925,5 +5925,5 @@
     return App;
   }();
 
-  var $4751b04dd2ba0ce75e876d8669cb6b10$var$app = new $4751b04dd2ba0ce75e876d8669cb6b10$var$App();
+  var $d76f0f067c4ff05480bca5de47cb0951$var$app = new $d76f0f067c4ff05480bca5de47cb0951$var$App();
 })();
