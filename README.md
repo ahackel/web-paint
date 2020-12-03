@@ -1,22 +1,24 @@
-# web-paint
-This is a personal painting web-app.
+# Web-paint
+> This is a personal painting web-app.
 
-# Build version
+## Build version
 A build version can be found here:
 https://andreashackel.de/web-paint/
 
-# installation
+## installation
 
-- Clone the project
+Prerequisites: Node and NPM
+
+- Clone this repo
 - Run `npm install`
 
 
-# Preview the app
+## Preview the app
 
 - Run `npm start`    
 - Open http://localhost:1234 in a browser
 
-# Build the app
+## Build the app
 
 - Run `npm run build`
    
