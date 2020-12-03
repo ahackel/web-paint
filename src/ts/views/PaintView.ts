@@ -106,6 +106,9 @@ export default class PaintView extends View {
         canvas.addEventListener('click', event => event.preventDefault());
 
         if (window.PointerEvent != null){
+            // Required to prevent pointerDown events from being choked when tapping repeatedly: 
+            canvas.addEventListener('touchstart', event => event.preventDefault());
+            
             canvas.addEventListener('pointerdown', event => this.pointerDown(event));
             canvas.addEventListener('pointermove', event => this.pointerMove(event));
             canvas.addEventListener('pointerup', event => this.pointerUp(event));
@@ -152,7 +155,9 @@ export default class PaintView extends View {
     }
 
     pointerDown(event: PointerEvent) {
+        console.log("pointerDown");
         event.preventDefault();
+
         if (event.pointerType == 'touch' && this._currentTouchId !== 0){
             return;
         }
@@ -161,9 +166,13 @@ export default class PaintView extends View {
             return;
         }
 
+        let target = <HTMLElement>event.target;
+        target.setPointerCapture(event.pointerId);
+
         this._currentTouchId = event.pointerId;
         let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
         this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
+        this.up(true, this.getPointerEventPosition(event));
     }
 
     pointerMove(event: PointerEvent) {
@@ -176,6 +185,7 @@ export default class PaintView extends View {
             return;
         }
 
+        // normalize pressure:
         let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
         this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
@@ -190,11 +200,14 @@ export default class PaintView extends View {
             return;
         }
 
-        this.up(PaintView.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+        let target = <HTMLElement>event.target;
+        target.releasePointerCapture(event.pointerId);
+
+        this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
         this._currentTouchId = 0;
     }
 
-    private static getPointerEventPaintingFlag = (e: PointerEvent) => e.pointerType === "touch" ? true : e.buttons === 1;
+    private getPointerEventPaintingFlag = (e: PointerEvent) => e.pointerType === "touch" ? true : e.buttons === 1;
 
     pressureChanged(force: number){
         let pressure = Utils.clamp(0.3, 1, force * 2);
@@ -267,7 +280,7 @@ export default class PaintView extends View {
         if (!this._currentTool) {
             return;
         }
-
+        
         this.registerUndo();
         this._timeStamp = timeStamp;
         this._currentTool.speed = 1;

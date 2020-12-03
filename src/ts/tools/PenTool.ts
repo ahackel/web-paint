@@ -111,6 +111,6 @@ export default class PenTool extends Tool {
     }
 
     getWidth(){
-        return this.lineWidth * Utils.clamp(0.3, 1, this.pressure / this.speed);
+        return this.lineWidth * Utils.clamp(0.5, 1, this.pressure / this.speed);
     }
 }

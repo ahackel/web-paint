@@ -1,19 +1,25 @@
 import LocalForageAdapter from "./LocalForageAdapter";
 import Utils from "../utils/Utils";
 import DropboxAdapter from "./DropboxAdapter";
+import StorageAdapter from "./StorageAdapter";
 
 export default class ImageStorage {
 
-	private static _adapter = new LocalForageAdapter();
+	private static _adapter: StorageAdapter;
 	
-	public static get adapter() { return this._adapter }
+	public static get adapter() {
+		if (this._adapter == null) {
+			this._adapter = new LocalForageAdapter()
+		}
+		return this._adapter 
+	}
 
 	private static loadImageFromStore(id: string): Promise<HTMLImageElement> {
 		if (!id) {
 			return Promise.reject("Could not load image from empty id.");
 		}
 		
-		return this._adapter.getItem(id)
+		return this.adapter.getItem(id)
 			.then(blob => {
 				if (!blob){
 					// Returning null will create a new image
@@ -47,7 +53,7 @@ export default class ImageStorage {
 	}
 
 	public static saveImage(id: string, blob: Blob){
-		return this._adapter.setItem(id, blob)
+		return this.adapter.setItem(id, blob)
 			.then(() => {
 				const event: Event = new Event("imagesaved")
 				Utils.DispatchEventToAllElements(event);
@@ -55,11 +61,11 @@ export default class ImageStorage {
 	}
 
 	public static imageKeys() {
-		return this._adapter.keys();
+		return this.adapter.keys();
 	}
 
 	public static iterate(callback: (img: HTMLImageElement) => any) {
-		return this._adapter.iterate((blob: Blob, id: string, iteration: number) => {
+		return this.adapter.iterate((blob: Blob, id: string, iteration: number) => {
 			if (blob) {
 				callback(this.imageFromBlob(id, blob))
 			}
