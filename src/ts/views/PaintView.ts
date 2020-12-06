@@ -99,6 +99,7 @@ export default class PaintView extends View {
             this._lineWidth = lineWidth;
         };
         this._lineWidth = this._sizePalette.size;
+        this._opacity = 0.9;
     }
 
     private addEventListeners() {
