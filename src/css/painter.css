@@ -20,6 +20,15 @@ body {
     line-height: 1.5;
 }
 
+#fps-counter{
+    position: fixed;
+    width: 25px;
+    top: 0;
+    right: 0;
+    color: white;
+    background: black;
+}
+
 .button {
     width: 60px;
     height: 60px;
@@ -76,11 +85,23 @@ body {
 
 .paint canvas {
     position: absolute;
-    left: 0;
     top: 0;
+    left: 0;
     background: white;
     width: 100%;
     z-index: -1;
+}
+
+@media (orientation: portrait) {
+    .paint canvas {
+        transform: rotate(-90deg);
+        transform-origin: left top;
+        width: 100vh;
+        overflow-x: hidden;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
 }
 
 .thumbnail {

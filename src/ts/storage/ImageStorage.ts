@@ -56,6 +56,7 @@ export default class ImageStorage {
 		return this.adapter.setItem(id, blob)
 			.then(() => {
 				const event: Event = new Event("imagesaved")
+				// TODO: Broadcast image id
 				Utils.DispatchEventToAllElements(event);
 			})
 	}

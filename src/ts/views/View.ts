@@ -23,6 +23,8 @@ export class View {
 	hide():void {
 		this._element.classList.add("hidden");
 	}
-	
-	isVisible = (): boolean => !this._element.classList.contains("hidden");
+
+	isVisible(): boolean {
+		return !this._element.classList.contains("hidden");
+	}
 }

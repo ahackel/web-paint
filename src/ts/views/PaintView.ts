@@ -9,6 +9,7 @@ import PaintBucketTool from "../tools/PaintBucketTool";
 import Point from "../utils/Point";
 import {Palette} from "../palettes/Palette";
 import ImageStorage from "../storage/ImageStorage";
+import {config} from "../config";
 
 // var Pressure = require('pressure');
 
@@ -43,8 +44,8 @@ export default class PaintView extends View {
     constructor(id: string, onBackClicked: Function) {
         super(id);
 
-        this.width = window.screen.availWidth;
-        this.height = window.screen.availHeight;
+        [this.width, this.height] = Utils.getImageSize();
+        Utils.log(`Setting PaintView size to ${this.width} x ${this.height}`);
         
         this.createButtons(onBackClicked);
         this.createCtx();
@@ -127,12 +128,16 @@ export default class PaintView extends View {
         // })
     }
 
-    private getPointerEventPosition = (event: PointerEvent) => {
+    private getPointerEventPosition(event: PointerEvent) {
         let target = <HTMLElement>event.target;
         let rect = target.getBoundingClientRect();
+        const isPortraitOrientation = rect.height > rect.width;
 
-        let x = (event.clientX - rect.left) / rect.width * this.width;
-        let y = (event.clientY - rect.top) / rect.height * this.height;
+        let nx = (event.clientX - rect.left) / rect.width;
+        let ny = (event.clientY - rect.top) / rect.height;
+        
+        let x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
+        let y = (isPortraitOrientation ? nx : ny) * this.height; 
 
         if (this.pixelPerfect){
             x = Math.round(x);
@@ -141,12 +146,16 @@ export default class PaintView extends View {
         return new Point(x, y);
     }
 
-    private getTouchEventPosition = (touch: Touch) => {
+    private getTouchEventPosition(touch: Touch) {
         let canvas = this._ctx.canvas;
         let rect = canvas.getBoundingClientRect();
+        const isPortraitOrientation = rect.height > rect.width;
 
-        let x = (touch.clientX - rect.left) / rect.width * this.width;
-        let y = (touch.clientY - rect.top) / rect.height * this.height;
+        let nx = (touch.clientX - rect.left) / rect.width;
+        let ny = (touch.clientY - rect.top) / rect.height;
+
+        let x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
+        let y = (isPortraitOrientation ? nx : ny) * this.height;
 
         if (this.pixelPerfect){
             x = Math.round(x);
@@ -156,7 +165,6 @@ export default class PaintView extends View {
     }
 
     pointerDown(event: PointerEvent) {
-        console.log("pointerDown");
         event.preventDefault();
 
         if (event.pointerType == 'touch' && this._currentTouchId !== 0){
@@ -173,8 +181,7 @@ export default class PaintView extends View {
         this._currentTouchId = event.pointerId;
         let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
         this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
-        this.up(true, this.getPointerEventPosition(event));
-    }
+     }
 
     pointerMove(event: PointerEvent) {
         event.preventDefault();
@@ -197,9 +204,9 @@ export default class PaintView extends View {
             return;
         }
 
-        if (event.pointerType != 'touch' && event.buttons !== 1){
-            return;
-        }
+        // if (event.pointerType != 'touch' && event.buttons !== 1){
+        //     return;
+        // }
 
         let target = <HTMLElement>event.target;
         target.releasePointerCapture(event.pointerId);
@@ -299,6 +306,7 @@ export default class PaintView extends View {
         this._currentTool.painting = isPainting;
         this._currentTool.mouse = mouse;
         this._currentTool.up();
+        this.saveImage();
     }
 
     clear(registerUndo: boolean = false) {
@@ -345,6 +353,7 @@ export default class PaintView extends View {
     }
 
     saveImage() {
+        Utils.log("Saving image");
         this._ctx.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
     }
 
@@ -355,19 +364,16 @@ export default class PaintView extends View {
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
     }
 
-    hide(){
-        if (this._imageId){
-            this.saveImage();
-        }
-        super.hide();
-    }
-
     private tick(timeStamp: number) {
         if (!this.isVisible()){
             return;
         }
 
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
+        
+        if (config.Debug){
+            Utils.updateFPSCounter();
+        }
 
         if (!this._currentTool) {
             return;
