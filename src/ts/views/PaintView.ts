@@ -204,6 +204,7 @@ export default class PaintView extends View {
             return;
         }
 
+        // Return if this was not the left mouse button:
         // if (event.pointerType != 'touch' && event.buttons !== 1){
         //     return;
         // }

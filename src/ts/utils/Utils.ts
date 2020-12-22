@@ -1,13 +1,13 @@
 import Point from "./Point";
 import {config} from "../config";
 
+let _times: number[] = [];
+let _fps: number = 60;
+let _fpsDisplay: HTMLElement;
+let _fpsCounterEnabled = true;
+
 export default class Utils {
-
-    private static _times: number[] = [];
-    private static _fps: number = 60;
-    private static _fpsDisplay: HTMLElement;
-    private static _fpsCounterEnabled = true;
-
+    
     public static log(message?: any, ...optionalParams: any[]){
         if (!config.Debug){
             return;
@@ -16,29 +16,31 @@ export default class Utils {
     }
 
     public static updateFPSCounter(){
-        if (!this._fpsCounterEnabled){
+        if (!_fpsCounterEnabled){
             return false;    
         }
 
         const now = performance.now();
-        while (this._times.length > 0 && this._times[0] <= now - 1000) {
-            this._times.shift();
+        while (_times.length > 0 && _times[0] <= now - 1000) {
+            _times.shift();
         }
-        this._times.push(now);
-        this._fps = this.lerp(this._fps, this._times.length, 0.1);
-        if (this._fpsDisplay == null){
-            this._fpsDisplay = <HTMLElement>document.getElementById("fps-counter");
-            if (this._fpsDisplay == null){
+        _times.push(now);
+        _fps = this.lerp(_fps, _times.length, 0.1);
+        if (_fpsDisplay == null){
+            _fpsDisplay = <HTMLElement>document.getElementById("fps-counter");
+            if (_fpsDisplay == null){
                 this.log("Could not find fps counter element. Disabling fps counter.");
-                this._fpsCounterEnabled = false;
+                _fpsCounterEnabled = false;
                 return;
             }
         }
-        this._fpsDisplay.innerText = this._fps.toFixed(0);
+        _fpsDisplay.innerText = _fps.toFixed(0);
     }
 
-    public static getImageSize = (): [number, number] => screen.width > screen.height ? [screen.width, screen.height] : [screen.height, screen.width];
-    
+    public static getImageSize(): [number, number] {
+        return screen.width > screen.height ? [screen.width, screen.height] : [screen.height, screen.width];
+    }
+
     public static addFastClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
         element.addEventListener("touchstart", event => event.preventDefault());
         element.addEventListener("touchend", callback);

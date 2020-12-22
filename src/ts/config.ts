@@ -1,4 +1,4 @@
 export const config = {
-    Debug: true,
+    Debug: false,
     PagesInBookCount: 16
 };
