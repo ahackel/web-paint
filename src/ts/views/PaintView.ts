@@ -35,6 +35,7 @@ export default class PaintView extends View {
     private _undoButton: HTMLDivElement;
     private _timeStamp: number;
     private _tickTimeStamp: number;
+    private _overlay: HTMLImageElement;
 
     get color(): string { return this._color; }
     get opacity(): number { return this._opacity; }
@@ -72,6 +73,7 @@ export default class PaintView extends View {
         this._ctx = <CanvasRenderingContext2D>canvas.getContext("2d", {alpha: true});
         this._ctx.imageSmoothingQuality = "high";
         this._ctx.imageSmoothingEnabled = this.imageSmoothing;
+        this._overlay = <HTMLImageElement>document.getElementById("overlay");
     }
 
     private createTools() {
@@ -349,6 +351,9 @@ export default class PaintView extends View {
                 this.clear();
                 if (image){
                     this._ctx.drawImage(image, 0, 0);
+                    let overlayPath = this.getOverlayPath(id);
+                    this._overlay.src = overlayPath;
+                    this._overlay.style.display = overlayPath != null ? "block" : "none";
                 }
             })
     }
@@ -383,5 +388,10 @@ export default class PaintView extends View {
         let delta = timeStamp - this._tickTimeStamp;
         this._tickTimeStamp = timeStamp;
         this._currentTool.tick(delta);
+    }
+
+    private getOverlayPath(id: string) {
+        let page = config.pages.find(e => e.id == id);
+        return page == null ? null : page.overlay;
     }
 }

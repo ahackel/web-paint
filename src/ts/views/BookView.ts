@@ -21,12 +21,12 @@ export default class BookView extends View {
     }
 
     private updateImages() {
-        for (let i: number = 0; i < config.PagesInBookCount; i++) {
-            this.loadImage("image" + i);
+        for (let page of config.pages) {
+            this.loadImage(page.id, page.overlay)
         }
     }
 
-    private addImage(id: string) {
+    private createThumbnail(id: string): HTMLDivElement {
         let element = <HTMLDivElement>document.createElement("div");
         let [width, height] = Utils.getImageSize();
         element.id = id;
@@ -40,25 +40,36 @@ export default class BookView extends View {
             }
         });
         this._element.appendChild(element);
-        this.loadImage(id);
+        return element;
     }
 
-    private loadImage(id: string) {
+    private addOverlay(path: string, parent: HTMLElement) {
+        let element = <HTMLImageElement>document.createElement("img");
+        element.src = path;
+        parent.appendChild(element);
+    }
+
+    private loadImage(id: string, overlay: string) {
         let thumbnail = document.getElementById(id);
         
         if (!thumbnail){
-            this.addImage(id);
-            return;
+            thumbnail = this.createThumbnail(id);
+            this.addOverlay(overlay, thumbnail);
         }
         
         ImageStorage.loadImage(id)
             .then(img => {
                 if (img) {
-                    if (thumbnail.childElementCount > 0){
-                        thumbnail.removeChild(thumbnail.firstChild);
+                    let oldImages = thumbnail.getElementsByClassName("preview");
+                    if (oldImages.length > 0){
+                        thumbnail.replaceChild(img, oldImages[0]);
+                    }
+                    else
+                    {
+                        thumbnail.prepend(img);
                     }
                     img.draggable = false;
-                    thumbnail.appendChild(img);
+                    img.classList.add("preview");
                 }
             });
     }
