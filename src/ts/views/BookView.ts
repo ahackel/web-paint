@@ -44,6 +44,9 @@ export default class BookView extends View {
     }
 
     private addOverlay(path: string, parent: HTMLElement) {
+        if (!path){
+            return;
+        }
         let element = <HTMLImageElement>document.createElement("img");
         element.src = path;
         parent.appendChild(element);

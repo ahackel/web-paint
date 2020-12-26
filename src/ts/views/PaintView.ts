@@ -351,10 +351,10 @@ export default class PaintView extends View {
                 this.clear();
                 if (image){
                     this._ctx.drawImage(image, 0, 0);
-                    let overlayPath = this.getOverlayPath(id);
-                    this._overlay.src = overlayPath;
-                    this._overlay.style.display = overlayPath != null ? "block" : "none";
                 }
+                let overlayPath = this.getOverlayPath(id);
+                this._overlay.src = overlayPath;
+                this._overlay.style.display = overlayPath != null ? "block" : "none";
             })
     }
 
