@@ -80,8 +80,8 @@ export class Palette extends View {
     addOptions(){
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("options");
-        element.style.width = Math.min(4, this._options.length) * 50 + "px";
-        element.style.top = Math.ceil(this._options.length / 4) * -25 + 20 + "px";
+        element.style.width = Math.min(4, this._options.length) * 1.25 + "rem";
+        element.style.top = Math.ceil(this._options.length / 4) * -0.625 + 0.5 + "rem";
         this._optionsElement = element;
 
         this.addArrow();

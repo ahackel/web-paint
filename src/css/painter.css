@@ -11,13 +11,21 @@ body{
     width: 100%;
     height: 100%;
     position: fixed;
+    font-size: 40px;
+}
+
+@media screen and (min-resolution: 3dppx){
+    html,
+    body{
+        font-size: 30px;
+    }   
 }
 
 body {
     touch-action: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    line-height: 1.5;
+    line-height: 1.5rem;
 }
 
 #fps-counter{
@@ -30,11 +38,11 @@ body {
 }
 
 .button {
-    width: 60px;
-    height: 60px;
-    line-height: 60px;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
     text-align: center;
-    font-size: 30px;
+    font-size: 0.75rem;
     border-radius: 50%;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.5);
@@ -84,24 +92,36 @@ body {
     justify-content: center;
 }
 
+.paint #sheet-wrapper {
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
 .paint #sheet {
     position: absolute;
-    background: white;
+    display: flex;
     width: 100%;
-    max-width: 133vh; /* limit width if screen is very wide and not very high  */
-    z-index: -1;
+    max-width: 133vh;    
 }
 
 @media (orientation: portrait) {
-    .paint #sheet {
+    .paint #sheet-wrapper {
         transform: rotate(-90deg);
         transform-origin: left top;
         width: 100vh;
+        height: 100vw;
         overflow-x: hidden;
         position: absolute;
         top: 100%;
-        left: -37.5vh;
-        margin-left: 50vw;
+        left: 0;
+    }
+    
+    .paint #sheet {
+        max-width: 133vw;
     }
 }
 
@@ -122,6 +142,7 @@ body {
 
 .paint canvas {
     z-index: -1;
+    background: white;
 }
 
 .thumbnail {
@@ -153,8 +174,8 @@ body {
 
 #back-button {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 0.25rem;
+    left: 0.25rem;
 }
 
 .toolbar {
@@ -162,8 +183,8 @@ body {
     display: flex;
     flex-direction: column;
     background: lightgray;
-    border-radius: 30px;
-    margin-left: 10px;
+    border-radius: 0.75rem;
+    margin-left: 0.25rem;
     left: 0;
 }
 
@@ -174,12 +195,12 @@ body {
 
 .palette {
     position: relative;
-    padding: 5px;
+    padding: 0.125rem;
     transition: transform 0.25s;
     display: inline-block;
     float: left;
     text-align: center;
-    font-size: 30px;
+    font-size: 0.75rem;
 }
 
 .palette.collapsed:active {
@@ -191,9 +212,9 @@ body {
     display: flex;
     flex-wrap: wrap;
     background: lightgray;
-    border-radius: 30px;
-    padding: 10px;
-    left: 90px;
+    border-radius: 0.75rem;
+    padding: 0.25rem;
+    left: 2.25rem;
     transition: transform 0.15s;
 }
 
@@ -202,12 +223,12 @@ body {
 }
 
 .palette .option {
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
     display: inline-block;
     border-radius: 50%;
-    margin: 5px;
+    margin: 0.125rem;
     float: left;
     transition: transform 0.25s;
 }
@@ -218,14 +239,14 @@ body {
 
 .palette .options .arrow {
     position: absolute;
-    left: -20px;
+    left: -0.5rem;
     top: 50%;
-    margin-top: -5px;
+    margin-top: -0.125rem;
     width: 0;
     height: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-right: 20px solid lightgray;
+    border-top: 0.125rem solid transparent;
+    border-bottom: 0.125rem solid transparent;
+    border-right: 0.5rem solid lightgray;
 }
 
 .hidden {

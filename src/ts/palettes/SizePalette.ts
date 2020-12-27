@@ -13,6 +13,6 @@ export default class SizePalette extends Palette {
 
     updateOption(element: HTMLDivElement, option: any) {
         element.innerHTML = '<i class="fas fa-circle"></i>'
-        element.style.fontSize = option + 'px';
+        element.style.fontSize = option / 40 + 'rem';
     }
 }

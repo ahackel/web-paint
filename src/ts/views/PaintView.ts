@@ -87,10 +87,6 @@ export default class PaintView extends View {
     }
 
     private createPalettes() {
-        this._colorPalette = new ColorPalette("color-palette");
-        this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
-        this._color = this._colorPalette.color;
-
         this._toolPalette = new ToolPalette("tool-palette");
         this._toolPalette.onSelectionChanged = (option: string, index: number) => {
             const toolCount = this._tools.length;
@@ -102,6 +98,11 @@ export default class PaintView extends View {
             this._lineWidth = lineWidth;
         };
         this._lineWidth = this._sizePalette.size;
+
+        this._colorPalette = new ColorPalette("color-palette");
+        this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
+        this._color = this._colorPalette.color;
+
         this._opacity = 0.9;
     }
 
