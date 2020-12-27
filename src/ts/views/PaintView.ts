@@ -317,6 +317,7 @@ export default class PaintView extends View {
             this.registerUndo();
         }
         this._ctx.clearRect(0,0, this.width, this.height);
+        this.saveImage();
     }
 
     registerUndo(){

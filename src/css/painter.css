@@ -81,20 +81,33 @@ body {
 
 .paint{
     align-items: center;
+    justify-content: center;
 }
 
 .paint #sheet {
     position: absolute;
-    /*top: 0;*/
-    left: 0;
     background: white;
     width: 100%;
-    /*height: 100%;*/
+    max-width: 133vh; /* limit width if screen is very wide and not very high  */
     z-index: -1;
+}
+
+@media (orientation: portrait) {
+    .paint #sheet {
+        transform: rotate(-90deg);
+        transform-origin: left top;
+        width: 100vh;
+        overflow-x: hidden;
+        position: absolute;
+        top: 100%;
+        left: -37.5vh;
+        margin-left: 50vw;
+    }
 }
 
 .paint canvas, .paint #overlay {
     position: relative;
+    display: flex;
     top: 0;
     left: 0;
     width: 100%;
@@ -105,18 +118,6 @@ body {
     position: absolute;
     pointer-events: none;
     z-index: 1;
-}
-
-@media (orientation: portrait) {
-    .paint canvas {
-        transform: rotate(-90deg);
-        transform-origin: left top;
-        width: 100vh;
-        overflow-x: hidden;
-        position: absolute;
-        top: 100%;
-        left: 0;
-    }
 }
 
 .thumbnail {
@@ -153,11 +154,13 @@ body {
 }
 
 .toolbar {
+    position: absolute;
     display: flex;
     flex-direction: column;
     background: lightgray;
     border-radius: 30px;
     margin-left: 10px;
+    left: 0;
 }
 
 .toolbar .button {
