@@ -60,7 +60,7 @@ export default class PaintView extends View {
         Utils.addFastClick(backButton, () => onBackClicked());
 
         let clearButton = <HTMLDivElement>document.getElementById("clear-button");
-        Utils.addFastClick(clearButton, () => this.clear(true));
+        Utils.addFastClick(clearButton, () => this.clear(true, true));
 
         this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
         Utils.addFastClick(this._undoButton, () => this.undo());
@@ -312,12 +312,14 @@ export default class PaintView extends View {
         this.saveImage();
     }
 
-    clear(registerUndo: boolean = false) {
+    clear(registerUndo: boolean = false, save: boolean = false) {
         if (registerUndo){
             this.registerUndo();
         }
         this._ctx.clearRect(0,0, this.width, this.height);
-        this.saveImage();
+        if (save){
+            this.saveImage();
+        }
     }
 
     registerUndo(){
