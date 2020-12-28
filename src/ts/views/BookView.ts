@@ -31,9 +31,9 @@ export default class BookView extends View {
         let [width, height] = Utils.getImageSize();
         element.id = id;
         element.classList.add("thumbnail");
-        element.style.width = `${width * 0.18}px`;
-        element.style.height = `${height * 0.18}px`;
-        Utils.addFastClick(element, event => {
+        // element.style.width = `${width * 0.18}px`;
+        // element.style.height = `${height * 0.18}px`;
+        element.addEventListener("click", event => {
             event.preventDefault();
             if (this.onImageSelected) {
                 this.onImageSelected(id);
