@@ -10,6 +10,8 @@ import Point from "../utils/Point";
 import {Palette} from "../palettes/Palette";
 import ImageStorage from "../storage/ImageStorage";
 import {config} from "../config";
+import RectangleTool from "../tools/RectangleTool";
+import LineTool from "../tools/LineTool";
 
 // var Pressure = require('pressure');
 
@@ -26,6 +28,7 @@ export default class PaintView extends View {
     private _opacity: number;
     private _lineWidth: number;
     private _ctx: CanvasRenderingContext2D;
+    private _autoMaskCtx: CanvasRenderingContext2D;
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
     private _sizePalette: SizePalette;
@@ -36,11 +39,14 @@ export default class PaintView extends View {
     private _timeStamp: number;
     private _tickTimeStamp: number;
     private _overlay: HTMLImageElement;
+    private _overlayCtx: CanvasRenderingContext2D;
 
     get color(): string { return this._color; }
     get opacity(): number { return this._opacity; }
     get lineWidth(): number { return this._lineWidth; }
     get ctx(): CanvasRenderingContext2D { return this._ctx; }
+    get autoMaskCtx(): CanvasRenderingContext2D { return this._autoMaskCtx; }
+    get overlayCtx(): CanvasRenderingContext2D { return this._overlayCtx; }
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
@@ -73,7 +79,20 @@ export default class PaintView extends View {
         this._ctx = <CanvasRenderingContext2D>canvas.getContext("2d", {alpha: true});
         this._ctx.imageSmoothingQuality = "high";
         this._ctx.imageSmoothingEnabled = this.imageSmoothing;
+        
         this._overlay = <HTMLImageElement>document.getElementById("overlay");
+
+        let autoMaskCanvas = document.createElement("canvas");
+        autoMaskCanvas.id = "auto-mask";
+        autoMaskCanvas.width = this.width;
+        autoMaskCanvas.height = this.height;
+        this._autoMaskCtx = <CanvasRenderingContext2D>autoMaskCanvas.getContext("2d", {alpha: true});
+
+        let overlayCanvas = document.createElement("canvas");
+        overlayCanvas.id = "overlay";
+        overlayCanvas.width = this.width;
+        overlayCanvas.height = this.height;
+        this._overlayCtx = <CanvasRenderingContext2D>overlayCanvas.getContext("2d", {alpha: true});
     }
 
     private createTools() {
@@ -81,6 +100,8 @@ export default class PaintView extends View {
             new PenTool(this, "darken"),
             new PenTool(this, "source-over"),
             new PenTool(this, "destination-out"),
+            new RectangleTool(this),
+            new LineTool(this),
             new PaintBucketTool(this)
         ]
         this._currentTool = this._tools[0];
@@ -358,7 +379,14 @@ export default class PaintView extends View {
                 }
                 let overlayPath = this.getOverlayPath(id);
                 this._overlay.src = overlayPath;
-                this._overlay.style.display = overlayPath != null ? "block" : "none";
+                this._overlay.style.display = overlayPath ? "block" : "none";
+                
+                this._overlayCtx.clearRect(0, 0, this.width, this.height);
+                this._overlay.onload = () => {
+                    if (this._overlay){
+                        this._overlayCtx.drawImage(this._overlay, 0, 0);
+                    }
+                }
             })
     }
 
@@ -397,5 +425,10 @@ export default class PaintView extends View {
     private getOverlayPath(id: string) {
         let page = config.pages.find(e => e.id == id);
         return page == null ? null : page.overlay;
+    }
+
+    captureAutoMask(position: Point) {
+        this._autoMaskCtx.clearRect(0, 0, this.width, this.height);
+        Utils.floodFill(this._overlayCtx, this._autoMaskCtx, position, "#000000");
     }
 }

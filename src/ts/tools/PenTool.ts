@@ -22,6 +22,7 @@ export default class PenTool extends Tool {
     }
 
     down(): void {
+        // this.painter.captureAutoMask(this.mouse);
         this._lastPoint = this.mouse.copy()
         this._points = [this._lastPoint];
         this._widths = [this.getWidth()];
@@ -82,6 +83,8 @@ export default class PenTool extends Tool {
             ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
             ctx.fillStyle = ctx.strokeStyle;
             ctx.fill();
+            
+            // this.applyAutoMask();
 
             this.painter.ctx.globalAlpha = this.opacity;
             this.painter.ctx.drawImage(ctx.canvas, 0, 0);
@@ -103,9 +106,6 @@ export default class PenTool extends Tool {
         this.requestDrawPath();
     }
 
-    up(): void {
-    }
-
     pressureChanged(){
         this.requestDrawPath();
     }
@@ -114,5 +114,16 @@ export default class PenTool extends Tool {
         let pressure = Utils.clamp(0.5, 2, this.pressure * 2);
         let speed = Utils.clamp(1, 5, this.speed);
         return this.lineWidth * pressure / speed;
+    }
+
+    private applyAutoMask() {
+        if (!this.painter.autoMaskCtx){
+            return;
+        }
+        
+        let ctx = this.getBufferCtx();
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.drawImage(this.painter.autoMaskCtx.canvas, 0, 0);
+        ctx.globalCompositeOperation = "source-over";
     }
 }

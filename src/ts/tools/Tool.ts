@@ -24,6 +24,7 @@ export default abstract class Tool {
     // operation. The buffer can be shared by different tools.
     private createBufferCtx() {
         let brushCanvas = document.createElement("canvas");
+        brushCanvas.id = "buffer";
         brushCanvas.width = this.painter.width;
         brushCanvas.height = this.painter.height;
         Tool._bufferCtx = <CanvasRenderingContext2D>brushCanvas.getContext("2d", {alpha: true});
