@@ -30,7 +30,7 @@ export default class BookView extends View {
         let element = <HTMLDivElement>document.createElement("div");
         element.id = id;
         element.classList.add("thumbnail");
-        element.addEventListener("click", event => {
+        Utils.addFastClick(element,event => {
             event.preventDefault();
             if (this.onImageSelected) {
                 this.onImageSelected(id);
