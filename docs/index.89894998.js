@@ -583,7 +583,7 @@ function getBaseURL(url) {
 
 
 function getOrigin(url) {
-  let matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
+  var matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
 
   if (!matches) {
     throw new Error('Origin not found');
