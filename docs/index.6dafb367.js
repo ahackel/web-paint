@@ -139,7 +139,7 @@
     }
   }
 })({"5bGX7":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.7e904c89.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.6dafb367.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\"}"));
 },{"./bundle-manifest":"73x3q"}],"73x3q":[function(require,module,exports) {
 "use strict";
 
@@ -729,7 +729,7 @@ var Utils = /*#__PURE__*/function () {
 
       _times.push(now);
 
-      _fps = this.lerp(_fps, _times.length, 0.1);
+      _fps = Math.min(60, this.lerp(_fps, _times.length, 0.1));
 
       if (_fpsDisplay == null) {
         _fpsDisplay = document.getElementById("fps-counter");
@@ -879,7 +879,7 @@ var Utils = /*#__PURE__*/function () {
       var sourceData = sourceCtx.getImageData(0, 0, width, height);
       var sourcePixels = sourceData.data;
       startPosition = startPosition.round();
-      var startIndex = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
+      var startIndex = startPosition.x + startPosition.y * width;
       var startR = sourcePixels[startIndex * 4];
       var startG = sourcePixels[startIndex * 4 + 1];
       var startB = sourcePixels[startIndex * 4 + 2];
@@ -891,6 +891,22 @@ var Utils = /*#__PURE__*/function () {
 
       var stack = [];
       stack.push(startPosition);
+
+      if (startPosition.x > 1) {
+        stack.push(new _PointDefault.default(startPosition.x - 2, startPosition.y));
+      }
+
+      if (startPosition.x < width - 2) {
+        stack.push(new _PointDefault.default(startPosition.x + 2, startPosition.y));
+      }
+
+      if (startPosition.y > 1) {
+        stack.push(new _PointDefault.default(startPosition.x, startPosition.y - 2));
+      }
+
+      if (startPosition.y < height - 2) {
+        stack.push(new _PointDefault.default(startPosition.x, startPosition.y + 2));
+      }
 
       while (stack.length > 0) {
         var pos = stack.pop();
@@ -953,25 +969,35 @@ var Utils = /*#__PURE__*/function () {
 
         if (mask[indexA]) {
           return true;
-        }
+        } // let r = sourcePixels[index];
+        // let g = sourcePixels[index + 1];
+        // let b = sourcePixels[index + 2];
+        // let a = sourcePixels[index + 3];
+        //
+        // let difference = Math.max(
+        //     Math.abs(r - startR),
+        //     Math.abs(g - startG),
+        //     Math.abs(b - startB),
+        //     Math.abs(a - startA)
+        // ) / 255;
 
-        var r = sourcePixels[index];
-        var g = sourcePixels[index + 1];
-        var b = sourcePixels[index + 2];
-        var a = sourcePixels[index + 3];
-        var difference = Math.max(Math.abs(r - startR), Math.abs(g - startG), Math.abs(b - startB), Math.abs(a - startA)) / 255;
 
-        if (difference < threshold) {
+        if (sourcePixels[indexA] === 0) {
           if (setValue) {
             mask[indexA] = 255;
           }
 
           return false;
-        }
+        } // if (difference < threshold){
+        //     if (setValue){
+        //         mask[indexA] = 255;
+        //     }
+        //     return false;
+        // }
+        // if (setValue) {
+        //     mask[indexA] = (1 - difference) * 255;
+        // }
 
-        if (setValue) {
-          mask[indexA] = (1 - difference) * 255;
-        }
 
         return true;
       }
@@ -4407,7 +4433,7 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "createTools",
     value: function createTools() {
-      this._tools = [new _toolsPenToolDefault.default(this, "darken"), new _toolsPenToolDefault.default(this, "source-over"), new _toolsPenToolDefault.default(this, "destination-out"), new _toolsRectangleToolDefault.default(this), new _toolsLineToolDefault.default(this), new _toolsPaintBucketToolDefault.default(this)];
+      this._tools = [new _toolsPenToolDefault.default(this, "source-over"), new _toolsPenToolDefault.default(this, "darken"), new _toolsPenToolDefault.default(this, "destination-out"), new _toolsRectangleToolDefault.default(this), new _toolsLineToolDefault.default(this), new _toolsPaintBucketToolDefault.default(this)];
       this._currentTool = this._tools[0];
     }
   }, {
@@ -4436,7 +4462,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       };
 
       this._color = this._colorPalette.color;
-      this._opacity = 0.9;
+      this._opacity = 1;
     }
   }, {
     key: "addEventListeners",
@@ -4781,6 +4807,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 
       this._currentTouchId = 0;
       this.clearUndoBuffer();
+      this._autoMaskCaptured = false;
       window.requestAnimationFrame(function (timeStamp) {
         return _this7.tick(timeStamp);
       });
@@ -4823,13 +4850,24 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "captureAutoMask",
     value: function captureAutoMask(position) {
-      var imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
+      var imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height); // avoid expensive floodfill:
+
+
+      var index = (position.x + position.y * this.width) * 4 + 3;
+
+      if (this._autoMaskCaptured && imageData.data[index] > 0) {
+        return;
+      }
+
+      _utilsUtilsDefault.default.log("capturing auto mask");
 
       _utilsUtilsDefault.default.floodFill(this.overlayCtx, imageData.data, position);
 
       _utilsUtilsDefault.default.dilateMask(imageData.data, this.width, this.height);
 
       this._autoMaskCtx.putImageData(imageData, 0, 0);
+
+      this._autoMaskCaptured = true;
     }
   }, {
     key: "processOverlay",
@@ -5189,7 +5227,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, ToolPalette);
 
-    var tools = ['<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-brush"></i>', '<i class="fas fa-eraser"></i>', '<i class="far fa-square"></i>', '<i class="fas fa-grip-lines-vertical"></i>', '<i class="fas fa-fill-drip"></i>' // '<i class="fas fa-palette"></i>',
+    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-eraser"></i>', '<i class="far fa-square"></i>', '<i class="fas fa-grip-lines-vertical"></i>', '<i class="fas fa-fill-drip"></i>' // '<i class="fas fa-palette"></i>',
     // '<i class="fas fa-fill-drip"></i>'
     ];
     _this = _super.call(this, id, tools, true);
@@ -5340,7 +5378,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   _createClass(PenTool, [{
     key: "down",
     value: function down() {
-      this.painter.captureAutoMask(this.mouse);
+      this.painter.captureAutoMask(this.mouse.round());
       this._lastPoint = this.mouse.copy();
       this._points = [this._lastPoint];
       this._widths = [this.getWidth()];
@@ -5830,4 +5868,4 @@ var LineTool = /*#__PURE__*/function (_ShapeToolBase) {
 }(_ShapeToolBase2Default.default);
 },{"./ShapeToolBase":"2g01N","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}]},{},["5bGX7","26qg1"], "26qg1", "parcelRequireb491")
 
-//# sourceMappingURL=index.7e904c89.js.map
+//# sourceMappingURL=index.6dafb367.js.map

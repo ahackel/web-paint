@@ -22,7 +22,7 @@ export default class PenTool extends Tool {
     }
 
     down(): void {
-        this.painter.captureAutoMask(this.mouse);
+        this.painter.captureAutoMask(this.mouse.round());
         
         this._lastPoint = this.mouse.copy()
         this._points = [this._lastPoint];

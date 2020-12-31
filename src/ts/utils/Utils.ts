@@ -25,7 +25,7 @@ export default class Utils {
             _times.shift();
         }
         _times.push(now);
-        _fps = this.lerp(_fps, _times.length, 0.1);
+        _fps = Math.min(60, this.lerp(_fps, _times.length, 0.1));
         if (_fpsDisplay == null){
             _fpsDisplay = <HTMLElement>document.getElementById("fps-counter");
             if (_fpsDisplay == null){
@@ -163,7 +163,7 @@ export default class Utils {
         const sourcePixels = sourceData.data;
 
         startPosition = startPosition.round();
-        const startIndex: number = Math.round(startPosition.x) + Math.round(startPosition.y) * width;
+        const startIndex: number = startPosition.x + startPosition.y * width;
         
         const startR = sourcePixels[startIndex * 4];
         const startG = sourcePixels[startIndex * 4 + 1];
@@ -177,6 +177,18 @@ export default class Utils {
 
         let stack: Point[] = [];
         stack.push(startPosition);
+        if (startPosition.x > 1){
+            stack.push(new Point(startPosition.x - 2, startPosition.y));
+        }
+        if (startPosition.x < width - 2){
+            stack.push(new Point(startPosition.x + 2, startPosition.y));
+        }
+        if (startPosition.y > 1){
+            stack.push(new Point(startPosition.x, startPosition.y - 2));
+        }
+        if (startPosition.y < height - 2){
+            stack.push(new Point(startPosition.x, startPosition.y + 2));
+        }
 
         while (stack.length > 0)
         {

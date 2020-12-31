@@ -4,8 +4,8 @@ export default class ToolPalette extends Palette {
 
     constructor(id: string){
         let tools: string[] = [
-            '<i class="fas fa-pencil-alt"></i>',
             '<i class="fas fa-brush"></i>',
+            '<i class="fas fa-pencil-alt"></i>',
             '<i class="fas fa-eraser"></i>',
             '<i class="far fa-square"></i>',
             '<i class="fas fa-grip-lines-vertical"></i>',

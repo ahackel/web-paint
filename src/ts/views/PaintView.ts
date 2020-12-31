@@ -40,6 +40,7 @@ export default class PaintView extends View {
     private _tickTimeStamp: number;
     private _overlay: HTMLImageElement;
     private _overlayCtx: CanvasRenderingContext2D;
+    private _autoMaskCaptured: boolean;
 
     get color(): string { return this._color; }
     get opacity(): number { return this._opacity; }
@@ -97,8 +98,8 @@ export default class PaintView extends View {
 
     private createTools() {
         this._tools = [
-            new PenTool(this, "darken"),
             new PenTool(this, "source-over"),
+            new PenTool(this, "darken"),
             new PenTool(this, "destination-out"),
             new RectangleTool(this),
             new LineTool(this),
@@ -406,6 +407,7 @@ export default class PaintView extends View {
         super.show();
         this._currentTouchId = 0;
         this.clearUndoBuffer();
+        this._autoMaskCaptured = false;
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
     }
 
@@ -436,9 +438,18 @@ export default class PaintView extends View {
 
     captureAutoMask(position: Point) {
         let imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
+        
+        // avoid expensive floodfill:
+        const index = (position.x + position.y * this.width) * 4 + 3;
+        if (this._autoMaskCaptured && imageData.data[index] > 0){
+            return;
+        }
+        
+        Utils.log("capturing auto mask");
         Utils.floodFill(this.overlayCtx, imageData.data, position);
         Utils.dilateMask(imageData.data, this.width, this.height);
         this._autoMaskCtx.putImageData(imageData, 0, 0);
+        this._autoMaskCaptured = true;
     }
 
     private processOverlay(ctx: CanvasRenderingContext2D) {
