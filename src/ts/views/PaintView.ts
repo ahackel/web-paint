@@ -124,7 +124,7 @@ export default class PaintView extends View {
         this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
         this._color = this._colorPalette.color;
 
-        this._opacity = 0.9;
+        this._opacity = 1;
     }
 
     private addEventListeners() {

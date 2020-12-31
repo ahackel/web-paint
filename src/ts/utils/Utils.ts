@@ -242,28 +242,35 @@ export default class Utils {
                 return true;
             }
 
-            let r = sourcePixels[index];
-            let g = sourcePixels[index + 1];
-            let b = sourcePixels[index + 2];
-            let a = sourcePixels[index + 3];
-
-            let difference = Math.max(
-                Math.abs(r - startR),
-                Math.abs(g - startG),
-                Math.abs(b - startB),
-                Math.abs(a - startA)
-            ) / 255;
+            // let r = sourcePixels[index];
+            // let g = sourcePixels[index + 1];
+            // let b = sourcePixels[index + 2];
+            // let a = sourcePixels[index + 3];
+            //
+            // let difference = Math.max(
+            //     Math.abs(r - startR),
+            //     Math.abs(g - startG),
+            //     Math.abs(b - startB),
+            //     Math.abs(a - startA)
+            // ) / 255;
             
-            if (difference < threshold){
+            if (sourcePixels[indexA] === 0){
                 if (setValue){
                     mask[indexA] = 255;
                 }
-                return false;
+                return false;               
             }
+            
+            // if (difference < threshold){
+            //     if (setValue){
+            //         mask[indexA] = 255;
+            //     }
+            //     return false;
+            // }
 
-            if (setValue) {
-                mask[indexA] = (1 - difference) * 255;
-            }
+            // if (setValue) {
+            //     mask[indexA] = (1 - difference) * 255;
+            // }
             return true;
         }
     }
