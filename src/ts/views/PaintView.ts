@@ -383,8 +383,15 @@ export default class PaintView extends View {
                 
                 this._overlayCtx.clearRect(0, 0, this.width, this.height);
                 this._overlay.onload = () => {
+                    this._overlay.onload = null;
                     if (this._overlay){
                         this._overlayCtx.drawImage(this._overlay, 0, 0);
+                        this.processOverlay(this.overlayCtx);
+                        
+                        // show processed overlay:
+                        // this._overlayCtx.canvas.toBlob(blob => {
+                        //     this._overlay.src = URL.createObjectURL(blob);
+                        // })
                     }
                 }
             })
@@ -428,7 +435,19 @@ export default class PaintView extends View {
     }
 
     captureAutoMask(position: Point) {
-        this._autoMaskCtx.clearRect(0, 0, this.width, this.height);
-        Utils.floodFill(this._overlayCtx, this._autoMaskCtx, position, "#000000");
+        let imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
+        Utils.floodFill(this.overlayCtx, imageData.data, position);
+        Utils.dilateMask(imageData.data, this.width, this.height);
+        this._autoMaskCtx.putImageData(imageData, 0, 0);
     }
+
+    private processOverlay(ctx: CanvasRenderingContext2D) {
+        const imageData = ctx.getImageData(0, 0, this.width, this.height);
+        const pixels = imageData.data;
+        for (let i = pixels.length - 1; i >= 0; i--) {
+            pixels[i] = pixels[i] > 64 ? 255 : 0;
+        }
+        ctx.putImageData(imageData, 0, 0);
+    }
+
 }

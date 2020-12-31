@@ -11,6 +11,7 @@ export default class PaintBucketTool extends Tool{
         buffer.fillRect(0, 0, buffer.canvas.width, buffer.canvas.height);
         let imageData = buffer.getImageData(0, 0, buffer.canvas.width, buffer.canvas.height);
         Utils.floodFill(overlayCtx, imageData.data, this.mouse);
+        Utils.dilateMask(imageData.data, buffer.canvas.width, buffer.canvas.height);
         buffer.putImageData(imageData, 0, 0);
         ctx.globalCompositeOperation = "source-over";
         ctx.drawImage(buffer.canvas, 0, 0);       

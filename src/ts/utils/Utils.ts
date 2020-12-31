@@ -267,4 +267,35 @@ export default class Utils {
             return true;
         }
     }
+    
+    public static dilateMask(pixels: Uint8ClampedArray, width: number, height: number) {
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width - 1; x++) {
+                const i = (x + y * width) * 4 + 3;
+                if (pixels[i + 4]){
+                    pixels[i] = 255;
+                }
+            }
+            for (let x = width - 1; x > 0; x--) {
+                const i = (x + y * width) * 4 + 3;
+                if (pixels[i - 4]){
+                    pixels[i] = 255;
+                }
+            }
+        }
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height - 1; y++) {
+                const i = (x + y * width) * 4 + 3;
+                if (pixels[i + 4 * width]){
+                    pixels[i] = 255;
+                }
+            }
+            for (let y = height - 1; y > 0; y--) {
+                const i = (x + y * width) * 4 + 3;
+                if (pixels[i - 4 * width]){
+                    pixels[i] = 255;
+                }
+            }
+        }
+    }
 }

@@ -139,7 +139,7 @@
     }
   }
 })({"5bGX7":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.89894998.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.7e904c89.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\"}"));
 },{"./bundle-manifest":"73x3q"}],"73x3q":[function(require,module,exports) {
 "use strict";
 
@@ -189,7 +189,7 @@ var App = /*#__PURE__*/function () {
     _classCallCheck(this, App);
 
     App.preventOverScroll();
-    this.bookView = new _viewsBookViewDefault("book");
+    this.bookView = new _viewsBookViewDefault.default("book");
 
     this.bookView.onImageSelected = function (id) {
       _this.paintView.loadImage(id).then(function () {
@@ -197,7 +197,7 @@ var App = /*#__PURE__*/function () {
       });
     };
 
-    this.paintView = new _viewsPaintViewDefault("paint", function () {
+    this.paintView = new _viewsPaintViewDefault.default("paint", function () {
       _this.openView(_this.bookView);
     }); // Dropbox integration is not working yet:
     // this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
@@ -332,7 +332,7 @@ var BookView = /*#__PURE__*/function (_View) {
       element.id = id;
       element.classList.add("thumbnail");
 
-      _utilsUtilsDefault.addFastClick(element, function (event) {
+      _utilsUtilsDefault.default.addFastClick(element, function (event) {
         event.preventDefault();
 
         if (_this2.onImageSelected) {
@@ -365,7 +365,7 @@ var BookView = /*#__PURE__*/function (_View) {
         this.addOverlay(overlay, thumbnail);
       }
 
-      _storageImageStorageDefault.loadImage(id).then(function (img) {
+      _storageImageStorageDefault.default.loadImage(id).then(function (img) {
         if (img) {
           var oldImages = thumbnail.getElementsByClassName("preview");
 
@@ -442,7 +442,9 @@ var View = /*#__PURE__*/function () {
 "use strict";
 
 exports.interopDefault = function (a) {
-  return a && a.__esModule ? a.default : a;
+  return a && a.__esModule ? a : {
+    default: a
+  };
 };
 
 exports.defineInteropFlag = function (a) {
@@ -511,16 +513,16 @@ var config = {
   height: 768,
   pages: [{
     id: "image01",
-    overlay: _urlImgOverlaysSpiritPngDefault
+    overlay: _urlImgOverlaysSpiritPngDefault.default
   }, {
     id: "image02",
-    overlay: _urlImgOverlaysSpirit2PngDefault
+    overlay: _urlImgOverlaysSpirit2PngDefault.default
   }, {
     id: "image03",
-    overlay: _urlImgOverlaysSpirit3PngDefault
+    overlay: _urlImgOverlaysSpirit3PngDefault.default
   }, {
     id: "image04",
-    overlay: _urlImgOverlaysSantaPngDefault
+    overlay: _urlImgOverlaysSantaPngDefault.default
   }, {
     id: "image05"
   }, {
@@ -750,8 +752,10 @@ var Utils = /*#__PURE__*/function () {
   }, {
     key: "addFastClick",
     value: function addFastClick(element, callback) {
-      // element.addEventListener("touchstart", event => event.preventDefault());
-      // element.addEventListener("touchend", callback);
+      element.addEventListener("touchstart", function (event) {
+        return event.preventDefault();
+      });
+      element.addEventListener("touchend", callback);
       element.addEventListener("click", callback);
     }
   }, {
@@ -939,7 +943,7 @@ var Utils = /*#__PURE__*/function () {
             continue;
           }
 
-          stack.push(new _PointDefault(x, y));
+          stack.push(new _PointDefault.default(x, y));
         }
       }
 
@@ -970,6 +974,45 @@ var Utils = /*#__PURE__*/function () {
         }
 
         return true;
+      }
+    }
+  }, {
+    key: "dilateMask",
+    value: function dilateMask(pixels, width, height) {
+      for (var y = 0; y < height; y++) {
+        for (var x = 0; x < width - 1; x++) {
+          var i = (x + y * width) * 4 + 3;
+
+          if (pixels[i + 4]) {
+            pixels[i] = 255;
+          }
+        }
+
+        for (var _x = width - 1; _x > 0; _x--) {
+          var _i = (_x + y * width) * 4 + 3;
+
+          if (pixels[_i - 4]) {
+            pixels[_i] = 255;
+          }
+        }
+      }
+
+      for (var _x2 = 0; _x2 < width; _x2++) {
+        for (var _y = 0; _y < height - 1; _y++) {
+          var _i2 = (_x2 + _y * width) * 4 + 3;
+
+          if (pixels[_i2 + 4 * width]) {
+            pixels[_i2] = 255;
+          }
+        }
+
+        for (var _y2 = height - 1; _y2 > 0; _y2--) {
+          var _i3 = (_x2 + _y2 * width) * 4 + 3;
+
+          if (pixels[_i3 - 4 * width]) {
+            pixels[_i3] = 255;
+          }
+        }
       }
     }
   }]);
@@ -1111,7 +1154,7 @@ var ImageStorage = /*#__PURE__*/function () {
       return this.adapter.setItem(id, blob).then(function () {
         var event = new Event("imagesaved"); // TODO: Broadcast image id
 
-        _utilsUtilsDefault.DispatchEventToAllElements(event);
+        _utilsUtilsDefault.default.DispatchEventToAllElements(event);
       });
     }
   }, {
@@ -1134,7 +1177,7 @@ var ImageStorage = /*#__PURE__*/function () {
     key: "adapter",
     get: function get() {
       if (this._adapter == null) {
-        this._adapter = new _LocalForageAdapterDefault();
+        this._adapter = new _LocalForageAdapterDefault.default();
       }
 
       return this._adapter;
@@ -1198,7 +1241,7 @@ var LocalForageAdapter = /*#__PURE__*/function (_StorageAdapter) {
 
     _this = _super.call.apply(_super, [this].concat(args));
 
-    _defineProperty(_assertThisInitialized(_this), "_imageStore", _localforageDefault.createInstance({
+    _defineProperty(_assertThisInitialized(_this), "_imageStore", _localforageDefault.default.createInstance({
       name: "ImageStore"
     }));
 
@@ -1228,7 +1271,7 @@ var LocalForageAdapter = /*#__PURE__*/function (_StorageAdapter) {
   }]);
 
   return LocalForageAdapter;
-}(_StorageAdapter2Default);
+}(_StorageAdapter2Default.default);
 },{"localforage":"7aGAg","./StorageAdapter":"4g6b7","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"7aGAg":[function(require,module,exports) {
 var define;
 var global = arguments[3];
@@ -4289,14 +4332,14 @@ var PaintView = /*#__PURE__*/function (_View) {
       return e.pointerType === "touch" ? true : e.buttons === 1;
     });
 
-    var _Utils$getImageSize = _utilsUtilsDefault.getImageSize();
+    var _Utils$getImageSize = _utilsUtilsDefault.default.getImageSize();
 
     var _Utils$getImageSize2 = _slicedToArray(_Utils$getImageSize, 2);
 
     _this.width = _Utils$getImageSize2[0];
     _this.height = _Utils$getImageSize2[1];
 
-    _utilsUtilsDefault.log("Setting PaintView size to ".concat(_this.width, " x ").concat(_this.height));
+    _utilsUtilsDefault.default.log("Setting PaintView size to ".concat(_this.width, " x ").concat(_this.height));
 
     _this.createButtons(onBackClicked);
 
@@ -4318,19 +4361,19 @@ var PaintView = /*#__PURE__*/function (_View) {
 
       var backButton = document.getElementById("back-button");
 
-      _utilsUtilsDefault.addFastClick(backButton, function () {
+      _utilsUtilsDefault.default.addFastClick(backButton, function () {
         return onBackClicked();
       });
 
       var clearButton = document.getElementById("clear-button");
 
-      _utilsUtilsDefault.addFastClick(clearButton, function () {
+      _utilsUtilsDefault.default.addFastClick(clearButton, function () {
         return _this2.clear(true, true);
       });
 
       this._undoButton = document.getElementById("undo-button");
 
-      _utilsUtilsDefault.addFastClick(this._undoButton, function () {
+      _utilsUtilsDefault.default.addFastClick(this._undoButton, function () {
         return _this2.undo();
       });
     }
@@ -4364,7 +4407,7 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "createTools",
     value: function createTools() {
-      this._tools = [new _toolsPenToolDefault(this, "darken"), new _toolsPenToolDefault(this, "source-over"), new _toolsPenToolDefault(this, "destination-out"), new _toolsRectangleToolDefault(this), new _toolsLineToolDefault(this), new _toolsPaintBucketToolDefault(this)];
+      this._tools = [new _toolsPenToolDefault.default(this, "darken"), new _toolsPenToolDefault.default(this, "source-over"), new _toolsPenToolDefault.default(this, "destination-out"), new _toolsRectangleToolDefault.default(this), new _toolsLineToolDefault.default(this), new _toolsPaintBucketToolDefault.default(this)];
       this._currentTool = this._tools[0];
     }
   }, {
@@ -4372,21 +4415,21 @@ var PaintView = /*#__PURE__*/function (_View) {
     value: function createPalettes() {
       var _this3 = this;
 
-      this._toolPalette = new _palettesToolPaletteDefault("tool-palette");
+      this._toolPalette = new _palettesToolPaletteDefault.default("tool-palette");
 
       this._toolPalette.onSelectionChanged = function (option, index) {
         var toolCount = _this3._tools.length;
         _this3._currentTool = _this3._tools[Math.min(index, toolCount - 1)];
       };
 
-      this._sizePalette = new _palettesSizePaletteDefault("size-palette");
+      this._sizePalette = new _palettesSizePaletteDefault.default("size-palette");
 
       this._sizePalette.onSelectionChanged = function (lineWidth) {
         _this3._lineWidth = lineWidth;
       };
 
       this._lineWidth = this._sizePalette.size;
-      this._colorPalette = new _palettesColorPaletteDefault("color-palette");
+      this._colorPalette = new _palettesColorPaletteDefault.default("color-palette");
 
       this._colorPalette.onSelectionChanged = function (color) {
         return _this3._color = color;
@@ -4457,7 +4500,7 @@ var PaintView = /*#__PURE__*/function (_View) {
         y = Math.round(y);
       }
 
-      return new _utilsPointDefault(x, y);
+      return new _utilsPointDefault.default(x, y);
     }
   }, {
     key: "getTouchEventPosition",
@@ -4475,7 +4518,7 @@ var PaintView = /*#__PURE__*/function (_View) {
         y = Math.round(y);
       }
 
-      return new _utilsPointDefault(x, y);
+      return new _utilsPointDefault.default(x, y);
     }
   }, {
     key: "pointerDown",
@@ -4493,7 +4536,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       var target = event.target;
       target.setPointerCapture(event.pointerId);
       this._currentTouchId = event.pointerId;
-      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.clamp(0.3, 1, event.pressure * 2) : 1;
+      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.3, 1, event.pressure * 2) : 1;
       this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
   }, {
@@ -4510,7 +4553,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       } // normalize pressure:
 
 
-      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.clamp(0.5, 1, event.pressure * 2) : 1;
+      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 1, event.pressure * 2) : 1;
       this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
     }
   }, {
@@ -4534,7 +4577,7 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "pressureChanged",
     value: function pressureChanged(force) {
-      var pressure = _utilsUtilsDefault.clamp(0.3, 1, force * 2);
+      var pressure = _utilsUtilsDefault.default.clamp(0.3, 1, force * 2);
 
       this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
 
@@ -4588,13 +4631,13 @@ var PaintView = /*#__PURE__*/function (_View) {
       this._currentTool.pressure = pressure;
       var newMouse = mouse;
 
-      var delta = _utilsPointDefault.distance(this._currentTool.mouse, newMouse);
+      var delta = _utilsPointDefault.default.distance(this._currentTool.mouse, newMouse);
 
       if (delta > 2) {
         var timeDelta = timeStamp - this._timeStamp;
         this._timeStamp = timeStamp;
         var speed = delta / timeDelta;
-        this._currentTool.speed = _utilsUtilsDefault.lerp(this._currentTool.speed, speed, 0.2);
+        this._currentTool.speed = _utilsUtilsDefault.default.lerp(this._currentTool.speed, speed, 0.2);
         this._currentTool.mouse = newMouse;
 
         this._currentTool.move();
@@ -4687,7 +4730,7 @@ var PaintView = /*#__PURE__*/function (_View) {
     value: function loadImage(id) {
       var _this5 = this;
 
-      return _storageImageStorageDefault.loadImage(id).then(function (image) {
+      return _storageImageStorageDefault.default.loadImage(id).then(function (image) {
         _this5._imageId = id;
 
         _this5.clear();
@@ -4704,8 +4747,16 @@ var PaintView = /*#__PURE__*/function (_View) {
         _this5._overlayCtx.clearRect(0, 0, _this5.width, _this5.height);
 
         _this5._overlay.onload = function () {
+          _this5._overlay.onload = null;
+
           if (_this5._overlay) {
             _this5._overlayCtx.drawImage(_this5._overlay, 0, 0);
+
+            _this5.processOverlay(_this5.overlayCtx); // show processed overlay:
+            // this._overlayCtx.canvas.toBlob(blob => {
+            //     this._overlay.src = URL.createObjectURL(blob);
+            // })
+
           }
         };
       });
@@ -4715,10 +4766,10 @@ var PaintView = /*#__PURE__*/function (_View) {
     value: function saveImage() {
       var _this6 = this;
 
-      _utilsUtilsDefault.log("Saving image");
+      _utilsUtilsDefault.default.log("Saving image");
 
       this._ctx.canvas.toBlob(function (blob) {
-        return _storageImageStorageDefault.saveImage(_this6._imageId, blob);
+        return _storageImageStorageDefault.default.saveImage(_this6._imageId, blob);
       });
     }
   }, {
@@ -4748,7 +4799,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       });
 
       if (_config.config.Debug) {
-        _utilsUtilsDefault.updateFPSCounter();
+        _utilsUtilsDefault.default.updateFPSCounter();
       }
 
       if (!this._currentTool) {
@@ -4772,9 +4823,25 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "captureAutoMask",
     value: function captureAutoMask(position) {
-      this._autoMaskCtx.clearRect(0, 0, this.width, this.height);
+      var imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
 
-      _utilsUtilsDefault.floodFill(this._overlayCtx, this._autoMaskCtx, position, "#000000");
+      _utilsUtilsDefault.default.floodFill(this.overlayCtx, imageData.data, position);
+
+      _utilsUtilsDefault.default.dilateMask(imageData.data, this.width, this.height);
+
+      this._autoMaskCtx.putImageData(imageData, 0, 0);
+    }
+  }, {
+    key: "processOverlay",
+    value: function processOverlay(ctx) {
+      var imageData = ctx.getImageData(0, 0, this.width, this.height);
+      var pixels = imageData.data;
+
+      for (var i = pixels.length - 1; i >= 0; i--) {
+        pixels[i] = pixels[i] > 64 ? 255 : 0;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
     }
   }], [{
     key: "findTouch",
@@ -5001,7 +5068,7 @@ var Palette = /*#__PURE__*/function (_View) {
       element.classList.add("option");
       this._selectedElement = element;
 
-      _utilsUtilsDefault.addFastClick(element, function () {
+      _utilsUtilsDefault.default.addFastClick(element, function () {
         return _this2.toggle();
       });
 
@@ -5053,7 +5120,7 @@ var Palette = /*#__PURE__*/function (_View) {
       var element = document.createElement("div");
       element.classList.add("option");
 
-      _utilsUtilsDefault.addFastClick(element, function () {
+      _utilsUtilsDefault.default.addFastClick(element, function () {
         _this3.selectedIndex = index;
 
         _this3.collapse();
@@ -5264,7 +5331,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 
     _this = _super.call(this, painter);
 
-    _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _utilsPointDefault(0, 0));
+    _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _utilsPointDefault.default(0, 0));
 
     _this._operation = operation;
     return _this;
@@ -5273,7 +5340,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   _createClass(PenTool, [{
     key: "down",
     value: function down() {
-      // this.painter.captureAutoMask(this.mouse);
+      this.painter.captureAutoMask(this.mouse);
       this._lastPoint = this.mouse.copy();
       this._points = [this._lastPoint];
       this._widths = [this.getWidth()];
@@ -5314,7 +5381,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
           point = this._points[i].copy(); // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
           // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
 
-          var midPoint = new _utilsPointDefault((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
+          var midPoint = new _utilsPointDefault.default((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
           ctx.lineWidth = this._widths[i];
           ctx.beginPath();
           ctx.moveTo(oldPoint.x, oldPoint.y);
@@ -5330,8 +5397,8 @@ var PenTool = /*#__PURE__*/function (_Tool) {
         ctx.beginPath();
         ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
         ctx.fillStyle = ctx.strokeStyle;
-        ctx.fill(); // this.applyAutoMask();
-
+        ctx.fill();
+        this.applyAutoMask();
         this.painter.ctx.globalAlpha = this.opacity;
         this.painter.ctx.drawImage(ctx.canvas, 0, 0);
         this.painter.ctx.globalAlpha = 1;
@@ -5351,7 +5418,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
 
       var lastWidth = this._widths[this._widths.length - 1];
 
-      this._widths.push(_utilsUtilsDefault.clamp(lastWidth - 1, lastWidth + 1, width));
+      this._widths.push(_utilsUtilsDefault.default.clamp(lastWidth - 1, lastWidth + 1, width));
 
       this.requestDrawPath();
     }
@@ -5363,9 +5430,9 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   }, {
     key: "getWidth",
     value: function getWidth() {
-      var pressure = _utilsUtilsDefault.clamp(0.5, 2, this.pressure * 2);
+      var pressure = _utilsUtilsDefault.default.clamp(0.5, 2, this.pressure * 2);
 
-      var speed = _utilsUtilsDefault.clamp(1, 5, this.speed);
+      var speed = _utilsUtilsDefault.default.clamp(1, 5, this.speed);
 
       return this.lineWidth * pressure / speed;
     }
@@ -5384,7 +5451,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   }]);
 
   return PenTool;
-}(_Tool2Default);
+}(_Tool2Default.default);
 },{"./Tool":"5H8FT","../utils/Point":"6vQND","../utils/Utils":"geRr1","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"5H8FT":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
@@ -5433,7 +5500,7 @@ var Tool = /*#__PURE__*/function () {
     _defineProperty(this, "pressure", 1);
 
     this.painter = painter;
-    this.mouse = new _utilsPointDefault(0, 0);
+    this.mouse = new _utilsPointDefault.default(0, 0);
   } // creates a context to draw the current stroke to so we can draw the complete stroke with a different
   // operation. The buffer can be shared by different tools.
 
@@ -5538,7 +5605,9 @@ var PaintBucketTool = /*#__PURE__*/function (_Tool) {
       buffer.fillRect(0, 0, buffer.canvas.width, buffer.canvas.height);
       var imageData = buffer.getImageData(0, 0, buffer.canvas.width, buffer.canvas.height);
 
-      _utilsUtilsDefault.floodFill(overlayCtx, imageData.data, this.mouse);
+      _utilsUtilsDefault.default.floodFill(overlayCtx, imageData.data, this.mouse);
+
+      _utilsUtilsDefault.default.dilateMask(imageData.data, buffer.canvas.width, buffer.canvas.height);
 
       buffer.putImageData(imageData, 0, 0);
       ctx.globalCompositeOperation = "source-over";
@@ -5547,7 +5616,7 @@ var PaintBucketTool = /*#__PURE__*/function (_Tool) {
   }]);
 
   return PaintBucketTool;
-}(_Tool2Default);
+}(_Tool2Default.default);
 },{"./Tool":"5H8FT","../utils/Utils":"geRr1","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"30jOU":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
@@ -5603,7 +5672,7 @@ var RectangleTool = /*#__PURE__*/function (_ShapeToolBase) {
   }]);
 
   return RectangleTool;
-}(_ShapeToolBase2Default);
+}(_ShapeToolBase2Default.default);
 },{"./ShapeToolBase":"2g01N","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"2g01N":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
@@ -5701,7 +5770,7 @@ var ShapeToolBase = /*#__PURE__*/function (_Tool) {
   }]);
 
   return ShapeToolBase;
-}(_Tool2Default);
+}(_Tool2Default.default);
 },{"./Tool":"5H8FT","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"375uC":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
@@ -5758,7 +5827,7 @@ var LineTool = /*#__PURE__*/function (_ShapeToolBase) {
   }]);
 
   return LineTool;
-}(_ShapeToolBase2Default);
+}(_ShapeToolBase2Default.default);
 },{"./ShapeToolBase":"2g01N","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}]},{},["5bGX7","26qg1"], "26qg1", "parcelRequireb491")
 
-//# sourceMappingURL=index.89894998.js.map
+//# sourceMappingURL=index.7e904c89.js.map
