@@ -10,6 +10,7 @@ export default class ToolPalette extends Palette {
             '<i class="far fa-square"></i>',
             '<i class="fas fa-grip-lines-vertical"></i>',
             '<i class="fas fa-fill-drip"></i>',
+            '<i class="fas fa-stamp"></i>'
             // '<i class="fas fa-palette"></i>',
             // '<i class="fas fa-fill-drip"></i>'
         ];

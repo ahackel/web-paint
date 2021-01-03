@@ -12,6 +12,8 @@ import ImageStorage from "../storage/ImageStorage";
 import {config} from "../config";
 import RectangleTool from "../tools/RectangleTool";
 import LineTool from "../tools/LineTool";
+import StampTool from "../tools/StampTool";
+import StampPalette from "../palettes/StampPalette";
 
 // var Pressure = require('pressure');
 
@@ -32,6 +34,7 @@ export default class PaintView extends View {
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
     private _sizePalette: SizePalette;
+    private _stampPalette: StampPalette;
     private _tools: Tool[];
     private _currentTouchId: number = 0;
     private _undoBuffer: ImageData;
@@ -41,8 +44,10 @@ export default class PaintView extends View {
     private _overlay: HTMLImageElement;
     private _overlayCtx: CanvasRenderingContext2D;
     private _autoMaskCaptured: boolean;
+    private _stamp: string;
 
     get color(): string { return this._color; }
+    get stamp(): string { return this._stamp; }
     get opacity(): number { return this._opacity; }
     get lineWidth(): number { return this._lineWidth; }
     get ctx(): CanvasRenderingContext2D { return this._ctx; }
@@ -58,8 +63,8 @@ export default class PaintView extends View {
         this.createButtons(onBackClicked);
         this.createCtx();
         this.addEventListeners();
-        this.createPalettes();
         this.createTools();
+        this.createPalettes();
     }
 
     private createButtons(onBackClicked: Function) {
@@ -71,6 +76,21 @@ export default class PaintView extends View {
 
         this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
         Utils.addFastClick(this._undoButton, () => this.undo());
+
+        let importImageField = <HTMLInputElement>document.getElementById("import-image-field");
+        importImageField.addEventListener("change", files => {
+            if (importImageField.files.length == 0){
+                return;
+            }
+            let file = importImageField.files[0];
+            let image = new Image();
+            image.src = URL.createObjectURL(file);
+            image.onload = () => {
+                this.ctx.drawImage(image, 0, 0, this.width, this.height);
+            }
+        })
+        let importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
+        Utils.addFastClick(importImageButton, () => importImageField.click());
     }
 
     private createCtx() {
@@ -103,17 +123,15 @@ export default class PaintView extends View {
             new PenTool(this, "destination-out"),
             new RectangleTool(this),
             new LineTool(this),
-            new PaintBucketTool(this)
+            new PaintBucketTool(this),
+            new StampTool(this)
         ]
         this._currentTool = this._tools[0];
     }
 
     private createPalettes() {
         this._toolPalette = new ToolPalette("tool-palette");
-        this._toolPalette.onSelectionChanged = (option: string, index: number) => {
-            const toolCount = this._tools.length;
-            this._currentTool = this._tools[Math.min(index, toolCount - 1)];
-        };
+        this._toolPalette.onSelectionChanged = (option: string, index: number) => this.setTool(index);
 
         this._sizePalette = new SizePalette("size-palette");
         this._sizePalette.onSelectionChanged = (lineWidth: number) => {
@@ -125,7 +143,20 @@ export default class PaintView extends View {
         this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
         this._color = this._colorPalette.color;
 
+        this._stampPalette = new StampPalette("stamp-palette");
+        this._stampPalette.onSelectionChanged = (stamp: string) => this._stamp = stamp;
+        this._stamp = this._stampPalette.stamp;
+
         this._opacity = 1;
+        this.setTool(0);
+    }
+
+    private setTool(index: number) {
+        const toolCount = this._tools.length;
+        this._currentTool = this._tools[Math.min(index, toolCount - 1)];
+
+        this._sizePalette.setVisible(!(this._currentTool instanceof StampTool));
+        this._stampPalette.setVisible(this._currentTool instanceof StampTool);
     }
 
     private addEventListeners() {

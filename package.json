@@ -13,7 +13,7 @@
     "build": "parcel build ./src/index.html --no-scope-hoist"
   },
   "devDependencies": {
-    "parcel": "^2.0.0-nightly.495",
+    "parcel": "^2.0.0-nightly.496",
     "typescript": "^4.1.3"
   },
   "dependencies": {

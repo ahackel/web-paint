@@ -138,8 +138,8 @@
       this[globalName] = mainExports;
     }
   }
-})({"5bGX7":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.6dafb367.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\"}"));
+})({"4ivzv":[function(require,module,exports) {
+require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.28074996.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\",\"286lK\":\"star.be119e69.png\",\"6TZbx\":\"unicorn.663daf1e.png\",\"3O75Q\":\"snowman.65a840cd.png\"}"));
 },{"./bundle-manifest":"73x3q"}],"73x3q":[function(require,module,exports) {
 "use strict";
 
@@ -430,6 +430,11 @@ var View = /*#__PURE__*/function () {
       this._element.classList.add("hidden");
     }
   }, {
+    key: "setVisible",
+    value: function setVisible(visible) {
+      this._element.classList.toggle("hidden", !visible);
+    }
+  }, {
     key: "isVisible",
     value: function isVisible() {
       return !this._element.classList.contains("hidden");
@@ -585,7 +590,7 @@ function getBaseURL(url) {
 
 
 function getOrigin(url) {
-  let matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
+  var matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
 
   if (!matches) {
     throw new Error('Origin not found');
@@ -4261,6 +4266,14 @@ var _toolsLineTool = require("../tools/LineTool");
 
 var _toolsLineToolDefault = _parcelHelpers.interopDefault(_toolsLineTool);
 
+var _toolsStampTool = require("../tools/StampTool");
+
+var _toolsStampToolDefault = _parcelHelpers.interopDefault(_toolsStampTool);
+
+var _palettesStampPalette = require("../palettes/StampPalette");
+
+var _palettesStampPaletteDefault = _parcelHelpers.interopDefault(_palettesStampPalette);
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -4311,6 +4324,11 @@ var PaintView = /*#__PURE__*/function (_View) {
     // Whether to use smooth pixel filtering or to draw hard pixel edges
     get: function get() {
       return this._color;
+    }
+  }, {
+    key: "stamp",
+    get: function get() {
+      return this._stamp;
     }
   }, {
     key: "opacity",
@@ -4373,9 +4391,9 @@ var PaintView = /*#__PURE__*/function (_View) {
 
     _this.addEventListeners();
 
-    _this.createPalettes();
-
     _this.createTools();
+
+    _this.createPalettes();
 
     return _this;
   }
@@ -4401,6 +4419,26 @@ var PaintView = /*#__PURE__*/function (_View) {
 
       _utilsUtilsDefault.default.addFastClick(this._undoButton, function () {
         return _this2.undo();
+      });
+
+      var importImageField = document.getElementById("import-image-field");
+      importImageField.addEventListener("change", function (files) {
+        if (importImageField.files.length == 0) {
+          return;
+        }
+
+        var file = importImageField.files[0];
+        var image = new Image();
+        image.src = URL.createObjectURL(file);
+
+        image.onload = function () {
+          _this2.ctx.drawImage(image, 0, 0, _this2.width, _this2.height);
+        };
+      });
+      var importImageButton = document.getElementById("import-image-button");
+
+      _utilsUtilsDefault.default.addFastClick(importImageButton, function () {
+        return importImageField.click();
       });
     }
   }, {
@@ -4433,7 +4471,7 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "createTools",
     value: function createTools() {
-      this._tools = [new _toolsPenToolDefault.default(this, "source-over"), new _toolsPenToolDefault.default(this, "darken"), new _toolsPenToolDefault.default(this, "destination-out"), new _toolsRectangleToolDefault.default(this), new _toolsLineToolDefault.default(this), new _toolsPaintBucketToolDefault.default(this)];
+      this._tools = [new _toolsPenToolDefault.default(this, "source-over"), new _toolsPenToolDefault.default(this, "darken"), new _toolsPenToolDefault.default(this, "destination-out"), new _toolsRectangleToolDefault.default(this), new _toolsLineToolDefault.default(this), new _toolsPaintBucketToolDefault.default(this), new _toolsStampToolDefault.default(this)];
       this._currentTool = this._tools[0];
     }
   }, {
@@ -4444,8 +4482,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       this._toolPalette = new _palettesToolPaletteDefault.default("tool-palette");
 
       this._toolPalette.onSelectionChanged = function (option, index) {
-        var toolCount = _this3._tools.length;
-        _this3._currentTool = _this3._tools[Math.min(index, toolCount - 1)];
+        return _this3.setTool(index);
       };
 
       this._sizePalette = new _palettesSizePaletteDefault.default("size-palette");
@@ -4462,7 +4499,25 @@ var PaintView = /*#__PURE__*/function (_View) {
       };
 
       this._color = this._colorPalette.color;
+      this._stampPalette = new _palettesStampPaletteDefault.default("stamp-palette");
+
+      this._stampPalette.onSelectionChanged = function (stamp) {
+        return _this3._stamp = stamp;
+      };
+
+      this._stamp = this._stampPalette.stamp;
       this._opacity = 1;
+      this.setTool(0);
+    }
+  }, {
+    key: "setTool",
+    value: function setTool(index) {
+      var toolCount = this._tools.length;
+      this._currentTool = this._tools[Math.min(index, toolCount - 1)];
+
+      this._sizePalette.setVisible(!(this._currentTool instanceof _toolsStampToolDefault.default));
+
+      this._stampPalette.setVisible(this._currentTool instanceof _toolsStampToolDefault.default);
     }
   }, {
     key: "addEventListeners",
@@ -4896,7 +4951,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 
   return PaintView;
 }(_View2.View);
-},{"./View":"4rTGo","../palettes/ColorPalette":"2hM4i","../palettes/ToolPalette":"1gIo5","../palettes/SizePalette":"Jlc4Y","../utils/Utils":"geRr1","../tools/PenTool":"6TQyj","../tools/PaintBucketTool":"52gzH","../utils/Point":"6vQND","../palettes/Palette":"4JDNu","../storage/ImageStorage":"44v0Z","../config":"7l7XE","../tools/RectangleTool":"30jOU","../tools/LineTool":"375uC","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"2hM4i":[function(require,module,exports) {
+},{"./View":"4rTGo","../palettes/ColorPalette":"2hM4i","../palettes/ToolPalette":"1gIo5","../palettes/SizePalette":"Jlc4Y","../utils/Utils":"geRr1","../tools/PenTool":"6TQyj","../tools/PaintBucketTool":"52gzH","../utils/Point":"6vQND","../palettes/Palette":"4JDNu","../storage/ImageStorage":"44v0Z","../config":"7l7XE","../tools/RectangleTool":"30jOU","../tools/LineTool":"375uC","../tools/StampTool":"43tz2","../palettes/StampPalette":"7nhiz","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"2hM4i":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
 _parcelHelpers.defineInteropFlag(exports);
@@ -5227,7 +5282,7 @@ var ToolPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, ToolPalette);
 
-    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-eraser"></i>', '<i class="far fa-square"></i>', '<i class="fas fa-grip-lines-vertical"></i>', '<i class="fas fa-fill-drip"></i>' // '<i class="fas fa-palette"></i>',
+    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-eraser"></i>', '<i class="far fa-square"></i>', '<i class="fas fa-grip-lines-vertical"></i>', '<i class="fas fa-fill-drip"></i>', '<i class="fas fa-stamp"></i>' // '<i class="fas fa-palette"></i>',
     // '<i class="fas fa-fill-drip"></i>'
     ];
     _this = _super.call(this, id, tools, true);
@@ -5866,6 +5921,227 @@ var LineTool = /*#__PURE__*/function (_ShapeToolBase) {
 
   return LineTool;
 }(_ShapeToolBase2Default.default);
-},{"./ShapeToolBase":"2g01N","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}]},{},["5bGX7","26qg1"], "26qg1", "parcelRequireb491")
+},{"./ShapeToolBase":"2g01N","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"43tz2":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
-//# sourceMappingURL=index.6dafb367.js.map
+_parcelHelpers.defineInteropFlag(exports);
+
+_parcelHelpers.export(exports, "default", function () {
+  return StampTool;
+});
+
+var _Tool2 = require("./Tool");
+
+var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
+
+var _utilsPoint = require("../utils/Point");
+
+var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+// Fills an area with the selected color 
+var StampTool = /*#__PURE__*/function (_Tool) {
+  _inherits(StampTool, _Tool);
+
+  var _super = _createSuper(StampTool);
+
+  function StampTool() {
+    _classCallCheck(this, StampTool);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(StampTool, [{
+    key: "down",
+    value: function down() {
+      this._startPosition = this.mouse;
+      var ctx = this.getBufferCtx();
+      ctx.strokeStyle = this.color;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = this.lineWidth; // this.painter.ctx.globalCompositeOperation = this._operation;
+
+      this.requestDrawShape();
+    }
+  }, {
+    key: "move",
+    value: function move() {
+      if (!this.painting) {
+        return;
+      }
+
+      this.requestDrawShape();
+    }
+  }, {
+    key: "tick",
+    value: function tick(delta) {
+      if (this._drawShapeRequested) {
+        if (!this._stampImage || this._stampImage.src != this.painter.stamp) {
+          this.loadStampImage();
+          return;
+        }
+
+        this.updateShape();
+        this._drawShapeRequested = false;
+      }
+    }
+  }, {
+    key: "requestDrawShape",
+    value: function requestDrawShape() {
+      this._drawShapeRequested = true;
+    }
+  }, {
+    key: "updateShape",
+    value: function updateShape() {
+      var ctx = this.getBufferCtx();
+      this.painter.undo(false);
+      ctx.clearRect(0, 0, this.painter.width, this.painter.height);
+      var x = Math.min(this._startPosition.x, this.mouse.x);
+      var y = Math.min(this._startPosition.y, this.mouse.y);
+      var width = Math.abs(this._startPosition.x - this.mouse.x);
+      var height = Math.abs(this._startPosition.y - this.mouse.y);
+      this.drawShape(ctx, x, y, width, height); //this.painter.ctx.globalAlpha = this.opacity;
+
+      this.painter.ctx.drawImage(ctx.canvas, 0, 0);
+      this.painter.ctx.globalAlpha = 1;
+    }
+  }, {
+    key: "drawShape",
+    value: function drawShape(ctx, x, y, width, height) {
+      ctx.save();
+      var aspect = this._stampImage.width / this._stampImage.height;
+
+      var size = _utilsPointDefault.default.distance(this._startPosition, this.mouse);
+
+      var dx = this.mouse.x - this._startPosition.x;
+      var dy = this.mouse.y - this._startPosition.y;
+      var angle = Math.atan2(dy, dx);
+      width = size * 2;
+      height = width / aspect;
+      x = this._startPosition.x - width * 0.5;
+      y = this._startPosition.y - height * 0.5;
+      ctx.translate(this._startPosition.x, this._startPosition.y);
+      ctx.rotate(angle);
+      ctx.translate(-this._startPosition.x, -this._startPosition.y);
+      ctx.fillStyle = this.color;
+      ctx.fillRect(x, y, width, height);
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.drawImage(this._stampImage, x, y, width, height);
+      ctx.restore();
+    }
+  }, {
+    key: "loadStampImage",
+    value: function loadStampImage() {
+      if (!this._stampImage) {
+        this._stampImage = new Image();
+      }
+
+      this._stampImage.src = this.painter.stamp;
+    }
+  }]);
+
+  return StampTool;
+}(_Tool2Default.default);
+},{"./Tool":"5H8FT","../utils/Point":"6vQND","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"7nhiz":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+
+_parcelHelpers.defineInteropFlag(exports);
+
+_parcelHelpers.export(exports, "default", function () {
+  return StampPalette;
+});
+
+var _Palette2 = require("./Palette");
+
+var _urlImgStampsStarPng = require("url:../../img/stamps/star.png");
+
+var _urlImgStampsStarPngDefault = _parcelHelpers.interopDefault(_urlImgStampsStarPng);
+
+var _urlImgStampsUnicornPng = require("url:../../img/stamps/unicorn.png");
+
+var _urlImgStampsUnicornPngDefault = _parcelHelpers.interopDefault(_urlImgStampsUnicornPng);
+
+var _urlImgStampsSnowmanPng = require("url:../../img/stamps/snowman.png");
+
+var _urlImgStampsSnowmanPngDefault = _parcelHelpers.interopDefault(_urlImgStampsSnowmanPng);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var StampPalette = /*#__PURE__*/function (_Palette) {
+  _inherits(StampPalette, _Palette);
+
+  var _super = _createSuper(StampPalette);
+
+  _createClass(StampPalette, [{
+    key: "stamp",
+    get: function get() {
+      return this.selectedOption;
+    }
+  }]);
+
+  function StampPalette(id) {
+    var _this;
+
+    _classCallCheck(this, StampPalette);
+
+    var stamps = [_urlImgStampsStarPngDefault.default, _urlImgStampsUnicornPngDefault.default, _urlImgStampsSnowmanPngDefault.default];
+    _this = _super.call(this, id, stamps, true);
+    _this.selectedIndex = 0;
+    return _this;
+  }
+
+  _createClass(StampPalette, [{
+    key: "updateOption",
+    value: function updateOption(element, option) {
+      element.style.backgroundImage = "url(\"".concat(option, "\")");
+    }
+  }]);
+
+  return StampPalette;
+}(_Palette2.Palette);
+},{"./Palette":"4JDNu","url:../../img/stamps/star.png":"4EmEd","url:../../img/stamps/unicorn.png":"5IDkd","url:../../img/stamps/snowman.png":"4nNV2","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}],"4EmEd":[function(require,module,exports) {
+module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("4Zlhs", "286lK");
+},{"./bundle-url":"79Hpz","./relative-path":"7E1ZB"}],"5IDkd":[function(require,module,exports) {
+module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("4Zlhs", "6TZbx");
+},{"./bundle-url":"79Hpz","./relative-path":"7E1ZB"}],"4nNV2":[function(require,module,exports) {
+module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("4Zlhs", "3O75Q");
+},{"./bundle-url":"79Hpz","./relative-path":"7E1ZB"}]},{},["4ivzv","26qg1"], "26qg1", "parcelRequireb491")
+
+//# sourceMappingURL=index.28074996.js.map
