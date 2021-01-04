@@ -5,7 +5,7 @@ import Utils from "../utils/Utils";
 export default class PaintBucketTool extends Tool{
     down() {
         let overlayCtx = this.painter.overlayCtx;
-        let ctx = this.painter.ctx;
+        let ctx = this.painter.baseLayer.ctx;
         let buffer = this.getBufferCtx();
         buffer.fillStyle = this.painter.color;
         buffer.fillRect(0, 0, buffer.canvas.width, buffer.canvas.height);

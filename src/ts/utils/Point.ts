@@ -14,11 +14,31 @@ export default class Point {
     static add(a: Point, b: Point){
         return new Point(a.x + b.x, a.y + b.y);
     }
+    
+    add(p: Point){
+        this.x += p.x;
+        this.y += p.y;
+        return this;
+    }
+
+    static subtract(a: Point, b: Point){
+        return new Point(a.x - b.x, a.y - b.y);
+    }
+
+    subtract(p: Point){
+        this.x -= p.x;
+        this.y -= p.y;
+        return this;
+    }
 
     static distance(a: Point, b: Point) {
         let dx = a.x - b.x;
         let dy = a.y - b.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    static center(a: Point, b: Point) {
+        return new Point(0.5 * (a.x + b.x), 0.5 * (a.y + b.y));
     }
 
     static lerp(p1: Point, p2: Point, a: number){

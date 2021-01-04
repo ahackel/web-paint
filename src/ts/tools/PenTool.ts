@@ -32,7 +32,7 @@ export default class PenTool extends Tool {
         ctx.strokeStyle = this.color;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
-        this.painter.ctx.globalCompositeOperation = this._operation;
+        this.painter.baseLayer.ctx.globalCompositeOperation = this._operation;
 
         this.requestDrawPath();
     }
@@ -87,9 +87,9 @@ export default class PenTool extends Tool {
             
             this.applyAutoMask();
 
-            this.painter.ctx.globalAlpha = this.opacity;
-            this.painter.ctx.drawImage(ctx.canvas, 0, 0);
-            this.painter.ctx.globalAlpha = 1;
+            this.painter.baseLayer.ctx.globalAlpha = this.opacity;
+            this.painter.baseLayer.drawImage(ctx.canvas);
+            this.painter.baseLayer.ctx.globalAlpha = 1;
         }
     }
 

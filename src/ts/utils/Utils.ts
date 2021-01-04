@@ -9,7 +9,7 @@ let _fpsCounterEnabled = true;
 export default class Utils {
     
     public static log(message?: any, ...optionalParams: any[]){
-        if (!config.Debug){
+        if (!config.debug){
             return;
         }
         console.log(message, optionalParams);

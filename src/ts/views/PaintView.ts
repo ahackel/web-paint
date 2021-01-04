@@ -14,12 +14,11 @@ import RectangleTool from "../tools/RectangleTool";
 import LineTool from "../tools/LineTool";
 import StampTool from "../tools/StampTool";
 import StampPalette from "../palettes/StampPalette";
+import Layer from "../Layer";
 
 // var Pressure = require('pressure');
 
 export default class PaintView extends View {
-    public readonly pixelPerfect = false;   // Make sure to perform painting operations on rounded pixel positions
-    public readonly imageSmoothing = true;  // Whether to use smooth pixel filtering or to draw hard pixel edges
     public readonly scaleFactor = 1;
     public readonly width: number;
     public readonly height: number;
@@ -29,7 +28,6 @@ export default class PaintView extends View {
     private _color: string;
     private _opacity: number;
     private _lineWidth: number;
-    private _ctx: CanvasRenderingContext2D;
     private _autoMaskCtx: CanvasRenderingContext2D;
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
@@ -41,30 +39,42 @@ export default class PaintView extends View {
     private _undoButton: HTMLDivElement;
     private _timeStamp: number;
     private _tickTimeStamp: number;
-    private _overlay: HTMLImageElement;
-    private _overlayCtx: CanvasRenderingContext2D;
     private _autoMaskCaptured: boolean;
     private _stamp: string;
+    private _layers: Layer[] = [];
+    private _sheet: HTMLElement;
 
     get color(): string { return this._color; }
     get stamp(): string { return this._stamp; }
     get opacity(): number { return this._opacity; }
     get lineWidth(): number { return this._lineWidth; }
-    get ctx(): CanvasRenderingContext2D { return this._ctx; }
     get autoMaskCtx(): CanvasRenderingContext2D { return this._autoMaskCtx; }
-    get overlayCtx(): CanvasRenderingContext2D { return this._overlayCtx; }
+    get layers(): Layer[] { return this._layers; }
+    get baseLayer(): Layer { return this._layers[0]; }
+    get overlay(): Layer { return this._layers[1]; }
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
+        
+        this._sheet = document.getElementById("sheet");
 
         [this.width, this.height] = Utils.getImageSize();
         Utils.log(`Setting PaintView size to ${this.width} x ${this.height}`);
         
         this.createButtons(onBackClicked);
-        this.createCtx();
-        this.addEventListeners();
+        this.addLayer("base-layer", this.width, this.height,true);
+        this.addLayer("overlay", this.width, this.height);
+        let l = this.addLayer("floating", 100, 100, true);
+        l.floating = true;
+        //this.addEventListeners();
         this.createTools();
         this.createPalettes();
+
+        let autoMaskCanvas = document.createElement("canvas");
+        autoMaskCanvas.id = "auto-mask";
+        autoMaskCanvas.width = this.width;
+        autoMaskCanvas.height = this.height;
+        this._autoMaskCtx = <CanvasRenderingContext2D>autoMaskCanvas.getContext("2d", {alpha: true});
     }
 
     private createButtons(onBackClicked: Function) {
@@ -86,34 +96,18 @@ export default class PaintView extends View {
             let image = new Image();
             image.src = URL.createObjectURL(file);
             image.onload = () => {
-                this.ctx.drawImage(image, 0, 0, this.width, this.height);
+                this.baseLayer.drawImage(image);
             }
         })
         let importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
         Utils.addFastClick(importImageButton, () => importImageField.click());
     }
 
-    private createCtx() {
-        let canvas = <HTMLCanvasElement>document.getElementById("canvas");
-        canvas.width = this.width;
-        canvas.height = this.height;
-        this._ctx = <CanvasRenderingContext2D>canvas.getContext("2d", {alpha: true});
-        this._ctx.imageSmoothingQuality = "high";
-        this._ctx.imageSmoothingEnabled = this.imageSmoothing;
-        
-        this._overlay = <HTMLImageElement>document.getElementById("overlay");
-
-        let autoMaskCanvas = document.createElement("canvas");
-        autoMaskCanvas.id = "auto-mask";
-        autoMaskCanvas.width = this.width;
-        autoMaskCanvas.height = this.height;
-        this._autoMaskCtx = <CanvasRenderingContext2D>autoMaskCanvas.getContext("2d", {alpha: true});
-
-        let overlayCanvas = document.createElement("canvas");
-        overlayCanvas.id = "overlay";
-        overlayCanvas.width = this.width;
-        overlayCanvas.height = this.height;
-        this._overlayCtx = <CanvasRenderingContext2D>overlayCanvas.getContext("2d", {alpha: true});
+    private addLayer(id: string, width: number, height: number, acceptInput: boolean = false): Layer {
+        let layer = new Layer(this._sheet, id, width, height, acceptInput);
+        this._layers.push(layer);
+        layer.canvas.style.zIndex = this._layers.length.toString();
+        return layer;
     }
 
     private createTools() {
@@ -160,7 +154,7 @@ export default class PaintView extends View {
     }
 
     private addEventListeners() {
-        let canvas = this._ctx.canvas;
+        let canvas = this.baseLayer.canvas;
         canvas.addEventListener('click', event => event.preventDefault());
 
         if (window.PointerEvent != null){
@@ -195,7 +189,7 @@ export default class PaintView extends View {
         let x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
         let y = (isPortraitOrientation ? nx : ny) * this.height; 
 
-        if (this.pixelPerfect){
+        if (config.pixelPerfect){
             x = Math.round(x);
             y = Math.round(y);
         }
@@ -203,8 +197,7 @@ export default class PaintView extends View {
     }
 
     private getTouchEventPosition(touch: Touch) {
-        let canvas = this._ctx.canvas;
-        let rect = canvas.getBoundingClientRect();
+        let rect = this.baseLayer.canvas.getBoundingClientRect();
         const isPortraitOrientation = rect.height > rect.width;
 
         let nx = (touch.clientX - rect.left) / rect.width;
@@ -213,7 +206,7 @@ export default class PaintView extends View {
         let x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
         let y = (isPortraitOrientation ? nx : ny) * this.height;
 
-        if (this.pixelPerfect){
+        if (config.pixelPerfect){
             x = Math.round(x);
             y = Math.round(y);
         }
@@ -370,14 +363,14 @@ export default class PaintView extends View {
         if (registerUndo){
             this.registerUndo();
         }
-        this._ctx.clearRect(0,0, this.width, this.height);
+        this.baseLayer.clear();
         if (save){
             this.saveImage();
         }
     }
 
     registerUndo(){
-        this._undoBuffer = this._ctx.getImageData(0, 0, this.width, this.height);
+        this._undoBuffer = this.baseLayer.getData();
         this.updateUndoButtonState();
     }
 
@@ -398,7 +391,7 @@ export default class PaintView extends View {
         if (swapBuffers){
             this.registerUndo();
         }
-        this._ctx.putImageData(undoBuffer, 0, 0);
+        this.baseLayer.putData(undoBuffer);
     }
 
     loadImage(id: string) {
@@ -407,18 +400,15 @@ export default class PaintView extends View {
                 this._imageId = id;
                 this.clear();
                 if (image){
-                    this._ctx.drawImage(image, 0, 0);
+                    this.baseLayer.drawImage(image);
                 }
                 let overlayPath = this.getOverlayPath(id);
-                this._overlay.src = overlayPath;
-                this._overlay.style.display = overlayPath ? "block" : "none";
-                
-                this._overlayCtx.clearRect(0, 0, this.width, this.height);
-                this._overlay.onload = () => {
-                    this._overlay.onload = null;
-                    if (this._overlay){
-                        this._overlayCtx.drawImage(this._overlay, 0, 0);
-                        this.processOverlay(this.overlayCtx);
+                let overlayImage = new Image();
+                overlayImage.src = overlayPath;
+                overlayImage.onload = () => {
+                    if (overlayImage){
+                        this.overlay.drawImage(overlayImage);
+                        //this.processOverlay(this.overlay.ctx);
                         
                         // show processed overlay:
                         // this._overlayCtx.canvas.toBlob(blob => {
@@ -431,7 +421,7 @@ export default class PaintView extends View {
 
     saveImage() {
         Utils.log("Saving image");
-        this._ctx.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
+        this.baseLayer.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
     }
 
     show(){
@@ -449,7 +439,7 @@ export default class PaintView extends View {
 
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
         
-        if (config.Debug){
+        if (config.debug){
             Utils.updateFPSCounter();
         }
 
@@ -477,7 +467,7 @@ export default class PaintView extends View {
         }
         
         Utils.log("capturing auto mask");
-        Utils.floodFill(this.overlayCtx, imageData.data, position);
+        Utils.floodFill(this.overlay.ctx, imageData.data, position);
         Utils.dilateMask(imageData.data, this.width, this.height);
         this._autoMaskCtx.putImageData(imageData, 0, 0);
         this._autoMaskCaptured = true;

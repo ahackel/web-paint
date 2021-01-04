@@ -4,7 +4,9 @@ import spirit3 from "url:../img/overlays/spirit3.png";
 import santa from "url:../img/overlays/santa.png";
 
 export const config = {
-    Debug: false,
+    debug: false,
+    pixelPerfect: false,   // Make sure to perform painting operations on rounded pixel positions
+    imageSmoothing: true,  // Whether to use smooth pixel filtering or to draw hard pixel edges
     width: 1024,
     height: 768,
     pages:[

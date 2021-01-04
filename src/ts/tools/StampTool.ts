@@ -61,8 +61,8 @@ export default class StampTool extends Tool {
         this.drawShape(ctx, x, y, width, height);
 
         //this.painter.ctx.globalAlpha = this.opacity;
-        this.painter.ctx.drawImage(ctx.canvas, 0, 0);
-        this.painter.ctx.globalAlpha = 1;
+        this.painter.baseLayer.drawImage(ctx.canvas);
+        this.painter.baseLayer.ctx.globalAlpha = 1;
     }
 
     drawShape(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number){

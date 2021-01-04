@@ -513,7 +513,7 @@ var _urlImgOverlaysSantaPng = require("url:../img/overlays/santa.png");
 var _urlImgOverlaysSantaPngDefault = _parcelHelpers.interopDefault(_urlImgOverlaysSantaPng);
 
 var config = {
-  Debug: false,
+  debug: false,
   width: 1024,
   height: 768,
   pages: [{
