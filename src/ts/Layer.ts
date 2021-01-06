@@ -7,8 +7,8 @@ export default class Layer {
     protected _canvas: HTMLCanvasElement;
     protected _ctx: CanvasRenderingContext2D;
     
-    private _currentTouchId: number = 0;
-    private _dragOrigin: Point;
+    private _index: number;
+    private _pinchCenter: Point;
     private _pinchStartDist: number;
     private _pinchStartRotation: number;
     private _startScale: number = 1;
@@ -21,25 +21,39 @@ export default class Layer {
     get ctx() { return this._ctx; }
     get width(): number { return this._canvas.width; }
     get height(): number { return this._canvas.height; }
+    get position() { return this._position; }
+    get rotation() { return this._rotation; }
+    get scale() { return this._scale; }
     get floating(): boolean { return this._canvas.classList.contains("floating"); }
-    set floating(value: boolean) { this._canvas.classList.toggle("floating", value); }
+    set floating(value: boolean) { 
+        this._canvas.classList.toggle("floating", value);
+        this._canvas.style.pointerEvents = value ? "auto" : "none";
+        if (value){
+            this.addEventListeners();
+        }
+        else {
+            this.removeEventListeners();
+        }
+    }
 
-    constructor(parent: HTMLElement, id: string, width: number, height: number, acceptInput: boolean = false) {
+    constructor(parent: HTMLElement, id: string, index: number, x: number, y: number, width: number, height: number, acceptInput: boolean = false) {
         this._canvas = <HTMLCanvasElement>document.createElement("canvas");
         this._canvas.id = id;
+        this._index = index;
         this._canvas.width = width;
         this._canvas.height = height;
+        this._canvas.style.width = `${width}em`;
+        this._canvas.style.height = `${height}em`;
         this._ctx = <CanvasRenderingContext2D>this._canvas.getContext("2d", {alpha: true});
         this._ctx.imageSmoothingQuality = "high";
         this._ctx.imageSmoothingEnabled = config.imageSmoothing;
         if (!acceptInput){
             this._canvas.style.pointerEvents = "none";
         }
-        else {
-            this.addEventListeners();
-        }
             
         parent.appendChild(this._canvas);
+        this.transform(new Point(x, y), 1, 0);
+        this.bindEventListeners();
     }
 
     getData(): ImageData {
@@ -57,65 +71,91 @@ export default class Layer {
     clear(){
         this._ctx.clearRect(0,0, this.width, this.height);
     }
-
-
+    
+    drawToCanvas(ctx: CanvasRenderingContext2D){
+        ctx.save();
+        let x = this._position.x + 0.5 * this.width;
+        let y = this._position.y + 0.5 * this.height;
+        ctx.setTransform(this._scale, 0, 0, this._scale, x, y);
+        ctx.rotate(this._rotation);
+        ctx.translate(-0.5 * this.width, -0.5 * this.height);
+        ctx.drawImage(this.canvas, 0, 0);
+        ctx.restore();
+    }
+    
     private addEventListeners() {
-        this._canvas.addEventListener('click', event => event.preventDefault());
+        this._canvas.addEventListener('click', this.click);
+        this._canvas.addEventListener('touchstart', this.touchStart);
 
         if (window.PointerEvent != null){
             // Required to prevent pointerDown events from being choked when tapping repeatedly: 
-            this._canvas.addEventListener('touchstart', event => this.touchStart(event));
-            this._canvas.addEventListener('touchmove', event => this.touchMove(event));
-            this._canvas.addEventListener('touchend', event => this.touchEnd(event));
-            this._canvas.addEventListener('touchcancel', event => event.preventDefault());
         }
     }
+    
+    private removeEventListeners() {
+        this._canvas.removeEventListener('click', this.click);
+        this._canvas.removeEventListener('touchstart', this.touchStart);
 
+        if (window.PointerEvent != null){
+            // Required to prevent pointerDown events from being choked when tapping repeatedly: 
+        }
+    }
+    
+    private click(event: Event) {
+        event.preventDefault();
+    }
+    
     private touchStart(event: TouchEvent) {
         event.preventDefault();
-        
-        if (event.touches.length != 2){
-            return;
+
+        if (event.touches.length === 1){
+            this.addPinchEventListeners();
+
+            this._pinchCenter = new Point(
+                this._position.x + 0.5 * this.width,
+                this._position.y + 0.5 * this.height);
+
+            if (event.altKey){
+                let p1 = this.pointFromTouch(event.touches[0]);
+                let p2 = new Point(2 * this._pinchCenter.x - p1.x, 2 * this._pinchCenter.y - p1.y);
+                this.pinchStart(p1, p2);
+            }
+            else{
+                this.dragStart(this.pointFromTouch(event.touches[0]));
+            }
         }
+        
+        if (event.touches.length === 2){
+            //target.setPointerCapture(event.pointerId);
 
-        let target = <HTMLElement>event.target;
-        //target.setPointerCapture(event.pointerId);
+            //this._currentTouchId = event.pointerId;
 
-        //this._currentTouchId = event.pointerId;
-
-        let rect = target.getBoundingClientRect();
-        let p1 = new Point(event.touches[0].clientX, event.touches[0].clientY);
-        let p2 = new Point(event.touches[1].clientX, event.touches[1].clientY);
-        let layerPosition = new Point(rect.x, rect.y);
-        let center = Point.center(p1, p2);
-        this._dragOrigin = Point.subtract(center, layerPosition);
-        this._pinchStartDist = Point.distance(p1, p2);
-        this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
-        this._startRotation = this._rotation;
-        this._startScale = this._scale;
+            this.pinchStart(this.pointFromTouch(event.touches[0]), this.pointFromTouch(event.touches[1]));
+        }
     }
 
     private touchMove(event: TouchEvent) {
         event.preventDefault();
-        if (event.touches.length != 2){
-            return;
+
+        if (event.touches.length === 1){
+            if (event.altKey){
+                let p1 = this.pointFromTouch(event.touches[0]);
+                let p2 = new Point(2 * this._pinchCenter.x - p1.x, 2 * this._pinchCenter.y - p1.y);
+                this.pinchMove(p1, p2);
+            }
+            else{
+                this.dragMove(this.pointFromTouch(event.touches[0]));
+            }
         }
-
-        let p1 = new Point(event.touches[0].clientX, event.touches[0].clientY);
-        let p2 = new Point(event.touches[1].clientX, event.touches[1].clientY);
-        let center = Point.center(p1, p2);
-        let distance = Point.distance(p1, p2);
-        let angle = Math.atan2(p1.y - center.y, p1.x - center.x);
-        let angleChange = angle - this._pinchStartRotation;
-
-        let position = Point.center(p1, p2);
-        let scale = this._startScale + 0.01 * (distance - this._pinchStartDist);
-        let rotation = this._startRotation + angleChange;
-        this.transform(position, scale, rotation);
+        if (event.touches.length === 2) {
+            this.pinchMove(this.pointFromTouch(event.touches[0]), this.pointFromTouch(event.touches[1]));
+        }
     }
 
-    private touchEnd(event: TouchEvent) {
-        // event.preventDefault();
+
+    private touchEnd (event: TouchEvent) {
+        event.preventDefault();
+        this.removePinchEventListeners();
         // if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId){
         //     return;
         // }
@@ -130,14 +170,87 @@ export default class Layer {
         // this._currentTouchId = 0;
     }
 
-    private transform(position: Point, scale: number, rotation: number) {
-        // compensate original center:
-        position.x += (-0.5 * this.width);
-        position.y += (-0.5 * this.height);
+    private touchCancel (event: TouchEvent) {
+        event.preventDefault();
+    }
+
+    private addPinchEventListeners() {
+        this._canvas.addEventListener('touchmove', this.touchMove);
+        this._canvas.addEventListener('touchend', this.touchEnd);
+        this._canvas.addEventListener('touchcancel', this.touchCancel);
+    }
+
+    private removePinchEventListeners() {
+        this._canvas.removeEventListener('touchmove', this.touchMove);
+        this._canvas.addEventListener('touchend', this.touchEnd);
+        this._canvas.addEventListener('touchcancel', this.touchCancel);
+    }
+
+    public transform(position: Point, scale: number, rotation: number) {
         this._position = position;
         this._rotation = rotation;
         this._scale = scale;
-        this._canvas.style.transform = `translate(${position.x}px, ${position.y}px) rotate(${rotation}rad) scale(${scale})`;
-        this._canvas.style.borderWidth = `${2 / scale}px`;
+        const index = this._index;
+        this._canvas.style.transform = `translate(${position.x}em, ${position.y}em) rotate(${rotation}rad) scale(${scale}) translateZ(${index}px)`;
+        this._canvas.style.outlineWidth = `${2 / scale}em`;
+    }
+
+    private bindEventListeners() {
+        
+        // TODO: Find a better way. This is ugly:
+        this.click = this.click.bind(this);
+        this.touchStart = this.touchStart.bind(this);
+        this.touchMove = this.touchMove.bind(this);
+        this.touchEnd = this.touchEnd.bind(this);
+        this.touchCancel = this.touchCancel.bind(this);
+    }
+
+    private dragStart(p: Point) {
+    }
+
+    private dragMove(position: Point) {
+        position.x -= 0.5 * this.width;
+        position.y -= 0.5 * this.height;
+
+        this.transform(position, this._scale, this._rotation);
+    }
+
+    private pinchStart(p1: Point, p2: Point) {
+        let center = Point.center(p1, p2);
+        this._pinchStartDist = Point.distance(p1, p2);
+        this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
+        this._startRotation = this._rotation;
+        this._startScale = this._scale;       
+    }
+
+    private pinchMove(p1: Point, p2: Point) {
+        let center = Point.center(p1, p2);
+        let distance = Point.distance(p1, p2);
+        let angle = Math.atan2(p1.y - center.y, p1.x - center.x);
+        let angleChange = angle - this._pinchStartRotation;
+
+        let scale = this._startScale * (distance / this._pinchStartDist);
+        scale = Utils.clamp(0.1, 10, scale);
+        let position = Point.center(p1, p2);
+        position.x -= 0.5 * this.width;
+        position.y -= 0.5 * this.height;
+
+        let rotation = this._startRotation + angleChange;
+        this.transform(position, scale, rotation);
+    }
+    
+    private pointFromTouch(touch: Touch){
+        let parent = this._canvas.parentElement;
+        let rect = parent.getBoundingClientRect();
+
+        const isPortraitOrientation = rect.height > rect.width;
+
+        let nx = (touch.clientX - rect.x) / rect.width;
+        let ny = (touch.clientY - rect.y) / rect.height;
+
+        let x = (isPortraitOrientation ? 1 - ny : nx) * config.width;
+        let y = (isPortraitOrientation ? nx : ny) * config.height;
+
+        return new Point(x, y);
     }
 }

@@ -39,6 +39,8 @@ export default abstract class Tool {
         return Tool._bufferCtx;
     }
 
+    enable(): void {};
+    disable(): void {};
     down(): void {};
     move(): void {};
     up(): void {};

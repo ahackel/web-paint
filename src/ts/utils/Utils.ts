@@ -37,11 +37,6 @@ export default class Utils {
         _fpsDisplay.innerText = _fps.toFixed(0);
     }
 
-    public static getImageSize(): [number, number] {
-        // return screen.width > screen.height ? [screen.width, screen.height] : [screen.height, screen.width];
-        return [config.width, config.height];
-    }
-
     public static addFastClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
         element.addEventListener("touchstart", event => event.preventDefault());
         element.addEventListener("touchend", callback);

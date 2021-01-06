@@ -38,6 +38,8 @@ export class Palette extends View {
 
         this.show();
         this.collapse();
+        
+        window.addEventListener("resize", () => this.adjustOptionsPosition());
     }
     
     static collapseAll() {
@@ -81,8 +83,8 @@ export class Palette extends View {
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("options");
         element.style.width = Math.min(4, this._options.length) * 1.25 + "rem";
-        element.style.top = Math.ceil(this._options.length / 4) * -0.625 + 0.5 + "rem";
         this._optionsElement = element;
+        this.adjustOptionsPosition();
 
         this.addArrow();
 
@@ -92,6 +94,13 @@ export class Palette extends View {
             i ++;
         }
         this._element.appendChild(element);
+    }
+
+    private adjustOptionsPosition() {
+        console.log("adjustOptionsPosition")
+        let isPortrait = window.innerWidth < window.innerHeight;
+        this._optionsElement.style.top = isPortrait ? "initial" : Math.ceil(this._options.length / 4) * -0.625 + 0.5 + "rem";
+        this._optionsElement.style.left = isPortrait ? Math.min(this._options.length, 4) * -0.625 + 0.5 + "rem" : null;
     }
 
     addArrow(){

@@ -3,93 +3,103 @@ import Point from "../utils/Point";
 
 // @ts-ignore
 import brushPath from "url:../../img/stamps/star.png";
+import Utils from "../utils/Utils";
+import PaintView from "../views/PaintView";
 
 // Fills an area with the selected color 
 export default class StampTool extends Tool {
 
-    protected _startPosition: Point;
-    private _drawShapeRequested: boolean;
     private _stampImage: HTMLImageElement;
+    private _scale = 1;
+    private _rotation = 0;
+    private _stampButton: HTMLDivElement;
 
-    down() {
-        this._startPosition = this.mouse;
-        let ctx = this.getBufferCtx();
-        ctx.strokeStyle = this.color;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.lineWidth = this.lineWidth;
-
-        // this.painter.ctx.globalCompositeOperation = this._operation;
-
-        this.requestDrawShape();
-    }
-
-    move(): void {
-        if (!this.painting) {
-            return;
-        }
-
-        this.requestDrawShape();
+    constructor(painter: PaintView) {
+        super(painter);
+        this._stampButton = <HTMLDivElement>document.getElementById("stamp-button");
+        Utils.addFastClick(this._stampButton, () => this.performStamp());
+        this._stampButton.hidden = true;
     }
 
     tick(delta: number) {
-        if (this._drawShapeRequested) {
-            if (!this._stampImage || this._stampImage.src != this.painter.stamp){
-                this.loadStampImage();
-                return;
-            }
-            this.updateShape();
-            this._drawShapeRequested = false;
+        if (!this._stampImage || !this.painter.hasFloatingLayer()){
+            return;
+        }
+        
+        if (this._stampImage.src != this.painter.stamp || this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
+            this.recreateStamp();
         }
     }
 
-    requestDrawShape() {
-        this._drawShapeRequested = true;
+    enable() {
+        this.mouse = new Point(this.painter.width * 0.5, this.painter.height * 0.5);
+        this.showStamp();
+        this._stampButton.hidden = false;
     }
 
-    updateShape() {
-        let ctx = this.getBufferCtx();
-
-        this.painter.undo(false);
-        ctx.clearRect(0, 0, this.painter.width, this.painter.height);
-
-        const x = Math.min(this._startPosition.x, this.mouse.x);
-        const y = Math.min(this._startPosition.y, this.mouse.y);
-        const width = Math.abs(this._startPosition.x - this.mouse.x);
-        const height = Math.abs(this._startPosition.y - this.mouse.y);
-
-        this.drawShape(ctx, x, y, width, height);
-
-        //this.painter.ctx.globalAlpha = this.opacity;
-        this.painter.baseLayer.drawImage(ctx.canvas);
-        this.painter.baseLayer.ctx.globalAlpha = 1;
+    disable() {
+        this.hideStamp();
+        this._stampButton.hidden = true;
+    }
+    
+    performStamp(){
+        this.painter.recordUndo();
+        this.painter.floatingLayer.drawToCanvas(this.painter.baseLayer.ctx);        
     }
 
-    drawShape(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number){
-        ctx.save();
-        const aspect = this._stampImage.width / this._stampImage.height;
-        const size = Point.distance(this._startPosition, this.mouse);
-        const dx = this.mouse.x - this._startPosition.x;
-        const dy = this.mouse.y - this._startPosition.y;
-        const angle = Math.atan2(dy, dx);
-        width = size * 2;
-        height = width / aspect;
-        x = this._startPosition.x - width * 0.5;
-        y = this._startPosition.y - height * 0.5;
-        ctx.translate(this._startPosition.x, this._startPosition.y);
-        ctx.rotate(angle);
-        ctx.translate(-this._startPosition.x, -this._startPosition.y);
-        ctx.fillStyle = this.color;
-        ctx.fillRect(x, y, width, height);
-        ctx.globalCompositeOperation = "destination-in";
-        ctx.drawImage(this._stampImage, x, y, width, height);
-        ctx.restore();
+    private hideStamp() {
+        if (!this.painter.hasFloatingLayer()){
+            return;
+        }
+        
+        // save transform:
+        let layer = this.painter.floatingLayer;
+        this._scale = layer.scale;
+        this._rotation = layer.rotation;
+        this.mouse = new Point(layer.position.x + 0.5 * layer.width, layer.position.y + 0.5 * layer.height);
+
+        this.painter.removeLayer(this.painter.floatingLayer);
     }
 
-    private loadStampImage() {
+    private showStamp() {
+        if (this.painter.hasFloatingLayer()) {
+            this._scale = this.painter.floatingLayer.scale;
+            this._rotation = this.painter.floatingLayer.rotation;
+        }
+
+        this.loadStampImage()
+            .then(img => {
+                const width = img.width;
+                const height = img.height;
+                const x = this.mouse.x - 0.5 * width;
+                const y = this.mouse.y - 0.5 * height;
+                let layer = this.painter.newFloatingLayer(x, y, width, height);
+                layer.ctx.fillStyle = this.painter.color;
+                layer.ctx.fillRect(0, 0, width, height);
+                layer.ctx.globalCompositeOperation = "destination-in";
+                layer.drawImage(img);
+                layer.ctx.globalCompositeOperation = "source-over";
+                layer.transform(new Point(x, y), this._scale, this._rotation);
+                layer.canvas.style.opacity = "0.5";
+            })       
+    }
+
+    private recreateStamp(){
+        this.hideStamp();
+        this.showStamp();
+    }
+
+    private loadStampImage(): Promise<HTMLImageElement> {
         if (!this._stampImage){
             this._stampImage = new Image();
         }
+        if (this._stampImage.src == this.painter.stamp){
+            return Promise.resolve(this._stampImage);
+        }
+
         this._stampImage.src = this.painter.stamp;
+        return new Promise<HTMLImageElement>(resolve => {
+            this._stampImage.onload = () => resolve(this._stampImage);
+        });
     }
 }
