@@ -103,7 +103,6 @@ export default class Layer {
     }
     
     private click(event: Event) {
-        console.log("click")
         event.preventDefault();
     }
     
@@ -178,6 +177,8 @@ export default class Layer {
     }
 
     private addPinchEventListeners() {
+        console.log("addPinchEventListeners")
+
         this._canvas.addEventListener('touchmove', this.touchMove);
         this._canvas.addEventListener('touchend', this.touchEnd);
         this._canvas.addEventListener('touchcancel', this.touchCancel);
