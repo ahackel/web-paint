@@ -118,7 +118,7 @@ export default class PenTool extends Tool {
     }
 
     private applyAutoMask() {
-        if (!this.painter.autoMaskCtx){
+        if (!this.painter.overlayLayer || !this.painter.autoMaskCtx){
             return;
         }
         

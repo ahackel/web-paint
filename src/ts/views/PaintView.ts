@@ -41,7 +41,7 @@ export default class PaintView extends View {
     private _tickTimeStamp: number;
     private _autoMaskCaptured: boolean;
     private _stamp: string;
-    private _layers: Layer[] = [];
+    private _layers: { [id : string] : Layer } = {};
     private _sheet: HTMLElement;
 
     get color(): string { return this._color; }
@@ -49,10 +49,10 @@ export default class PaintView extends View {
     get opacity(): number { return this._opacity; }
     get lineWidth(): number { return this._lineWidth; }
     get autoMaskCtx(): CanvasRenderingContext2D { return this._autoMaskCtx; }
-    get layers(): Layer[] { return this._layers; }
-    get baseLayer(): Layer { return this._layers[0]; }
-    get overlay(): Layer { return this._layers[1]; }
-    get floatingLayer(): Layer { return this._layers[2]; }
+    //get layers(): Layer[] { return this._layers; }
+    get baseLayer(): Layer { return this._layers["base-layer"]; }
+    get overlayLayer(): Layer { return this._layers["overlay-layer"]; }
+    get floatingLayer(): Layer { return this._layers["floating-layer"]; }
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
@@ -103,30 +103,32 @@ export default class PaintView extends View {
     }
 
     private addLayer(id: string, x: number, y: number, width: number, height: number, acceptInput: boolean = false): Layer {
-        let index = this._layers.length;
+        if (this._layers[id]){
+            return this._layers[id];
+        }
+        let index = Object.keys(this._layers).length;
         let layer = new Layer(this._sheet, id, index, x, y, width, height, acceptInput);
-        this._layers.push(layer);
+        this._layers[id] = layer;
         return layer;
     }
     
-    public removeLayer(layer: Layer){
+    public removeLayer(layer: Layer) {
         layer.canvas.remove();
-        const index = this.layers.indexOf(layer);
-        this.layers.splice(index, 1);
+        delete this._layers[layer.id]
     }
     
     public createOverlay(){
-        if (this.overlay){
+        if (this.overlayLayer){
             return;
         }
-        this.addLayer("overlay", 0, 0, this.width, this.height);
+        this.addLayer("overlay-layer", 0, 0, this.width, this.height);
     }
     
     public removeOverlay(){
-        if (!this.overlay){
+        if (!this.overlayLayer){
             return;
         }
-        this.removeLayer(this.overlay);
+        this.removeLayer(this.overlayLayer);
     }
     
     public setOverlay(url: string){
@@ -139,7 +141,7 @@ export default class PaintView extends View {
         overlayImage.src = url;
         overlayImage.onload = () => {
             if (overlayImage){
-                this.overlay.drawImage(overlayImage);
+                this.overlayLayer.drawImage(overlayImage);
                 //this.processOverlay(this.overlay.ctx);
 
                 // show processed overlay:
@@ -148,26 +150,22 @@ export default class PaintView extends View {
                 // })
             }
         }
-    } 
-    
+    }
+
     public newFloatingLayer(x: number, y: number, width: number, height: number): Layer {
         this.mergeFloatingLayer();
-        let layer = this.addLayer("floating", x, y, width, height);
+        let layer = this.addLayer("floating-layer", x, y, width, height);
         layer.floating = true;
         return layer;
     }
-    
+
     public mergeFloatingLayer(){
-        if (!this.hasFloatingLayer()){
+        if (!this.floatingLayer){
             return;
         }
-        this.mergeLayer(this.layers[2]);
+        this.mergeLayer(this.floatingLayer);
     }
     
-    public hasFloatingLayer(){
-        return this.layers.length > 2;
-    }
-
     private createTools() {
         this._tools = [
             new PenTool(this, "source-over"),
@@ -236,14 +234,6 @@ export default class PaintView extends View {
         // Pressure.set(canvas, {
         //     change: (force: number, event: Event) => this.pressureChanged(force)
         // })
-        
-        document.addEventListener('keydown', event => {
-            if (event.key == 'e'){
-                if (this.layers.length > 2){
-                    this.mergeLayer(this.layers[2]);
-                }
-            }
-        })
     }
 
     private getPointerEventPosition(event: PointerEvent) {
@@ -533,6 +523,11 @@ export default class PaintView extends View {
     }
 
     captureAutoMask(position: Point) {
+        this._autoMaskCaptured = true;
+        if (!this.overlayLayer){
+            return;
+        }
+        
         let imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
         
         // avoid expensive floodfill:
@@ -542,10 +537,9 @@ export default class PaintView extends View {
         }
         
         Utils.log("capturing auto mask");
-        Utils.floodFill(this.overlay.ctx, imageData.data, position);
+        Utils.floodFill(this.overlayLayer.ctx, imageData.data, position);
         Utils.dilateMask(imageData.data, this.width, this.height);
         this._autoMaskCtx.putImageData(imageData, 0, 0);
-        this._autoMaskCaptured = true;
     }
 
     private processOverlay(ctx: CanvasRenderingContext2D) {

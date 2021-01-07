@@ -22,7 +22,7 @@ export default class StampTool extends Tool {
     }
 
     tick(delta: number) {
-        if (!this._stampImage || !this.painter.hasFloatingLayer()){
+        if (!this._stampImage || !this.painter.floatingLayer){
             return;
         }
         
@@ -48,7 +48,7 @@ export default class StampTool extends Tool {
     }
 
     private hideStamp() {
-        if (!this.painter.hasFloatingLayer()){
+        if (!this.painter.floatingLayer){
             return;
         }
         
@@ -62,7 +62,7 @@ export default class StampTool extends Tool {
     }
 
     private showStamp() {
-        if (this.painter.hasFloatingLayer()) {
+        if (this.painter.floatingLayer) {
             this._scale = this.painter.floatingLayer.scale;
             this._rotation = this.painter.floatingLayer.rotation;
         }

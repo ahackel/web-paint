@@ -17,6 +17,7 @@ export default class Layer {
     private _scale: number = 1;
     private _rotation: number = 0;
     
+    get id() { return this._canvas.id; }
     get canvas() { return this._canvas; }
     get ctx() { return this._ctx; }
     get width(): number { return this._canvas.width; }
