@@ -103,10 +103,12 @@ export default class Layer {
     }
     
     private click(event: Event) {
+        console.log("click")
         event.preventDefault();
     }
     
     private touchStart(event: TouchEvent) {
+        console.log("touchstart")
         event.preventDefault();
 
         if (event.touches.length === 1){
