@@ -44,7 +44,8 @@ export default class StampTool extends Tool {
     
     performStamp(){
         this.painter.recordUndo();
-        this.painter.floatingLayer.drawToCanvas(this.painter.baseLayer.ctx);        
+        this.painter.floatingLayer.drawToCanvas(this.painter.baseLayer.ctx);
+        this.painter.saveImage();
     }
 
     private hideStamp() {
