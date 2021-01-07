@@ -42,10 +42,17 @@ class App {
     }
 
     private OnResize() {
-        let portrait = window.innerWidth < window.innerHeight;
-        let windowWidth = Math.max(window.innerWidth, window.innerHeight);
-        let windowHeight = Math.min(window.innerWidth, window.innerHeight);
-        let virtualPixelSize = Math.min(windowWidth / config.width, windowHeight / config.height);
+        const portrait = window.innerWidth < window.innerHeight;
+        const isLargeScreen = window.innerWidth > 1024;
+        const windowWidth = Math.max(window.innerWidth, window.innerHeight);
+        const windowHeight = Math.min(window.innerWidth, window.innerHeight);
+        const horizontalPixelSize = windowWidth / config.width;
+        const verticalPixelSize = windowHeight / config.height;
+        
+        const virtualPixelSize = config.fullScreenCanvas && !isLargeScreen ?
+            Math.max(horizontalPixelSize, verticalPixelSize) :
+            Math.min(horizontalPixelSize, verticalPixelSize);
+
         this._sheet.style.fontSize = `${virtualPixelSize}px`;
         this._sheet.style.left = `${portrait ? 0.5 * (window.innerWidth - virtualPixelSize * config.width) : 0}px`;
     }

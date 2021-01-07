@@ -65,8 +65,6 @@ export default class PaintView extends View {
         
         this.createButtons(onBackClicked);
         this.addLayer("base-layer", 0, 0, this.width, this.height,true);
-        this.addLayer("overlay", 0, 0, this.width, this.height);
-        
         this.addEventListeners();
         this.createTools();
         this.createPalettes();
@@ -116,6 +114,41 @@ export default class PaintView extends View {
         const index = this.layers.indexOf(layer);
         this.layers.splice(index, 1);
     }
+    
+    public createOverlay(){
+        if (this.overlay){
+            return;
+        }
+        this.addLayer("overlay", 0, 0, this.width, this.height);
+    }
+    
+    public removeOverlay(){
+        if (!this.overlay){
+            return;
+        }
+        this.removeLayer(this.overlay);
+    }
+    
+    public setOverlay(url: string){
+        if (!url){
+            this.removeOverlay();
+            return;
+        }
+        this.createOverlay();
+        let overlayImage = new Image();
+        overlayImage.src = url;
+        overlayImage.onload = () => {
+            if (overlayImage){
+                this.overlay.drawImage(overlayImage);
+                //this.processOverlay(this.overlay.ctx);
+
+                // show processed overlay:
+                // this._overlayCtx.canvas.toBlob(blob => {
+                //     this._overlay.src = URL.createObjectURL(blob);
+                // })
+            }
+        }
+    } 
     
     public newFloatingLayer(x: number, y: number, width: number, height: number): Layer {
         this.mergeFloatingLayer();
@@ -448,20 +481,8 @@ export default class PaintView extends View {
                 if (image){
                     this.baseLayer.drawImage(image);
                 }
-                let overlayPath = this.getOverlayPath(id);
-                let overlayImage = new Image();
-                overlayImage.src = overlayPath;
-                overlayImage.onload = () => {
-                    if (overlayImage){
-                        this.overlay.drawImage(overlayImage);
-                        //this.processOverlay(this.overlay.ctx);
-                        
-                        // show processed overlay:
-                        // this._overlayCtx.canvas.toBlob(blob => {
-                        //     this._overlay.src = URL.createObjectURL(blob);
-                        // })
-                    }
-                }
+                
+                this.setOverlay(this.getOverlayPath(id));
             })
     }
 

@@ -117,7 +117,7 @@ export default class Layer {
 
             if (event.altKey){
                 let p1 = this.pointFromTouch(event.touches[0]);
-                let p2 = new Point(2 * this._pinchCenter.x - p1.x, 2 * this._pinchCenter.y - p1.y);
+                let p2 = Point.mirror(p1, this._pinchCenter);
                 this.pinchStart(p1, p2);
             }
             else{
@@ -140,7 +140,7 @@ export default class Layer {
         if (event.touches.length === 1){
             if (event.altKey){
                 let p1 = this.pointFromTouch(event.touches[0]);
-                let p2 = new Point(2 * this._pinchCenter.x - p1.x, 2 * this._pinchCenter.y - p1.y);
+                let p2 = Point.mirror(p1, this._pinchCenter);
                 this.pinchMove(p1, p2);
             }
             else{

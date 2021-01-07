@@ -41,6 +41,10 @@ export default class Point {
         return new Point(0.5 * (a.x + b.x), 0.5 * (a.y + b.y));
     }
 
+    static mirror(p: Point, center: Point) {
+        return new Point(2 * center.x - p.x, 2 * center.y - p.y);
+    }
+
     static lerp(p1: Point, p2: Point, a: number){
         return new Point(
             p1.x * (1 - a) + p2.x * a,

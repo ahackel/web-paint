@@ -97,7 +97,6 @@ export class Palette extends View {
     }
 
     private adjustOptionsPosition() {
-        console.log("adjustOptionsPosition")
         let isPortrait = window.innerWidth < window.innerHeight;
         this._optionsElement.style.top = isPortrait ? "initial" : Math.ceil(this._options.length / 4) * -0.625 + 0.5 + "rem";
         this._optionsElement.style.left = isPortrait ? Math.min(this._options.length, 4) * -0.625 + 0.5 + "rem" : null;
