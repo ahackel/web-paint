@@ -139,7 +139,7 @@
     }
   }
 })({"wqsje":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"3XdeP\":\"index.d5d3fbbe.js\",\"4GVeK\":\"spirit.8e4b171c.png\",\"1tqV6\":\"spirit2.f5fa8938.png\",\"3RIJO\":\"spirit3.500656d1.png\",\"37INZ\":\"santa.86d088b0.png\",\"55xaQ\":\"star.be119e69.png\",\"3gS03\":\"unicorn.663daf1e.png\",\"2kS91\":\"snowman.65a840cd.png\",\"6j3lm\":\"dolphin.3a8c35d2.png\",\"2CsjR\":\"snail.57e52822.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"3XdeP\":\"index.d42f5bf0.js\",\"4GVeK\":\"spirit.8e4b171c.png\",\"1tqV6\":\"spirit2.f5fa8938.png\",\"3RIJO\":\"spirit3.500656d1.png\",\"37INZ\":\"santa.86d088b0.png\",\"55xaQ\":\"star.be119e69.png\",\"3gS03\":\"unicorn.663daf1e.png\",\"2kS91\":\"snowman.65a840cd.png\",\"6j3lm\":\"dolphin.3a8c35d2.png\",\"2CsjR\":\"snail.57e52822.png\"}"));
 },{"./bundle-manifest":"6sbKG"}],"6sbKG":[function(require,module,exports) {
 "use strict";
 
@@ -614,7 +614,7 @@ function getBaseURL(url) {
 
 
 function getOrigin(url) {
-  let matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
+  var matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
 
   if (!matches) {
     throw new Error('Origin not found');
@@ -6088,7 +6088,7 @@ var StampPalette = /*#__PURE__*/function (_Palette) {
 
   return StampPalette;
 }(_Palette2.Palette);
-},{"./Palette":"1J0Eg","url:../../img/stamps/star.png":"7zHsb","url:../../img/stamps/unicorn.png":"6wdKw","url:../../img/stamps/snowman.png":"30JBI","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","url:../../img/stamps/dolphin.png":"52MDq","url:../../img/stamps/snail.png":"1s3Kg"}],"7zHsb":[function(require,module,exports) {
+},{"./Palette":"1J0Eg","url:../../img/stamps/star.png":"7zHsb","url:../../img/stamps/unicorn.png":"6wdKw","url:../../img/stamps/snowman.png":"30JBI","url:../../img/stamps/dolphin.png":"52MDq","url:../../img/stamps/snail.png":"1s3Kg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7zHsb":[function(require,module,exports) {
 module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "55xaQ");
 },{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"6wdKw":[function(require,module,exports) {
 module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "3gS03");
@@ -6442,4 +6442,4 @@ var Layer = /*#__PURE__*/function () {
 }();
 },{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["wqsje","JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.d5d3fbbe.js.map
+//# sourceMappingURL=index.d42f5bf0.js.map
