@@ -139,7 +139,7 @@
     }
   }
 })({"4ivzv":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.291a1881.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\",\"286lK\":\"star.be119e69.png\",\"6TZbx\":\"unicorn.663daf1e.png\",\"3O75Q\":\"snowman.65a840cd.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"4Zlhs\":\"index.081efe3e.js\",\"74Km5\":\"spirit.8e4b171c.png\",\"5cyKw\":\"spirit2.f5fa8938.png\",\"7kk9e\":\"spirit3.500656d1.png\",\"4JyWI\":\"santa.86d088b0.png\",\"286lK\":\"star.be119e69.png\",\"6TZbx\":\"unicorn.663daf1e.png\",\"3O75Q\":\"snowman.65a840cd.png\"}"));
 },{"./bundle-manifest":"73x3q"}],"73x3q":[function(require,module,exports) {
 "use strict";
 
@@ -4375,26 +4375,22 @@ var PaintView = /*#__PURE__*/function (_View) {
     key: "autoMaskCtx",
     get: function get() {
       return this._autoMaskCtx;
-    }
-  }, {
-    key: "layers",
-    get: function get() {
-      return this._layers;
-    }
+    } //get layers(): Layer[] { return this._layers; }
+
   }, {
     key: "baseLayer",
     get: function get() {
-      return this._layers[0];
+      return this._layers["base-layer"];
     }
   }, {
-    key: "overlay",
+    key: "overlayLayer",
     get: function get() {
-      return this._layers[1];
+      return this._layers["overlay-layer"];
     }
   }, {
     key: "floatingLayer",
     get: function get() {
-      return this._layers[2];
+      return this._layers["floating-layer"];
     }
   }]);
 
@@ -4409,7 +4405,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 
     _defineProperty(_assertThisInitialized(_this), "_currentTouchId", 0);
 
-    _defineProperty(_assertThisInitialized(_this), "_layers", []);
+    _defineProperty(_assertThisInitialized(_this), "_layers", {});
 
     _defineProperty(_assertThisInitialized(_this), "getPointerEventPaintingFlag", function (e) {
       return e.pointerType === "touch" ? true : e.buttons === 1;
@@ -4488,37 +4484,39 @@ var PaintView = /*#__PURE__*/function (_View) {
     key: "addLayer",
     value: function addLayer(id, x, y, width, height) {
       var acceptInput = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-      var index = this._layers.length;
+
+      if (this._layers[id]) {
+        return this._layers[id];
+      }
+
+      var index = Object.keys(this._layers).length;
       var layer = new _LayerDefault.default(this._sheet, id, index, x, y, width, height, acceptInput);
-
-      this._layers.push(layer);
-
+      this._layers[id] = layer;
       return layer;
     }
   }, {
     key: "removeLayer",
     value: function removeLayer(layer) {
       layer.canvas.remove();
-      var index = this.layers.indexOf(layer);
-      this.layers.splice(index, 1);
+      delete this._layers[layer.id];
     }
   }, {
     key: "createOverlay",
     value: function createOverlay() {
-      if (this.overlay) {
+      if (this.overlayLayer) {
         return;
       }
 
-      this.addLayer("overlay", 0, 0, this.width, this.height);
+      this.addLayer("overlay-layer", 0, 0, this.width, this.height);
     }
   }, {
     key: "removeOverlay",
     value: function removeOverlay() {
-      if (!this.overlay) {
+      if (!this.overlayLayer) {
         return;
       }
 
-      this.removeLayer(this.overlay);
+      this.removeLayer(this.overlayLayer);
     }
   }, {
     key: "setOverlay",
@@ -4536,7 +4534,7 @@ var PaintView = /*#__PURE__*/function (_View) {
 
       overlayImage.onload = function () {
         if (overlayImage) {
-          _this3.overlay.drawImage(overlayImage); //this.processOverlay(this.overlay.ctx);
+          _this3.overlayLayer.drawImage(overlayImage); //this.processOverlay(this.overlay.ctx);
           // show processed overlay:
           // this._overlayCtx.canvas.toBlob(blob => {
           //     this._overlay.src = URL.createObjectURL(blob);
@@ -4549,23 +4547,18 @@ var PaintView = /*#__PURE__*/function (_View) {
     key: "newFloatingLayer",
     value: function newFloatingLayer(x, y, width, height) {
       this.mergeFloatingLayer();
-      var layer = this.addLayer("floating", x, y, width, height);
+      var layer = this.addLayer("floating-layer", x, y, width, height);
       layer.floating = true;
       return layer;
     }
   }, {
     key: "mergeFloatingLayer",
     value: function mergeFloatingLayer() {
-      if (!this.hasFloatingLayer()) {
+      if (!this.floatingLayer) {
         return;
       }
 
-      this.mergeLayer(this.layers[2]);
-    }
-  }, {
-    key: "hasFloatingLayer",
-    value: function hasFloatingLayer() {
-      return this.layers.length > 2;
+      this.mergeLayer(this.floatingLayer);
     }
   }, {
     key: "createTools",
@@ -4670,14 +4663,6 @@ var PaintView = /*#__PURE__*/function (_View) {
       //     change: (force: number, event: Event) => this.pressureChanged(force)
       // })
 
-
-      document.addEventListener('keydown', function (event) {
-        if (event.key == 'e') {
-          if (_this5.layers.length > 2) {
-            _this5.mergeLayer(_this5.layers[2]);
-          }
-        }
-      });
     }
   }, {
     key: "getPointerEventPosition",
@@ -5023,6 +5008,12 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "captureAutoMask",
     value: function captureAutoMask(position) {
+      this._autoMaskCaptured = true;
+
+      if (!this.overlayLayer) {
+        return;
+      }
+
       var imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height); // avoid expensive floodfill:
 
 
@@ -5034,13 +5025,11 @@ var PaintView = /*#__PURE__*/function (_View) {
 
       _utilsUtilsDefault.default.log("capturing auto mask");
 
-      _utilsUtilsDefault.default.floodFill(this.overlay.ctx, imageData.data, position);
+      _utilsUtilsDefault.default.floodFill(this.overlayLayer.ctx, imageData.data, position);
 
       _utilsUtilsDefault.default.dilateMask(imageData.data, this.width, this.height);
 
       this._autoMaskCtx.putImageData(imageData, 0, 0);
-
-      this._autoMaskCaptured = true;
     }
   }, {
     key: "processOverlay",
@@ -5662,7 +5651,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   }, {
     key: "applyAutoMask",
     value: function applyAutoMask() {
-      if (!this.painter.autoMaskCtx) {
+      if (!this.painter.overlayLayer || !this.painter.autoMaskCtx) {
         return;
       }
 
@@ -5919,7 +5908,7 @@ var StampTool = /*#__PURE__*/function (_Tool) {
   _createClass(StampTool, [{
     key: "tick",
     value: function tick(delta) {
-      if (!this._stampImage || !this.painter.hasFloatingLayer()) {
+      if (!this._stampImage || !this.painter.floatingLayer) {
         return;
       }
 
@@ -5949,7 +5938,7 @@ var StampTool = /*#__PURE__*/function (_Tool) {
   }, {
     key: "hideStamp",
     value: function hideStamp() {
-      if (!this.painter.hasFloatingLayer()) {
+      if (!this.painter.floatingLayer) {
         return;
       } // save transform:
 
@@ -5965,7 +5954,7 @@ var StampTool = /*#__PURE__*/function (_Tool) {
     value: function showStamp() {
       var _this2 = this;
 
-      if (this.painter.hasFloatingLayer()) {
+      if (this.painter.floatingLayer) {
         this._scale = this.painter.floatingLayer.scale;
         this._rotation = this.painter.floatingLayer.rotation;
       }
@@ -6127,6 +6116,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var Layer = /*#__PURE__*/function () {
   _createClass(Layer, [{
+    key: "id",
+    get: function get() {
+      return this._canvas.id;
+    }
+  }, {
     key: "canvas",
     get: function get() {
       return this._canvas;
@@ -6425,8 +6419,8 @@ var Layer = /*#__PURE__*/function () {
       var parent = this._canvas.parentElement;
       var rect = parent.getBoundingClientRect();
       var isPortraitOrientation = rect.height > rect.width;
-      var nx = (touch.clientX - rect.x) / rect.width;
-      var ny = (touch.clientY - rect.y) / rect.height;
+      var nx = (touch.clientX - rect.left) / rect.width;
+      var ny = (touch.clientY - rect.top) / rect.height;
       var x = (isPortraitOrientation ? 1 - ny : nx) * _config.config.width;
       var y = (isPortraitOrientation ? nx : ny) * _config.config.height;
       return new _utilsPointDefault.default(x, y);
@@ -6437,4 +6431,4 @@ var Layer = /*#__PURE__*/function () {
 }();
 },{"./config":"7l7XE","./utils/Utils":"geRr1","./utils/Point":"6vQND","@parcel/transformer-js/lib/esmodule-helpers.js":"6mpaZ"}]},{},["4ivzv","26qg1"], "26qg1", "parcelRequireb491")
 
-//# sourceMappingURL=index.291a1881.js.map
+//# sourceMappingURL=index.081efe3e.js.map

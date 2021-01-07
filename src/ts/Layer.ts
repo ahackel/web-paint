@@ -107,7 +107,6 @@ export default class Layer {
     }
     
     private touchStart(event: TouchEvent) {
-        console.log("touchstart")
         event.preventDefault();
 
         if (event.touches.length === 1){
@@ -177,8 +176,6 @@ export default class Layer {
     }
 
     private addPinchEventListeners() {
-        console.log("addPinchEventListeners")
-
         this._canvas.addEventListener('touchmove', this.touchMove);
         this._canvas.addEventListener('touchend', this.touchEnd);
         this._canvas.addEventListener('touchcancel', this.touchCancel);
@@ -249,8 +246,8 @@ export default class Layer {
 
         const isPortraitOrientation = rect.height > rect.width;
 
-        let nx = (touch.clientX - rect.x) / rect.width;
-        let ny = (touch.clientY - rect.y) / rect.height;
+        let nx = (touch.clientX - rect.left) / rect.width;
+        let ny = (touch.clientY - rect.top) / rect.height;
 
         let x = (isPortraitOrientation ? 1 - ny : nx) * config.width;
         let y = (isPortraitOrientation ? nx : ny) * config.height;
