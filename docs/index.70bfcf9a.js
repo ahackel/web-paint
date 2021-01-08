@@ -442,16 +442,16 @@ var config = {
   height: 768,
   sheets: [{
     id: "image01",
-    overlay: "/img/overlays/spirit.png"
+    overlay: "./img/overlays/spirit.png"
   }, {
     id: "image02",
-    overlay: "/img/overlays/spirit2.png"
+    overlay: "./img/overlays/spirit2.png"
   }, {
     id: "image03",
-    overlay: "/img/overlays/spirit3.png"
+    overlay: "./img/overlays/spirit3.png"
   }, {
     id: "image04",
-    overlay: "/img/overlays/santa.png"
+    overlay: "./img/overlays/santa.png"
   }, {
     id: "image05"
   }, {
@@ -5929,7 +5929,7 @@ var StampPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, StampPalette);
 
-    var stamps = ["/img/stamps/star.png", "/img/stamps/unicorn.png", "/img/stamps/snowman.png", "/img/stamps/dolphin.png", "/img/stamps/snail.png"];
+    var stamps = ["./img/stamps/star.png", "./img/stamps/unicorn.png", "./img/stamps/snowman.png", "./img/stamps/dolphin.png", "./img/stamps/snail.png"];
     _this = _super.call(this, id, stamps, true);
     _this.selectedIndex = 0;
     return _this;
@@ -6288,4 +6288,4 @@ var Layer = /*#__PURE__*/function () {
 }();
 },{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.e6b72ad9.js.map
+//# sourceMappingURL=index.70bfcf9a.js.map

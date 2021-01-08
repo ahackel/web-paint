@@ -8,19 +8,19 @@ export const config = {
     sheets:[
         {
             id: "image01",
-            overlay: "/img/overlays/spirit.png"
+            overlay: "./img/overlays/spirit.png"
         },
         {
             id: "image02",
-            overlay: "/img/overlays/spirit2.png"
+            overlay: "./img/overlays/spirit2.png"
         },
         {
             id: "image03",
-            overlay: "/img/overlays/spirit3.png"
+            overlay: "./img/overlays/spirit3.png"
         },
         {
             id: "image04",
-            overlay: "/img/overlays/santa.png"
+            overlay: "./img/overlays/santa.png"
         },
         {
             id: "image05"
