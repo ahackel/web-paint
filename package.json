@@ -9,8 +9,11 @@
     "url": "https://github.com/ahackel/web-paint.git"
   },
   "scripts": {
-    "start": "parcel serve ./src/index.html",
-    "build": "rm -rf docs; parcel build ./src/index.html --no-scope-hoist"
+    "clean": "rm -rf docs",
+    "start": "cp -r static/* dist/; parcel serve ./src/index.html",
+    "build": "parcel build ./src/index.html --no-scope-hoist",
+    "postbuild": "cp -r static/* docs/",
+    "publish": "git push"
   },
   "devDependencies": {
     "parcel": "^2.0.0-nightly.514",

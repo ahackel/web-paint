@@ -138,34 +138,7 @@
       this[globalName] = mainExports;
     }
   }
-})({"wqsje":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"3XdeP\":\"index.22fef3b3.js\",\"4GVeK\":\"spirit.8e4b171c.png\",\"1tqV6\":\"spirit2.f5fa8938.png\",\"3RIJO\":\"spirit3.500656d1.png\",\"37INZ\":\"santa.86d088b0.png\",\"55xaQ\":\"star.be119e69.png\",\"3gS03\":\"unicorn.663daf1e.png\",\"2kS91\":\"snowman.65a840cd.png\",\"6j3lm\":\"dolphin.3a8c35d2.png\",\"2CsjR\":\"snail.57e52822.png\"}"));
-},{"./bundle-manifest":"6sbKG"}],"6sbKG":[function(require,module,exports) {
-"use strict";
-
-var mapping = {};
-
-function register(pairs) {
-  var keys = Object.keys(pairs);
-
-  for (var i = 0; i < keys.length; i++) {
-    mapping[keys[i]] = pairs[keys[i]];
-  }
-}
-
-function resolve(id) {
-  var resolved = mapping[id];
-
-  if (resolved == null) {
-    throw new Error('Could not resolve bundle with id ' + id);
-  }
-
-  return resolved;
-}
-
-module.exports.register = register;
-module.exports.resolve = resolve;
-},{}],"JzIzc":[function(require,module,exports) {
+})({"JzIzc":[function(require,module,exports) {
 var _viewsBookView = require("./views/BookView");
 
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -457,22 +430,6 @@ _parcelHelpers.export(exports, "config", function () {
   return config;
 });
 
-var _urlImgOverlaysSpiritPng = require("url:../img/overlays/spirit.png");
-
-var _urlImgOverlaysSpiritPngDefault = _parcelHelpers.interopDefault(_urlImgOverlaysSpiritPng);
-
-var _urlImgOverlaysSpirit2Png = require("url:../img/overlays/spirit2.png");
-
-var _urlImgOverlaysSpirit2PngDefault = _parcelHelpers.interopDefault(_urlImgOverlaysSpirit2Png);
-
-var _urlImgOverlaysSpirit3Png = require("url:../img/overlays/spirit3.png");
-
-var _urlImgOverlaysSpirit3PngDefault = _parcelHelpers.interopDefault(_urlImgOverlaysSpirit3Png);
-
-var _urlImgOverlaysSantaPng = require("url:../img/overlays/santa.png");
-
-var _urlImgOverlaysSantaPngDefault = _parcelHelpers.interopDefault(_urlImgOverlaysSantaPng);
-
 var config = {
   debug: false,
   fullScreenCanvas: true,
@@ -485,16 +442,16 @@ var config = {
   height: 768,
   sheets: [{
     id: "image01",
-    overlay: _urlImgOverlaysSpiritPngDefault.default
+    overlay: "/img/overlays/spirit.png"
   }, {
     id: "image02",
-    overlay: _urlImgOverlaysSpirit2PngDefault.default
+    overlay: "/img/overlays/spirit2.png"
   }, {
     id: "image03",
-    overlay: _urlImgOverlaysSpirit3PngDefault.default
+    overlay: "/img/overlays/spirit3.png"
   }, {
     id: "image04",
-    overlay: _urlImgOverlaysSantaPngDefault.default
+    overlay: "/img/overlays/santa.png"
   }, {
     id: "image05"
   }, {
@@ -521,126 +478,7 @@ var config = {
     id: "image16"
   }]
 };
-},{"url:../img/overlays/spirit.png":"DHVKx","url:../img/overlays/spirit2.png":"5GJ7c","url:../img/overlays/spirit3.png":"4s15k","url:../img/overlays/santa.png":"2s9l6","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"DHVKx":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "4GVeK");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"29UAO":[function(require,module,exports) {
-"use strict";
-
-/* globals document:readonly */
-var bundleURL = null;
-
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-
-  return bundleURL;
-}
-
-function getBundleURL() {
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp):\/\/[^)\n]+/g);
-
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-
-  return '/';
-}
-
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp):\/\/.+)\/[^/]+$/, '$1') + '/';
-} // TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
-
-
-function getOrigin(url) {
-  var matches = ('' + url).match(/(https?|file|ftp):\/\/[^/]+/);
-
-  if (!matches) {
-    throw new Error('Origin not found');
-  }
-
-  return matches[0];
-}
-
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-exports.getOrigin = getOrigin;
-},{}],"7o9rK":[function(require,module,exports) {
-"use strict";
-
-var resolve = require('./bundle-manifest').resolve;
-
-module.exports = function (fromId, toId) {
-  return relative(dirname(resolve(fromId)), resolve(toId));
-};
-
-function dirname(_filePath) {
-  if (_filePath === '') {
-    return '.';
-  }
-
-  var filePath = _filePath[_filePath.length - 1] === '/' ? _filePath.slice(0, _filePath.length - 1) : _filePath;
-  var slashIndex = filePath.lastIndexOf('/');
-  return slashIndex === -1 ? '.' : filePath.slice(0, slashIndex);
-}
-
-function relative(from, to) {
-  if (from === to) {
-    return '';
-  }
-
-  var fromParts = from.split('/');
-
-  if (fromParts[0] === '.') {
-    fromParts.shift();
-  }
-
-  var toParts = to.split('/');
-
-  if (toParts[0] === '.') {
-    toParts.shift();
-  } // Find where path segments diverge.
-
-
-  var i;
-  var divergeIndex;
-
-  for (i = 0; (i < toParts.length || i < fromParts.length) && divergeIndex == null; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      divergeIndex = i;
-    }
-  } // If there are segments from "from" beyond the point of divergence,
-  // return back up the path to that point using "..".
-
-
-  var parts = [];
-
-  for (i = 0; i < fromParts.length - divergeIndex; i++) {
-    parts.push('..');
-  } // If there are segments from "to" beyond the point of divergence,
-  // continue using the remaining segments.
-
-
-  if (toParts.length > divergeIndex) {
-    parts.push.apply(parts, toParts.slice(divergeIndex));
-  }
-
-  return parts.join('/');
-}
-
-module.exports._dirname = dirname;
-module.exports._relative = relative;
-},{"./bundle-manifest":"6sbKG"}],"5GJ7c":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "1tqV6");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"4s15k":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "3RIJO");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"2s9l6":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "37INZ");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"6v2zT":[function(require,module,exports) {
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6v2zT":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
 _parcelHelpers.defineInteropFlag(exports);
@@ -6054,26 +5892,6 @@ _parcelHelpers.export(exports, "default", function () {
 
 var _Palette2 = require("./Palette");
 
-var _urlImgStampsStarPng = require("url:../../img/stamps/star.png");
-
-var _urlImgStampsStarPngDefault = _parcelHelpers.interopDefault(_urlImgStampsStarPng);
-
-var _urlImgStampsUnicornPng = require("url:../../img/stamps/unicorn.png");
-
-var _urlImgStampsUnicornPngDefault = _parcelHelpers.interopDefault(_urlImgStampsUnicornPng);
-
-var _urlImgStampsSnowmanPng = require("url:../../img/stamps/snowman.png");
-
-var _urlImgStampsSnowmanPngDefault = _parcelHelpers.interopDefault(_urlImgStampsSnowmanPng);
-
-var _urlImgStampsDolphinPng = require("url:../../img/stamps/dolphin.png");
-
-var _urlImgStampsDolphinPngDefault = _parcelHelpers.interopDefault(_urlImgStampsDolphinPng);
-
-var _urlImgStampsSnailPng = require("url:../../img/stamps/snail.png");
-
-var _urlImgStampsSnailPngDefault = _parcelHelpers.interopDefault(_urlImgStampsSnailPng);
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -6111,7 +5929,7 @@ var StampPalette = /*#__PURE__*/function (_Palette) {
 
     _classCallCheck(this, StampPalette);
 
-    var stamps = [_urlImgStampsStarPngDefault.default, _urlImgStampsUnicornPngDefault.default, _urlImgStampsSnowmanPngDefault.default, _urlImgStampsDolphinPngDefault.default, _urlImgStampsSnailPngDefault.default];
+    var stamps = ["/img/stamps/star.png", "/img/stamps/unicorn.png", "/img/stamps/snowman.png", "/img/stamps/dolphin.png", "/img/stamps/snail.png"];
     _this = _super.call(this, id, stamps, true);
     _this.selectedIndex = 0;
     return _this;
@@ -6126,17 +5944,7 @@ var StampPalette = /*#__PURE__*/function (_Palette) {
 
   return StampPalette;
 }(_Palette2.Palette);
-},{"./Palette":"1J0Eg","url:../../img/stamps/star.png":"7zHsb","url:../../img/stamps/unicorn.png":"6wdKw","url:../../img/stamps/snowman.png":"30JBI","url:../../img/stamps/dolphin.png":"52MDq","url:../../img/stamps/snail.png":"1s3Kg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7zHsb":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "55xaQ");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"6wdKw":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "3gS03");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"30JBI":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "2kS91");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"52MDq":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "6j3lm");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"1s3Kg":[function(require,module,exports) {
-module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "2CsjR");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"hkRDB":[function(require,module,exports) {
+},{"./Palette":"1J0Eg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"hkRDB":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
 _parcelHelpers.defineInteropFlag(exports);
@@ -6478,6 +6286,6 @@ var Layer = /*#__PURE__*/function () {
 
   return Layer;
 }();
-},{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["wqsje","JzIzc"], "JzIzc", "parcelRequireb491")
+},{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.22fef3b3.js.map
+//# sourceMappingURL=index.e6b72ad9.js.map

@@ -1,8 +1,3 @@
-import spirit from "url:../img/overlays/spirit.png";
-import spirit2 from "url:../img/overlays/spirit2.png";
-import spirit3 from "url:../img/overlays/spirit3.png";
-import santa from "url:../img/overlays/santa.png";
-
 export const config = {
     debug: false,
     fullScreenCanvas: true, // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -13,19 +8,19 @@ export const config = {
     sheets:[
         {
             id: "image01",
-            overlay: spirit
+            overlay: "/img/overlays/spirit.png"
         },
         {
             id: "image02",
-            overlay: spirit2
+            overlay: "/img/overlays/spirit2.png"
         },
         {
             id: "image03",
-            overlay: spirit3
+            overlay: "/img/overlays/spirit3.png"
         },
         {
             id: "image04",
-            overlay: santa
+            overlay: "/img/overlays/santa.png"
         },
         {
             id: "image05"

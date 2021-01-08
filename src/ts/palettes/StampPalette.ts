@@ -1,9 +1,4 @@
 import {Palette} from "./Palette";
-import star from "url:../../img/stamps/star.png";
-import unicorn from "url:../../img/stamps/unicorn.png";
-import snowman from "url:../../img/stamps/snowman.png";
-import dolphin from "url:../../img/stamps/dolphin.png";
-import snail from "url:../../img/stamps/snail.png";
 
 export default class StampPalette extends Palette {
 
@@ -11,7 +6,11 @@ export default class StampPalette extends Palette {
     
     constructor(id: string){
         let stamps: string[] = [
-            star, unicorn, snowman, dolphin, snail
+            "/img/stamps/star.png",
+            "/img/stamps/unicorn.png",
+            "/img/stamps/snowman.png",
+            "/img/stamps/dolphin.png",
+            "/img/stamps/snail.png"
         ];
 
         super(id, stamps, true);
