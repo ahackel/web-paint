@@ -10,7 +10,7 @@ export const config = {
     imageSmoothing: true,  // Whether to use smooth pixel filtering or to draw hard pixel edges
     width: 1024,
     height: 768,
-    pages:[
+    sheets:[
         {
             id: "image01",
             overlay: spirit

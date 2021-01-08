@@ -1,76 +1,28 @@
 import {View} from "./View";
 import {config} from "../config";
-import Utils from "../utils/Utils";
-import ImageStorage from "../storage/ImageStorage";
+import Thumbnail from "./Thumbnail";
 
 
 export default class BookView extends View {
 
     public onImageSelected: Function | undefined;
-
-    constructor(id: string) {
-        super(id);
-        this._element.addEventListener("imagesaved", () => {
-            this.updateImages();
-        })
-    }
+    private _thumbnails: Thumbnail[]; 
 
     show(): void {
         super.show();
-        this.updateImages();
+        this.createImages();
     }
 
-    private updateImages() {
-        for (let page of config.pages) {
-            this.loadImage(page.id, page.overlay)
-        }
-    }
-
-    private createThumbnail(id: string): HTMLDivElement {
-        let element = <HTMLDivElement>document.createElement("div");
-        element.id = id;
-        element.classList.add("thumbnail");
-        Utils.addFastClick(element,event => {
-            event.preventDefault();
-            if (this.onImageSelected) {
-                this.onImageSelected(id);
-            }
-        });
-        this._element.appendChild(element);
-        return element;
-    }
-
-    private addOverlay(path: string, parent: HTMLElement) {
-        if (!path){
+    private createImages() {
+        if (this._thumbnails){
             return;
         }
-        let element = <HTMLImageElement>document.createElement("img");
-        element.src = path;
-        parent.appendChild(element);
-    }
-
-    private loadImage(id: string, overlay: string) {
-        let thumbnail = document.getElementById(id);
         
-        if (!thumbnail){
-            thumbnail = this.createThumbnail(id);
-            this.addOverlay(overlay, thumbnail);
+        this._thumbnails = [];
+        
+        for (let sheet of config.sheets) {
+            let thumbnail = new Thumbnail(this._element, sheet.id, (id: string) => this.onImageSelected(id))
+            this._thumbnails.push(thumbnail);
         }
-        
-        ImageStorage.loadImage(id)
-            .then(img => {
-                if (img) {
-                    let oldImages = thumbnail.getElementsByClassName("preview");
-                    if (oldImages.length > 0){
-                        thumbnail.replaceChild(img, oldImages[0]);
-                    }
-                    else
-                    {
-                        thumbnail.prepend(img);
-                    }
-                    img.draggable = false;
-                    img.classList.add("preview");
-                }
-            });
     }
 }

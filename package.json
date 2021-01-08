@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "parcel serve ./src/index.html",
-    "build": "parcel build ./src/index.html --no-scope-hoist"
+    "build": "rm -rf docs; parcel build ./src/index.html --no-scope-hoist"
   },
   "devDependencies": {
     "parcel": "^2.0.0-nightly.514",

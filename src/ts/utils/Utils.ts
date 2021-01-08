@@ -7,6 +7,11 @@ let _fpsDisplay: HTMLElement;
 let _fpsCounterEnabled = true;
 
 export default class Utils {
+
+    static getOverlayPath(id: string) {
+        let page = config.sheets.find(e => e.id == id);
+        return page == null ? null : page.overlay;
+    }
     
     public static log(message?: any, ...optionalParams: any[]){
         if (!config.debug){

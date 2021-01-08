@@ -45,6 +45,10 @@ export default class ImageStorage {
 		return this.loadImageFromStore(id);
 	}
 
+	public static loadBlob(id: string): Promise<Blob> {
+		return <Promise<Blob>>this.adapter.getItem(id)
+	}
+
 	private static imageFromBlob(id: string, blob: Blob) {
 		let img = new Image();
 		img.id = id;
@@ -55,8 +59,7 @@ export default class ImageStorage {
 	public static saveImage(id: string, blob: Blob){
 		return this.adapter.setItem(id, blob)
 			.then(() => {
-				const event: Event = new Event("imagesaved")
-				// TODO: Broadcast image id
+				const event = new CustomEvent<string>("imagesaved", {detail: id})
 				Utils.DispatchEventToAllElements(event);
 			})
 	}

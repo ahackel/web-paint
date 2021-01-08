@@ -137,6 +137,7 @@ export default class PaintView extends View {
             return;
         }
         this.createOverlay();
+        this.overlayLayer.clear();
         let overlayImage = new Image();
         overlayImage.src = url;
         overlayImage.onload = () => {
@@ -472,7 +473,7 @@ export default class PaintView extends View {
                     this.baseLayer.drawImage(image);
                 }
                 
-                this.setOverlay(this.getOverlayPath(id));
+                this.setOverlay(Utils.getOverlayPath(id));
             })
     }
 
@@ -515,11 +516,6 @@ export default class PaintView extends View {
         let delta = timeStamp - this._tickTimeStamp;
         this._tickTimeStamp = timeStamp;
         this._currentTool.tick(delta);
-    }
-
-    private getOverlayPath(id: string) {
-        let page = config.pages.find(e => e.id == id);
-        return page == null ? null : page.overlay;
     }
 
     captureAutoMask(position: Point) {

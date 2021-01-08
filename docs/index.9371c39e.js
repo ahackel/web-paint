@@ -139,7 +139,7 @@
     }
   }
 })({"wqsje":[function(require,module,exports) {
-require('./bundle-manifest').register(JSON.parse("{\"3XdeP\":\"index.d42f5bf0.js\",\"4GVeK\":\"spirit.8e4b171c.png\",\"1tqV6\":\"spirit2.f5fa8938.png\",\"3RIJO\":\"spirit3.500656d1.png\",\"37INZ\":\"santa.86d088b0.png\",\"55xaQ\":\"star.be119e69.png\",\"3gS03\":\"unicorn.663daf1e.png\",\"2kS91\":\"snowman.65a840cd.png\",\"6j3lm\":\"dolphin.3a8c35d2.png\",\"2CsjR\":\"snail.57e52822.png\"}"));
+require('./bundle-manifest').register(JSON.parse("{\"3XdeP\":\"index.9371c39e.js\",\"4GVeK\":\"spirit.8e4b171c.png\",\"1tqV6\":\"spirit2.f5fa8938.png\",\"3RIJO\":\"spirit3.500656d1.png\",\"37INZ\":\"santa.86d088b0.png\",\"55xaQ\":\"star.be119e69.png\",\"3gS03\":\"unicorn.663daf1e.png\",\"2kS91\":\"snowman.65a840cd.png\",\"6j3lm\":\"dolphin.3a8c35d2.png\",\"2CsjR\":\"snail.57e52822.png\"}"));
 },{"./bundle-manifest":"6sbKG"}],"6sbKG":[function(require,module,exports) {
 "use strict";
 
@@ -262,13 +262,9 @@ var _View2 = require("./View");
 
 var _config = require("../config");
 
-var _utilsUtils = require("../utils/Utils");
+var _Thumbnail = require("./Thumbnail");
 
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-
-var _storageImageStorage = require("../storage/ImageStorage");
-
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _ThumbnailDefault = _parcelHelpers.interopDefault(_Thumbnail);
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 
@@ -305,18 +301,10 @@ var BookView = /*#__PURE__*/function (_View) {
 
   var _super = _createSuper(BookView);
 
-  function BookView(id) {
-    var _this;
-
+  function BookView() {
     _classCallCheck(this, BookView);
 
-    _this = _super.call(this, id);
-
-    _this._element.addEventListener("imagesaved", function () {
-      _this.updateImages();
-    });
-
-    return _this;
+    return _super.apply(this, arguments);
   }
 
   _createClass(BookView, [{
@@ -324,18 +312,30 @@ var BookView = /*#__PURE__*/function (_View) {
     value: function show() {
       _get(_getPrototypeOf(BookView.prototype), "show", this).call(this);
 
-      this.updateImages();
+      this.createImages();
     }
   }, {
-    key: "updateImages",
-    value: function updateImages() {
-      var _iterator = _createForOfIteratorHelper(_config.config.pages),
+    key: "createImages",
+    value: function createImages() {
+      var _this = this;
+
+      if (this._thumbnails) {
+        return;
+      }
+
+      this._thumbnails = [];
+
+      var _iterator = _createForOfIteratorHelper(_config.config.sheets),
           _step;
 
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var page = _step.value;
-          this.loadImage(page.id, page.overlay);
+          var sheet = _step.value;
+          var thumbnail = new _ThumbnailDefault.default(this._element, sheet.id, function (id) {
+            return _this.onImageSelected(id);
+          });
+
+          this._thumbnails.push(thumbnail);
         }
       } catch (err) {
         _iterator.e(err);
@@ -343,68 +343,11 @@ var BookView = /*#__PURE__*/function (_View) {
         _iterator.f();
       }
     }
-  }, {
-    key: "createThumbnail",
-    value: function createThumbnail(id) {
-      var _this2 = this;
-
-      var element = document.createElement("div");
-      element.id = id;
-      element.classList.add("thumbnail");
-
-      _utilsUtilsDefault.default.addFastClick(element, function (event) {
-        event.preventDefault();
-
-        if (_this2.onImageSelected) {
-          _this2.onImageSelected(id);
-        }
-      });
-
-      this._element.appendChild(element);
-
-      return element;
-    }
-  }, {
-    key: "addOverlay",
-    value: function addOverlay(path, parent) {
-      if (!path) {
-        return;
-      }
-
-      var element = document.createElement("img");
-      element.src = path;
-      parent.appendChild(element);
-    }
-  }, {
-    key: "loadImage",
-    value: function loadImage(id, overlay) {
-      var thumbnail = document.getElementById(id);
-
-      if (!thumbnail) {
-        thumbnail = this.createThumbnail(id);
-        this.addOverlay(overlay, thumbnail);
-      }
-
-      _storageImageStorageDefault.default.loadImage(id).then(function (img) {
-        if (img) {
-          var oldImages = thumbnail.getElementsByClassName("preview");
-
-          if (oldImages.length > 0) {
-            thumbnail.replaceChild(img, oldImages[0]);
-          } else {
-            thumbnail.prepend(img);
-          }
-
-          img.draggable = false;
-          img.classList.add("preview");
-        }
-      });
-    }
   }]);
 
   return BookView;
 }(_View2.View);
-},{"./View":"30r6k","../config":"1tzQg","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"30r6k":[function(require,module,exports) {
+},{"./View":"30r6k","../config":"1tzQg","./Thumbnail":"6v2zT","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"30r6k":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
 _parcelHelpers.defineInteropFlag(exports);
@@ -540,7 +483,7 @@ var config = {
   // Whether to use smooth pixel filtering or to draw hard pixel edges
   width: 1024,
   height: 768,
-  pages: [{
+  sheets: [{
     id: "image01",
     overlay: _urlImgOverlaysSpiritPngDefault.default
   }, {
@@ -697,7 +640,94 @@ module.exports = require('./bundle-url').getBundleURL() + require('./relative-pa
 module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "3RIJO");
 },{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"2s9l6":[function(require,module,exports) {
 module.exports = require('./bundle-url').getBundleURL() + require('./relative-path')("3XdeP", "37INZ");
-},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"1H53o":[function(require,module,exports) {
+},{"./bundle-url":"29UAO","./relative-path":"7o9rK"}],"6v2zT":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+
+_parcelHelpers.defineInteropFlag(exports);
+
+_parcelHelpers.export(exports, "default", function () {
+  return Thumbnail;
+});
+
+var _utilsUtils = require("../utils/Utils");
+
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+
+var _storageImageStorage = require("../storage/ImageStorage");
+
+var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Thumbnail = /*#__PURE__*/function () {
+  _createClass(Thumbnail, [{
+    key: "id",
+    get: function get() {
+      return this._element.id;
+    }
+  }]);
+
+  function Thumbnail(parent, id, onImageSelected) {
+    var _this = this;
+
+    _classCallCheck(this, Thumbnail);
+
+    var element = document.createElement("div");
+    this._element = element;
+    element.id = id;
+    element.classList.add("thumbnail");
+
+    _utilsUtilsDefault.default.addFastClick(element, function (event) {
+      event.preventDefault();
+
+      if (onImageSelected) {
+        onImageSelected(id);
+      }
+    });
+
+    element.addEventListener("imagesaved", function (event) {
+      if (event.detail != _this.id) {
+        return;
+      }
+
+      _this.loadImage();
+    });
+    this._image = new Image();
+    this._image.draggable = false;
+    element.appendChild(this._image);
+
+    var overlayPath = _utilsUtilsDefault.default.getOverlayPath(id);
+
+    if (overlayPath) {
+      this._overlay = new Image();
+      this._overlay.draggable = false;
+      this._overlay.src = overlayPath;
+      element.appendChild(this._overlay);
+    }
+
+    parent.appendChild(element);
+    this.loadImage(); //this.addOverlay(overlay, thumbnail);
+  }
+
+  _createClass(Thumbnail, [{
+    key: "loadImage",
+    value: function loadImage() {
+      var _this2 = this;
+
+      _storageImageStorageDefault.default.loadBlob(this.id).then(function (blob) {
+        _this2._image.src = blob ? URL.createObjectURL(blob) : null;
+        _this2._image.style.display = blob ? "initial" : "none";
+      });
+    }
+  }]);
+
+  return Thumbnail;
+}();
+},{"../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1H53o":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 
 _parcelHelpers.defineInteropFlag(exports);
@@ -731,6 +761,15 @@ var Utils = /*#__PURE__*/function () {
   }
 
   _createClass(Utils, null, [{
+    key: "getOverlayPath",
+    value: function getOverlayPath(id) {
+      var page = _config.config.sheets.find(function (e) {
+        return e.id == id;
+      });
+
+      return page == null ? null : page.overlay;
+    }
+  }, {
     key: "log",
     value: function log(message) {
       if (!_config.config.debug) {
@@ -1219,6 +1258,11 @@ var ImageStorage = /*#__PURE__*/function () {
       return this.loadImageFromStore(id);
     }
   }, {
+    key: "loadBlob",
+    value: function loadBlob(id) {
+      return this.adapter.getItem(id);
+    }
+  }, {
     key: "imageFromBlob",
     value: function imageFromBlob(id, blob) {
       var img = new Image();
@@ -1230,7 +1274,9 @@ var ImageStorage = /*#__PURE__*/function () {
     key: "saveImage",
     value: function saveImage(id, blob) {
       return this.adapter.setItem(id, blob).then(function () {
-        var event = new Event("imagesaved"); // TODO: Broadcast image id
+        var event = new CustomEvent("imagesaved", {
+          detail: id
+        });
 
         _utilsUtilsDefault.default.DispatchEventToAllElements(event);
       });
@@ -4527,6 +4573,7 @@ var PaintView = /*#__PURE__*/function (_View) {
       }
 
       this.createOverlay();
+      this.overlayLayer.clear();
       var overlayImage = new Image();
       overlayImage.src = url;
 
@@ -4929,7 +4976,7 @@ var PaintView = /*#__PURE__*/function (_View) {
           _this6.baseLayer.drawImage(image);
         }
 
-        _this6.setOverlay(_this6.getOverlayPath(id));
+        _this6.setOverlay(_utilsUtilsDefault.default.getOverlayPath(id));
       });
     }
   }, {
@@ -4993,15 +5040,6 @@ var PaintView = /*#__PURE__*/function (_View) {
       this._tickTimeStamp = timeStamp;
 
       this._currentTool.tick(delta);
-    }
-  }, {
-    key: "getOverlayPath",
-    value: function getOverlayPath(id) {
-      var page = _config.config.pages.find(function (e) {
-        return e.id == id;
-      });
-
-      return page == null ? null : page.overlay;
     }
   }, {
     key: "captureAutoMask",
@@ -6442,4 +6480,4 @@ var Layer = /*#__PURE__*/function () {
 }();
 },{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["wqsje","JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.d42f5bf0.js.map
+//# sourceMappingURL=index.9371c39e.js.map
