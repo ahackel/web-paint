@@ -5786,9 +5786,14 @@ var StampTool = /*#__PURE__*/function (_Tool) {
         return;
       }
 
-      if (this._stampImage.src != this.painter.stamp || this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
+      if (this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp) || this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
         this.recreateStamp();
       }
+    }
+  }, {
+    key: "getFileName",
+    value: function getFileName(url) {
+      return url.substring(url.lastIndexOf('/') + 1);
     }
   }, {
     key: "enable",
@@ -6288,4 +6293,4 @@ var Layer = /*#__PURE__*/function () {
 }();
 },{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.7a56cadc.js.map
+//# sourceMappingURL=index.cfc9f31e.js.map

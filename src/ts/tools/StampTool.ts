@@ -26,9 +26,13 @@ export default class StampTool extends Tool {
             return;
         }
         
-        if (this._stampImage.src != this.painter.stamp || this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
+        if (this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp) || this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
             this.recreateStamp();
         }
+    }
+    
+    getFileName(url: string){
+        return url.substring(url.lastIndexOf('/')+1)
     }
 
     enable() {
