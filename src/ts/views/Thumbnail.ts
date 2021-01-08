@@ -48,7 +48,7 @@ export default class Thumbnail {
     private loadImage() {
         ImageStorage.loadBlob(this.id)
             .then(blob => {
-                this._image.src = blob ? URL.createObjectURL(blob) : null;
+                this._image.src = blob ? URL.createObjectURL(blob) : "//:0";
                 this._image.style.display = blob ? "initial" : "none";
             });
     }
