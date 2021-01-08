@@ -6,11 +6,11 @@ export default class StampPalette extends Palette {
     
     constructor(id: string){
         let stamps: string[] = [
-            "./img/stamps/star.png",
-            "./img/stamps/unicorn.png",
-            "./img/stamps/snowman.png",
-            "./img/stamps/dolphin.png",
-            "./img/stamps/snail.png"
+            "img/stamps/star.png",
+            "img/stamps/unicorn.png",
+            "img/stamps/snowman.png",
+            "img/stamps/dolphin.png",
+            "img/stamps/snail.png"
         ];
 
         super(id, stamps, true);
