@@ -22,11 +22,12 @@ export default class StampTool extends Tool {
     }
 
     tick(delta: number) {
-        if (!this._stampImage || !this.painter.floatingLayer){
+        if (!this.painter.stamp){
             return;
         }
         
-        if (this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp) || this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
+        if (!this._stampImage || this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp) ||
+            this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
             this.recreateStamp();
         }
     }
