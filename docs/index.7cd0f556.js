@@ -4379,6 +4379,10 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "removeLayer",
     value: function removeLayer(layer) {
+      if (!layer) {
+        return;
+      }
+
       layer.canvas.remove();
       delete this._layers[layer.id];
     }
@@ -4394,10 +4398,6 @@ var PaintView = /*#__PURE__*/function (_View) {
   }, {
     key: "removeOverlay",
     value: function removeOverlay() {
-      if (!this.overlayLayer) {
-        return;
-      }
-
       this.removeLayer(this.overlayLayer);
     }
   }, {
@@ -5750,8 +5750,6 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 // Fills an area with the selected color 
 var StampTool = /*#__PURE__*/function (_Tool) {
   _inherits(StampTool, _Tool);
@@ -5764,11 +5762,6 @@ var StampTool = /*#__PURE__*/function (_Tool) {
     _classCallCheck(this, StampTool);
 
     _this = _super.call(this, painter);
-
-    _defineProperty(_assertThisInitialized(_this), "_scale", 1);
-
-    _defineProperty(_assertThisInitialized(_this), "_rotation", 0);
-
     _this._stampButton = document.getElementById("stamp-button");
 
     _utilsUtilsDefault.default.addFastClick(_this._stampButton, function () {
@@ -5782,12 +5775,17 @@ var StampTool = /*#__PURE__*/function (_Tool) {
   _createClass(StampTool, [{
     key: "tick",
     value: function tick(delta) {
-      if (!this.painter.stamp || !this.painter.floatingLayer) {
+      if (!this.painter.stamp || !this.painter.floatingLayer || !this._stampImage) {
         return;
       }
 
-      if (!this._stampImage || this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp) || this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
-        this.recreateStamp();
+      if (this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp)) {
+        this.setStampImage(this.painter.stamp);
+        return;
+      }
+
+      if (this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
+        this.drawStampImage();
       }
     }
   }, {
@@ -5799,13 +5797,13 @@ var StampTool = /*#__PURE__*/function (_Tool) {
     key: "enable",
     value: function enable() {
       this.mouse = new _utilsPointDefault.default(this.painter.width * 0.5, this.painter.height * 0.5);
-      this.showStamp();
+      this.showStampLayer();
       this._stampButton.hidden = false;
     }
   }, {
     key: "disable",
     value: function disable() {
-      this.hideStamp();
+      this.hideStampLayer();
       this._stampButton.hidden = true;
     }
   }, {
@@ -5816,55 +5814,51 @@ var StampTool = /*#__PURE__*/function (_Tool) {
       this.painter.saveImage();
     }
   }, {
-    key: "hideStamp",
-    value: function hideStamp() {
-      if (!this.painter.floatingLayer) {
-        return;
-      } // save transform:
-
-
-      var layer = this.painter.floatingLayer;
-      this._scale = layer.scale;
-      this._rotation = layer.rotation;
-      this.mouse = new _utilsPointDefault.default(layer.position.x + 0.5 * layer.width, layer.position.y + 0.5 * layer.height);
+    key: "hideStampLayer",
+    value: function hideStampLayer() {
       this.painter.removeLayer(this.painter.floatingLayer);
     }
   }, {
-    key: "showStamp",
-    value: function showStamp() {
-      var _this2 = this;
-
+    key: "showStampLayer",
+    value: function showStampLayer() {
       if (this.painter.floatingLayer) {
-        this._scale = this.painter.floatingLayer.scale;
-        this._rotation = this.painter.floatingLayer.rotation;
+        return;
       }
 
-      this.loadStampImage().then(function (img) {
-        var width = img.width;
-        var height = img.height;
-        var x = _this2.mouse.x - 0.5 * width;
-        var y = _this2.mouse.y - 0.5 * height;
+      var x = this.mouse.x - 0.5 * 10;
+      var y = this.mouse.y - 0.5 * 10;
+      this.painter.newFloatingLayer(x, y, 10, 10);
+      this.setStampImage(this.painter.stamp);
+    }
+  }, {
+    key: "drawStampImage",
+    value: function drawStampImage() {
+      var img = this._stampImage;
+      var width = img.width;
+      var height = img.height;
+      var layer = this.painter.floatingLayer;
+      layer.resize(width, height);
+      layer.ctx.fillStyle = this.painter.color;
+      layer.ctx.fillRect(0, 0, width, height);
+      layer.ctx.globalCompositeOperation = "destination-in";
+      layer.drawImage(img);
+      layer.ctx.globalCompositeOperation = "source-over";
+      layer.canvas.style.opacity = "0.5";
+    }
+  }, {
+    key: "setStampImage",
+    value: function setStampImage(id) {
+      var _this2 = this;
 
-        var layer = _this2.painter.newFloatingLayer(x, y, width, height);
+      this.loadStampImage(id).then(function (img) {
+        _this2._stampImage = img;
 
-        layer.ctx.fillStyle = _this2.painter.color;
-        layer.ctx.fillRect(0, 0, width, height);
-        layer.ctx.globalCompositeOperation = "destination-in";
-        layer.drawImage(img);
-        layer.ctx.globalCompositeOperation = "source-over";
-        layer.transform(new _utilsPointDefault.default(x, y), _this2._scale, _this2._rotation);
-        layer.canvas.style.opacity = "0.5";
+        _this2.drawStampImage();
       });
     }
   }, {
-    key: "recreateStamp",
-    value: function recreateStamp() {
-      this.hideStamp();
-      this.showStamp();
-    }
-  }, {
     key: "loadStampImage",
-    value: function loadStampImage() {
+    value: function loadStampImage(id) {
       var _this3 = this;
 
       if (!this._stampImage) {
@@ -5875,7 +5869,7 @@ var StampTool = /*#__PURE__*/function (_Tool) {
         return Promise.resolve(this._stampImage);
       }
 
-      this._stampImage.src = this.painter.stamp;
+      this._stampImage.src = id;
       return new Promise(function (resolve) {
         _this3._stampImage.onload = function () {
           return resolve(_this3._stampImage);
@@ -6073,6 +6067,17 @@ var Layer = /*#__PURE__*/function () {
   }
 
   _createClass(Layer, [{
+    key: "resize",
+    value: function resize(width, height) {
+      var x = this.position.x + 0.5 * (this.width - width);
+      var y = this.position.y + 0.5 * (this.height - height);
+      this._canvas.width = width;
+      this._canvas.height = height;
+      this._canvas.style.width = "".concat(width, "em");
+      this._canvas.style.height = "".concat(height, "em");
+      this.transform(new _utilsPointDefault.default(x, y), this.scale, this.rotation);
+    }
+  }, {
     key: "getData",
     value: function getData() {
       return this._ctx.getImageData(0, 0, this.width, this.height);
@@ -6293,4 +6298,4 @@ var Layer = /*#__PURE__*/function () {
 }();
 },{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.1c7c5a74.js.map
+//# sourceMappingURL=index.7cd0f556.js.map

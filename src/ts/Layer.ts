@@ -56,6 +56,17 @@ export default class Layer {
         this.transform(new Point(x, y), 1, 0);
         this.bindEventListeners();
     }
+    
+    resize(width: number, height: number){
+        const x = this.position.x + 0.5 * (this.width - width);
+        const y = this.position.y + 0.5 * (this.height - height);
+
+        this._canvas.width = width;
+        this._canvas.height = height;
+        this._canvas.style.width = `${width}em`;
+        this._canvas.style.height = `${height}em`;
+        this.transform(new Point(x, y), this.scale, this.rotation);
+    }
 
     getData(): ImageData {
         return this._ctx.getImageData(0, 0, this.width, this.height);

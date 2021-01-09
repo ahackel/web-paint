@@ -10,8 +10,6 @@ import PaintView from "../views/PaintView";
 export default class StampTool extends Tool {
 
     private _stampImage: HTMLImageElement;
-    private _scale = 1;
-    private _rotation = 0;
     private _stampButton: HTMLDivElement;
 
     constructor(painter: PaintView) {
@@ -22,13 +20,18 @@ export default class StampTool extends Tool {
     }
 
     tick(delta: number) {
-        if (!this.painter.stamp || !this.painter.floatingLayer){
+        if (!this.painter.stamp || !this.painter.floatingLayer || !this._stampImage){
             return;
         }
         
-        if (!this._stampImage || this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp) ||
-            this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
-            this.recreateStamp();
+        if (this.getFileName(this._stampImage.src) != this.getFileName(this.painter.stamp)){
+            this.setStampImage(this.painter.stamp);
+            return;
+        }
+        
+        
+        if (this.painter.floatingLayer.ctx.fillStyle != this.painter.color) {
+            this.drawStampImage();
         }
     }
     
@@ -38,12 +41,12 @@ export default class StampTool extends Tool {
 
     enable() {
         this.mouse = new Point(this.painter.width * 0.5, this.painter.height * 0.5);
-        this.showStamp();
+        this.showStampLayer();
         this._stampButton.hidden = false;
     }
 
     disable() {
-        this.hideStamp();
+        this.hideStampLayer();
         this._stampButton.hidden = true;
     }
     
@@ -53,49 +56,46 @@ export default class StampTool extends Tool {
         this.painter.saveImage();
     }
 
-    private hideStamp() {
-        if (!this.painter.floatingLayer){
-            return;
-        }
-        
-        // save transform:
-        let layer = this.painter.floatingLayer;
-        this._scale = layer.scale;
-        this._rotation = layer.rotation;
-        this.mouse = new Point(layer.position.x + 0.5 * layer.width, layer.position.y + 0.5 * layer.height);
-
+    private hideStampLayer() {
         this.painter.removeLayer(this.painter.floatingLayer);
     }
 
-    private showStamp() {
-        if (this.painter.floatingLayer) {
-            this._scale = this.painter.floatingLayer.scale;
-            this._rotation = this.painter.floatingLayer.rotation;
+    private showStampLayer() {
+        if (this.painter.floatingLayer){
+            return;
         }
+        
+        const x = this.mouse.x - 0.5 * 10;
+        const y = this.mouse.y - 0.5 * 10;
+        this.painter.newFloatingLayer(x, y, 10, 10);
+        this.setStampImage(this.painter.stamp);
+    }    
+    
+    private drawStampImage() {
+        const img = this._stampImage;
+        const width = img.width;
+        const height = img.height;
+        
+        const layer = this.painter.floatingLayer;
 
-        this.loadStampImage()
+        layer.resize(width, height);
+        layer.ctx.fillStyle = this.painter.color;
+        layer.ctx.fillRect(0, 0, width, height);
+        layer.ctx.globalCompositeOperation = "destination-in";
+        layer.drawImage(img);
+        layer.ctx.globalCompositeOperation = "source-over";
+        layer.canvas.style.opacity = "0.5";
+    }
+
+    private setStampImage(id: string) {
+        this.loadStampImage(id)
             .then(img => {
-                const width = img.width;
-                const height = img.height;
-                const x = this.mouse.x - 0.5 * width;
-                const y = this.mouse.y - 0.5 * height;
-                let layer = this.painter.newFloatingLayer(x, y, width, height);
-                layer.ctx.fillStyle = this.painter.color;
-                layer.ctx.fillRect(0, 0, width, height);
-                layer.ctx.globalCompositeOperation = "destination-in";
-                layer.drawImage(img);
-                layer.ctx.globalCompositeOperation = "source-over";
-                layer.transform(new Point(x, y), this._scale, this._rotation);
-                layer.canvas.style.opacity = "0.5";
-            })       
+                this._stampImage = img;
+                this.drawStampImage()
+            });       
     }
 
-    private recreateStamp(){
-        this.hideStamp();
-        this.showStamp();
-    }
-
-    private loadStampImage(): Promise<HTMLImageElement> {
+    private loadStampImage(id: string): Promise<HTMLImageElement> {
         if (!this._stampImage){
             this._stampImage = new Image();
         }
@@ -103,7 +103,7 @@ export default class StampTool extends Tool {
             return Promise.resolve(this._stampImage);
         }
 
-        this._stampImage.src = this.painter.stamp;
+        this._stampImage.src = id;
         return new Promise<HTMLImageElement>(resolve => {
             this._stampImage.onload = () => resolve(this._stampImage);
         });

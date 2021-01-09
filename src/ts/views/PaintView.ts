@@ -113,6 +113,9 @@ export default class PaintView extends View {
     }
     
     public removeLayer(layer: Layer) {
+        if (!layer){
+            return;
+        }
         layer.canvas.remove();
         delete this._layers[layer.id]
     }
@@ -125,9 +128,6 @@ export default class PaintView extends View {
     }
     
     public removeOverlay(){
-        if (!this.overlayLayer){
-            return;
-        }
         this.removeLayer(this.overlayLayer);
     }
     
