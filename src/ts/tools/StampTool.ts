@@ -22,7 +22,7 @@ export default class StampTool extends Tool {
     }
 
     tick(delta: number) {
-        if (!this.painter.stamp){
+        if (!this.painter.stamp || !this.painter.floatingLayer){
             return;
         }
         
