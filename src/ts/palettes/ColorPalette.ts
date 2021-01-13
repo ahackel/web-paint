@@ -32,7 +32,7 @@ export default class ColorPalette extends Palette {
         this.selectedIndex = 15;
     }
     
-    updateOption(element: HTMLDivElement, option: string) {
+    updateOptionElement(element: HTMLDivElement, option: string) {
         element.style.background = option;
     }
 }

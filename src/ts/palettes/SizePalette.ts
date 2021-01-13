@@ -11,7 +11,7 @@ export default class SizePalette extends Palette {
         this.selectedIndex = 1;
     }
 
-    updateOption(element: HTMLDivElement, option: any) {
+    updateOptionElement(element: HTMLDivElement, option: any) {
         element.innerHTML = '<i class="fas fa-circle"></i>'
         element.style.fontSize = option / 40 + 'rem';
     }

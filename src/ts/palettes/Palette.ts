@@ -6,6 +6,7 @@ export class Palette extends View {
     public onSelectionChanged: Function | undefined;
     private _selectedElement: HTMLDivElement;
     private _optionsElement: HTMLDivElement;
+    private _optionElements: HTMLDivElement[];
     private _selectedIndex: number;
     protected _options: any[];
     
@@ -13,8 +14,8 @@ export class Palette extends View {
 
     get selectedIndex(){ return this._selectedIndex }
     set selectedIndex(value){
-        this._selectedIndex = value;
-        this.updateOption(this._selectedElement, this.selectedOption);
+        this._selectedIndex = Math.max(0, Math.min(this._options.length - 1, value));
+        this.updateOptionElement(this._selectedElement, this.selectedOption);
     }
     
     get selectedOption(){ return this._options[this._selectedIndex] }
@@ -31,11 +32,9 @@ export class Palette extends View {
     constructor(id: string, options: any[], rightAlign: boolean = false) {
         super(id);
         this._options = options;
+        this._optionElements = [];
         this._selectedIndex = 0;
-
-        this.addSelectedOption();
-        this.addOptions();
-
+        this.createOptions();
         this.show();
         this.collapse();
         
@@ -46,6 +45,16 @@ export class Palette extends View {
         if (Palette._expandedPalette){
             Palette._expandedPalette.collapse();
         }
+    }
+    
+    private createOptions(){
+        this.addSelectedOption();
+        this.addOptionElements();
+    }
+    
+    recreateOptions(){
+        this.clear();
+        this.createOptions();
     }
 
     collapse() {
@@ -69,28 +78,42 @@ export class Palette extends View {
             this.collapse();
         }
     }
+    
+    addOption(value: any){
+        this._options.push(value);
+        this.addOptionElement(this._options.length - 1, value);
+    }
 
-    addSelectedOption() {
+    removeOption(index: number){
+        this._options.splice(index, 1);
+        this._optionElements[index].remove();
+        this._optionElements.splice(index, 1);
+        
+        // update the index assigned to each element:
+        this.recreateOptions();
+    }
+
+    private addSelectedOption() {
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("option");
         this._selectedElement = element;
         Utils.addFastClick(element, () => this.toggle());
-        this.updateOption(element, this.selectedOption);
+        this.updateOptionElement(element, this.selectedOption);
         this._element.appendChild(element);
     }
 
-    addOptions(){
+    private addOptionElements(){
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("options");
         element.style.width = Math.min(4, this._options.length) * 1.25 + "rem";
         this._optionsElement = element;
         this.adjustOptionsPosition();
 
-        this.addArrow();
+        this.addArrowElement();
 
         let i: number = 0;
         for (let option of this._options){
-            this.addOption(i, option);
+            this.addOptionElement(i, option);
             i ++;
         }
         this._element.appendChild(element);
@@ -102,26 +125,30 @@ export class Palette extends View {
         this._optionsElement.style.left = isPortrait ? Math.min(this._options.length, 4) * -0.625 + 0.5 + "rem" : null;
     }
 
-    addArrow(){
+    private addArrowElement(){
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("arrow");
         this._optionsElement.appendChild(element);
     }
 
-    addOption(index: number, option: any) {
+    private addOptionElement(index: number, option: any) {
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("option");
-        Utils.addFastClick(element, () => {
-            this.selectedIndex = index;
-            this.collapse();
-            if (this.onSelectionChanged) {
-                this.onSelectionChanged(option, index);
-            }
-        });
-        this.updateOption(element, option);
+        element.dataset.index = `${index}`;
+        Utils.addFastClick(element, event => this.optionClicked(event, option, index));
+        this.updateOptionElement(element, option);
         this._optionsElement.appendChild(element);
+        this._optionElements[index] = element;
+    }
+    
+    protected optionClicked(event: Event, option: any, index: number){
+        this.selectedIndex = index;
+        this.collapse();
+        if (this.onSelectionChanged) {
+            this.onSelectionChanged(option, index);
+        }        
     }
 
-    updateOption(element: HTMLDivElement, option: any){
+    protected updateOptionElement(element: HTMLDivElement, option: any){
     }
 }

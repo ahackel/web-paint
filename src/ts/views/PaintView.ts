@@ -15,6 +15,10 @@ import LineTool from "../tools/LineTool";
 import StampTool from "../tools/StampTool";
 import StampPalette from "../palettes/StampPalette";
 import Layer from "../Layer";
+import ILayer from "../ILayer";
+import CanvasLayer from "../CanvasLayer";
+import ImageLayer from "../ImageLayer ";
+import SelectionTool from "../tools/SelectionTool";
 
 // var Pressure = require('pressure');
 
@@ -22,7 +26,13 @@ export default class PaintView extends View {
     public readonly scaleFactor = 1;
     public readonly width: number;
     public readonly height: number;
-    
+
+    public brushTool: Tool;
+    public markerTool: Tool;
+    public eraserTool: Tool;
+    public selectionTool: SelectionTool;
+    public paintBucketTool: Tool;
+
     private _currentTool: Tool;
     private _imageId: string;
     private _color: string;
@@ -41,7 +51,7 @@ export default class PaintView extends View {
     private _tickTimeStamp: number;
     private _autoMaskCaptured: boolean;
     private _stamp: string;
-    private _layers: { [id : string] : Layer } = {};
+    private _layers: { [id : string] : ILayer } = {};
     private _sheet: HTMLElement;
 
     get color(): string { return this._color; }
@@ -50,9 +60,8 @@ export default class PaintView extends View {
     get lineWidth(): number { return this._lineWidth; }
     get autoMaskCtx(): CanvasRenderingContext2D { return this._autoMaskCtx; }
     //get layers(): Layer[] { return this._layers; }
-    get baseLayer(): Layer { return this._layers["base-layer"]; }
-    get overlayLayer(): Layer { return this._layers["overlay-layer"]; }
-    get floatingLayer(): Layer { return this._layers["floating-layer"]; }
+    get baseLayer(): CanvasLayer { return <CanvasLayer>this._layers["base-layer"]; }
+    get overlayLayer(): ImageLayer { return <ImageLayer>this._layers["overlay-layer"]; }
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
@@ -64,7 +73,7 @@ export default class PaintView extends View {
         Utils.log(`Setting PaintView size to ${this.width} x ${this.height}`);
         
         this.createButtons(onBackClicked);
-        this.addLayer("base-layer", 0, 0, this.width, this.height,true);
+        this.addCanvasLayer("base-layer", 0, 0, this.width, this.height,false);
         this.addEventListeners();
         this.createTools();
         this.createPalettes();
@@ -74,6 +83,10 @@ export default class PaintView extends View {
         autoMaskCanvas.width = this.width;
         autoMaskCanvas.height = this.height;
         this._autoMaskCtx = <CanvasRenderingContext2D>autoMaskCanvas.getContext("2d", {alpha: true});
+    }
+    
+    getLayer(id: string){
+        return this._layers[id];
     }
 
     private createButtons(onBackClicked: Function) {
@@ -95,28 +108,39 @@ export default class PaintView extends View {
             let image = new Image();
             image.src = URL.createObjectURL(file);
             image.onload = () => {
-                this.baseLayer.drawImage(image);
+                this.setTool(this.selectionTool);
+                this.selectionTool.setImage(image);
             }
         })
         let importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
         Utils.addFastClick(importImageButton, () => importImageField.click());
     }
 
-    private addLayer(id: string, x: number, y: number, width: number, height: number, acceptInput: boolean = false): Layer {
-        if (this._layers[id]){
-            return this._layers[id];
-        }
-        let index = Object.keys(this._layers).length;
-        let layer = new Layer(this._sheet, id, index, x, y, width, height, acceptInput);
-        this._layers[id] = layer;
+    private addLayer(layer: ILayer): ILayer {
+        layer.index = Object.keys(this._layers).length;
+        this._layers[layer.id] = layer;
         return layer;
     }
     
-    public removeLayer(layer: Layer) {
+    public addImageLayer(id: string, x: number, y: number, width: number, height: number, floating: boolean): ImageLayer{
+        const layer = new ImageLayer(this._sheet, id, x, y, width, height);
+        layer.floating = floating;
+        this.addLayer(layer);
+        return layer;
+    }
+    
+    public addCanvasLayer(id: string, x: number, y: number, width: number, height: number, floating: boolean): CanvasLayer{
+        const layer = new CanvasLayer(this._sheet, id, x, y, width, height);
+        layer.floating = floating;
+        this.addLayer(layer);
+        return layer;
+    }
+    
+    public removeLayer(layer: ILayer) {
         if (!layer){
             return;
         }
-        layer.canvas.remove();
+        layer.remove();
         delete this._layers[layer.id]
     }
     
@@ -124,7 +148,7 @@ export default class PaintView extends View {
         if (this.overlayLayer){
             return;
         }
-        this.addLayer("overlay-layer", 0, 0, this.width, this.height);
+        this.addLayer(new ImageLayer(this._sheet, "overlay-layer", 0, 0, this.width, this.height));
     }
     
     public removeOverlay(){
@@ -137,52 +161,33 @@ export default class PaintView extends View {
             return;
         }
         this.createOverlay();
-        this.overlayLayer.clear();
-        let overlayImage = new Image();
-        overlayImage.src = url;
-        overlayImage.onload = () => {
-            if (overlayImage){
-                this.overlayLayer.drawImage(overlayImage);
+        this.overlayLayer.image.src = url;
                 //this.processOverlay(this.overlay.ctx);
 
                 // show processed overlay:
                 // this._overlayCtx.canvas.toBlob(blob => {
                 //     this._overlay.src = URL.createObjectURL(blob);
                 // })
-            }
-        }
-    }
-
-    public newFloatingLayer(x: number, y: number, width: number, height: number): Layer {
-        this.mergeFloatingLayer();
-        let layer = this.addLayer("floating-layer", x, y, width, height);
-        layer.floating = true;
-        return layer;
-    }
-
-    public mergeFloatingLayer(){
-        if (!this.floatingLayer){
-            return;
-        }
-        this.mergeLayer(this.floatingLayer);
     }
     
     private createTools() {
-        this._tools = [
-            new PenTool(this, "source-over"),
-            new PenTool(this, "darken"),
-            new PenTool(this, "destination-out"),
-            // new RectangleTool(this),
-            // new LineTool(this),
-            new PaintBucketTool(this),
-            new StampTool(this)
-        ]
-        this._currentTool = this._tools[0];
+        this._tools = [];
+        this.brushTool = this.addTool(new PenTool(this, "source-over"));
+        this.markerTool = this.addTool(new PenTool(this, "darken"));
+        this.eraserTool = this.addTool(new PenTool(this, "destination-out"));
+        this.selectionTool = <SelectionTool>this.addTool(new SelectionTool(this));
+        this.paintBucketTool = this.addTool(new PaintBucketTool(this));
+        this._currentTool = this.brushTool;
+    }
+    
+    private addTool(tool: Tool){
+        this._tools.push(tool);
+        return tool;
     }
 
     private createPalettes() {
         this._toolPalette = new ToolPalette("tool-palette");
-        this._toolPalette.onSelectionChanged = (option: string, index: number) => this.setTool(index);
+        this._toolPalette.onSelectionChanged = (option: string, index: number) => this.setTool(this._tools[index]);
 
         this._sizePalette = new SizePalette("size-palette");
         this._sizePalette.onSelectionChanged = (lineWidth: number) => {
@@ -195,25 +200,31 @@ export default class PaintView extends View {
         this._color = this._colorPalette.color;
 
         this._stampPalette = new StampPalette("stamp-palette");
-        this._stampPalette.onSelectionChanged = (stamp: string) => this._stamp = stamp;
+        this._stampPalette.onSelectionChanged = (stamp: string) => {
+            this._stamp = stamp;
+            this.setTool(this.selectionTool);
+            this.selectionTool.setImageUrl(this.stamp);
+        }
         this._stamp = this._stampPalette.stamp;
 
         this._opacity = 1;
-        this.setTool(0);
     }
 
-    private setTool(index: number) {
-        const toolCount = this._tools.length;
-        this._currentTool.disable();
-        this._currentTool = this._tools[Math.min(index, toolCount - 1)];
-        this._currentTool.enable();
+    private setTool(tool: Tool) {
+        this._currentTool?.disable();
+        this._currentTool = tool;
+        this._currentTool?.enable();
+        this._toolPalette.selectedIndex = this._tools.indexOf(tool);
 
-        this._sizePalette.setVisible(!(this._currentTool instanceof StampTool));
-        this._stampPalette.setVisible(this._currentTool instanceof StampTool);
+        // this._sizePalette.setVisible(!(this._currentTool instanceof StampTool));
+        // this._stampPalette.setVisible(this._currentTool instanceof StampTool);
     }
 
     private addEventListeners() {
         let canvas = this.baseLayer.canvas;
+        canvas.style.pointerEvents = "auto";
+        //canvas.addEventListener('keydown', event => this.keyDown(event));
+        document.addEventListener('keydown', event => this.keyDown(event));
         canvas.addEventListener('click', event => event.preventDefault());
 
         if (window.PointerEvent != null){
@@ -270,6 +281,13 @@ export default class PaintView extends View {
             y = Math.round(y);
         }
         return new Point(x, y);
+    }
+    
+    private keyDown(event: KeyboardEvent){
+        if (!this._currentTool) {
+            return;
+        }
+        this._currentTool.keyDown(event);
     }
 
     pointerDown(event: PointerEvent) {
@@ -374,7 +392,7 @@ export default class PaintView extends View {
             return;
         }
 
-        this._currentTool.painting = isPainting;
+        // this._currentTool.painting = isPainting;
         this._currentTool.pressure = pressure;
 
         let newMouse = mouse;
@@ -416,17 +434,6 @@ export default class PaintView extends View {
         this._currentTool.mouse = mouse;
         this._currentTool.up();
         this.saveImage();
-    }
-    
-    copyToNewLayer(x: number, y: number, width: number, height: number){
-        let layer = this.addLayer("floating", x, y, width, height);
-        layer.floating = true;
-        layer.ctx.drawImage(this.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
-    }
-    
-    mergeLayer(layer: Layer){
-        layer.drawToCanvas(this.baseLayer.ctx);
-        this.removeLayer(layer);
     }
 
     clear(registerUndo: boolean = false, save: boolean = false) {
@@ -524,18 +531,18 @@ export default class PaintView extends View {
             return;
         }
         
-        let imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
-        
-        // avoid expensive floodfill:
-        const index = (position.x + position.y * this.width) * 4 + 3;
-        if (this._autoMaskCaptured && imageData.data[index] > 0){
-            return;
-        }
-        
-        Utils.log("capturing auto mask");
-        Utils.floodFill(this.overlayLayer.ctx, imageData.data, position);
-        Utils.dilateMask(imageData.data, this.width, this.height);
-        this._autoMaskCtx.putImageData(imageData, 0, 0);
+        // let imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
+        //
+        // // avoid expensive floodfill:
+        // const index = (position.x + position.y * this.width) * 4 + 3;
+        // if (this._autoMaskCaptured && imageData.data[index] > 0){
+        //     return;
+        // }
+        //
+        // Utils.log("capturing auto mask");
+        // Utils.floodFill(this.overlayLayer.ctx, imageData.data, position);
+        // Utils.dilateMask(imageData.data, this.width, this.height);
+        // this._autoMaskCtx.putImageData(imageData, 0, 0);
     }
 
     private processOverlay(ctx: CanvasRenderingContext2D) {

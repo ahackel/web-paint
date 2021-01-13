@@ -70,4 +70,5 @@ class App {
     }
 }
 
-let app = new App();
+// @ts-ignore
+window.app = new App();

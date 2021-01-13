@@ -1,5 +1,6 @@
 import Point from "./Point";
 import {config} from "../config";
+import Rect from "./Rect";
 
 let _times: number[] = [];
 let _fps: number = 60;
@@ -7,6 +8,10 @@ let _fpsDisplay: HTMLElement;
 let _fpsCounterEnabled = true;
 
 export default class Utils {
+    
+    static pointerEventsSupported(): boolean {
+        return window.PointerEvent != null;
+    }
 
     static getOverlayPath(id: string) {
         let page = config.sheets.find(e => e.id == id);
@@ -162,7 +167,7 @@ export default class Utils {
         const sourceData = sourceCtx.getImageData(0, 0, width, height);
         const sourcePixels = sourceData.data;
 
-        startPosition = startPosition.round();
+        startPosition = startPosition.copy().round();
         const startIndex: number = startPosition.x + startPosition.y * width;
         
         const startR = sourcePixels[startIndex * 4];
@@ -285,6 +290,39 @@ export default class Utils {
             // }
             return true;
         }
+    }
+
+    public static getVisiblePixelFrame(ctx: CanvasRenderingContext2D, rect: Rect): Rect {
+        let {x, y, width, height} = rect;
+
+        if (width <= 0 || height <= 0){
+            return Rect.Empty();
+        }
+        
+        const data = ctx.getImageData(x, y, width, height);
+        const pixels = data.data;
+        
+        let minX = width;
+        let maxX = 0;
+        let minY = height;
+        let maxY = 0;
+
+        for (let cy = 0; cy < height; cy++) {
+            for (let cx = 0; cx < width; cx++) {
+                if (pixels[(cx + cy * width) * 4 + 3]){
+                    minX = cx < minX ? cx : minX;
+                    maxX = cx > maxX ? cx : maxX;
+                    minY = cy < minY ? cy : minY;
+                    maxY = cy > maxY ? cy : maxY;
+                }
+            }
+        }
+        
+        x += minX;
+        y += minY;
+        width = Math.max(0, maxX - minX + 1);
+        height = Math.max(0, maxY - minY + 1);
+        return new Rect(x, y, width, height); 
     }
     
     public static dilateMask(pixels: Uint8ClampedArray, width: number, height: number) {

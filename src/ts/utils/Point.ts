@@ -1,3 +1,5 @@
+import Utils from "./Utils";
+
 export default class Point {
     public x: number;
     public y: number;
@@ -31,6 +33,18 @@ export default class Point {
         return this;
     }
 
+    round(){
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    }
+    
+    clamp(minX: number, minY: number, maxX: number, maxY: number){
+        this.x = Utils.clamp(minX, maxX, this.x);
+        this.y = Utils.clamp(minY, maxY, this.y);
+        return this;
+    }
+
     static distance(a: Point, b: Point) {
         let dx = a.x - b.x;
         let dy = a.y - b.y;
@@ -49,9 +63,5 @@ export default class Point {
         return new Point(
             p1.x * (1 - a) + p2.x * a,
             p1.y * (1 - a) + p2.y * a);
-    }
-    
-    round(){
-        return new Point(Math.round(this.x), Math.round(this.y));
     }
 }

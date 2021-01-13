@@ -63,8 +63,16 @@ export default class ImageStorage {
 				Utils.DispatchEventToAllElements(event);
 			})
 	}
+	
+	public static deleteImage(id: string){
+		return this.adapter.removeItem(id)
+			.then(() => {
+				const event = new CustomEvent<string>("imagedeleted", {detail: id})
+				Utils.DispatchEventToAllElements(event);
+			})		
+	}
 
-	public static imageKeys() {
+	public static keys() {
 		return this.adapter.keys();
 	}
 

@@ -22,7 +22,7 @@ export default class PenTool extends Tool {
     }
 
     down(): void {
-        this.painter.captureAutoMask(this.mouse.round());
+        this.painter.captureAutoMask(this.mouse.copy().round());
         
         this._lastPoint = this.mouse.copy()
         this._points = [this._lastPoint];
@@ -85,8 +85,8 @@ export default class PenTool extends Tool {
             ctx.fillStyle = ctx.strokeStyle;
             ctx.fill();
             
-            this.applyAutoMask();
-
+            //this.applyAutoMask();
+            
             this.painter.baseLayer.ctx.globalAlpha = this.opacity;
             this.painter.baseLayer.drawImage(ctx.canvas);
             this.painter.baseLayer.ctx.globalAlpha = 1;

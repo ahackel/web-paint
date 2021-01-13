@@ -39,11 +39,12 @@ export default abstract class Tool {
         return Tool._bufferCtx;
     }
 
-    enable(): void {};
-    disable(): void {};
-    down(): void {};
-    move(): void {};
-    up(): void {};
-    pressureChanged(): void {};
-    tick(delta: number): void {};
+    enable(): void {}
+    disable(): void {}
+    down(): void {}
+    move(): void {}
+    up(): void {}
+    pressureChanged(): void {}
+    tick(delta: number): void {}
+    keyDown(event: KeyboardEvent): void {}
 }

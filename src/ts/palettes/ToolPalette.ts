@@ -7,10 +7,11 @@ export default class ToolPalette extends Palette {
             '<i class="fas fa-brush"></i>',
             '<i class="fas fa-pencil-alt"></i>',
             '<i class="fas fa-eraser"></i>',
+            '<i class="fas fa-cut"></i>',
             // '<i class="far fa-square"></i>',
             // '<i class="fas fa-grip-lines-vertical"></i>',
             '<i class="fas fa-fill-drip"></i>',
-            '<i class="fas fa-stamp"></i>'
+            // '<i class="fas fa-stamp"></i>'
             // '<i class="fas fa-palette"></i>',
             // '<i class="fas fa-fill-drip"></i>'
         ];
@@ -19,7 +20,7 @@ export default class ToolPalette extends Palette {
         this.selectedIndex = 0;
     }
 
-    updateOption(element: HTMLDivElement, option: string) {
+    updateOptionElement(element: HTMLDivElement, option: string) {
         element.innerHTML = option;
     }
 }
