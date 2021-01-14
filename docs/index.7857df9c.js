@@ -4640,7 +4640,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "hide",
     value: function hide() {
-      if (this._layers["base-layer"]) {
+      if (('base-layer' in this._layers)) {
         this.saveImage();
       }
       if (this._currentTool) {
@@ -7111,4 +7111,4 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
 
 },{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.91a88d41.js.map
+//# sourceMappingURL=index.7857df9c.js.map
