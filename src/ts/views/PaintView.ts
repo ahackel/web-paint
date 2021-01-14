@@ -503,7 +503,7 @@ export default class PaintView extends View {
     }
     
     hide(){
-        if ('base-layer' in this._layers){
+        if (this._layers){
             this.saveImage();
         }
         if (this._currentTool){
