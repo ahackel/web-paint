@@ -13,7 +13,7 @@ import {config} from "../config";
 import RectangleTool from "../tools/RectangleTool";
 import LineTool from "../tools/LineTool";
 import StampTool from "../tools/StampTool";
-import StampPalette from "../palettes/StampPalette";
+import ShapePalette from "../palettes/ShapePalette";
 import Layer from "../Layer";
 import ILayer from "../ILayer";
 import CanvasLayer from "../CanvasLayer";
@@ -42,7 +42,7 @@ export default class PaintView extends View {
     private _colorPalette: ColorPalette;
     private _toolPalette: ToolPalette;
     private _sizePalette: SizePalette;
-    private _stampPalette: StampPalette;
+    private _stampPalette: ShapePalette;
     private _tools: Tool[];
     private _currentTouchId: number = 0;
     private _undoBuffer: ImageData;
@@ -199,7 +199,7 @@ export default class PaintView extends View {
         this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
         this._color = this._colorPalette.color;
 
-        this._stampPalette = new StampPalette("stamp-palette");
+        this._stampPalette = new ShapePalette("stamp-palette");
         this._stampPalette.onSelectionChanged = (stamp: string) => {
             this._stamp = stamp;
             this.setTool(this.selectionTool);
@@ -288,6 +288,19 @@ export default class PaintView extends View {
     }
     
     private keyDown(event: KeyboardEvent){
+        if (!this.isVisible()){
+            return;
+        }
+        
+        switch (event.code){
+            case 'KeyV':
+                if (event.metaKey){
+                    this.setTool(this.selectionTool);
+                    this.selectionTool.pasteFromClipboard();
+                }
+                break;
+        }
+        
         if (!this._currentTool) {
             return;
         }
@@ -560,5 +573,4 @@ export default class PaintView extends View {
         }
         ctx.putImageData(imageData, 0, 0);
     }
-
 }

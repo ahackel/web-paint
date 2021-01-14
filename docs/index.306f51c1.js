@@ -557,6 +557,7 @@ _parcelHelpers.export(exports, "config", function () {
 var config = {
   debug: false,
   doubleTapDelay: 400,
+  maxShapeCount: 30,
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -4001,8 +4002,8 @@ var _palettesPalette = require("../palettes/Palette");
 var _storageImageStorage = require("../storage/ImageStorage");
 var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
 var _config = require("../config");
-var _palettesStampPalette = require("../palettes/StampPalette");
-var _palettesStampPaletteDefault = _parcelHelpers.interopDefault(_palettesStampPalette);
+var _palettesShapePalette = require("../palettes/ShapePalette");
+var _palettesShapePaletteDefault = _parcelHelpers.interopDefault(_palettesShapePalette);
 var _CanvasLayer = require("../CanvasLayer");
 var _CanvasLayerDefault = _parcelHelpers.interopDefault(_CanvasLayer);
 var _ImageLayer = require("../ImageLayer ");
@@ -4325,7 +4326,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         return _this3._color = color;
       };
       this._color = this._colorPalette.color;
-      this._stampPalette = new _palettesStampPaletteDefault.default("stamp-palette");
+      this._stampPalette = new _palettesShapePaletteDefault.default("stamp-palette");
       this._stampPalette.onSelectionChanged = function (stamp) {
         _this3._stamp = stamp;
         _this3.setTool(_this3.selectionTool);
@@ -4425,6 +4426,17 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "keyDown",
     value: function keyDown(event) {
+      if (!this.isVisible()) {
+        return;
+      }
+      switch (event.code) {
+        case 'KeyV':
+          if (event.metaKey) {
+            this.setTool(this.selectionTool);
+            this.selectionTool.pasteFromClipboard();
+          }
+          break;
+      }
       if (!this._currentTool) {
         return;
       }
@@ -4700,7 +4712,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   return PaintView;
 })(_View2.View);
 
-},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/ToolPalette":"1sVOv","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../tools/PaintBucketTool":"2P5Gb","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/StampPalette":"6CMoN","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
+},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/ToolPalette":"1sVOv","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../tools/PaintBucketTool":"2P5Gb","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -4991,7 +5003,7 @@ var Palette = /*#__PURE__*/(function (_View) {
     },
     set: function set(value) {
       this._selectedIndex = Math.max(0, Math.min(this._options.length - 1, value));
-      this.updateOptionElement(this._selectedElement, this.selectedOption);
+      this.updateSelectedOptionElement(this._selectedElement, this.selectedOption);
     }
   }, {
     key: "selectedOption",
@@ -5022,9 +5034,6 @@ var Palette = /*#__PURE__*/(function (_View) {
     _this.createOptions();
     _this.show();
     _this.collapse();
-    window.addEventListener("resize", function () {
-      return _this.adjustOptionsPosition();
-    });
     return _this;
   }
   _createClass(Palette, [{
@@ -5068,6 +5077,7 @@ var Palette = /*#__PURE__*/(function (_View) {
     value: function addOption(value) {
       this._options.push(value);
       this.addOptionElement(this._options.length - 1, value);
+      this.updateOptionsWidth();
     }
   }, {
     key: "removeOption",
@@ -5088,7 +5098,7 @@ var Palette = /*#__PURE__*/(function (_View) {
       _utilsUtilsDefault.default.addFastClick(element, function () {
         return _this2.toggle();
       });
-      this.updateOptionElement(element, this.selectedOption);
+      this.updateSelectedOptionElement(element, this.selectedOption);
       this._element.appendChild(element);
     }
   }, {
@@ -5096,9 +5106,7 @@ var Palette = /*#__PURE__*/(function (_View) {
     value: function addOptionElements() {
       var element = document.createElement("div");
       element.classList.add("options");
-      element.style.width = Math.min(4, this._options.length) * 1.25 + "rem";
       this._optionsElement = element;
-      this.adjustOptionsPosition();
       this.addArrowElement();
       var i = 0;
       var _iterator = _createForOfIteratorHelper(this._options), _step;
@@ -5113,14 +5121,13 @@ var Palette = /*#__PURE__*/(function (_View) {
       } finally {
         _iterator.f();
       }
+      this.updateOptionsWidth();
       this._element.appendChild(element);
     }
   }, {
-    key: "adjustOptionsPosition",
-    value: function adjustOptionsPosition() {
-      var isPortrait = window.innerWidth < window.innerHeight;
-      this._optionsElement.style.top = isPortrait ? "initial" : Math.ceil(this._options.length / 4) * -0.625 + 0.5 + "rem";
-      this._optionsElement.style.left = isPortrait ? Math.min(this._options.length, 4) * -0.625 + 0.5 + "rem" : null;
+    key: "updateOptionsWidth",
+    value: function updateOptionsWidth() {
+      this._optionsElement.style.width = Math.min(8, this._options.length) * 1.25 + "em";
     }
   }, {
     key: "addArrowElement",
@@ -5136,6 +5143,9 @@ var Palette = /*#__PURE__*/(function (_View) {
       var element = document.createElement("div");
       element.classList.add("option");
       element.dataset.index = ("").concat(index);
+      _utilsUtilsDefault.default.addLongClick(element, function (event) {
+        return _this3.optionLongClicked(event, option, index);
+      });
       _utilsUtilsDefault.default.addFastClick(element, function (event) {
         return _this3.optionClicked(event, option, index);
       });
@@ -5153,8 +5163,16 @@ var Palette = /*#__PURE__*/(function (_View) {
       }
     }
   }, {
+    key: "optionLongClicked",
+    value: function optionLongClicked(event, option, index) {}
+  }, {
     key: "updateOptionElement",
     value: function updateOptionElement(element, option) {}
+  }, {
+    key: "updateSelectedOptionElement",
+    value: function updateSelectedOptionElement(element, option) {
+      this.updateOptionElement(element, option);
+    }
   }], [{
     key: "collapseAll",
     value: function collapseAll() {
@@ -5381,7 +5399,7 @@ var SizePalette = /*#__PURE__*/(function (_Palette) {
   function SizePalette(id) {
     var _this;
     _classCallCheck(this, SizePalette);
-    var sizes = [8, 24, 40];
+    var sizes = [2, 8, 24, 40];
     _this = _super.call(this, id, sizes, true);
     _this.selectedIndex = 1;
     return _this;
@@ -5389,8 +5407,8 @@ var SizePalette = /*#__PURE__*/(function (_Palette) {
   _createClass(SizePalette, [{
     key: "updateOptionElement",
     value: function updateOptionElement(element, option) {
-      element.innerHTML = '<i class="fas fa-circle"></i>';
-      element.style.fontSize = option / 40 + 'rem';
+      var width = option / 40;
+      element.innerHTML = '<div class="line-width" style="width:' + width + 'em"></div>';
     }
   }]);
   return SizePalette;
@@ -5854,17 +5872,15 @@ var PaintBucketTool = /*#__PURE__*/(function (_Tool) {
   return PaintBucketTool;
 })(_Tool2Default.default);
 
-},{"./Tool":"7utpK","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6CMoN":[function(require,module,exports) {
+},{"./Tool":"7utpK","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"4aYdj":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
-  return StampPalette;
+  return ShapePalette;
 });
 var _Palette2 = require("./Palette");
 var _storageImageStorage = require("../storage/ImageStorage");
 var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 function _createForOfIteratorHelper(o, allowArrayLike) {
   var it;
   if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
@@ -5933,29 +5949,6 @@ function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
-}
-function _get(target, property, receiver) {
-  if (typeof Reflect !== "undefined" && Reflect.get) {
-    _get = Reflect.get;
-  } else {
-    _get = function _get(target, property, receiver) {
-      var base = _superPropBase(target, property);
-      if (!base) return;
-      var desc = Object.getOwnPropertyDescriptor(base, property);
-      if (desc.get) {
-        return desc.get.call(receiver);
-      }
-      return desc.value;
-    };
-  }
-  return _get(target, property, receiver || target);
-}
-function _superPropBase(object, property) {
-  while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = _getPrototypeOf(object);
-    if (object === null) break;
-  }
-  return object;
 }
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
@@ -6033,31 +6026,31 @@ function _getPrototypeOf(o) {
   };
   return _getPrototypeOf(o);
 }
-var StampPalette = /*#__PURE__*/(function (_Palette) {
-  _inherits(StampPalette, _Palette);
-  var _super = _createSuper(StampPalette);
-  _createClass(StampPalette, [{
+var ShapePalette = /*#__PURE__*/(function (_Palette) {
+  _inherits(ShapePalette, _Palette);
+  var _super = _createSuper(ShapePalette);
+  _createClass(ShapePalette, [{
     key: "stamp",
     get: function get() {
       return this.selectedOption;
     }
   }]);
-  function StampPalette(id) {
+  function ShapePalette(id) {
     var _this;
-    _classCallCheck(this, StampPalette);
-    var stamps = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
-    _this = _super.call(this, id, stamps, true);
-    _this._stampIds = {};
+    _classCallCheck(this, ShapePalette);
+    var shapeUrls = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
+    _this = _super.call(this, id, shapeUrls, true);
+    _this._shapeIds = {};
     _this.selectedIndex = 0;
     _storageImageStorageDefault.default.keys().then(function (keys) {
-      var stamps = keys.filter(function (x) {
-        return x.startsWith("Stamp");
+      var shapesIds = keys.filter(function (x) {
+        return x.startsWith("Shape");
       });
-      var _iterator = _createForOfIteratorHelper(stamps), _step;
+      var _iterator = _createForOfIteratorHelper(shapesIds), _step;
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-          var stampId = _step.value;
-          _this.addStampFromImageId(stampId);
+          var shapeId = _step.value;
+          _this.addShapeFromImageId(shapeId);
         }
       } catch (err) {
         _iterator.e(err);
@@ -6067,34 +6060,26 @@ var StampPalette = /*#__PURE__*/(function (_Palette) {
     });
     _this._element.addEventListener("imagesaved", function (event) {
       var id = event.detail;
-      if (id.startsWith("Stamp")) {
-        _this.addStampFromImageId(id);
+      if (id.startsWith("Shape")) {
+        _this.addShapeFromImageId(id);
       }
     });
     return _this;
   }
-  _createClass(StampPalette, [{
-    key: "addStampFromImageId",
-    value: function addStampFromImageId(stampId) {
+  _createClass(ShapePalette, [{
+    key: "addShapeFromImageId",
+    value: function addShapeFromImageId(stampId) {
       var _this2 = this;
       _storageImageStorageDefault.default.loadBlob(stampId).then(function (blob) {
         var url = URL.createObjectURL(blob);
-        _this2._stampIds[url] = stampId;
+        _this2._shapeIds[url] = stampId;
         _this2.addOption(url);
       });
     }
   }, {
-    key: "optionClicked",
-    value: function optionClicked(event, option, index) {
-      if (event.altKey) {
-        this.deleteStamp(index);
-        return;
-      }
-      if (event.shiftKey) {
-        this.showFullScreen(index);
-        return;
-      }
-      _get(_getPrototypeOf(StampPalette.prototype), "optionClicked", this).call(this, event, option, index);
+    key: "optionLongClicked",
+    value: function optionLongClicked(event, option, index) {
+      this.deleteShape(index);
     }
   }, {
     key: "updateOptionElement",
@@ -6102,16 +6087,21 @@ var StampPalette = /*#__PURE__*/(function (_Palette) {
       element.style.backgroundImage = ("url(\"").concat(option, "\")");
     }
   }, {
-    key: "deleteStamp",
-    value: function deleteStamp(index) {
+    key: "updateSelectedOptionElement",
+    value: function updateSelectedOptionElement(element, option) {
+      element.innerHTML = '<i class="fas fa-shapes"></i>';
+    }
+  }, {
+    key: "deleteShape",
+    value: function deleteShape(index) {
       var _this3 = this;
       var option = this._options[index];
-      var stampId = this._stampIds[option];
+      var stampId = this._shapeIds[option];
       if (!stampId) {
         return;
       }
       _storageImageStorageDefault.default.deleteImage(stampId).then(function () {
-        delete _this3._stampIds[option];
+        delete _this3._shapeIds[option];
         _this3.removeOption(index);
         if (_this3.selectedIndex == index) {
           // select the following item that now has the same index
@@ -6119,22 +6109,11 @@ var StampPalette = /*#__PURE__*/(function (_Palette) {
         }
       });
     }
-  }, {
-    key: "showFullScreen",
-    value: function showFullScreen(index) {
-      var img = new Image();
-      img.src = this._options[index];
-      img.classList.add("fullscreen");
-      _utilsUtilsDefault.default.addFastClick(img, function () {
-        img.remove();
-      });
-      document.body.appendChild(img);
-    }
   }]);
-  return StampPalette;
+  return ShapePalette;
 })(_Palette2.Palette);
 
-},{"./Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6xo2a":[function(require,module,exports) {
+},{"./Palette":"1J0Eg","../storage/ImageStorage":"3kpel","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6xo2a":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -6794,6 +6773,7 @@ var _storageImageStorage = require("../storage/ImageStorage");
 var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+var _config = require("../config");
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -6911,6 +6891,15 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this._hasFloatingSelection = value;
       this._toolbar.classList.toggle("hidden", !value);
     }
+  }, {
+    key: "isInShapesPalette",
+    get: function get() {
+      return this._isInShapesPalette;
+    },
+    set: function set(value) {
+      this._isInShapesPalette = value;
+      this._saveButton.classList.toggle("disabled", value);
+    }
   }]);
   function SelectionTool(painter) {
     var _this;
@@ -6931,6 +6920,10 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     _utilsUtilsDefault.default.addFastClick(_this._saveButton, function () {
       return _this.saveSelectionAsNewStamp();
     });
+    _this._fullscreenButton = document.getElementById("selection-fullscreen-button");
+    _utilsUtilsDefault.default.addFastClick(_this._fullscreenButton, function () {
+      return _this.showSelectionInFullscreen();
+    });
     _this.hasFloatingSelection = false;
     return _this;
   }
@@ -6939,12 +6932,14 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     value: function enable() {
       this.createSelectionLayer();
       this.hasFloatingSelection = false;
+      this.isInShapesPalette = false;
     }
   }, {
     key: "disable",
     value: function disable() {
       this.paintSelectionToCanvas();
       this.destroySelectionLayer();
+      this.hasFloatingSelection = false;
     }
   }, {
     key: "down",
@@ -6959,6 +6954,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this.selectionLayer.transform(new _utilsPointDefault.default(0, 0), 1, 0);
       this.selectionLayer.floating = false;
       this.hasFloatingSelection = false;
+      this.isInShapesPalette = false;
       this._startPosition = this.getMousePosition();
       var ctx = this.selectionLayer.ctx;
       ctx.resetTransform();
@@ -7003,6 +6999,11 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
         case 'Backspace':
           this.clearSelection();
           break;
+        case 'KeyC':
+          if (event.metaKey) {
+            this.copyToClipboard();
+          }
+          break;
       }
     }
   }, {
@@ -7018,6 +7019,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this.selectionLayer.resize(image.width, image.height);
       this.selectionLayer.floating = true;
       this.selectionLayer.drawImage(image);
+      this.isInShapesPalette = true;
     }
   }, {
     key: "setImageUrl",
@@ -7099,16 +7101,72 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "saveSelectionAsNewStamp",
     value: function saveSelectionAsNewStamp() {
-      var id = "Stamp" + Date.now();
-      console.log(("Saving stamp: ").concat(id));
-      this.selectionLayer.canvas.toBlob(function (blob) {
-        return _storageImageStorageDefault.default.saveImage(id, blob);
+      var _this4 = this;
+      _storageImageStorageDefault.default.keys().then(function (keys) {
+        var shapesIds = keys.filter(function (x) {
+          return x.startsWith("Shape");
+        });
+        if (shapesIds.length >= _config.config.maxShapeCount) {
+          console.log("Cannot save selection as shape because there are already too many in storage.");
+          return;
+        }
+        var id = "Shape" + Date.now();
+        console.log(("Saving selection as: ").concat(id));
+        _this4.selectionLayer.canvas.toBlob(function (blob) {
+          return _storageImageStorageDefault.default.saveImage(id, blob);
+        });
+        _this4.isInShapesPalette = true;
       });
+    }
+  }, {
+    key: "copyToClipboard",
+    value: function copyToClipboard() {
+      this.selectionLayer.canvas.toBlob(function (blob) {
+        return navigator.clipboard.write([new ClipboardItem({
+          'image/png': blob
+        })]);
+      });
+      console.log("copied selection to clipboard");
+    }
+  }, {
+    key: "pasteFromClipboard",
+    value: function pasteFromClipboard() {
+      var _this5 = this;
+      navigator.permissions.query({
+        name: "clipboard-read"
+      }).then(function (result) {
+        if (!(result.state == "granted" || result.state == "prompt")) {
+          return;
+        }
+        navigator.clipboard.read().then(function (data) {
+          for (var i = 0; i < data.length; i++) {
+            if (!data[i].types.includes("image/png")) {
+              continue;
+            }
+            data[i].getType("image/png").then(function (blob) {
+              _this5.setImageUrl(URL.createObjectURL(blob));
+            });
+          }
+        });
+      });
+    }
+  }, {
+    key: "showSelectionInFullscreen",
+    value: function showSelectionInFullscreen() {
+      var img = new Image();
+      this.selectionLayer.canvas.toBlob(function (blob) {
+        return img.src = URL.createObjectURL(blob);
+      });
+      img.classList.add("fullscreen");
+      _utilsUtilsDefault.default.addFastClick(img, function () {
+        img.remove();
+      });
+      document.body.appendChild(img);
     }
   }]);
   return SelectionTool;
 })(_Tool2Default.default);
 
-},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
+},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.b2ced989.js.map
+//# sourceMappingURL=index.306f51c1.js.map

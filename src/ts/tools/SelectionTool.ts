@@ -5,6 +5,7 @@ import Rect from "../utils/Rect";
 import ImageStorage from "../storage/ImageStorage";
 import Utils from "../utils/Utils";
 import PaintView from "../views/PaintView";
+import {config} from "../config";
 
 // Provides a floating selection the user can manipulate 
 export default class SelectionTool extends Tool {
@@ -17,15 +18,22 @@ export default class SelectionTool extends Tool {
         this._hasFloatingSelection = value;
         this._toolbar.classList.toggle("hidden", !value);
     }
+    get isInShapesPalette(): boolean { return this._isInShapesPalette; }
+    set isInShapesPalette(value: boolean) { 
+        this._isInShapesPalette = value;
+        this._saveButton.classList.toggle("disabled", value);
+    }
     
     protected _startPosition: Point;
     protected _selection: Rect = Rect.Empty();
     private _hasFloatingSelection: boolean;
     private _drawSelectionOutlineRequested: boolean;
+    private _isInShapesPalette: boolean;
     private _toolbar: HTMLDivElement;
     private _deleteButton: HTMLDivElement;
     private _stampButton: HTMLDivElement;
     private _saveButton: HTMLDivElement;
+    private _fullscreenButton: HTMLDivElement;
 
     constructor(painter: PaintView) {
         super(painter);
@@ -36,17 +44,21 @@ export default class SelectionTool extends Tool {
         Utils.addFastClick(this._stampButton, () => this.paintSelectionToCanvas());
         this._saveButton = <HTMLDivElement>document.getElementById("selection-save-button");
         Utils.addFastClick(this._saveButton, () => this.saveSelectionAsNewStamp());
+        this._fullscreenButton = <HTMLDivElement>document.getElementById("selection-fullscreen-button");
+        Utils.addFastClick(this._fullscreenButton, () => this.showSelectionInFullscreen());
         this.hasFloatingSelection = false;
     }
 
     enable() {
         this.createSelectionLayer();
         this.hasFloatingSelection = false;
+        this.isInShapesPalette = false;
     }
 
     disable() {
         this.paintSelectionToCanvas();
         this.destroySelectionLayer();
+        this.hasFloatingSelection = false;
     }
     
     down() {
@@ -60,6 +72,7 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.floating = false;
 
         this.hasFloatingSelection = false;
+        this.isInShapesPalette = false;
         this._startPosition = this.getMousePosition();
         
         let ctx = this.selectionLayer.ctx;
@@ -101,6 +114,11 @@ export default class SelectionTool extends Tool {
             case 'Backspace':
                 this.clearSelection();
                 break;
+            case 'KeyC':
+                if (event.metaKey){
+                    this.copyToClipboard();
+                }
+                break;
         }
     }
 
@@ -114,6 +132,7 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.resize(image.width, image.height);
         this.selectionLayer.floating = true;
         this.selectionLayer.drawImage(image);
+        this.isInShapesPalette = true;
     }
 
     setImageUrl(url: string){
@@ -192,8 +211,55 @@ export default class SelectionTool extends Tool {
     }
 
     private saveSelectionAsNewStamp() {
-        const id = "Stamp" + Date.now();
-        console.log(`Saving stamp: ${id}`);
-        this.selectionLayer.canvas.toBlob(blob => ImageStorage.saveImage(id, blob as Blob));
+        ImageStorage.keys()
+            .then((keys: string[]) => {
+                const shapesIds = keys.filter(x => x.startsWith("Shape"));
+                if (shapesIds.length >= config.maxShapeCount){
+                    console.log("Cannot save selection as shape because there are already too many in storage.");
+                    return;
+                }
+                
+                const id = "Shape" + Date.now();
+                console.log(`Saving selection as: ${id}`);
+                this.selectionLayer.canvas.toBlob(blob => ImageStorage.saveImage(id, blob as Blob));
+                this.isInShapesPalette = true;
+            });
+    }
+
+
+    copyToClipboard(){
+        this.selectionLayer.canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({'image/png': blob})]));
+        console.log("copied selection to clipboard");
+    }
+
+    pasteFromClipboard() {
+        navigator.permissions.query({name: "clipboard-read"})
+            .then(result => {
+                if (!(result.state == "granted" || result.state == "prompt")) {
+                    return;
+                }
+                navigator.clipboard.read()
+                    .then(data => {
+                        for (let i = 0; i < data.length; i++) {
+                            if (!data[i].types.includes("image/png")){
+                                continue;
+                            }
+                            data[i].getType("image/png")
+                                .then(blob => {
+                                    this.setImageUrl(URL.createObjectURL(blob));
+                                })
+                        }
+                    });
+            });
+    }
+
+    private showSelectionInFullscreen() {
+        let img = new Image();
+        this.selectionLayer.canvas.toBlob(blob => img.src = URL.createObjectURL(blob));
+        img.classList.add("fullscreen");
+        Utils.addFastClick(img, () => {
+            img.remove();
+        })
+        document.body.appendChild(img);
     }
 }

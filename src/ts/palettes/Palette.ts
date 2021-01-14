@@ -15,7 +15,7 @@ export class Palette extends View {
     get selectedIndex(){ return this._selectedIndex }
     set selectedIndex(value){
         this._selectedIndex = Math.max(0, Math.min(this._options.length - 1, value));
-        this.updateOptionElement(this._selectedElement, this.selectedOption);
+        this.updateSelectedOptionElement(this._selectedElement, this.selectedOption);
     }
     
     get selectedOption(){ return this._options[this._selectedIndex] }
@@ -37,8 +37,6 @@ export class Palette extends View {
         this.createOptions();
         this.show();
         this.collapse();
-        
-        window.addEventListener("resize", () => this.adjustOptionsPosition());
     }
     
     static collapseAll() {
@@ -82,6 +80,7 @@ export class Palette extends View {
     addOption(value: any){
         this._options.push(value);
         this.addOptionElement(this._options.length - 1, value);
+        this.updateOptionsWidth();
     }
 
     removeOption(index: number){
@@ -98,17 +97,14 @@ export class Palette extends View {
         element.classList.add("option");
         this._selectedElement = element;
         Utils.addFastClick(element, () => this.toggle());
-        this.updateOptionElement(element, this.selectedOption);
+        this.updateSelectedOptionElement(element, this.selectedOption);
         this._element.appendChild(element);
     }
-
+    
     private addOptionElements(){
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("options");
-        element.style.width = Math.min(4, this._options.length) * 1.25 + "rem";
         this._optionsElement = element;
-        this.adjustOptionsPosition();
-
         this.addArrowElement();
 
         let i: number = 0;
@@ -116,13 +112,12 @@ export class Palette extends View {
             this.addOptionElement(i, option);
             i ++;
         }
+        this.updateOptionsWidth();
         this._element.appendChild(element);
     }
 
-    private adjustOptionsPosition() {
-        let isPortrait = window.innerWidth < window.innerHeight;
-        this._optionsElement.style.top = isPortrait ? "initial" : Math.ceil(this._options.length / 4) * -0.625 + 0.5 + "rem";
-        this._optionsElement.style.left = isPortrait ? Math.min(this._options.length, 4) * -0.625 + 0.5 + "rem" : null;
+    private updateOptionsWidth() {
+        this._optionsElement.style.width = Math.min(8, this._options.length) * 1.25 + "em";
     }
 
     private addArrowElement(){
@@ -135,6 +130,7 @@ export class Palette extends View {
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("option");
         element.dataset.index = `${index}`;
+        Utils.addLongClick(element, event => this.optionLongClicked(event, option, index));
         Utils.addFastClick(element, event => this.optionClicked(event, option, index));
         this.updateOptionElement(element, option);
         this._optionsElement.appendChild(element);
@@ -149,6 +145,13 @@ export class Palette extends View {
         }        
     }
 
+    protected optionLongClicked(event: Event, option: any, index: number){
+    }
+
     protected updateOptionElement(element: HTMLDivElement, option: any){
+    }
+
+    protected updateSelectedOptionElement(element: HTMLDivElement, option: any) {
+        this.updateOptionElement(element, option);
     }
 }
