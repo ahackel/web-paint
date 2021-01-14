@@ -211,9 +211,13 @@ export default class PaintView extends View {
     }
 
     private setTool(tool: Tool) {
-        this._currentTool?.disable();
+        if (this._currentTool){
+            this._currentTool.disable();
+        }
         this._currentTool = tool;
-        this._currentTool?.enable();
+        if (this._currentTool){
+            this._currentTool.enable();
+        }
         this._toolPalette.selectedIndex = this._tools.indexOf(tool);
 
         // this._sizePalette.setVisible(!(this._currentTool instanceof StampTool));
@@ -499,6 +503,7 @@ export default class PaintView extends View {
     }
     
     hide(){
+        this.saveImage();
         if (this._currentTool){
             this._currentTool.disable();
         }

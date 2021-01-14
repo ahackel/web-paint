@@ -187,6 +187,7 @@ export default class SelectionTool extends Tool {
             return;
         }
         this.painter.recordUndo();
+        this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
         this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
     }
 
