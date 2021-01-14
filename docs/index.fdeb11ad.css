@@ -195,6 +195,8 @@ body {
 #main-toolbar{
     position: absolute;
     left: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 #selection-toolbar{
@@ -333,4 +335,4 @@ opacity: 0.25;
     object-fit: scale-down;
 }
 
-/*# sourceMappingURL=index.152b1e91.css.map */
+/*# sourceMappingURL=index.fdeb11ad.css.map */
