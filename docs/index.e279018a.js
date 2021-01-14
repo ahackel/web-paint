@@ -4337,10 +4337,13 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "setTool",
     value: function setTool(tool) {
-      var _this$_currentTool, _this$_currentTool2;
-      (_this$_currentTool = this._currentTool) === null || _this$_currentTool === void 0 ? void 0 : _this$_currentTool?.disable();
+      if (this._currentTool) {
+        this._currentTool.disable();
+      }
       this._currentTool = tool;
-      (_this$_currentTool2 = this._currentTool) === null || _this$_currentTool2 === void 0 ? void 0 : _this$_currentTool2?.enable();
+      if (this._currentTool) {
+        this._currentTool.enable();
+      }
       this._toolPalette.selectedIndex = this._tools.indexOf(tool);
     }
   }, {
@@ -4637,6 +4640,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "hide",
     value: function hide() {
+      this.saveImage();
       if (this._currentTool) {
         this._currentTool.disable();
       }
@@ -7087,6 +7091,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
         return;
       }
       this.painter.recordUndo();
+      this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
       this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
     }
   }, {
@@ -7104,4 +7109,4 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
 
 },{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.1d159df0.js.map
+//# sourceMappingURL=index.e279018a.js.map
