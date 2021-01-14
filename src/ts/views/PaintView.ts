@@ -503,9 +503,11 @@ export default class PaintView extends View {
     }
     
     hide(){
-        this.saveImage();
-        if (this._currentTool){
-            this._currentTool.disable();
+        if (this.isVisible()){
+            this.saveImage();
+            if (this._currentTool){
+                this._currentTool.disable();
+            }
         }
         super.hide();
     }

@@ -198,8 +198,8 @@ var App = /*#__PURE__*/(function () {
       var horizontalPixelSize = windowWidth / _config.config.width;
       var verticalPixelSize = windowHeight / _config.config.height;
       var virtualPixelSize = _config.config.fullScreenCanvas && !isLargeScreen ? Math.max(horizontalPixelSize, verticalPixelSize) : Math.min(horizontalPixelSize, verticalPixelSize);
-      this._sheet.style.fontSize = "".concat(virtualPixelSize, "px");
-      this._sheet.style.left = "".concat(portrait ? 0.5 * (window.innerWidth - virtualPixelSize * _config.config.width) : 0, "px");
+      this._sheet.style.fontSize = ("").concat(virtualPixelSize, "px");
+      this._sheet.style.left = ("").concat(portrait ? 0.5 * (window.innerWidth - virtualPixelSize * _config.config.width) : 0, "px");
     }
   }, {
     key: "openView",
@@ -288,7 +288,7 @@ function _unsupportedIterableToArray(o, minLen) {
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
   if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
 }
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
@@ -471,7 +471,7 @@ var View = /*#__PURE__*/(function () {
     _classCallCheck(this, View);
     this._element = document.getElementById(id);
     if (!this._element) {
-      console.error("Could not find element with id ".concat(id));
+      console.error(("Could not find element with id ").concat(id));
     }
     this.hide();
   }
@@ -1907,7 +1907,7 @@ https://localforage.github.io/localForage
           // 
           // We test for openDatabase because IE Mobile identifies itself
           // as Safari. Oh the lulz...
-          var isSafari = typeof openDatabase !== 'undefined' && /(Safari|iPhone|iPad|iPod)/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent) && !/BlackBerry/.test(navigator.platform);
+          var isSafari = typeof openDatabase !== 'undefined' && (/(Safari|iPhone|iPad|iPod)/).test(navigator.userAgent) && !(/Chrome/).test(navigator.userAgent) && !(/BlackBerry/).test(navigator.platform);
           var hasFetch = typeof fetch === 'function' && fetch.toString().indexOf('[native code') !== -1;
           // Safari <10.1 does not meet our requirements for IDB support
           // (see: https://github.com/pouchdb/pouchdb/issues/5572).
@@ -4181,7 +4181,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
     _this._sheet = document.getElementById("sheet");
     _this.width = _config.config.width;
     _this.height = _config.config.height;
-    _utilsUtilsDefault.default.log("Setting PaintView size to ".concat(_this.width, " x ").concat(_this.height));
+    _utilsUtilsDefault.default.log(("Setting PaintView size to ").concat(_this.width, " x ").concat(_this.height));
     _this.createButtons(onBackClicked);
     _this.addCanvasLayer("base-layer", 0, 0, _this.width, _this.height, false);
     _this.addEventListeners();
@@ -4640,9 +4640,11 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "hide",
     value: function hide() {
-      this.saveImage();
-      if (this._currentTool) {
-        this._currentTool.disable();
+      if (this.isVisible()) {
+        this.saveImage();
+        if (this._currentTool) {
+          this._currentTool.disable();
+        }
       }
       _get(_getPrototypeOf(PaintView.prototype), "hide", this).call(this);
     }
@@ -4889,7 +4891,7 @@ function _unsupportedIterableToArray(o, minLen) {
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
   if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
 }
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
@@ -5133,7 +5135,7 @@ var Palette = /*#__PURE__*/(function (_View) {
       var _this3 = this;
       var element = document.createElement("div");
       element.classList.add("option");
-      element.dataset.index = "".concat(index);
+      element.dataset.index = ("").concat(index);
       _utilsUtilsDefault.default.addFastClick(element, function (event) {
         return _this3.optionClicked(event, option, index);
       });
@@ -5918,7 +5920,7 @@ function _unsupportedIterableToArray(o, minLen) {
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
   if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
 }
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
@@ -6097,7 +6099,7 @@ var StampPalette = /*#__PURE__*/(function (_Palette) {
   }, {
     key: "updateOptionElement",
     value: function updateOptionElement(element, option) {
-      element.style.backgroundImage = "url(\"".concat(option, "\")");
+      element.style.backgroundImage = ("url(\"").concat(option, "\")");
     }
   }, {
     key: "deleteStamp",
@@ -6396,8 +6398,8 @@ var Layer = /*#__PURE__*/(function () {
     this._index = 0;
     this._element.width = width;
     this._element.height = height;
-    this._element.style.width = "".concat(width, "em");
-    this._element.style.height = "".concat(height, "em");
+    this._element.style.width = ("").concat(width, "em");
+    this._element.style.height = ("").concat(height, "em");
     this._element.style.pointerEvents = "none";
     parent.appendChild(this._element);
     this.transform(new _utilsPointDefault.default(x, y), 1, 0);
@@ -6420,8 +6422,8 @@ var Layer = /*#__PURE__*/(function () {
     value: function setPositionAndSize(x, y, width, height) {
       this._element.width = width;
       this._element.height = height;
-      this._element.style.width = "".concat(width, "em");
-      this._element.style.height = "".concat(height, "em");
+      this._element.style.width = ("").concat(width, "em");
+      this._element.style.height = ("").concat(height, "em");
       this.transform(new _utilsPointDefault.default(x, y), this.scale, this.rotation);
     }
   }, {
@@ -6600,8 +6602,8 @@ var Layer = /*#__PURE__*/(function () {
       this._rotation = rotation;
       this._scale = scale;
       var index = this._index;
-      this._element.style.transform = "translate(".concat(position.x, "em, ").concat(position.y, "em) rotate(").concat(rotation, "rad) scale(").concat(scale, ") translateZ(").concat(index, "px)");
-      this._element.style.outlineWidth = "".concat(2 / scale, "em");
+      this._element.style.transform = ("translate(").concat(position.x, "em, ").concat(position.y, "em) rotate(").concat(rotation, "rad) scale(").concat(scale, ") translateZ(").concat(index, "px)");
+      this._element.style.outlineWidth = ("").concat(2 / scale, "em");
     }
   }, {
     key: "bindEventListeners",
@@ -7098,7 +7100,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     key: "saveSelectionAsNewStamp",
     value: function saveSelectionAsNewStamp() {
       var id = "Stamp" + Date.now();
-      console.log("Saving stamp: ".concat(id));
+      console.log(("Saving stamp: ").concat(id));
       this.selectionLayer.canvas.toBlob(function (blob) {
         return _storageImageStorageDefault.default.saveImage(id, blob);
       });
@@ -7109,4 +7111,4 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
 
 },{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.e279018a.js.map
+//# sourceMappingURL=index.ee5e6808.js.map
