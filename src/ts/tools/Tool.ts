@@ -14,10 +14,12 @@ export default abstract class Tool {
     get lineWidth() { return this.painter.lineWidth };
     
     private static _bufferCtx: CanvasRenderingContext2D;
+    protected _buttonElement: HTMLElement; 
 
-    constructor(painter: PaintView) {
+    constructor(painter: PaintView, buttonId: string) {
         this.painter = painter;
         this.mouse = new Point(0,0);
+        this._buttonElement = document.getElementById(buttonId);
     }
 
     // creates a context to draw the current stroke to so we can draw the complete stroke with a different
@@ -39,8 +41,12 @@ export default abstract class Tool {
         return Tool._bufferCtx;
     }
 
-    enable(): void {}
-    disable(): void {}
+    enable(): void {
+        this._buttonElement.classList.add("selected");
+    }
+    disable(): void {
+        this._buttonElement.classList.remove("selected");
+    }
     down(): void {}
     move(): void {}
     up(): void {}

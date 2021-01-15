@@ -44,7 +44,7 @@ body {
     line-height: 1.5rem;
     text-align: center;
     font-size: 0.75rem;
-    border-radius: 50%;
+    border-radius: 30%;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.5);
     color: black;
@@ -186,37 +186,53 @@ body {
 
 .toolbar {
     display: flex;
-    flex-direction: column;
     background: lightgray;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     z-index: 100;
+    position: absolute;
 }
 
-#main-toolbar{
-    position: absolute;
+.toolbar.left {
+    flex-direction: column;
     left: 0.25rem;
     top: 50%;
     transform: translateY(-50%);
 }
 
-#selection-toolbar{
-    top: 0.25rem;
-    flex-direction: row;
-    position: absolute;
-    margin: auto;
-    left: 0;
-    right: 0;
-    width: 6rem;
+.toolbar.right {
+    flex-direction: column;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
 }
+
+.toolbar.top {
+    flex-direction: row;
+    left: 50%;
+    top: 0.25em;
+    transform: translateX(-50%);
+}
+
+.toolbar.bottom {
+    flex-direction: row;
+    left: 50%;
+    bottom: 0.25em;
+    transform: translateX(-50%);
+}
+
 
 .toolbar .button {
     /*display: inline-block;*/
     background: transparent;
 }
 
+.toolbar .spacer {
+    width: 1.5em;
+    height: 1.5em;
+}
+
 .palette {
     position: relative;
-    padding: 0.125rem;
     transition: transform 0.25s;
     display: inline-block;
     float: left;
@@ -228,10 +244,7 @@ body {
     font-size: 0.75em;
 }
 
-.palette.collapsed:active {
-    transform: scale(0.9);
-}
-
+/* down direction is default: */
 .palette .options{
     position: absolute;
     display: flex;
@@ -239,27 +252,27 @@ body {
     background: lightgray;
     border-radius: 0.75rem;
     padding: 0.25rem;
-    left: 2.25rem;
-    top: 50%;
     transition: transform 0.15s;
-    transform: translateY(-50%);
-}
-
-.palette.collapsed .options{
-    transform: scale(0.0);
+    top: 2.25rem;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .palette .option {
     width: 1em;
     height: 1em;
-    line-height: 1em;
+    line-height: 0.75em;
     display: inline-block;
-    margin: 0.125em;
+    margin: 0.25em;
     float: left;
     transition: transform 0.25s;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+}
+
+.palette .options .option {
+    margin: 0.125em;
 }
 
 .palette .option:active {
@@ -268,14 +281,81 @@ body {
 
 .palette .options .arrow {
     position: absolute;
-    left: -0.5rem;
-    top: 50%;
-    margin-top: -0.125rem;
     width: 0;
     height: 0;
-    border-top: 0.125rem solid transparent;
-    border-bottom: 0.125rem solid transparent;
-    border-right: 0.5rem solid lightgray;
+    font-size: 0.25rem;
+    top: -2em;
+    left: 50%;
+    margin-left: -1em;
+    border-left: 1em solid transparent;
+    border-right: 1em solid transparent;
+    border-bottom: 2em solid lightgray;
+    border-top: none;
+}
+
+.toolbar.left .palette .options{
+    left: 2.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.toolbar.left .palette .options .arrow {
+    top: initial;
+    left: -2em;
+    top: 50%;
+    margin-top: -1em;
+    border-top: 1em solid transparent;
+    border-bottom: 1em solid transparent;
+    border-right: 2em solid lightgray;
+}
+
+.toolbar.right .palette .options{
+    left: initial;
+    right: 2.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.toolbar.right .palette .options .arrow {
+    left: initial;
+    top: initial;
+    right: -2em;
+    top: 50%;
+    margin-top: -1em;
+    border-top: 1em solid transparent;
+    border-bottom: 1em solid transparent;
+    border-left: 2em solid lightgray;
+    border-right: 0;
+}
+
+.toolbar.bottom .palette .options{
+    left: 50%;
+    top: initial;
+    bottom: 2.25rem;
+    transform: translateX(-50%);
+}
+
+.toolbar.bottom .palette .options .arrow {
+    top: initial;
+    bottom: -2em;
+    left: 50%;
+    margin-left: -1em;
+    border-left: 1em solid transparent;
+    border-right: 1em solid transparent;
+    border-top: 2em solid lightgray;
+    border-bottom: none;
+}
+
+.palette.collapsed:active {
+    transform: scale(0.9);
+}
+
+.toolbar.top .palette.collapsed .options, .toolbar.bottom .palette.collapsed .options {
+    transform: translateX(-50%) scale(0.0);
+}
+
+.toolbar.left .palette.collapsed .options, .toolbar.right .palette.collapsed .options {
+    transform: translateY(-50%) scale(0.0);
 }
 
 #stamp-palette.palette .options{
@@ -286,45 +366,24 @@ body {
     background: black;
     height: 100%;
     margin: auto;
-}
-
-@media (orientation: portrait) {
-    #main-toolbar {
-        flex-direction: row;
-        left: 50%;
-        bottom: 0.25em;
-        transform: translateX(-50%);
-    }
-
-    .palette .options{
-        left: 50%;
-        top: initial;
-        bottom: 2.25rem;
-        transform: translateX(-50%);
-    }
-
-    .palette .options .arrow {
-        top: initial;
-        bottom: -0.5rem;
-        left: 50%;
-        margin-left: -0.125rem;
-        border-left: 0.125rem solid transparent;
-        border-right: 0.125rem solid transparent;
-        border-top: 0.5rem solid lightgray;
-        border-bottom: none;
-    }
+    border-radius: 0.15em;
 }
 
 #color-palette .option {
-border-radius: 50%;
+    border-radius: 40%;
 }
 
 .hidden {
-display: none;
+    display: none;
 }
 
 .disabled {
-opacity: 0.25;
+    opacity: 0.25;
+}
+
+.selected {
+    background: #58b0ff!important;
+    color: white;
 }
 
 .fullscreen {

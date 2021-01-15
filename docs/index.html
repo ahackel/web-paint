@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="icon-144x144.20b8ad9a.png">
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512x512.8bd2d3e9.png">
 
-    <link rel="stylesheet" href="index.fdeb11ad.css">
+    <link rel="stylesheet" href="index.825d7501.css">
     <link href="index.78a7c35a.css" rel="stylesheet">
 </head>
 <body>
@@ -20,20 +20,27 @@
 <div class="view paint hidden" id="paint">
     <div id="fps-counter"></div>
     <div class="button" id="back-button"><i class="fas fa-times"></i></div>
-    <div class="toolbar" id="selection-toolbar">
+    <div class="toolbar left" id="context-toolbar">
+        <div class="palette" id="color-palette"></div>
+        <div class="palette" id="size-palette"></div>
+
         <div class="button" id="selection-stamp-button"><i class="fas fa-stamp"></i></div>
-        <div class="button" id="selection-save-button"><i class="fas fa-shapes"></i></div>
+        <div class="button" id="selection-save-button"><i class="far fa-plus-square"></i></div>
         <div class="button" id="selection-fullscreen-button"><i class="fas fa-expand"></i></div>
         <div class="button" id="selection-delete-button"><i class="fas fa-trash-alt"></i></div>
+
     </div>
-    <div class="toolbar" id="main-toolbar">
-        <div class="palette" id="tool-palette"></div>
-        <div class="palette" id="size-palette"></div>
+    <div class="toolbar top" id="main-toolbar">
+        <div class="button selected" id="tool-pen"><i class="fas fa-highlighter"></i></div>
+        <div class="button" id="tool-eraser"><i class="fas fa-eraser"></i></div>
+        <div class="button" id="tool-selection"><i class="fas fa-cut"></i></div>
+        
+        <div class="spacer"></div>
+
         <div class="palette" id="stamp-palette"></div>
-        <div class="palette" id="color-palette"></div>
         <div class="button" id="import-image-button"><i class="fas fa-camera"></i></div>
         <div class="button" id="undo-button"><i class="fas fa-undo"></i></div>
-        <div class="button" id="clear-button"><i class="fas fa-trash-alt"></i></div>
+
         <input type="file" accept="image/*" id="import-image-field" style="display: none">
     </div>
     <div id="sheet"></div>
@@ -47,7 +54,7 @@
 </div>
 
 <script src="index.d749440a.js"></script>
-<script src="index.306f51c1.js"></script>
+<script src="index.3481906a.js"></script>
 
 </body>
 </html>

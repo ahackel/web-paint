@@ -16,7 +16,7 @@ export default class SelectionTool extends Tool {
     get hasFloatingSelection(): boolean { return this._hasFloatingSelection; }
     set hasFloatingSelection(value: boolean) { 
         this._hasFloatingSelection = value;
-        this._toolbar.classList.toggle("hidden", !value);
+        this.toggleFloatingSelectionButtons(value);
     }
     get isInShapesPalette(): boolean { return this._isInShapesPalette; }
     set isInShapesPalette(value: boolean) { 
@@ -29,15 +29,13 @@ export default class SelectionTool extends Tool {
     private _hasFloatingSelection: boolean;
     private _drawSelectionOutlineRequested: boolean;
     private _isInShapesPalette: boolean;
-    private _toolbar: HTMLDivElement;
     private _deleteButton: HTMLDivElement;
     private _stampButton: HTMLDivElement;
     private _saveButton: HTMLDivElement;
     private _fullscreenButton: HTMLDivElement;
 
-    constructor(painter: PaintView) {
-        super(painter);
-        this._toolbar = <HTMLDivElement>document.getElementById("selection-toolbar");
+    constructor(painter: PaintView, buttonId: string) {
+        super(painter, buttonId);
         this._deleteButton = <HTMLDivElement>document.getElementById("selection-delete-button");
         Utils.addFastClick(this._deleteButton, () => this.clearSelection());
         this._stampButton = <HTMLDivElement>document.getElementById("selection-stamp-button");
@@ -48,14 +46,23 @@ export default class SelectionTool extends Tool {
         Utils.addFastClick(this._fullscreenButton, () => this.showSelectionInFullscreen());
         this.hasFloatingSelection = false;
     }
+    
+    toggleFloatingSelectionButtons(visible: boolean){
+        this._deleteButton.classList.toggle("hidden", !visible);
+        this._stampButton.classList.toggle("hidden", !visible);
+        this._fullscreenButton.classList.toggle("hidden", !visible);
+        this._saveButton.classList.toggle("hidden", !visible);
+    }
 
     enable() {
+        super.enable();
         this.createSelectionLayer();
         this.hasFloatingSelection = false;
         this.isInShapesPalette = false;
     }
 
     disable() {
+        super.disable();
         this.paintSelectionToCanvas();
         this.destroySelectionLayer();
         this.hasFloatingSelection = false;

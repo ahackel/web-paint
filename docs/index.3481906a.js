@@ -798,6 +798,7 @@ var Utils = /*#__PURE__*/(function () {
       element.addEventListener("touchend", function (event) {
         if (called) {
           event.stopImmediatePropagation();
+          called = false;
         } else {
           clearTimeout(timer);
         }
@@ -3986,16 +3987,12 @@ _parcelHelpers.export(exports, "default", function () {
 var _View2 = require("./View");
 var _palettesColorPalette = require("../palettes/ColorPalette");
 var _palettesColorPaletteDefault = _parcelHelpers.interopDefault(_palettesColorPalette);
-var _palettesToolPalette = require("../palettes/ToolPalette");
-var _palettesToolPaletteDefault = _parcelHelpers.interopDefault(_palettesToolPalette);
 var _palettesSizePalette = require("../palettes/SizePalette");
 var _palettesSizePaletteDefault = _parcelHelpers.interopDefault(_palettesSizePalette);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _toolsPenTool = require("../tools/PenTool");
 var _toolsPenToolDefault = _parcelHelpers.interopDefault(_toolsPenTool);
-var _toolsPaintBucketTool = require("../tools/PaintBucketTool");
-var _toolsPaintBucketToolDefault = _parcelHelpers.interopDefault(_toolsPaintBucketTool);
 var _utilsPoint = require("../utils/Point");
 var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
 var _palettesPalette = require("../palettes/Palette");
@@ -4010,6 +4007,7 @@ var _ImageLayer = require("../ImageLayer ");
 var _ImageLayerDefault = _parcelHelpers.interopDefault(_ImageLayer);
 var _toolsSelectionTool = require("../tools/SelectionTool");
 var _toolsSelectionToolDefault = _parcelHelpers.interopDefault(_toolsSelectionTool);
+var _Toolbar = require("../Toolbar");
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -4183,11 +4181,12 @@ var PaintView = /*#__PURE__*/(function (_View) {
     _this.width = _config.config.width;
     _this.height = _config.config.height;
     _utilsUtilsDefault.default.log(("Setting PaintView size to ").concat(_this.width, " x ").concat(_this.height));
-    _this.createButtons(onBackClicked);
     _this.addCanvasLayer("base-layer", 0, 0, _this.width, _this.height, false);
     _this.addEventListeners();
-    _this.createTools();
+    _this.createButtons(onBackClicked);
+    _this.createToolbar();
     _this.createPalettes();
+    _this.createTools();
     var autoMaskCanvas = document.createElement("canvas");
     autoMaskCanvas.id = "auto-mask";
     autoMaskCanvas.width = _this.width;
@@ -4210,10 +4209,6 @@ var PaintView = /*#__PURE__*/(function (_View) {
       _utilsUtilsDefault.default.addFastClick(backButton, function () {
         return onBackClicked();
       });
-      var clearButton = document.getElementById("clear-button");
-      _utilsUtilsDefault.default.addFastClick(clearButton, function () {
-        return _this2.clear(true, true);
-      });
       this._undoButton = document.getElementById("undo-button");
       _utilsUtilsDefault.default.addFastClick(this._undoButton, function () {
         return _this2.undo();
@@ -4231,8 +4226,8 @@ var PaintView = /*#__PURE__*/(function (_View) {
           _this2.selectionTool.setImage(image);
         };
       });
-      var importImageButton = document.getElementById("import-image-button");
-      _utilsUtilsDefault.default.addFastClick(importImageButton, function () {
+      this._importImageButton = document.getElementById("import-image-button");
+      _utilsUtilsDefault.default.addFastClick(this._importImageButton, function () {
         return importImageField.click();
       });
     }
@@ -4294,13 +4289,30 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "createTools",
     value: function createTools() {
+      var _this3 = this;
+      var penButton = document.getElementById("tool-pen");
+      _utilsUtilsDefault.default.addFastClick(penButton, function () {
+        return _this3.setTool(_this3.markerTool);
+      });
+      var eraserButton = document.getElementById("tool-eraser");
+      _utilsUtilsDefault.default.addLongClick(eraserButton, function () {
+        return _this3.clear(true, true);
+      });
+      _utilsUtilsDefault.default.addFastClick(eraserButton, function () {
+        return _this3.setTool(_this3.eraserTool);
+      });
+      var selectionButton = document.getElementById("tool-selection");
+      _utilsUtilsDefault.default.addFastClick(selectionButton, function () {
+        return _this3.setTool(_this3.selectionTool);
+      });
       this._tools = [];
-      this.brushTool = this.addTool(new _toolsPenToolDefault.default(this, "source-over"));
-      this.markerTool = this.addTool(new _toolsPenToolDefault.default(this, "darken"));
-      this.eraserTool = this.addTool(new _toolsPenToolDefault.default(this, "destination-out"));
-      this.selectionTool = this.addTool(new _toolsSelectionToolDefault.default(this));
-      this.paintBucketTool = this.addTool(new _toolsPaintBucketToolDefault.default(this));
-      this._currentTool = this.brushTool;
+      // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
+      this.markerTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-pen", "darken"));
+      this.eraserTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-eraser", "destination-out"));
+      this.selectionTool = this.addTool(new _toolsSelectionToolDefault.default(this, "tool-selection"));
+      // this.paintBucketTool = this.addTool(new PaintBucketTool(this));
+      // this._currentTool = this.brushTool;
+      this.setTool(this.markerTool);
     }
   }, {
     key: "addTool",
@@ -4309,30 +4321,32 @@ var PaintView = /*#__PURE__*/(function (_View) {
       return tool;
     }
   }, {
+    key: "createToolbar",
+    value: function createToolbar() {
+      this._mainToolbar = new _Toolbar.Toolbar("main-toolbar");
+      this._contextToolbar = new _Toolbar.Toolbar("context-toolbar");
+    }
+  }, {
     key: "createPalettes",
     value: function createPalettes() {
-      var _this3 = this;
-      this._toolPalette = new _palettesToolPaletteDefault.default("tool-palette");
-      this._toolPalette.onSelectionChanged = function (option, index) {
-        return _this3.setTool(_this3._tools[index]);
-      };
+      var _this4 = this;
       this._sizePalette = new _palettesSizePaletteDefault.default("size-palette");
       this._sizePalette.onSelectionChanged = function (lineWidth) {
-        _this3._lineWidth = lineWidth;
+        _this4._lineWidth = lineWidth;
       };
       this._lineWidth = this._sizePalette.size;
       this._colorPalette = new _palettesColorPaletteDefault.default("color-palette");
       this._colorPalette.onSelectionChanged = function (color) {
-        return _this3._color = color;
+        return _this4._color = color;
       };
       this._color = this._colorPalette.color;
-      this._stampPalette = new _palettesShapePaletteDefault.default("stamp-palette");
-      this._stampPalette.onSelectionChanged = function (stamp) {
-        _this3._stamp = stamp;
-        _this3.setTool(_this3.selectionTool);
-        _this3.selectionTool.setImageUrl(_this3.stamp);
+      this._shapePalette = new _palettesShapePaletteDefault.default("stamp-palette");
+      this._shapePalette.onSelectionChanged = function (stamp) {
+        _this4._stamp = stamp;
+        _this4.setTool(_this4.selectionTool);
+        _this4.selectionTool.setImageUrl(_this4.stamp);
       };
-      this._stamp = this._stampPalette.stamp;
+      this._stamp = this._shapePalette.stamp;
       this._opacity = 1;
     }
   }, {
@@ -4345,17 +4359,18 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (this._currentTool) {
         this._currentTool.enable();
       }
-      this._toolPalette.selectedIndex = this._tools.indexOf(tool);
+      this._colorPalette.setVisible(this._currentTool == this.markerTool);
+      this._sizePalette.setVisible(this._currentTool == this.markerTool || this._currentTool == this.eraserTool);
     }
   }, {
     key: "addEventListeners",
     value: function addEventListeners() {
-      var _this4 = this;
+      var _this5 = this;
       var canvas = this.baseLayer.canvas;
       canvas.style.pointerEvents = "auto";
       // canvas.addEventListener('keydown', event => this.keyDown(event));
       document.addEventListener('keydown', function (event) {
-        return _this4.keyDown(event);
+        return _this5.keyDown(event);
       });
       canvas.addEventListener('click', function (event) {
         return event.preventDefault();
@@ -4366,26 +4381,26 @@ var PaintView = /*#__PURE__*/(function (_View) {
           return event.preventDefault();
         });
         canvas.addEventListener('pointerdown', function (event) {
-          return _this4.pointerDown(event);
+          return _this5.pointerDown(event);
         });
         canvas.addEventListener('pointermove', function (event) {
-          return _this4.pointerMove(event);
+          return _this5.pointerMove(event);
         });
         canvas.addEventListener('pointerup', function (event) {
-          return _this4.pointerUp(event);
+          return _this5.pointerUp(event);
         });
         canvas.addEventListener('pointercancel', function (event) {
           return event.preventDefault();
         });
       } else {
         canvas.addEventListener('touchstart', function (event) {
-          return _this4.touchStart(event);
+          return _this5.touchStart(event);
         });
         canvas.addEventListener('touchmove', function (event) {
-          return _this4.touchMove(event);
+          return _this5.touchMove(event);
         });
         canvas.addEventListener('touchend', function (event) {
-          return _this4.touchEnd(event);
+          return _this5.touchEnd(event);
         });
         canvas.addEventListener('touchcancel', function (event) {
           return event.preventDefault();
@@ -4617,35 +4632,35 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "loadImage",
     value: function loadImage(id) {
-      var _this5 = this;
+      var _this6 = this;
       return _storageImageStorageDefault.default.loadImage(id).then(function (image) {
-        _this5._imageId = id;
-        _this5.clear();
+        _this6._imageId = id;
+        _this6.clear();
         if (image) {
-          _this5.baseLayer.drawImage(image);
+          _this6.baseLayer.drawImage(image);
         }
-        _this5.setOverlay(_utilsUtilsDefault.default.getOverlayPath(id));
+        _this6.setOverlay(_utilsUtilsDefault.default.getOverlayPath(id));
       });
     }
   }, {
     key: "saveImage",
     value: function saveImage() {
-      var _this6 = this;
+      var _this7 = this;
       _utilsUtilsDefault.default.log("Saving image");
       this.baseLayer.canvas.toBlob(function (blob) {
-        return _storageImageStorageDefault.default.saveImage(_this6._imageId, blob);
+        return _storageImageStorageDefault.default.saveImage(_this7._imageId, blob);
       });
     }
   }, {
     key: "show",
     value: function show() {
-      var _this7 = this;
+      var _this8 = this;
       _get(_getPrototypeOf(PaintView.prototype), "show", this).call(this);
       this._currentTouchId = 0;
       this.clearUndoBuffer();
       this._autoMaskCaptured = false;
       window.requestAnimationFrame(function (timeStamp) {
-        return _this7.tick(timeStamp);
+        return _this8.tick(timeStamp);
       });
       this._currentTool.enable();
     }
@@ -4663,12 +4678,12 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "tick",
     value: function tick(timeStamp) {
-      var _this8 = this;
+      var _this9 = this;
       if (!this.isVisible()) {
         return;
       }
       window.requestAnimationFrame(function (timeStamp) {
-        return _this8.tick(timeStamp);
+        return _this9.tick(timeStamp);
       });
       if (_config.config.debug) {
         _utilsUtilsDefault.default.updateFPSCounter();
@@ -4712,7 +4727,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   return PaintView;
 })(_View2.View);
 
-},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/ToolPalette":"1sVOv","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../tools/PaintBucketTool":"2P5Gb","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
+},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -5184,119 +5199,7 @@ var Palette = /*#__PURE__*/(function (_View) {
   return Palette;
 })(_viewsView.View);
 
-},{"../views/View":"30r6k","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1sVOv":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return ToolPalette;
-});
-var _Palette2 = require("./Palette");
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var ToolPalette = /*#__PURE__*/(function (_Palette) {
-  _inherits(ToolPalette, _Palette);
-  var _super = _createSuper(ToolPalette);
-  function ToolPalette(id) {
-    var _this;
-    _classCallCheck(this, ToolPalette);
-    var tools = ['<i class="fas fa-brush"></i>', '<i class="fas fa-pencil-alt"></i>', '<i class="fas fa-eraser"></i>', '<i class="fas fa-cut"></i>', // '<i class="far fa-square"></i>',
-    // '<i class="fas fa-grip-lines-vertical"></i>',
-    // '<i class="far fa-square"></i>',
-    // '<i class="fas fa-grip-lines-vertical"></i>',
-    '<i class="fas fa-fill-drip"></i>'];
-    _this = _super.call(this, id, tools, true);
-    _this.selectedIndex = 0;
-    return _this;
-  }
-  _createClass(ToolPalette, [{
-    key: "updateOptionElement",
-    value: function updateOptionElement(element, option) {
-      element.innerHTML = option;
-    }
-  }]);
-  return ToolPalette;
-})(_Palette2.Palette);
-
-},{"./Palette":"1J0Eg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5u02W":[function(require,module,exports) {
+},{"../views/View":"30r6k","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5u02W":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -5524,11 +5427,11 @@ function _defineProperty(obj, key, value) {
 var PenTool = /*#__PURE__*/(function (_Tool) {
   _inherits(PenTool, _Tool);
   var _super = _createSuper(PenTool);
-  function PenTool(painter) {
+  function PenTool(painter, buttonId) {
     var _this;
-    var operation = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "darken";
+    var operation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "darken";
     _classCallCheck(this, PenTool);
-    _this = _super.call(this, painter);
+    _this = _super.call(this, painter, buttonId);
     _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _utilsPointDefault.default(0, 0));
     _this._operation = operation;
     return _this;
@@ -5694,12 +5597,13 @@ var Tool = /*#__PURE__*/(function () {
       return this.painter.lineWidth;
     }
   }]);
-  function Tool(painter) {
+  function Tool(painter, buttonId) {
     _classCallCheck(this, Tool);
     _defineProperty(this, "painting", false);
     _defineProperty(this, "pressure", 1);
     this.painter = painter;
     this.mouse = new _utilsPointDefault.default(0, 0);
+    this._buttonElement = document.getElementById(buttonId);
   }
   _createClass(Tool, [{
     key: "createBufferCtx",
@@ -5728,10 +5632,14 @@ var Tool = /*#__PURE__*/(function () {
     }
   }, {
     key: "enable",
-    value: function enable() {}
+    value: function enable() {
+      this._buttonElement.classList.add("selected");
+    }
   }, {
     key: "disable",
-    value: function disable() {}
+    value: function disable() {
+      this._buttonElement.classList.remove("selected");
+    }
   }, {
     key: "down",
     value: function down() {}
@@ -5754,125 +5662,7 @@ var Tool = /*#__PURE__*/(function () {
   return Tool;
 })();
 
-},{"../utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2P5Gb":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return PaintBucketTool;
-});
-var _Tool2 = require("./Tool");
-var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-// Fills an area with the selected color
-var PaintBucketTool = /*#__PURE__*/(function (_Tool) {
-  _inherits(PaintBucketTool, _Tool);
-  var _super = _createSuper(PaintBucketTool);
-  function PaintBucketTool() {
-    _classCallCheck(this, PaintBucketTool);
-    return _super.apply(this, arguments);
-  }
-  _createClass(PaintBucketTool, [{
-    key: "down",
-    value: function down() {
-      var overlayCtx = this.painter.overlayCtx;
-      var ctx = this.painter.baseLayer.ctx;
-      var buffer = this.getBufferCtx();
-      buffer.fillStyle = this.painter.color;
-      buffer.fillRect(0, 0, buffer.canvas.width, buffer.canvas.height);
-      var imageData = buffer.getImageData(0, 0, buffer.canvas.width, buffer.canvas.height);
-      _utilsUtilsDefault.default.floodFill(overlayCtx, imageData.data, this.mouse);
-      _utilsUtilsDefault.default.dilateMask(imageData.data, buffer.canvas.width, buffer.canvas.height);
-      buffer.putImageData(imageData, 0, 0);
-      ctx.globalCompositeOperation = "source-over";
-      ctx.drawImage(buffer.canvas, 0, 0);
-    }
-  }]);
-  return PaintBucketTool;
-})(_Tool2Default.default);
-
-},{"./Tool":"7utpK","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"4aYdj":[function(require,module,exports) {
+},{"../utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"4aYdj":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -6779,6 +6569,29 @@ function _classCallCheck(instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+      return desc.value;
+    };
+  }
+  return _get(target, property, receiver || target);
+}
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+  return object;
+}
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -6889,7 +6702,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     },
     set: function set(value) {
       this._hasFloatingSelection = value;
-      this._toolbar.classList.toggle("hidden", !value);
+      this.toggleFloatingSelectionButtons(value);
     }
   }, {
     key: "isInShapesPalette",
@@ -6901,13 +6714,12 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this._saveButton.classList.toggle("disabled", value);
     }
   }]);
-  function SelectionTool(painter) {
+  function SelectionTool(painter, buttonId) {
     var _this;
     _classCallCheck(this, SelectionTool);
-    _this = _super.call(this, painter);
+    _this = _super.call(this, painter, buttonId);
     _defineProperty(_assertThisInitialized(_this), "selectionLayerId", "selection-layer");
     _defineProperty(_assertThisInitialized(_this), "_selection", _utilsRectDefault.default.Empty());
-    _this._toolbar = document.getElementById("selection-toolbar");
     _this._deleteButton = document.getElementById("selection-delete-button");
     _utilsUtilsDefault.default.addFastClick(_this._deleteButton, function () {
       return _this.clearSelection();
@@ -6928,8 +6740,17 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     return _this;
   }
   _createClass(SelectionTool, [{
+    key: "toggleFloatingSelectionButtons",
+    value: function toggleFloatingSelectionButtons(visible) {
+      this._deleteButton.classList.toggle("hidden", !visible);
+      this._stampButton.classList.toggle("hidden", !visible);
+      this._fullscreenButton.classList.toggle("hidden", !visible);
+      this._saveButton.classList.toggle("hidden", !visible);
+    }
+  }, {
     key: "enable",
     value: function enable() {
+      _get(_getPrototypeOf(SelectionTool.prototype), "enable", this).call(this);
       this.createSelectionLayer();
       this.hasFloatingSelection = false;
       this.isInShapesPalette = false;
@@ -6937,6 +6758,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "disable",
     value: function disable() {
+      _get(_getPrototypeOf(SelectionTool.prototype), "disable", this).call(this);
       this.paintSelectionToCanvas();
       this.destroySelectionLayer();
       this.hasFloatingSelection = false;
@@ -7167,6 +6989,93 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
   return SelectionTool;
 })(_Tool2Default.default);
 
-},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
+},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5EiOX":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "Toolbar", function () {
+  return Toolbar;
+});
+var _viewsView = require("./views/View");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var Toolbar = /*#__PURE__*/(function (_View) {
+  _inherits(Toolbar, _View);
+  var _super = _createSuper(Toolbar);
+  function Toolbar(id) {
+    var _this;
+    _classCallCheck(this, Toolbar);
+    _this = _super.call(this, id);
+    _this.show();
+    return _this;
+  }
+  return Toolbar;
+})(_viewsView.View);
 
-//# sourceMappingURL=index.306f51c1.js.map
+},{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
+
+//# sourceMappingURL=index.3481906a.js.map

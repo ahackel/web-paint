@@ -16,8 +16,8 @@ export default class PenTool extends Tool {
     
     private readonly _operation: string;
 
-    constructor(painter: PaintView, operation: string = "darken") {
-        super(painter);
+    constructor(painter: PaintView, buttonId: string, operation: string = "darken") {
+        super(painter, buttonId);
         this._operation = operation;
     }
 

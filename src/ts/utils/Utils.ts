@@ -68,6 +68,7 @@ export default class Utils {
         element.addEventListener("touchend", event => {
             if (called){
                 event.stopImmediatePropagation();
+                called = false;
             }
             else{
                 clearTimeout(timer);

@@ -19,6 +19,7 @@ import ILayer from "../ILayer";
 import CanvasLayer from "../CanvasLayer";
 import ImageLayer from "../ImageLayer ";
 import SelectionTool from "../tools/SelectionTool";
+import {Toolbar} from "../Toolbar";
 
 // var Pressure = require('pressure');
 
@@ -39,10 +40,11 @@ export default class PaintView extends View {
     private _opacity: number;
     private _lineWidth: number;
     private _autoMaskCtx: CanvasRenderingContext2D;
+    private _mainToolbar: Toolbar;
+    private _contextToolbar: Toolbar;
     private _colorPalette: ColorPalette;
-    private _toolPalette: ToolPalette;
     private _sizePalette: SizePalette;
-    private _stampPalette: ShapePalette;
+    private _shapePalette: ShapePalette;
     private _tools: Tool[];
     private _currentTouchId: number = 0;
     private _undoBuffer: ImageData;
@@ -53,6 +55,7 @@ export default class PaintView extends View {
     private _stamp: string;
     private _layers: { [id : string] : ILayer } = {};
     private _sheet: HTMLElement;
+    private _importImageButton: HTMLDivElement;
 
     get color(): string { return this._color; }
     get stamp(): string { return this._stamp; }
@@ -71,12 +74,13 @@ export default class PaintView extends View {
         this.width = config.width;
         this.height = config.height;
         Utils.log(`Setting PaintView size to ${this.width} x ${this.height}`);
-        
-        this.createButtons(onBackClicked);
+
         this.addCanvasLayer("base-layer", 0, 0, this.width, this.height,false);
         this.addEventListeners();
-        this.createTools();
+        this.createButtons(onBackClicked);
+        this.createToolbar();
         this.createPalettes();
+        this.createTools();
 
         let autoMaskCanvas = document.createElement("canvas");
         autoMaskCanvas.id = "auto-mask";
@@ -92,9 +96,6 @@ export default class PaintView extends View {
     private createButtons(onBackClicked: Function) {
         let backButton = <HTMLDivElement>document.getElementById("back-button");
         Utils.addFastClick(backButton, () => onBackClicked());
-
-        let clearButton = <HTMLDivElement>document.getElementById("clear-button");
-        Utils.addFastClick(clearButton, () => this.clear(true, true));
 
         this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
         Utils.addFastClick(this._undoButton, () => this.undo());
@@ -112,8 +113,8 @@ export default class PaintView extends View {
                 this.selectionTool.setImage(image);
             }
         })
-        let importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
-        Utils.addFastClick(importImageButton, () => importImageField.click());
+        this._importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
+        Utils.addFastClick(this._importImageButton, () => importImageField.click());
     }
 
     private addLayer(layer: ILayer): ILayer {
@@ -171,24 +172,36 @@ export default class PaintView extends View {
     }
     
     private createTools() {
+        let penButton = document.getElementById("tool-pen");
+        Utils.addFastClick(penButton, () => this.setTool(this.markerTool));
+        let eraserButton = document.getElementById("tool-eraser");
+        Utils.addLongClick(eraserButton, () => this.clear(true, true));
+        Utils.addFastClick(eraserButton, () => this.setTool(this.eraserTool));
+        let selectionButton = document.getElementById("tool-selection");
+        Utils.addFastClick(selectionButton, () => this.setTool(this.selectionTool));
+        
         this._tools = [];
-        this.brushTool = this.addTool(new PenTool(this, "source-over"));
-        this.markerTool = this.addTool(new PenTool(this, "darken"));
-        this.eraserTool = this.addTool(new PenTool(this, "destination-out"));
-        this.selectionTool = <SelectionTool>this.addTool(new SelectionTool(this));
-        this.paintBucketTool = this.addTool(new PaintBucketTool(this));
-        this._currentTool = this.brushTool;
+        // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
+        this.markerTool = this.addTool(new PenTool(this, "tool-pen", "darken"));
+        this.eraserTool = this.addTool(new PenTool(this, "tool-eraser", "destination-out"));
+        this.selectionTool = <SelectionTool>this.addTool(new SelectionTool(this, "tool-selection"));
+        // this.paintBucketTool = this.addTool(new PaintBucketTool(this));
+        // this._currentTool = this.brushTool;
+        this.setTool(this.markerTool);
     }
     
     private addTool(tool: Tool){
         this._tools.push(tool);
         return tool;
     }
+    
+    private createToolbar(){
+        this._mainToolbar = new Toolbar("main-toolbar");
+
+        this._contextToolbar = new Toolbar("context-toolbar");
+    }
 
     private createPalettes() {
-        this._toolPalette = new ToolPalette("tool-palette");
-        this._toolPalette.onSelectionChanged = (option: string, index: number) => this.setTool(this._tools[index]);
-
         this._sizePalette = new SizePalette("size-palette");
         this._sizePalette.onSelectionChanged = (lineWidth: number) => {
             this._lineWidth = lineWidth;
@@ -199,13 +212,13 @@ export default class PaintView extends View {
         this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
         this._color = this._colorPalette.color;
 
-        this._stampPalette = new ShapePalette("stamp-palette");
-        this._stampPalette.onSelectionChanged = (stamp: string) => {
+        this._shapePalette = new ShapePalette("stamp-palette");
+        this._shapePalette.onSelectionChanged = (stamp: string) => {
             this._stamp = stamp;
             this.setTool(this.selectionTool);
             this.selectionTool.setImageUrl(this.stamp);
         }
-        this._stamp = this._stampPalette.stamp;
+        this._stamp = this._shapePalette.stamp;
 
         this._opacity = 1;
     }
@@ -218,10 +231,11 @@ export default class PaintView extends View {
         if (this._currentTool){
             this._currentTool.enable();
         }
-        this._toolPalette.selectedIndex = this._tools.indexOf(tool);
 
-        // this._sizePalette.setVisible(!(this._currentTool instanceof StampTool));
-        // this._stampPalette.setVisible(this._currentTool instanceof StampTool);
+        this._colorPalette.setVisible(this._currentTool == this.markerTool);
+        this._sizePalette.setVisible(this._currentTool == this.markerTool || this._currentTool == this.eraserTool);
+        // this._shapePalette.setVisible(this._currentTool == this.selectionTool);
+        // this._importImageButton.classList.toggle("hidden", this._currentTool != this.selectionTool);
     }
 
     private addEventListeners() {
