@@ -83,7 +83,7 @@ export default class SelectionTool extends Tool {
         this._startPosition = this.getMousePosition();
         
         let ctx = this.selectionLayer.ctx;
-        ctx.resetTransform();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.strokeStyle = "black";
         ctx.lineCap = "round";
         ctx.lineJoin = "round";

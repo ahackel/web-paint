@@ -14736,7 +14736,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this.isInShapesPalette = false;
       this._startPosition = this.getMousePosition();
       var ctx = this.selectionLayer.ctx;
-      ctx.resetTransform();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.strokeStyle = "black";
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -15069,4 +15069,4 @@ var Toolbar = /*#__PURE__*/(function (_View) {
 
 },{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.45301942.js.map
+//# sourceMappingURL=index.07a713d8.js.map
