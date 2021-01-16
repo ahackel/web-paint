@@ -1,6 +1,7 @@
 export const config = {
     debug: false,
     doubleTapDelay: 400,
+    longClickDelay: 1200,
     maxShapeCount: 30,
     fullScreenCanvas: true, // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
     pixelPerfect: false,   // Make sure to perform painting operations on rounded pixel positions

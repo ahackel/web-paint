@@ -250,7 +250,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     background: lightgray;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     padding: 0.25rem;
     transition: transform 0.15s;
     top: 2.25rem;

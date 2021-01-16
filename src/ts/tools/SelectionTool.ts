@@ -269,4 +269,10 @@ export default class SelectionTool extends Tool {
         })
         document.body.appendChild(img);
     }
+
+    selectAll() {
+        this.startNewSelection();
+        this._selection = new Rect(0, 0, this.painter.width, this.painter.height);
+        this.cutSelection();
+    }
 }

@@ -173,12 +173,17 @@ export default class PaintView extends View {
     
     private createTools() {
         let penButton = document.getElementById("tool-pen");
+        Utils.addLongClick(penButton, () => this.fill());
         Utils.addFastClick(penButton, () => this.setTool(this.markerTool));
         let eraserButton = document.getElementById("tool-eraser");
         Utils.addLongClick(eraserButton, () => this.clear(true, true));
         Utils.addFastClick(eraserButton, () => this.setTool(this.eraserTool));
         let selectionButton = document.getElementById("tool-selection");
         Utils.addFastClick(selectionButton, () => this.setTool(this.selectionTool));
+        Utils.addLongClick(selectionButton, () => {
+            this.setTool(this.selectionTool);
+            this.selectionTool.selectAll();
+        });
         
         this._tools = [];
         // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
@@ -224,6 +229,10 @@ export default class PaintView extends View {
     }
 
     private setTool(tool: Tool) {
+        if (this._currentTool == tool){
+            return;
+        }
+        
         if (this._currentTool){
             this._currentTool.disable();
         }
@@ -475,6 +484,12 @@ export default class PaintView extends View {
         if (save){
             this.saveImage();
         }
+    }
+
+    fill() {
+        this.recordUndo();
+        this.baseLayer.ctx.fillStyle = this.color;
+        this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
     }
 
     recordUndo(){

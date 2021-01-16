@@ -557,6 +557,7 @@ _parcelHelpers.export(exports, "config", function () {
 var config = {
   debug: false,
   doubleTapDelay: 400,
+  longClickDelay: 1200,
   maxShapeCount: 30,
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -785,18 +786,18 @@ var Utils = /*#__PURE__*/(function () {
   }, {
     key: "addLongClick",
     value: function addLongClick(element, callback) {
-      var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1500;
       var timer;
       var caller = this;
       var called = false;
-      element.addEventListener("touchstart", function (event) {
+      var touchSupport = navigator.maxTouchPoints > 0;
+      element.addEventListener(touchSupport ? "touchstart" : "mousedown", function (event) {
         called = false;
         timer = setTimeout(function () {
           callback.call(caller, event);
           called = true;
-        }, delay);
+        }, _config.config.longClickDelay);
       });
-      element.addEventListener("touchend", function (event) {
+      element.addEventListener(touchSupport ? "touchend" : "mouseup", function (event) {
         if (called) {
           event.stopImmediatePropagation();
           called = false;
@@ -4336,6 +4337,9 @@ var PaintView = /*#__PURE__*/(function (_View) {
     value: function createTools() {
       var _this3 = this;
       var penButton = document.getElementById("tool-pen");
+      _utilsUtilsDefault.default.addLongClick(penButton, function () {
+        return _this3.fill();
+      });
       _utilsUtilsDefault.default.addFastClick(penButton, function () {
         return _this3.setTool(_this3.markerTool);
       });
@@ -4349,6 +4353,10 @@ var PaintView = /*#__PURE__*/(function (_View) {
       var selectionButton = document.getElementById("tool-selection");
       _utilsUtilsDefault.default.addFastClick(selectionButton, function () {
         return _this3.setTool(_this3.selectionTool);
+      });
+      _utilsUtilsDefault.default.addLongClick(selectionButton, function () {
+        _this3.setTool(_this3.selectionTool);
+        _this3.selectionTool.selectAll();
       });
       this._tools = [];
       // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
@@ -4397,6 +4405,9 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "setTool",
     value: function setTool(tool) {
+      if (this._currentTool == tool) {
+        return;
+      }
       if (this._currentTool) {
         this._currentTool.disable();
       }
@@ -4643,6 +4654,13 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (save) {
         this.saveImage();
       }
+    }
+  }, {
+    key: "fill",
+    value: function fill() {
+      this.recordUndo();
+      this.baseLayer.ctx.fillStyle = this.color;
+      this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
     }
   }, {
     key: "recordUndo",
@@ -7030,6 +7048,13 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       });
       document.body.appendChild(img);
     }
+  }, {
+    key: "selectAll",
+    value: function selectAll() {
+      this.startNewSelection();
+      this._selection = new _utilsRectDefault.default(0, 0, this.painter.width, this.painter.height);
+      this.cutSelection();
+    }
   }]);
   return SelectionTool;
 })(_Tool2Default.default);
@@ -7150,4 +7175,4 @@ var Toolbar = /*#__PURE__*/(function (_View) {
 
 },{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.20f82bec.js.map
+//# sourceMappingURL=index.cf051ba6.js.map

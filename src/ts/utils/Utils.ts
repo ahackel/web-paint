@@ -53,20 +53,21 @@ export default class Utils {
         element.addEventListener("click", callback);
     }
 
-    public static addLongClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any, delay: number = 1500){
+    public static addLongClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
         
         let timer: any;
         let caller = this;
         let called: boolean = false;
+        const touchSupport = navigator.maxTouchPoints > 0;
         
-        element.addEventListener("touchstart", event => {
+        element.addEventListener(touchSupport ? "touchstart" : "mousedown", event => {
             called = false;
             timer = setTimeout(() => {
                 callback.call(caller, event);
                 called = true;
-            }, delay);
+            }, config.longClickDelay);
         });
-        element.addEventListener("touchend", event => {
+        element.addEventListener(touchSupport ? "touchend" : "mouseup", event => {
             if (called){
                 event.stopImmediatePropagation();
                 called = false;
