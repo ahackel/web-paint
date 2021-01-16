@@ -56,12 +56,14 @@ export default class ImageStorage {
 		return img;
 	}
 
-	public static saveImage(id: string, blob: Blob){
-		return this.adapter.setItem(id, blob)
-			.then(() => {
-				const event = new CustomEvent<string>("imagesaved", {detail: id})
-				Utils.DispatchEventToAllElements(event);
-			})
+	public static async saveImage(id: string, blob: Blob){
+		try{
+			await this.adapter.setItem(id, blob);
+		}
+		catch (e) {
+		}
+		const event = new CustomEvent<string>("imagesaved", {detail: id})
+		Utils.DispatchEventToAllElements(event);
 	}
 	
 	public static deleteImage(id: string){
@@ -76,12 +78,5 @@ export default class ImageStorage {
 		return this.adapter.keys();
 	}
 
-	public static iterate(callback: (img: HTMLImageElement) => any) {
-		return this.adapter.iterate((blob: Blob, id: string, iteration: number) => {
-			if (blob) {
-				callback(this.imageFromBlob(id, blob))
-			}
-		});
-	}
 
 }

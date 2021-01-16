@@ -60,6 +60,7 @@ export default class Utils {
         let called: boolean = false;
         
         element.addEventListener("touchstart", event => {
+            called = false;
             timer = setTimeout(() => {
                 callback.call(caller, event);
                 called = true;

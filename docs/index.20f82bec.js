@@ -790,6 +790,7 @@ var Utils = /*#__PURE__*/(function () {
       var caller = this;
       var called = false;
       element.addEventListener("touchstart", function (event) {
+        called = false;
         timer = setTimeout(function () {
           callback.call(caller, event);
           called = true;
@@ -1239,6 +1240,35 @@ var _LocalForageAdapter = require("./LocalForageAdapter");
 var _LocalForageAdapterDefault = _parcelHelpers.interopDefault(_LocalForageAdapter);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this, args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+      _next(undefined);
+    });
+  };
+}
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -1310,14 +1340,39 @@ var ImageStorage = /*#__PURE__*/(function () {
     }
   }, {
     key: "saveImage",
-    value: function saveImage(id, blob) {
-      return this.adapter.setItem(id, blob).then(function () {
-        var event = new CustomEvent("imagesaved", {
-          detail: id
-        });
-        _utilsUtilsDefault.default.DispatchEventToAllElements(event);
-      });
-    }
+    value: (function () {
+      var _saveImage = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(id, blob) {
+        var event;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.prev = 0;
+                _context.next = 3;
+                return this.adapter.setItem(id, blob);
+              case 3:
+                _context.next = 7;
+                break;
+              case 5:
+                _context.prev = 5;
+                _context.t0 = _context["catch"](0);
+              case 7:
+                event = new CustomEvent("imagesaved", {
+                  detail: id
+                });
+                _utilsUtilsDefault.default.DispatchEventToAllElements(event);
+              case 9:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[0, 5]]);
+      }));
+      function saveImage(_x, _x2) {
+        return _saveImage.apply(this, arguments);
+      }
+      return saveImage;
+    })()
   }, {
     key: "deleteImage",
     value: function deleteImage(id) {
@@ -1332,16 +1387,6 @@ var ImageStorage = /*#__PURE__*/(function () {
     key: "keys",
     value: function keys() {
       return this.adapter.keys();
-    }
-  }, {
-    key: "iterate",
-    value: function iterate(callback) {
-      var _this2 = this;
-      return this.adapter.iterate(function (blob, id, iteration) {
-        if (blob) {
-          callback(_this2.imageFromBlob(id, blob));
-        }
-      });
     }
   }, {
     key: "adapter",
@@ -7001,6 +7046,20 @@ function _classCallCheck(instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function");
@@ -7073,9 +7132,22 @@ var Toolbar = /*#__PURE__*/(function (_View) {
     _this.show();
     return _this;
   }
+  _createClass(Toolbar, [{
+    key: "flip",
+    value: function flip() {
+      if (this._element.classList.contains("left") || this._element.classList.contains("right")) {
+        this._element.classList.toggle("left");
+        this._element.classList.toggle("right");
+      }
+      if (this._element.classList.contains("top") || this._element.classList.contains("bottom")) {
+        this._element.classList.toggle("top");
+        this._element.classList.toggle("bottom");
+      }
+    }
+  }]);
   return Toolbar;
 })(_viewsView.View);
 
 },{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.3481906a.js.map
+//# sourceMappingURL=index.20f82bec.js.map
