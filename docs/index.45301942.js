@@ -8680,22 +8680,25 @@ var Utils = /*#__PURE__*/(function () {
       var timer;
       var caller = this;
       var called = false;
-      var touchSupport = navigator.maxTouchPoints > 0;
-      element.addEventListener(touchSupport ? "touchstart" : "mousedown", function (event) {
+      element.addEventListener("touchstart", down);
+      element.addEventListener("touchend", up);
+      element.addEventListener("mousedown", down);
+      element.addEventListener("mouseup", up);
+      function down(event) {
         called = false;
         timer = setTimeout(function () {
           callback.call(caller, event);
           called = true;
         }, _config.config.longClickDelay);
-      });
-      element.addEventListener(touchSupport ? "touchend" : "mouseup", function (event) {
+      }
+      function up(event) {
         if (called) {
           event.stopImmediatePropagation();
           called = false;
         } else {
           clearTimeout(timer);
         }
-      });
+      }
     }
   }, {
     key: "DispatchEventToAllElements",
@@ -15066,4 +15069,4 @@ var Toolbar = /*#__PURE__*/(function (_View) {
 
 },{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.d913bc0b.js.map
+//# sourceMappingURL=index.45301942.js.map

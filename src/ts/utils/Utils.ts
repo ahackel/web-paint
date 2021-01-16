@@ -58,24 +58,28 @@ export default class Utils {
         let timer: any;
         let caller = this;
         let called: boolean = false;
-        const touchSupport = navigator.maxTouchPoints > 0;
         
-        element.addEventListener(touchSupport ? "touchstart" : "mousedown", event => {
+        element.addEventListener("touchstart", down);
+        element.addEventListener("touchend", up);
+        element.addEventListener("mousedown", down);
+        element.addEventListener("mouseup", up);
+
+        function down(event: Event) {
             called = false;
             timer = setTimeout(() => {
                 callback.call(caller, event);
                 called = true;
             }, config.longClickDelay);
-        });
-        element.addEventListener(touchSupport ? "touchend" : "mouseup", event => {
-            if (called){
+        }
+
+        function up(event: Event) {
+            if (called) {
                 event.stopImmediatePropagation();
                 called = false;
-            }
-            else{
+            } else {
                 clearTimeout(timer);
             }
-        });
+        }
     }
 
     public static DispatchEventToAllElements(event: Event) {
