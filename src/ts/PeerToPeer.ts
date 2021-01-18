@@ -46,7 +46,7 @@ export default class PeerToPeer {
         // local server
         // this._peer = new Peer(id + idSuffix, {host: "192.168.178.20", port: 9000});
         let id = this.getId(this._peerList[0]);
-        this._peer = new Peer(id);
+        this._peer = new Peer(id, {debug: 3});
 
         this._peer.on('open', function (id) {
             console.log('Logged in as: ' + id);

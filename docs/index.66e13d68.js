@@ -12054,7 +12054,9 @@ var PeerToPeer = /*#__PURE__*/(function () {
       // local server
       // this._peer = new Peer(id + idSuffix, {host: "192.168.178.20", port: 9000});
       var id = this.getId(this._peerList[0]);
-      this._peer = new _peerjsDefault.default(id);
+      this._peer = new _peerjsDefault.default(id, {
+        debug: 3
+      });
       this._peer.on('open', function (id) {
         console.log('Logged in as: ' + id);
       });
@@ -19901,4 +19903,4 @@ var SettingsView = /*#__PURE__*/(function (_View) {
 
 },{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.e2de2fbb.js.map
+//# sourceMappingURL=index.66e13d68.js.map
