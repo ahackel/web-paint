@@ -12,14 +12,14 @@
     <link rel="apple-touch-icon" sizes="144x144" href="icon-144x144.20b8ad9a.png">
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512x512.8bd2d3e9.png">
 
-    <link rel="stylesheet" href="index.a2649cc9.css">
+    <link rel="stylesheet" href="index.5161d20f.css">
     <link href="index.78a7c35a.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="view paint hidden" id="paint">
     <div id="fps-counter"></div>
-    <div class="button" id="back-button"><i class="fas fa-times"></i></div>
+    <div class="button back"><i class="fas fa-times"></i></div>
     <div class="toolbar left" id="context-toolbar">
         <div class="palette" id="color-palette"></div>
         <div class="palette" id="size-palette"></div>
@@ -46,7 +46,16 @@
     <div id="sheet"></div>
 </div>
 
+<div class="view settings hidden" id="settings">
+    <div class="button back"><i class="fas fa-times"></i></div>
+    <div class="wrapper">
+        <label for="peer-list">Peers</label>
+        <textarea id="peer-list" rows="10" cols="30"></textarea>
+    </div>
+</div>
+
 <div class="view book hidden" id="book">
+    <div class="button settings"><i class="fas fa-cog"></i></div>
 </div>
 
 <div class="view dropbox-auth hidden" id="dropbox-auth">
@@ -54,7 +63,7 @@
 </div>
 
 <script src="index.d749440a.js"></script>
-<script src="index.07a713d8.js"></script>
+<script src="index.e2de2fbb.js"></script>
 
 </body>
 </html>

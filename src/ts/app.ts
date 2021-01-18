@@ -2,19 +2,23 @@ import 'babel-polyfill';
 import {View} from "./views/View";
 import BookView from "./views/BookView";
 import PaintView from "./views/PaintView";
-import ImageStorage from "./storage/ImageStorage";
 import DropboxAuthView from "./views/DropboxAuthView";
 import {config} from "./config";
+import PeerToPeer from "./PeerToPeer";
+import SettingsView from "./views/SettingsView";
 
 class App {
-    private activeView: View;
-    private bookView: BookView;
-    private paintView: PaintView;
+    private _activeView: View;
+    private _bookView: BookView;
+    private _paintView: PaintView;
+    private _settingsView: SettingsView;
     private dropboxAuthView: DropboxAuthView;
     private _sheet: HTMLElement;
 
     constructor() {
         App.preventOverScroll();
+        
+        PeerToPeer.createInstance();
         
         this._sheet = document.getElementById("sheet")
         window.addEventListener('resize', event => {
@@ -22,24 +26,29 @@ class App {
         });
         this.OnResize();
         
-        this.bookView = new BookView("book");
-        this.bookView.onImageSelected = (id: string) => {
-            this.paintView.loadImage(id)
+        this._bookView = new BookView("book", () => {
+            this.openView(this._settingsView);
+        });
+        this._bookView.onImageSelected = (id: string) => {
+            this._paintView.loadImage(id)
                 .then(() => {
-                    this.openView(this.paintView);
+                    this.openView(this._paintView);
                 });
         }
 
-        this.paintView = new PaintView("paint",() => {
-            this.openView(this.bookView);
+        this._paintView = new PaintView("paint",() => {
+            this.openView(this._bookView);
         });
 
+        this._settingsView = new SettingsView("settings",() => {
+            this.openView(this._bookView);
+        });
 
         // Dropbox integration is not working yet:
         // this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
         // this.openView(ImageStorage.adapter.isAuthenticated ? this.bookView : this.dropboxAuthView);
 
-        this.openView(this.bookView);
+        this.openView(this._bookView);
     }
 
     private OnResize() {
@@ -63,11 +72,11 @@ class App {
     }
 
     openView(view: View){
-        if (this.activeView){
-            this.activeView.hide();
+        if (this._activeView){
+            this._activeView.hide();
         }
-        this.activeView = view;
-        this.activeView.show();
+        this._activeView = view;
+        this._activeView.show();
     }
 }
 

@@ -1,5 +1,6 @@
 import Utils from "../utils/Utils";
 import ImageStorage from "../storage/ImageStorage";
+import PeerToPeer from "../PeerToPeer";
 
 export default class Thumbnail {
     
@@ -13,6 +14,18 @@ export default class Thumbnail {
         this._element = element;
         element.id = id;
         element.classList.add("thumbnail");
+        
+        Utils.addLongClick(element, () => {
+            if (!this._image || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
+                return;
+            }
+
+            Utils.imageToBlob(this._image)
+                .then(blob => {
+                    const peerName = PeerToPeer.instance.peerList[1];
+                    PeerToPeer.instance.sendData(peerName, blob);
+                });
+        });
         
         Utils.addFastClick(element,event => {
             event.preventDefault();
@@ -51,5 +64,9 @@ export default class Thumbnail {
                 this._image.src = blob ? URL.createObjectURL(blob) : "//:0";
                 this._image.style.display = blob ? "initial" : "none";
             });
+    }
+    
+    setImageSrc(src: string){
+        this._image.src = src;
     }
 }

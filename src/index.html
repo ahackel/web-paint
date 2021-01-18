@@ -19,7 +19,7 @@
 
 <div class="view paint hidden" id="paint">
     <div id="fps-counter"></div>
-    <div class="button" id="back-button"><i class="fas fa-times"></i></div>
+    <div class="button back"><i class="fas fa-times"></i></div>
     <div class="toolbar left" id="context-toolbar">
         <div class="palette" id="color-palette"></div>
         <div class="palette" id="size-palette"></div>
@@ -46,7 +46,16 @@
     <div id="sheet"></div>
 </div>
 
+<div class="view settings hidden" id="settings">
+    <div class="button back"><i class="fas fa-times"></i></div>
+    <div class="wrapper">
+        <label for="peer-list">Peers</label>
+        <textarea id="peer-list" rows="10" cols="30"></textarea>
+    </div>
+</div>
+
 <div class="view book hidden" id="book">
+    <div class="button settings"><i class="fas fa-cog"></i></div>
 </div>
 
 <div class="view dropbox-auth hidden" id="dropbox-auth">

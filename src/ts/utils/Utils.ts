@@ -9,6 +9,18 @@ let _fpsCounterEnabled = true;
 
 export default class Utils {
     
+    static imageToBlob(image: HTMLImageElement){
+        const canvas = document.createElement("canvas");
+        canvas.id = "imageToCanvas";
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const ctx = <CanvasRenderingContext2D>canvas.getContext("2d", {alpha: true});
+        ctx.drawImage(image, 0 ,0);
+        return new Promise(resolve => {
+            canvas.toBlob(blob => resolve(blob));
+        })
+    }
+    
     static pointerEventsSupported(): boolean {
         return window.PointerEvent != null;
     }

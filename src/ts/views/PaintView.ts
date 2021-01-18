@@ -94,7 +94,7 @@ export default class PaintView extends View {
     }
 
     private createButtons(onBackClicked: Function) {
-        let backButton = <HTMLDivElement>document.getElementById("back-button");
+        let backButton = <HTMLDivElement>this._element.getElementsByClassName("button back")[0];
         Utils.addFastClick(backButton, () => onBackClicked());
 
         this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
