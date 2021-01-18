@@ -18,7 +18,7 @@ class App {
     constructor() {
         App.preventOverScroll();
         
-        PeerToPeer.createInstance();
+        //PeerToPeer.createInstance();
         
         this._sheet = document.getElementById("sheet")
         window.addEventListener('resize', event => {
@@ -52,19 +52,24 @@ class App {
     }
 
     private OnResize() {
-        const portrait = window.innerWidth < window.innerHeight;
-        const isLargeScreen = window.innerWidth > 1024;
-        const windowWidth = Math.max(window.innerWidth, window.innerHeight);
-        const windowHeight = Math.min(window.innerWidth, window.innerHeight);
-        const horizontalPixelSize = windowWidth / config.width;
-        const verticalPixelSize = windowHeight / config.height;
+        const docWidth = document.documentElement.clientWidth;
+        const docHeight = document.documentElement.clientHeight;
+        
+        const portrait = docWidth < docHeight;
+        const isLargeScreen = docWidth > 1024;
+        
+        const viewWidth = Math.max(docWidth, docHeight);
+        const viewHeight = Math.min(docWidth, docHeight);
+        
+        const horizontalPixelSize = viewWidth / config.width;
+        const verticalPixelSize = viewHeight / config.height;
         
         const virtualPixelSize = config.fullScreenCanvas && !isLargeScreen ?
             Math.max(horizontalPixelSize, verticalPixelSize) :
             Math.min(horizontalPixelSize, verticalPixelSize);
 
         this._sheet.style.fontSize = `${virtualPixelSize}px`;
-        this._sheet.style.left = `${portrait ? 0.5 * (window.innerWidth - virtualPixelSize * config.width) : 0}px`;
+        this._sheet.style.left = `${portrait ? 0.5 * (docWidth - virtualPixelSize * config.width) : 0}px`;
     }
 
     private static preventOverScroll() {

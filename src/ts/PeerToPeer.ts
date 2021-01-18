@@ -1,4 +1,4 @@
-import Peer from "peerjs";
+import Peer, {PeerJSOption} from "peerjs";
 import localforage from "localforage";
 
 export default class PeerToPeer {
@@ -10,8 +10,8 @@ export default class PeerToPeer {
         localforage.setItem('peer-list', value);
         if (this._peer){
             this.logout();
-            this.login();
         }
+        this.login();
     }
     public get loggedIn(): boolean { return this._peer != null; }
     
@@ -46,7 +46,7 @@ export default class PeerToPeer {
         // local server
         // this._peer = new Peer(id + idSuffix, {host: "192.168.178.20", port: 9000});
         let id = this.getId(this._peerList[0]);
-        this._peer = new Peer(id, {debug: 3});
+        this._peer = new Peer(id);
 
         this._peer.on('open', function (id) {
             console.log('Logged in as: ' + id);

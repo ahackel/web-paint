@@ -146,8 +146,6 @@ var _viewsBookViewDefault = _parcelHelpers.interopDefault(_viewsBookView);
 var _viewsPaintView = require("./views/PaintView");
 var _viewsPaintViewDefault = _parcelHelpers.interopDefault(_viewsPaintView);
 var _config = require("./config");
-var _PeerToPeer = require("./PeerToPeer");
-var _PeerToPeerDefault = _parcelHelpers.interopDefault(_PeerToPeer);
 var _viewsSettingsView = require("./views/SettingsView");
 var _viewsSettingsViewDefault = _parcelHelpers.interopDefault(_viewsSettingsView);
 function _classCallCheck(instance, Constructor) {
@@ -174,7 +172,7 @@ var App = /*#__PURE__*/(function () {
     var _this = this;
     _classCallCheck(this, App);
     App.preventOverScroll();
-    _PeerToPeerDefault.default.createInstance();
+    // PeerToPeer.createInstance();
     this._sheet = document.getElementById("sheet");
     window.addEventListener('resize', function (event) {
       _this.OnResize();
@@ -202,15 +200,17 @@ var App = /*#__PURE__*/(function () {
   _createClass(App, [{
     key: "OnResize",
     value: function OnResize() {
-      var portrait = window.innerWidth < window.innerHeight;
-      var isLargeScreen = window.innerWidth > 1024;
-      var windowWidth = Math.max(window.innerWidth, window.innerHeight);
-      var windowHeight = Math.min(window.innerWidth, window.innerHeight);
-      var horizontalPixelSize = windowWidth / _config.config.width;
-      var verticalPixelSize = windowHeight / _config.config.height;
+      var docWidth = document.documentElement.clientWidth;
+      var docHeight = document.documentElement.clientHeight;
+      var portrait = docWidth < docHeight;
+      var isLargeScreen = docWidth > 1024;
+      var viewWidth = Math.max(docWidth, docHeight);
+      var viewHeight = Math.min(docWidth, docHeight);
+      var horizontalPixelSize = viewWidth / _config.config.width;
+      var verticalPixelSize = viewHeight / _config.config.height;
       var virtualPixelSize = _config.config.fullScreenCanvas && !isLargeScreen ? Math.max(horizontalPixelSize, verticalPixelSize) : Math.min(horizontalPixelSize, verticalPixelSize);
       this._sheet.style.fontSize = ("").concat(virtualPixelSize, "px");
-      this._sheet.style.left = ("").concat(portrait ? 0.5 * (window.innerWidth - virtualPixelSize * _config.config.width) : 0, "px");
+      this._sheet.style.left = ("").concat(portrait ? 0.5 * (docWidth - virtualPixelSize * _config.config.width) : 0, "px");
     }
   }, {
     key: "openView",
@@ -234,7 +234,7 @@ var App = /*#__PURE__*/(function () {
 // @ts-ignore
 window.app = new App();
 
-},{"babel-polyfill":"57WP1","./views/BookView":"2qj3L","./views/PaintView":"1Zutj","./config":"1tzQg","./PeerToPeer":"1eo0P","./views/SettingsView":"5P39T","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"57WP1":[function(require,module,exports) {
+},{"babel-polyfill":"57WP1","./views/BookView":"2qj3L","./views/PaintView":"1Zutj","./config":"1tzQg","./views/SettingsView":"5P39T","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"57WP1":[function(require,module,exports) {
 "use strict";
 var global = arguments[3];
 require("core-js/shim");
@@ -8134,8 +8134,6 @@ var _View2 = require("./View");
 var _config = require("../config");
 var _Thumbnail = require("./Thumbnail");
 var _ThumbnailDefault = _parcelHelpers.interopDefault(_Thumbnail);
-var _PeerToPeer = require("../PeerToPeer");
-var _PeerToPeerDefault = _parcelHelpers.interopDefault(_PeerToPeer);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 function _createForOfIteratorHelper(o, allowArrayLike) {
@@ -8322,17 +8320,13 @@ var BookView = /*#__PURE__*/(function (_View) {
   _createClass(BookView, [{
     key: "show",
     value: function show() {
-      var _this2 = this;
       _get(_getPrototypeOf(BookView.prototype), "show", this).call(this);
       this.createImages();
-      _PeerToPeerDefault.default.instance.onDataReceived = function (data) {
-        _this2._thumbnails[0].setImageSrc(URL.createObjectURL(new Blob([data])));
-      };
     }
   }, {
     key: "createImages",
     value: function createImages() {
-      var _this3 = this;
+      var _this2 = this;
       if (this._thumbnails) {
         return;
       }
@@ -8342,7 +8336,7 @@ var BookView = /*#__PURE__*/(function (_View) {
         for (_iterator.s(); !(_step = _iterator.n()).done; ) {
           var sheet = _step.value;
           var thumbnail = new _ThumbnailDefault.default(this._element, sheet.id, function (id) {
-            return _this3.onImageSelected(id);
+            return _this2.onImageSelected(id);
           });
           this._thumbnails.push(thumbnail);
         }
@@ -8356,7 +8350,7 @@ var BookView = /*#__PURE__*/(function (_View) {
   return BookView;
 })(_View2.View);
 
-},{"./View":"30r6k","../config":"1tzQg","./Thumbnail":"6v2zT","../PeerToPeer":"1eo0P","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"30r6k":[function(require,module,exports) {
+},{"./View":"30r6k","../config":"1tzQg","./Thumbnail":"6v2zT","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"30r6k":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "View", function () {
@@ -8570,7 +8564,7 @@ var Thumbnail = /*#__PURE__*/(function () {
     element.id = id;
     element.classList.add("thumbnail");
     _utilsUtilsDefault.default.addLongClick(element, function () {
-      if (!_this._image || !_PeerToPeerDefault.default.instance.loggedIn || _PeerToPeerDefault.default.instance.peerList.length < 2) {
+      if (!_this._image || !_PeerToPeerDefault.default.instance || !_PeerToPeerDefault.default.instance.loggedIn || _PeerToPeerDefault.default.instance.peerList.length < 2) {
         return;
       }
       _utilsUtilsDefault.default.imageToBlob(_this._image).then(function (blob) {
@@ -12015,8 +12009,8 @@ var PeerToPeer = /*#__PURE__*/(function () {
       _localforageDefault.default.setItem('peer-list', value);
       if (this._peer) {
         this.logout();
-        this.login();
       }
+      this.login();
     }
   }, {
     key: "loggedIn",
@@ -12054,9 +12048,7 @@ var PeerToPeer = /*#__PURE__*/(function () {
       // local server
       // this._peer = new Peer(id + idSuffix, {host: "192.168.178.20", port: 9000});
       var id = this.getId(this._peerList[0]);
-      this._peer = new _peerjsDefault.default(id, {
-        debug: 3
-      });
+      this._peer = new _peerjsDefault.default(id);
       this._peer.on('open', function (id) {
         console.log('Logged in as: ' + id);
       });
@@ -19869,6 +19861,7 @@ function _getPrototypeOf(o) {
   };
   return _getPrototypeOf(o);
 }
+var version = require('/package').version;
 var SettingsView = /*#__PURE__*/(function (_View) {
   _inherits(SettingsView, _View);
   var _super = _createSuper(SettingsView);
@@ -19881,6 +19874,9 @@ var SettingsView = /*#__PURE__*/(function (_View) {
       return onBackClicked();
     });
     _this._peerList = document.getElementById("peer-list");
+    var info = document.getElementById("info");
+    info.innerText = // @ts-ignore
+    ("PeerJS browser: ").concat(peerjs.util.browser, "\nVersion: ").concat(version, "\n");
     return _this;
   }
   _createClass(SettingsView, [{
@@ -19901,6 +19897,9 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","/package":"5xv2G"}],"5xv2G":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.535\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
-//# sourceMappingURL=index.66e13d68.js.map
+},{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
+
+//# sourceMappingURL=index.34383d20.js.map

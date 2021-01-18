@@ -16,7 +16,7 @@ export default class Thumbnail {
         element.classList.add("thumbnail");
         
         Utils.addLongClick(element, () => {
-            if (!this._image || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
+            if (!this._image || !PeerToPeer.instance || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
                 return;
             }
 
