@@ -15,20 +15,19 @@ export default class Thumbnail {
         element.id = id;
         element.classList.add("thumbnail");
         
-        Utils.addLongClick(element, () => {
-            if (!this._image || !PeerToPeer.instance || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
-                return;
-            }
-
-            Utils.imageToBlob(this._image)
-                .then(blob => {
-                    const peerName = PeerToPeer.instance.peerList[1];
-                    PeerToPeer.instance.sendData(peerName, blob);
-                });
-        });
+        // Utils.addLongClick(element, () => {
+        //     if (!this._image || !PeerToPeer.instance || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
+        //         return;
+        //     }
+        //
+        //     Utils.imageToBlob(this._image)
+        //         .then(blob => {
+        //             const peerName = PeerToPeer.instance.peerList[1];
+        //             PeerToPeer.instance.sendData(peerName, blob);
+        //         });
+        // });
         
-        Utils.addFastClick(element,event => {
-            event.preventDefault();
+        Utils.addFastClick(element, () => {
             if (onImageSelected) {
                 onImageSelected(id);
             }
@@ -43,6 +42,7 @@ export default class Thumbnail {
         
         this._image = new Image();
         this._image.draggable = false;
+        this.preventContextMenu(this._image);
         element.appendChild(this._image);
 
         let overlayPath = Utils.getOverlayPath(id);
@@ -50,6 +50,7 @@ export default class Thumbnail {
             this._overlay = new Image();
             this._overlay.draggable = false;
             this._overlay.src = overlayPath;
+            this.preventContextMenu(this._overlay);
             element.appendChild(this._overlay);            
         }
 
@@ -68,5 +69,10 @@ export default class Thumbnail {
     
     setImageSrc(src: string){
         this._image.src = src;
+    }
+    
+    preventContextMenu(element: HTMLElement){
+        element.addEventListener("contextmenu", event => event.preventDefault());
+        element.addEventListener("touchend", event => event.preventDefault());
     }
 }

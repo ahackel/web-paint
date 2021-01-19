@@ -1,5 +1,6 @@
 import {Palette} from "./Palette";
 import ImageStorage from "../storage/ImageStorage";
+import {config} from "../config";
 
 export default class ShapePalette extends Palette {
 
@@ -8,15 +9,7 @@ export default class ShapePalette extends Palette {
     get stamp() { return this.selectedOption }
     
     constructor(id: string) {
-        let shapeUrls: string[] = [
-            "img/stamps/star.png",
-            "img/stamps/unicorn.png",
-            "img/stamps/snowman.png",
-            "img/stamps/dolphin.png",
-            "img/stamps/snail.png"
-        ];
-
-        super(id, shapeUrls, true);
+        super(id, config.defaultShapes, true);
         this._shapeIds = {};
         this.selectedIndex = 0;
 

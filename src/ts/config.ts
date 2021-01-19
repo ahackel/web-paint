@@ -1,13 +1,22 @@
+const defaultShapes = [
+    "img/stamps/star.png",
+    "img/stamps/unicorn.png",
+    "img/stamps/snowman.png",
+    "img/stamps/dolphin.png",
+    "img/stamps/snail.png"
+]
+
 export const config = {
     debug: false,
     doubleTapDelay: 400,
     longClickDelay: 1200,
-    maxShapeCount: 30,
+    maxShapeCount: 64 - defaultShapes.length,
     fullScreenCanvas: true, // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
     pixelPerfect: false,   // Make sure to perform painting operations on rounded pixel positions
     imageSmoothing: true,  // Whether to use smooth pixel filtering or to draw hard pixel edges
     width: 1024,
     height: 768,
+    defaultShapes: defaultShapes,
     sheets:[
         {
             id: "image01",

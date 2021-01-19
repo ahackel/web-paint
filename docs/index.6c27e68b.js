@@ -8463,11 +8463,12 @@ _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "config", function () {
   return config;
 });
+var defaultShapes = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
 var config = {
   debug: false,
   doubleTapDelay: 400,
   longClickDelay: 1200,
-  maxShapeCount: 30,
+  maxShapeCount: 64 - defaultShapes.length,
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -8479,6 +8480,7 @@ var config = {
   // Whether to use smooth pixel filtering or to draw hard pixel edges
   width: 1024,
   height: 768,
+  defaultShapes: defaultShapes,
   sheets: [{
     id: "image01",
     overlay: "./img/overlays/spirit.png"
@@ -8528,8 +8530,6 @@ var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _storageImageStorage = require("../storage/ImageStorage");
 var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
-var _PeerToPeer = require("../PeerToPeer");
-var _PeerToPeerDefault = _parcelHelpers.interopDefault(_PeerToPeer);
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8563,17 +8563,18 @@ var Thumbnail = /*#__PURE__*/(function () {
     this._element = element;
     element.id = id;
     element.classList.add("thumbnail");
-    _utilsUtilsDefault.default.addLongClick(element, function () {
-      if (!_this._image || !_PeerToPeerDefault.default.instance || !_PeerToPeerDefault.default.instance.loggedIn || _PeerToPeerDefault.default.instance.peerList.length < 2) {
-        return;
-      }
-      _utilsUtilsDefault.default.imageToBlob(_this._image).then(function (blob) {
-        var peerName = _PeerToPeerDefault.default.instance.peerList[1];
-        _PeerToPeerDefault.default.instance.sendData(peerName, blob);
-      });
-    });
-    _utilsUtilsDefault.default.addFastClick(element, function (event) {
-      event.preventDefault();
+    // Utils.addLongClick(element, () => {
+    // if (!this._image || !PeerToPeer.instance || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
+    // return;
+    // }
+    // 
+    // Utils.imageToBlob(this._image)
+    // .then(blob => {
+    // const peerName = PeerToPeer.instance.peerList[1];
+    // PeerToPeer.instance.sendData(peerName, blob);
+    // });
+    // });
+    _utilsUtilsDefault.default.addFastClick(element, function () {
       if (onImageSelected) {
         onImageSelected(id);
       }
@@ -8586,12 +8587,14 @@ var Thumbnail = /*#__PURE__*/(function () {
     });
     this._image = new Image();
     this._image.draggable = false;
+    this.preventContextMenu(this._image);
     element.appendChild(this._image);
     var overlayPath = _utilsUtilsDefault.default.getOverlayPath(id);
     if (overlayPath) {
       this._overlay = new Image();
       this._overlay.draggable = false;
       this._overlay.src = overlayPath;
+      this.preventContextMenu(this._overlay);
       element.appendChild(this._overlay);
     }
     parent.appendChild(element);
@@ -8611,11 +8614,21 @@ var Thumbnail = /*#__PURE__*/(function () {
     value: function setImageSrc(src) {
       this._image.src = src;
     }
+  }, {
+    key: "preventContextMenu",
+    value: function preventContextMenu(element) {
+      element.addEventListener("contextmenu", function (event) {
+        return event.preventDefault();
+      });
+      element.addEventListener("touchend", function (event) {
+        return event.preventDefault();
+      });
+    }
   }]);
   return Thumbnail;
 })();
 
-},{"../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","../PeerToPeer":"1eo0P","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1H53o":[function(require,module,exports) {
+},{"../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1H53o":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -11969,7 +11982,3312 @@ var StorageAdapter = function StorageAdapter() {
   _classCallCheck(this, StorageAdapter);
 };
 
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1Zutj":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return PaintView;
+});
+var _View2 = require("./View");
+var _palettesColorPalette = require("../palettes/ColorPalette");
+var _palettesColorPaletteDefault = _parcelHelpers.interopDefault(_palettesColorPalette);
+var _palettesSizePalette = require("../palettes/SizePalette");
+var _palettesSizePaletteDefault = _parcelHelpers.interopDefault(_palettesSizePalette);
+var _utilsUtils = require("../utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+var _toolsPenTool = require("../tools/PenTool");
+var _toolsPenToolDefault = _parcelHelpers.interopDefault(_toolsPenTool);
+var _utilsPoint = require("../utils/Point");
+var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+var _palettesPalette = require("../palettes/Palette");
+var _storageImageStorage = require("../storage/ImageStorage");
+var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _config = require("../config");
+var _palettesShapePalette = require("../palettes/ShapePalette");
+var _palettesShapePaletteDefault = _parcelHelpers.interopDefault(_palettesShapePalette);
+var _CanvasLayer = require("../CanvasLayer");
+var _CanvasLayerDefault = _parcelHelpers.interopDefault(_CanvasLayer);
+var _ImageLayer = require("../ImageLayer ");
+var _ImageLayerDefault = _parcelHelpers.interopDefault(_ImageLayer);
+var _toolsSelectionTool = require("../tools/SelectionTool");
+var _toolsSelectionToolDefault = _parcelHelpers.interopDefault(_toolsSelectionTool);
+var _Toolbar = require("../Toolbar");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+      return desc.value;
+    };
+  }
+  return _get(target, property, receiver || target);
+}
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+  return object;
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+function _defineProperty(obj, key, value) {
+  if ((key in obj)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+// var Pressure = require('pressure');
+var PaintView = /*#__PURE__*/(function (_View) {
+  _inherits(PaintView, _View);
+  var _super = _createSuper(PaintView);
+  _createClass(PaintView, [{
+    key: "color",
+    get: function get() {
+      return this._color;
+    }
+  }, {
+    key: "stamp",
+    get: function get() {
+      return this._stamp;
+    }
+  }, {
+    key: "opacity",
+    get: function get() {
+      return this._opacity;
+    }
+  }, {
+    key: "lineWidth",
+    get: function get() {
+      return this._lineWidth;
+    }
+  }, {
+    key: "autoMaskCtx",
+    get: function get() {
+      return this._autoMaskCtx;
+    }
+  }, {
+    key: "baseLayer",
+    // get layers(): Layer[] { return this._layers; }
+    // get layers(): Layer[] { return this._layers; }
+    get: function get() {
+      return this._layers["base-layer"];
+    }
+  }, {
+    key: "overlayLayer",
+    get: function get() {
+      return this._layers["overlay-layer"];
+    }
+  }]);
+  function PaintView(id, onBackClicked) {
+    var _this;
+    _classCallCheck(this, PaintView);
+    _this = _super.call(this, id);
+    _defineProperty(_assertThisInitialized(_this), "scaleFactor", 1);
+    _defineProperty(_assertThisInitialized(_this), "_currentTouchId", 0);
+    _defineProperty(_assertThisInitialized(_this), "_layers", {});
+    _defineProperty(_assertThisInitialized(_this), "getPointerEventPaintingFlag", function (e) {
+      return e.pointerType === "touch" ? true : e.buttons === 1;
+    });
+    _this._sheet = document.getElementById("sheet");
+    _this.width = _config.config.width;
+    _this.height = _config.config.height;
+    _utilsUtilsDefault.default.log(("Setting PaintView size to ").concat(_this.width, " x ").concat(_this.height));
+    _this.addCanvasLayer("base-layer", 0, 0, _this.width, _this.height, false);
+    _this.addEventListeners();
+    _this.createButtons(onBackClicked);
+    _this.createToolbar();
+    _this.createPalettes();
+    _this.createTools();
+    var autoMaskCanvas = document.createElement("canvas");
+    autoMaskCanvas.id = "auto-mask";
+    autoMaskCanvas.width = _this.width;
+    autoMaskCanvas.height = _this.height;
+    _this._autoMaskCtx = autoMaskCanvas.getContext("2d", {
+      alpha: true
+    });
+    return _this;
+  }
+  _createClass(PaintView, [{
+    key: "getLayer",
+    value: function getLayer(id) {
+      return this._layers[id];
+    }
+  }, {
+    key: "createButtons",
+    value: function createButtons(onBackClicked) {
+      var _this2 = this;
+      var backButton = this._element.getElementsByClassName("button back")[0];
+      _utilsUtilsDefault.default.addFastClick(backButton, function () {
+        return onBackClicked();
+      });
+      this._undoButton = document.getElementById("undo-button");
+      _utilsUtilsDefault.default.addFastClick(this._undoButton, function () {
+        return _this2.undo();
+      });
+      var importImageField = document.getElementById("import-image-field");
+      importImageField.addEventListener("change", function (files) {
+        if (importImageField.files.length == 0) {
+          return;
+        }
+        var file = importImageField.files[0];
+        var image = new Image();
+        image.src = URL.createObjectURL(file);
+        image.onload = function () {
+          _this2.setTool(_this2.selectionTool);
+          _this2.selectionTool.setImage(image);
+        };
+      });
+      this._importImageButton = document.getElementById("import-image-button");
+      _utilsUtilsDefault.default.addFastClick(this._importImageButton, function () {
+        return importImageField.click();
+      });
+    }
+  }, {
+    key: "addLayer",
+    value: function addLayer(layer) {
+      layer.index = Object.keys(this._layers).length;
+      this._layers[layer.id] = layer;
+      return layer;
+    }
+  }, {
+    key: "addImageLayer",
+    value: function addImageLayer(id, x, y, width, height, floating) {
+      var layer = new _ImageLayerDefault.default(this._sheet, id, x, y, width, height);
+      layer.floating = floating;
+      this.addLayer(layer);
+      return layer;
+    }
+  }, {
+    key: "addCanvasLayer",
+    value: function addCanvasLayer(id, x, y, width, height, floating) {
+      var layer = new _CanvasLayerDefault.default(this._sheet, id, x, y, width, height);
+      layer.floating = floating;
+      this.addLayer(layer);
+      return layer;
+    }
+  }, {
+    key: "removeLayer",
+    value: function removeLayer(layer) {
+      if (!layer) {
+        return;
+      }
+      layer.remove();
+      delete this._layers[layer.id];
+    }
+  }, {
+    key: "createOverlay",
+    value: function createOverlay() {
+      if (this.overlayLayer) {
+        return;
+      }
+      this.addLayer(new _ImageLayerDefault.default(this._sheet, "overlay-layer", 0, 0, this.width, this.height));
+    }
+  }, {
+    key: "removeOverlay",
+    value: function removeOverlay() {
+      this.removeLayer(this.overlayLayer);
+    }
+  }, {
+    key: "setOverlay",
+    value: function setOverlay(url) {
+      if (!url) {
+        this.removeOverlay();
+        return;
+      }
+      this.createOverlay();
+      this.overlayLayer.image.src = url;
+    }
+  }, {
+    key: "createTools",
+    value: function createTools() {
+      var _this3 = this;
+      var penButton = document.getElementById("tool-pen");
+      _utilsUtilsDefault.default.addLongClick(penButton, function () {
+        return _this3.fill();
+      });
+      _utilsUtilsDefault.default.addFastClick(penButton, function () {
+        return _this3.setTool(_this3.markerTool);
+      });
+      var eraserButton = document.getElementById("tool-eraser");
+      _utilsUtilsDefault.default.addLongClick(eraserButton, function () {
+        return _this3.clear(true, true);
+      });
+      _utilsUtilsDefault.default.addFastClick(eraserButton, function () {
+        return _this3.setTool(_this3.eraserTool);
+      });
+      var selectionButton = document.getElementById("tool-selection");
+      _utilsUtilsDefault.default.addFastClick(selectionButton, function () {
+        return _this3.setTool(_this3.selectionTool);
+      });
+      _utilsUtilsDefault.default.addLongClick(selectionButton, function () {
+        _this3.setTool(_this3.selectionTool);
+        _this3.selectionTool.selectAll();
+      });
+      this._tools = [];
+      // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
+      this.markerTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-pen", "darken"));
+      this.eraserTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-eraser", "destination-out"));
+      this.selectionTool = this.addTool(new _toolsSelectionToolDefault.default(this, "tool-selection"));
+      // this.paintBucketTool = this.addTool(new PaintBucketTool(this));
+      // this._currentTool = this.brushTool;
+      this.setTool(this.markerTool);
+    }
+  }, {
+    key: "addTool",
+    value: function addTool(tool) {
+      this._tools.push(tool);
+      return tool;
+    }
+  }, {
+    key: "createToolbar",
+    value: function createToolbar() {
+      this._mainToolbar = new _Toolbar.Toolbar("main-toolbar");
+      this._contextToolbar = new _Toolbar.Toolbar("context-toolbar");
+    }
+  }, {
+    key: "createPalettes",
+    value: function createPalettes() {
+      var _this4 = this;
+      this._sizePalette = new _palettesSizePaletteDefault.default("size-palette");
+      this._sizePalette.onSelectionChanged = function (lineWidth) {
+        _this4._lineWidth = lineWidth;
+      };
+      this._lineWidth = this._sizePalette.size;
+      this._colorPalette = new _palettesColorPaletteDefault.default("color-palette");
+      this._colorPalette.onSelectionChanged = function (color) {
+        return _this4._color = color;
+      };
+      this._color = this._colorPalette.color;
+      this._shapePalette = new _palettesShapePaletteDefault.default("stamp-palette");
+      this._shapePalette.onSelectionChanged = function (stamp) {
+        _this4._stamp = stamp;
+        _this4.setTool(_this4.selectionTool);
+        _this4.selectionTool.setImageUrl(_this4.stamp);
+      };
+      this._stamp = this._shapePalette.stamp;
+      this._opacity = 1;
+    }
+  }, {
+    key: "setTool",
+    value: function setTool(tool) {
+      if (this._currentTool == tool) {
+        return;
+      }
+      if (this._currentTool) {
+        this._currentTool.disable();
+      }
+      this._currentTool = tool;
+      if (this._currentTool) {
+        this._currentTool.enable();
+      }
+      this._colorPalette.setVisible(this._currentTool == this.markerTool);
+      this._sizePalette.setVisible(this._currentTool == this.markerTool || this._currentTool == this.eraserTool);
+    }
+  }, {
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      var _this5 = this;
+      var canvas = this.baseLayer.canvas;
+      canvas.style.pointerEvents = "auto";
+      // canvas.addEventListener('keydown', event => this.keyDown(event));
+      document.addEventListener('keydown', function (event) {
+        return _this5.keyDown(event);
+      });
+      canvas.addEventListener('click', function (event) {
+        return event.preventDefault();
+      });
+      if (window.PointerEvent != null) {
+        // Required to prevent pointerDown events from being choked when tapping repeatedly:
+        canvas.addEventListener('touchstart', function (event) {
+          return event.preventDefault();
+        });
+        canvas.addEventListener('pointerdown', function (event) {
+          return _this5.pointerDown(event);
+        });
+        canvas.addEventListener('pointermove', function (event) {
+          return _this5.pointerMove(event);
+        });
+        canvas.addEventListener('pointerup', function (event) {
+          return _this5.pointerUp(event);
+        });
+        canvas.addEventListener('pointercancel', function (event) {
+          return event.preventDefault();
+        });
+      } else {
+        canvas.addEventListener('touchstart', function (event) {
+          return _this5.touchStart(event);
+        });
+        canvas.addEventListener('touchmove', function (event) {
+          return _this5.touchMove(event);
+        });
+        canvas.addEventListener('touchend', function (event) {
+          return _this5.touchEnd(event);
+        });
+        canvas.addEventListener('touchcancel', function (event) {
+          return event.preventDefault();
+        });
+      }
+    }
+  }, {
+    key: "getPointerEventPosition",
+    value: function getPointerEventPosition(event) {
+      var target = event.target;
+      var rect = target.getBoundingClientRect();
+      var isPortraitOrientation = rect.height > rect.width;
+      var nx = (event.clientX - rect.left) / rect.width;
+      var ny = (event.clientY - rect.top) / rect.height;
+      var x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
+      var y = (isPortraitOrientation ? nx : ny) * this.height;
+      if (_config.config.pixelPerfect) {
+        x = Math.round(x);
+        y = Math.round(y);
+      }
+      return new _utilsPointDefault.default(x, y);
+    }
+  }, {
+    key: "getTouchEventPosition",
+    value: function getTouchEventPosition(touch) {
+      var rect = this.baseLayer.canvas.getBoundingClientRect();
+      var isPortraitOrientation = rect.height > rect.width;
+      var nx = (touch.clientX - rect.left) / rect.width;
+      var ny = (touch.clientY - rect.top) / rect.height;
+      var x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
+      var y = (isPortraitOrientation ? nx : ny) * this.height;
+      if (_config.config.pixelPerfect) {
+        x = Math.round(x);
+        y = Math.round(y);
+      }
+      return new _utilsPointDefault.default(x, y);
+    }
+  }, {
+    key: "keyDown",
+    value: function keyDown(event) {
+      if (!this.isVisible()) {
+        return;
+      }
+      switch (event.code) {
+        case 'KeyV':
+          if (event.metaKey) {
+            this.setTool(this.selectionTool);
+            this.selectionTool.pasteFromClipboard();
+          }
+          break;
+      }
+      if (!this._currentTool) {
+        return;
+      }
+      this._currentTool.keyDown(event);
+    }
+  }, {
+    key: "pointerDown",
+    value: function pointerDown(event) {
+      event.preventDefault();
+      if (event.pointerType == 'touch' && this._currentTouchId !== 0) {
+        return;
+      }
+      if (event.pointerType != 'touch' && event.buttons !== 1) {
+        return;
+      }
+      var target = event.target;
+      target.setPointerCapture(event.pointerId);
+      this._currentTouchId = event.pointerId;
+      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.3, 1, event.pressure * 2) : 1;
+      this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
+    }
+  }, {
+    key: "pointerMove",
+    value: function pointerMove(event) {
+      event.preventDefault();
+      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
+        return;
+      }
+      if (event.pointerType != 'touch' && event.buttons !== 1) {
+        return;
+      }
+      // normalize pressure:
+      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 1, event.pressure * 2) : 1;
+      this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
+    }
+  }, {
+    key: "pointerUp",
+    value: function pointerUp(event) {
+      event.preventDefault();
+      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
+        return;
+      }
+      // Return if this was not the left mouse button:
+      // if (event.pointerType != 'touch' && event.buttons !== 1){
+      // return;
+      // }
+      var target = event.target;
+      target.releasePointerCapture(event.pointerId);
+      this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+      this._currentTouchId = 0;
+    }
+  }, {
+    key: "pressureChanged",
+    value: function pressureChanged(force) {
+      var pressure = _utilsUtilsDefault.default.clamp(0.3, 1, force * 2);
+      this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
+      this._currentTool.pressureChanged();
+    }
+  }, {
+    key: "touchStart",
+    value: function touchStart(event) {
+      event.preventDefault();
+      if (this._currentTouchId !== 0) {
+        return;
+      }
+      this._currentTouchId = event.targetTouches[0].identifier;
+      this.down(event.timeStamp, true, this.getTouchEventPosition(event.targetTouches[0]), 1);
+    }
+  }, {
+    key: "touchMove",
+    value: function touchMove(event) {
+      event.preventDefault();
+      var touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
+      if (touch == null) {
+        return;
+      }
+      this.move(event.timeStamp, true, this.getTouchEventPosition(touch), 1);
+    }
+  }, {
+    key: "touchEnd",
+    value: function touchEnd(event) {
+      event.preventDefault();
+      var touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
+      if (touch != null) {
+        return;
+      }
+      this.up(true, event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
+      this._currentTouchId = 0;
+    }
+  }, {
+    key: "move",
+    value: function move(timeStamp, isPainting, mouse, pressure) {
+      if (!this._currentTool) {
+        return;
+      }
+      // this._currentTool.painting = isPainting;
+      this._currentTool.pressure = pressure;
+      var newMouse = mouse;
+      var delta = _utilsPointDefault.default.distance(this._currentTool.mouse, newMouse);
+      if (delta > 2) {
+        var timeDelta = timeStamp - this._timeStamp;
+        this._timeStamp = timeStamp;
+        var speed = delta / timeDelta;
+        this._currentTool.speed = _utilsUtilsDefault.default.lerp(this._currentTool.speed, speed, 0.2);
+        this._currentTool.mouse = newMouse;
+        this._currentTool.move();
+      }
+    }
+  }, {
+    key: "down",
+    value: function down(timeStamp, isPainting, mouse, pressure) {
+      _palettesPalette.Palette.collapseAll();
+      if (!this._currentTool) {
+        return;
+      }
+      this.recordUndo();
+      this._timeStamp = timeStamp;
+      this._currentTool.speed = 1;
+      this._currentTool.painting = isPainting;
+      this._currentTool.pressure = pressure;
+      this._currentTool.mouse = mouse;
+      this._currentTool.down();
+    }
+  }, {
+    key: "up",
+    value: function up(isPainting, mouse) {
+      if (!this._currentTool) {
+        return;
+      }
+      this._currentTool.painting = isPainting;
+      this._currentTool.mouse = mouse;
+      this._currentTool.up();
+      this.saveImage();
+    }
+  }, {
+    key: "clear",
+    value: function clear() {
+      var registerUndo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      if (registerUndo) {
+        this.recordUndo();
+      }
+      this.baseLayer.clear();
+      if (save) {
+        this.saveImage();
+      }
+    }
+  }, {
+    key: "fill",
+    value: function fill() {
+      this.recordUndo();
+      this.baseLayer.ctx.fillStyle = this.color;
+      this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
+    }
+  }, {
+    key: "recordUndo",
+    value: function recordUndo() {
+      this._undoBuffer = this.baseLayer.getData();
+      this.updateUndoButtonState();
+    }
+  }, {
+    key: "clearUndoBuffer",
+    value: function clearUndoBuffer() {
+      this._undoBuffer = null;
+      this.updateUndoButtonState();
+    }
+  }, {
+    key: "updateUndoButtonState",
+    value: function updateUndoButtonState() {
+      this._undoButton.classList.toggle("disabled", this._undoBuffer == null);
+    }
+  }, {
+    key: "undo",
+    value: function undo() {
+      var swapBuffers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      if (!this._undoBuffer) {
+        return;
+      }
+      var undoBuffer = this._undoBuffer;
+      if (swapBuffers) {
+        this.recordUndo();
+      }
+      this.baseLayer.putData(undoBuffer);
+    }
+  }, {
+    key: "loadImage",
+    value: function loadImage(id) {
+      var _this6 = this;
+      return _storageImageStorageDefault.default.loadImage(id).then(function (image) {
+        _this6._imageId = id;
+        _this6.clear();
+        if (image) {
+          _this6.baseLayer.drawImage(image);
+        }
+        _this6.setOverlay(_utilsUtilsDefault.default.getOverlayPath(id));
+      });
+    }
+  }, {
+    key: "saveImage",
+    value: function saveImage() {
+      var _this7 = this;
+      _utilsUtilsDefault.default.log("Saving image");
+      this.baseLayer.canvas.toBlob(function (blob) {
+        return _storageImageStorageDefault.default.saveImage(_this7._imageId, blob);
+      });
+    }
+  }, {
+    key: "show",
+    value: function show() {
+      var _this8 = this;
+      _get(_getPrototypeOf(PaintView.prototype), "show", this).call(this);
+      this._currentTouchId = 0;
+      this.clearUndoBuffer();
+      this._autoMaskCaptured = false;
+      window.requestAnimationFrame(function (timeStamp) {
+        return _this8.tick(timeStamp);
+      });
+      this._currentTool.enable();
+    }
+  }, {
+    key: "hide",
+    value: function hide() {
+      if (this._layers) {
+        this.saveImage();
+      }
+      if (this._currentTool) {
+        this._currentTool.disable();
+      }
+      _get(_getPrototypeOf(PaintView.prototype), "hide", this).call(this);
+    }
+  }, {
+    key: "tick",
+    value: function tick(timeStamp) {
+      var _this9 = this;
+      if (!this.isVisible()) {
+        return;
+      }
+      window.requestAnimationFrame(function (timeStamp) {
+        return _this9.tick(timeStamp);
+      });
+      if (_config.config.debug) {
+        _utilsUtilsDefault.default.updateFPSCounter();
+      }
+      if (!this._currentTool) {
+        return;
+      }
+      var delta = timeStamp - this._tickTimeStamp;
+      this._tickTimeStamp = timeStamp;
+      this._currentTool.tick(delta);
+    }
+  }, {
+    key: "captureAutoMask",
+    value: function captureAutoMask(position) {
+      this._autoMaskCaptured = true;
+      if (!this.overlayLayer) {
+        return;
+      }
+    }
+  }, {
+    key: "processOverlay",
+    value: function processOverlay(ctx) {
+      var imageData = ctx.getImageData(0, 0, this.width, this.height);
+      var pixels = imageData.data;
+      for (var i = pixels.length - 1; i >= 0; i--) {
+        pixels[i] = pixels[i] > 64 ? 255 : 0;
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+  }], [{
+    key: "findTouch",
+    value: function findTouch(touches, id) {
+      for (var i = 0; i < touches.length; i++) {
+        if (touches[i].identifier == id) {
+          return touches[i];
+        }
+      }
+      return null;
+    }
+  }]);
+  return PaintView;
+})(_View2.View);
+
+},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return ColorPalette;
+});
+var _Palette2 = require("./Palette");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var ColorPalette = /*#__PURE__*/(function (_Palette) {
+  _inherits(ColorPalette, _Palette);
+  var _super = _createSuper(ColorPalette);
+  _createClass(ColorPalette, [{
+    key: "color",
+    get: function get() {
+      return this.selectedOption;
+    },
+    set: function set(value) {
+      this.selectedOption = value;
+    }
+  }]);
+  function ColorPalette(id) {
+    var _this;
+    _classCallCheck(this, ColorPalette);
+    // 16 color Mac palette
+    // https://en.wikipedia.org/wiki/List_of_software_palettes#Apple_Macintosh_default_16-color_palette
+    // let colors: string[] = [
+    // "#FFFFFF", "#f5f60d", "#f5650a", "#d50406",
+    // "#f50695", "#330496", "#0306c5", "#0692f0",
+    // "#06a606", "#026405", "#643403", "#946434",
+    // "#b5b5b5", "#848484", "#444444", "#030303",
+    // ];
+    // 32 color palette
+    // https://github.com/geoffb/dawnbringer-palettes
+    var colors = ["#000000", "#222034", "#45283c", "#663931", "#8f563b", "#df7126", "#d9a066", "#eec39a", "#fbf236", "#99e550", "#6abe30", "#37946e", "#4b692f", "#524b24", "#323c39", "#3f3f74", "#306082", "#5b6ee1", "#639bff", "#5fcde4", "#cbdbfc", "#ffffff", "#9badb7", "#847e87", "#696a6a", "#595652", "#76428a", "#ac3232", "#d95763", "#d77bba", "#8f974a", "#8a6f30"];
+    _this = _super.call(this, id, colors);
+    _this.selectedIndex = 15;
+    return _this;
+  }
+  _createClass(ColorPalette, [{
+    key: "updateOptionElement",
+    value: function updateOptionElement(element, option) {
+      element.style.background = option;
+    }
+  }]);
+  return ColorPalette;
+})(_Palette2.Palette);
+
+},{"./Palette":"1J0Eg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1J0Eg":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "Palette", function () {
+  return Palette;
+});
+var _viewsView = require("../views/View");
+var _utilsUtils = require("../utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it;
+  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+      var F = function F() {};
+      return {
+        s: F,
+        n: function n() {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function e(_e) {
+          throw _e;
+        },
+        f: F
+      };
+    }
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  var normalCompletion = true, didErr = false, err;
+  return {
+    s: function s() {
+      it = o[Symbol.iterator]();
+    },
+    n: function n() {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function e(_e2) {
+      didErr = true;
+      err = _e2;
+    },
+    f: function f() {
+      try {
+        if (!normalCompletion && it.return != null) it.return();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
+}
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+  return arr2;
+}
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var Palette = /*#__PURE__*/(function (_View) {
+  _inherits(Palette, _View);
+  var _super = _createSuper(Palette);
+  _createClass(Palette, [{
+    key: "selectedIndex",
+    get: function get() {
+      return this._selectedIndex;
+    },
+    set: function set(value) {
+      this._selectedIndex = Math.max(0, Math.min(this._options.length - 1, value));
+      this.updateSelectedOptionElement(this._selectedElement, this.selectedOption);
+    }
+  }, {
+    key: "selectedOption",
+    get: function get() {
+      return this._options[this._selectedIndex];
+    },
+    set: function set(value) {
+      var index = this._options.indexOf(value);
+      if (index === -1) {
+        return;
+      }
+      this.selectedIndex = index;
+    }
+  }, {
+    key: "isCollapsed",
+    get: function get() {
+      return this._element.classList.contains("collapsed");
+    }
+  }]);
+  function Palette(id, options) {
+    var _this;
+    var rightAlign = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    _classCallCheck(this, Palette);
+    _this = _super.call(this, id);
+    _this._options = options;
+    _this._optionElements = [];
+    _this._selectedIndex = 0;
+    _this.createOptions();
+    _this.show();
+    _this.collapse();
+    return _this;
+  }
+  _createClass(Palette, [{
+    key: "createOptions",
+    value: function createOptions() {
+      this.addSelectedOption();
+      this.addOptionElements();
+    }
+  }, {
+    key: "recreateOptions",
+    value: function recreateOptions() {
+      this.clear();
+      this.createOptions();
+    }
+  }, {
+    key: "collapse",
+    value: function collapse() {
+      this._element.classList.add("collapsed");
+      if (Palette._expandedPalette == this) {
+        Palette._expandedPalette = null;
+      }
+    }
+  }, {
+    key: "expand",
+    value: function expand() {
+      Palette.collapseAll();
+      this._element.classList.remove("collapsed");
+      Palette._expandedPalette = this;
+    }
+  }, {
+    key: "toggle",
+    value: function toggle() {
+      if (this.isCollapsed) {
+        this.expand();
+      } else {
+        this.collapse();
+      }
+    }
+  }, {
+    key: "addOption",
+    value: function addOption(value) {
+      this._options.push(value);
+      this.addOptionElement(this._options.length - 1, value);
+      this.updateOptionsWidth();
+    }
+  }, {
+    key: "removeOption",
+    value: function removeOption(index) {
+      this._options.splice(index, 1);
+      this._optionElements[index].remove();
+      this._optionElements.splice(index, 1);
+      // update the index assigned to each element:
+      this.recreateOptions();
+    }
+  }, {
+    key: "addSelectedOption",
+    value: function addSelectedOption() {
+      var _this2 = this;
+      var element = document.createElement("div");
+      element.classList.add("option");
+      this._selectedElement = element;
+      _utilsUtilsDefault.default.addFastClick(element, function () {
+        return _this2.toggle();
+      });
+      this.updateSelectedOptionElement(element, this.selectedOption);
+      this._element.appendChild(element);
+    }
+  }, {
+    key: "addOptionElements",
+    value: function addOptionElements() {
+      var element = document.createElement("div");
+      element.classList.add("options");
+      this._optionsElement = element;
+      this.addArrowElement();
+      var i = 0;
+      var _iterator = _createForOfIteratorHelper(this._options), _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+          var option = _step.value;
+          this.addOptionElement(i, option);
+          i++;
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+      this.updateOptionsWidth();
+      this._element.appendChild(element);
+    }
+  }, {
+    key: "updateOptionsWidth",
+    value: function updateOptionsWidth() {
+      this._optionsElement.style.width = Math.min(8, this._options.length) * 1.25 + "em";
+    }
+  }, {
+    key: "addArrowElement",
+    value: function addArrowElement() {
+      var element = document.createElement("div");
+      element.classList.add("arrow");
+      this._optionsElement.appendChild(element);
+    }
+  }, {
+    key: "addOptionElement",
+    value: function addOptionElement(index, option) {
+      var _this3 = this;
+      var element = document.createElement("div");
+      element.classList.add("option");
+      element.dataset.index = ("").concat(index);
+      _utilsUtilsDefault.default.addLongClick(element, function (event) {
+        return _this3.optionLongClicked(event, option, index);
+      });
+      _utilsUtilsDefault.default.addFastClick(element, function (event) {
+        return _this3.optionClicked(event, option, index);
+      });
+      this.updateOptionElement(element, option);
+      this._optionsElement.appendChild(element);
+      this._optionElements[index] = element;
+    }
+  }, {
+    key: "optionClicked",
+    value: function optionClicked(event, option, index) {
+      this.selectedIndex = index;
+      this.collapse();
+      if (this.onSelectionChanged) {
+        this.onSelectionChanged(option, index);
+      }
+    }
+  }, {
+    key: "optionLongClicked",
+    value: function optionLongClicked(event, option, index) {}
+  }, {
+    key: "updateOptionElement",
+    value: function updateOptionElement(element, option) {}
+  }, {
+    key: "updateSelectedOptionElement",
+    value: function updateSelectedOptionElement(element, option) {
+      this.updateOptionElement(element, option);
+    }
+  }], [{
+    key: "collapseAll",
+    value: function collapseAll() {
+      if (Palette._expandedPalette) {
+        Palette._expandedPalette.collapse();
+      }
+    }
+  }]);
+  return Palette;
+})(_viewsView.View);
+
+},{"../views/View":"30r6k","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5u02W":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return SizePalette;
+});
+var _Palette2 = require("./Palette");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var SizePalette = /*#__PURE__*/(function (_Palette) {
+  _inherits(SizePalette, _Palette);
+  var _super = _createSuper(SizePalette);
+  _createClass(SizePalette, [{
+    key: "size",
+    get: function get() {
+      return this.selectedOption;
+    },
+    set: function set(value) {
+      this.selectedOption = value;
+    }
+  }]);
+  function SizePalette(id) {
+    var _this;
+    _classCallCheck(this, SizePalette);
+    var sizes = [2, 8, 24, 40];
+    _this = _super.call(this, id, sizes, true);
+    _this.selectedIndex = 1;
+    return _this;
+  }
+  _createClass(SizePalette, [{
+    key: "updateOptionElement",
+    value: function updateOptionElement(element, option) {
+      var width = option / 40;
+      element.innerHTML = '<div class="line-width" style="width:' + width + 'em"></div>';
+    }
+  }]);
+  return SizePalette;
+})(_Palette2.Palette);
+
+},{"./Palette":"1J0Eg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6lba4":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return PenTool;
+});
+var _Tool2 = require("./Tool");
+var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
+var _utilsPoint = require("../utils/Point");
+var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+var _utilsUtils = require("../utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+function _defineProperty(obj, key, value) {
+  if ((key in obj)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+// Paints lines with varying stroke width
+var PenTool = /*#__PURE__*/(function (_Tool) {
+  _inherits(PenTool, _Tool);
+  var _super = _createSuper(PenTool);
+  function PenTool(painter, buttonId) {
+    var _this;
+    var operation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "darken";
+    _classCallCheck(this, PenTool);
+    _this = _super.call(this, painter, buttonId);
+    _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _utilsPointDefault.default(0, 0));
+    _this._operation = operation;
+    return _this;
+  }
+  _createClass(PenTool, [{
+    key: "down",
+    value: function down() {
+      this.painter.captureAutoMask(this.mouse.copy().round());
+      this._lastPoint = this.mouse.copy();
+      this._points = [this._lastPoint];
+      this._widths = [this.getWidth()];
+      var ctx = this.getBufferCtx();
+      ctx.strokeStyle = this.color;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      this.painter.baseLayer.ctx.globalCompositeOperation = this._operation;
+      this.requestDrawPath();
+    }
+  }, {
+    key: "tick",
+    value: function tick(delta) {
+      if (this._drawPathRequested) {
+        this.drawPath();
+        this._drawPathRequested = false;
+      }
+    }
+  }, {
+    key: "requestDrawPath",
+    value: function requestDrawPath() {
+      this._drawPathRequested = true;
+    }
+  }, {
+    key: "drawPath",
+    value: function drawPath() {
+      var ctx = this.getBufferCtx();
+      if (this._points.length > 0) {
+        this.painter.undo(false);
+        ctx.clearRect(0, 0, this.painter.width, this.painter.height);
+        var point = this._points[0];
+        var oldPoint = point;
+        for (var i = 0; i < this._points.length; i++) {
+          var lastPoint = this._points[Math.max(0, i - 1)];
+          point = this._points[i].copy();
+          // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+          // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+          var midPoint = new _utilsPointDefault.default((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
+          ctx.lineWidth = this._widths[i];
+          ctx.beginPath();
+          ctx.moveTo(oldPoint.x, oldPoint.y);
+          ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
+          ctx.stroke();
+          oldPoint = midPoint;
+        }
+        ctx.moveTo(oldPoint.x, oldPoint.y);
+        ctx.quadraticCurveTo(point.x, point.y, this._lastPoint.x, this._lastPoint.y);
+        ctx.stroke();
+        var radius = this.getWidth() * 0.5;
+        ctx.beginPath();
+        ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+        // this.applyAutoMask();
+        this.painter.baseLayer.ctx.globalAlpha = this.opacity;
+        this.painter.baseLayer.drawImage(ctx.canvas);
+        this.painter.baseLayer.ctx.globalAlpha = 1;
+      }
+    }
+  }, {
+    key: "move",
+    value: function move() {
+      if (!this.painting) {
+        return;
+      }
+      this._lastPoint = this.mouse.copy();
+      var width = this.getWidth();
+      this._points.push(this._lastPoint);
+      var lastWidth = this._widths[this._widths.length - 1];
+      this._widths.push(_utilsUtilsDefault.default.clamp(lastWidth - 1, lastWidth + 1, width));
+      this.requestDrawPath();
+    }
+  }, {
+    key: "pressureChanged",
+    value: function pressureChanged() {
+      this.requestDrawPath();
+    }
+  }, {
+    key: "getWidth",
+    value: function getWidth() {
+      var pressure = _utilsUtilsDefault.default.clamp(0.5, 2, this.pressure * 2);
+      var speed = _utilsUtilsDefault.default.clamp(1, 5, this.speed);
+      return this.lineWidth * pressure / speed;
+    }
+  }, {
+    key: "applyAutoMask",
+    value: function applyAutoMask() {
+      if (!this.painter.overlayLayer || !this.painter.autoMaskCtx) {
+        return;
+      }
+      var ctx = this.getBufferCtx();
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.drawImage(this.painter.autoMaskCtx.canvas, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+    }
+  }]);
+  return PenTool;
+})(_Tool2Default.default);
+
+},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7utpK":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return Tool;
+});
+var _utilsPoint = require("../utils/Point");
+var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _defineProperty(obj, key, value) {
+  if ((key in obj)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+// Base class for all tools
+var Tool = /*#__PURE__*/(function () {
+  _createClass(Tool, [{
+    key: "color",
+    get: function get() {
+      return this.painter.color;
+    }
+  }, {
+    key: "opacity",
+    get: function get() {
+      return this.painter.opacity;
+    }
+  }, {
+    key: "lineWidth",
+    get: function get() {
+      return this.painter.lineWidth;
+    }
+  }]);
+  function Tool(painter, buttonId) {
+    _classCallCheck(this, Tool);
+    _defineProperty(this, "painting", false);
+    _defineProperty(this, "pressure", 1);
+    this.painter = painter;
+    this.mouse = new _utilsPointDefault.default(0, 0);
+    this._buttonElement = document.getElementById(buttonId);
+  }
+  _createClass(Tool, [{
+    key: "createBufferCtx",
+    // creates a context to draw the current stroke to so we can draw the complete stroke with a different
+    // operation. The buffer can be shared by different tools.
+    // creates a context to draw the current stroke to so we can draw the complete stroke with a different
+    // operation. The buffer can be shared by different tools.
+    value: function createBufferCtx() {
+      var brushCanvas = document.createElement("canvas");
+      brushCanvas.id = "buffer";
+      brushCanvas.width = this.painter.width;
+      brushCanvas.height = this.painter.height;
+      Tool._bufferCtx = brushCanvas.getContext("2d", {
+        alpha: true
+      });
+      Tool._bufferCtx.imageSmoothingQuality = "high";
+      Tool._bufferCtx.imageSmoothingEnabled = true;
+    }
+  }, {
+    key: "getBufferCtx",
+    value: function getBufferCtx() {
+      if (Tool._bufferCtx == null) {
+        this.createBufferCtx();
+      }
+      return Tool._bufferCtx;
+    }
+  }, {
+    key: "enable",
+    value: function enable() {
+      this._buttonElement.classList.add("selected");
+    }
+  }, {
+    key: "disable",
+    value: function disable() {
+      this._buttonElement.classList.remove("selected");
+    }
+  }, {
+    key: "down",
+    value: function down() {}
+  }, {
+    key: "move",
+    value: function move() {}
+  }, {
+    key: "up",
+    value: function up() {}
+  }, {
+    key: "pressureChanged",
+    value: function pressureChanged() {}
+  }, {
+    key: "tick",
+    value: function tick(delta) {}
+  }, {
+    key: "keyDown",
+    value: function keyDown(event) {}
+  }]);
+  return Tool;
+})();
+
+},{"../utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"4aYdj":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return ShapePalette;
+});
+var _Palette2 = require("./Palette");
+var _storageImageStorage = require("../storage/ImageStorage");
+var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _config = require("../config");
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it;
+  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+      var F = function F() {};
+      return {
+        s: F,
+        n: function n() {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function e(_e) {
+          throw _e;
+        },
+        f: F
+      };
+    }
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  var normalCompletion = true, didErr = false, err;
+  return {
+    s: function s() {
+      it = o[Symbol.iterator]();
+    },
+    n: function n() {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function e(_e2) {
+      didErr = true;
+      err = _e2;
+    },
+    f: function f() {
+      try {
+        if (!normalCompletion && it.return != null) it.return();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
+}
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+  return arr2;
+}
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var ShapePalette = /*#__PURE__*/(function (_Palette) {
+  _inherits(ShapePalette, _Palette);
+  var _super = _createSuper(ShapePalette);
+  _createClass(ShapePalette, [{
+    key: "stamp",
+    get: function get() {
+      return this.selectedOption;
+    }
+  }]);
+  function ShapePalette(id) {
+    var _this;
+    _classCallCheck(this, ShapePalette);
+    _this = _super.call(this, id, _config.config.defaultShapes, true);
+    _this._shapeIds = {};
+    _this.selectedIndex = 0;
+    _storageImageStorageDefault.default.keys().then(function (keys) {
+      var shapesIds = keys.filter(function (x) {
+        return x.startsWith("Shape");
+      });
+      var _iterator = _createForOfIteratorHelper(shapesIds), _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+          var shapeId = _step.value;
+          _this.addShapeFromImageId(shapeId);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+    });
+    _this._element.addEventListener("imagesaved", function (event) {
+      var id = event.detail;
+      if (id.startsWith("Shape")) {
+        _this.addShapeFromImageId(id);
+      }
+    });
+    return _this;
+  }
+  _createClass(ShapePalette, [{
+    key: "addShapeFromImageId",
+    value: function addShapeFromImageId(stampId) {
+      var _this2 = this;
+      _storageImageStorageDefault.default.loadBlob(stampId).then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        _this2._shapeIds[url] = stampId;
+        _this2.addOption(url);
+      });
+    }
+  }, {
+    key: "optionLongClicked",
+    value: function optionLongClicked(event, option, index) {
+      this.deleteShape(index);
+    }
+  }, {
+    key: "updateOptionElement",
+    value: function updateOptionElement(element, option) {
+      element.style.backgroundImage = ("url(\"").concat(option, "\")");
+    }
+  }, {
+    key: "updateSelectedOptionElement",
+    value: function updateSelectedOptionElement(element, option) {
+      element.innerHTML = '<i class="fas fa-shapes"></i>';
+    }
+  }, {
+    key: "deleteShape",
+    value: function deleteShape(index) {
+      var _this3 = this;
+      var option = this._options[index];
+      var stampId = this._shapeIds[option];
+      if (!stampId) {
+        return;
+      }
+      _storageImageStorageDefault.default.deleteImage(stampId).then(function () {
+        delete _this3._shapeIds[option];
+        _this3.removeOption(index);
+        if (_this3.selectedIndex == index) {
+          // select the following item that now has the same index
+          _this3.selectedIndex = index;
+        }
+      });
+    }
+  }]);
+  return ShapePalette;
+})(_Palette2.Palette);
+
+},{"./Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6xo2a":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return CanvasLayer;
+});
+var _config = require("./config");
+var _Layer2 = require("./Layer");
+var _Layer2Default = _parcelHelpers.interopDefault(_Layer2);
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var CanvasLayer = /*#__PURE__*/(function (_Layer) {
+  _inherits(CanvasLayer, _Layer);
+  var _super = _createSuper(CanvasLayer);
+  _createClass(CanvasLayer, [{
+    key: "canvas",
+    get: function get() {
+      return this._element;
+    }
+  }, {
+    key: "ctx",
+    get: function get() {
+      return this._ctx;
+    }
+  }]);
+  function CanvasLayer(parent, id, x, y, width, height) {
+    var _this;
+    _classCallCheck(this, CanvasLayer);
+    _this = _super.call(this, parent, "canvas", id, x, y, width, height);
+    _this._ctx = _this.canvas.getContext("2d", {
+      alpha: true
+    });
+    _this._ctx.imageSmoothingQuality = "high";
+    _this._ctx.imageSmoothingEnabled = _config.config.imageSmoothing;
+    return _this;
+  }
+  _createClass(CanvasLayer, [{
+    key: "getData",
+    value: function getData() {
+      return this._ctx.getImageData(0, 0, this.width, this.height);
+    }
+  }, {
+    key: "putData",
+    value: function putData(data) {
+      this._ctx.putImageData(data, 0, 0);
+    }
+  }, {
+    key: "drawImage",
+    value: function drawImage(image, rect) {
+      var _ref = rect || ({
+        x: 0,
+        y: 0,
+        width: this.width,
+        height: this.height
+      }), x = _ref.x, y = _ref.y, width = _ref.width, height = _ref.height;
+      this._ctx.drawImage(image, x, y, width, height);
+    }
+  }, {
+    key: "clear",
+    value: function clear(rect) {
+      var _ref2 = rect || ({
+        x: 0,
+        y: 0,
+        width: this.width,
+        height: this.height
+      }), x = _ref2.x, y = _ref2.y, width = _ref2.width, height = _ref2.height;
+      this._ctx.clearRect(x, y, width, height);
+    }
+  }]);
+  return CanvasLayer;
+})(_Layer2Default.default);
+
+},{"./config":"1tzQg","./Layer":"hkRDB","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"hkRDB":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return Layer;
+});
+var _config = require("./config");
+var _utilsUtils = require("./utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+var _utilsPoint = require("./utils/Point");
+var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _defineProperty(obj, key, value) {
+  if ((key in obj)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+var Layer = /*#__PURE__*/(function () {
+  _createClass(Layer, [{
+    key: "id",
+    get: function get() {
+      return this._element.id;
+    }
+  }, {
+    key: "index",
+    get: function get() {
+      return this._index;
+    },
+    set: function set(v) {
+      this._index = v;
+      this.transform(this.position, this.scale, this.rotation);
+    }
+  }, {
+    key: "width",
+    get: function get() {
+      return this._width;
+    }
+  }, {
+    key: "height",
+    get: function get() {
+      return this._height;
+    }
+  }, {
+    key: "position",
+    get: function get() {
+      return this._position;
+    }
+  }, {
+    key: "rotation",
+    get: function get() {
+      return this._rotation;
+    }
+  }, {
+    key: "scale",
+    get: function get() {
+      return this._scale;
+    }
+  }, {
+    key: "floating",
+    get: function get() {
+      return this._element.classList.contains("floating");
+    },
+    set: function set(value) {
+      this._element.classList.toggle("floating", value);
+      this._element.style.pointerEvents = value ? "auto" : "none";
+      if (value) {
+        this.addEventListeners();
+      } else {
+        this.removeEventListeners();
+      }
+    }
+  }]);
+  function Layer(parent, tag, id, x, y, width, height) {
+    _classCallCheck(this, Layer);
+    _defineProperty(this, "_startScale", 1);
+    _defineProperty(this, "_startRotation", 0);
+    _defineProperty(this, "_position", new _utilsPointDefault.default(0, 0));
+    _defineProperty(this, "_scale", 1);
+    _defineProperty(this, "_rotation", 0);
+    _defineProperty(this, "_lastTouchStartTime", 0);
+    _defineProperty(this, "_pointers", []);
+    this._element = document.createElement(tag);
+    this._element.id = id;
+    this._element.classList.add("layer");
+    this._index = 0;
+    this._width = width;
+    this._height = height;
+    this._element.width = width;
+    this._element.height = height;
+    this._element.style.width = ("").concat(width, "em");
+    this._element.style.height = ("").concat(height, "em");
+    this._element.style.pointerEvents = "none";
+    parent.appendChild(this._element);
+    this.transform(new _utilsPointDefault.default(x, y), 1, 0);
+    this.bindEventListeners();
+  }
+  _createClass(Layer, [{
+    key: "remove",
+    value: function remove() {
+      this._element.remove();
+    }
+  }, {
+    key: "resize",
+    value: function resize(width, height) {
+      var x = this.position.x + 0.5 * (this.width - width);
+      var y = this.position.y + 0.5 * (this.height - height);
+      this.setPositionAndSize(x, y, width, height);
+    }
+  }, {
+    key: "setPositionAndSize",
+    value: function setPositionAndSize(x, y, width, height) {
+      this._width = width;
+      this._height = height;
+      this._element.width = width;
+      this._element.height = height;
+      this._element.style.width = ("").concat(width, "em");
+      this._element.style.height = ("").concat(height, "em");
+      this.transform(new _utilsPointDefault.default(x, y), this.scale, this.rotation);
+    }
+  }, {
+    key: "drawToCanvas",
+    value: function drawToCanvas(ctx) {
+      ctx.save();
+      var x = this._position.x + 0.5 * this.width;
+      var y = this._position.y + 0.5 * this.height;
+      ctx.setTransform(this._scale, 0, 0, this._scale, x, y);
+      ctx.rotate(this._rotation);
+      ctx.translate(-0.5 * this.width, -0.5 * this.height);
+      ctx.drawImage(this._element, 0, 0);
+      ctx.restore();
+    }
+  }, {
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      // pinch gesture handling inspired by https://codepen.io/hanseklund/pen/izloq
+      this._element.addEventListener('click', this.preventDefault);
+      if (_utilsUtilsDefault.default.pointerEventsSupported()) {
+        this._element.addEventListener('touchstart', this.preventDefault);
+        this._element.addEventListener('pointerdown', this.pointerDown);
+      } else {
+        this._element.addEventListener('touchstart', this.touchStart);
+      }
+    }
+  }, {
+    key: "removeEventListeners",
+    value: function removeEventListeners() {
+      this._element.removeEventListener('click', this.preventDefault);
+      if (_utilsUtilsDefault.default.pointerEventsSupported()) {
+        this._element.removeEventListener('touchstart', this.preventDefault);
+        this._element.removeEventListener('pointerdown', this.pointerDown);
+      } else {
+        this._element.removeEventListener('touchstart', this.touchStart);
+      }
+    }
+  }, {
+    key: "preventDefault",
+    value: function preventDefault(event) {
+      event.preventDefault();
+    }
+  }, {
+    key: "doubleTap",
+    value: function doubleTap(event) {
+      if (this.onDoubleTap) {
+        this.onDoubleTap(event);
+      }
+    }
+  }, {
+    key: "pointerDown",
+    value: function pointerDown(event) {
+      event.preventDefault();
+      this._element.setPointerCapture(event.pointerId);
+      this.addPointerEvent(event);
+      if (this._pointers.length === 1) {
+        if (event.timeStamp < this._lastTouchStartTime + _config.config.doubleTapDelay) {
+          this.doubleTap(event);
+        }
+        this._lastTouchStartTime = event.timeStamp;
+        this._element.addEventListener("pointermove", this.pointerMove);
+        this._element.addEventListener("pointerup", this.pointerUp);
+        this._pinchCenter = new _utilsPointDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
+        if (event.altKey) {
+          var p1 = this.clientToPixel(this._pointers[0]);
+          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
+          this.pinchStart(p1, p2);
+        } else {
+          this.dragStart(this.clientToPixel(this._pointers[0]));
+        }
+      }
+      if (this._pointers.length === 2) {
+        this.pinchStart(this.clientToPixel(this._pointers[0]), this.clientToPixel(this._pointers[1]));
+      }
+    }
+  }, {
+    key: "addPointerEvent",
+    value: function addPointerEvent(event) {
+      var index = this._pointers.findIndex(function (x) {
+        return x.pointerId == event.pointerId;
+      });
+      if (index < 0) {
+        this._pointers.push(event);
+      } else {
+        this._pointers[index] = event;
+      }
+    }
+  }, {
+    key: "removePointerEvent",
+    value: function removePointerEvent(event) {
+      var index = this._pointers.findIndex(function (x) {
+        return x.pointerId == event.pointerId;
+      });
+      if (index >= 0) {
+        this._pointers.splice(index, 1);
+      }
+    }
+  }, {
+    key: "pointerMove",
+    value: function pointerMove(event) {
+      event.preventDefault();
+      this.addPointerEvent(event);
+      this.move(this._pointers, event.altKey);
+    }
+  }, {
+    key: "pointerUp",
+    value: function pointerUp(event) {
+      event.preventDefault();
+      this._element.releasePointerCapture(event.pointerId);
+      this.removePointerEvent(event);
+      if (this._pointers.length == 1) {
+        this.dragStart(this.clientToPixel(this._pointers[0]));
+      }
+      if (this._pointers.length == 0) {
+        this._element.removeEventListener("pointermove", this.pointerMove);
+        this._element.removeEventListener("pointerup", this.pointerUp);
+      }
+    }
+  }, {
+    key: "touchStart",
+    value: function touchStart(event) {
+      event.preventDefault();
+      if (event.touches.length === 1) {
+        if (event.timeStamp < this._lastTouchStartTime + _config.config.doubleTapDelay) {
+          this.doubleTap(event);
+        }
+        this._lastTouchStartTime = event.timeStamp;
+        this._element.addEventListener('touchmove', this.touchMove);
+        this._element.addEventListener('touchend', this.touchEnd);
+        this._pinchCenter = new _utilsPointDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
+        if (event.altKey) {
+          var p1 = this.clientToPixel(event.touches[0]);
+          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
+          this.pinchStart(p1, p2);
+        } else {
+          this.dragStart(this.clientToPixel(event.touches[0]));
+        }
+      }
+      if (event.touches.length === 2) {
+        this.pinchStart(this.clientToPixel(event.touches[0]), this.clientToPixel(event.touches[1]));
+      }
+    }
+  }, {
+    key: "touchMove",
+    value: function touchMove(event) {
+      event.preventDefault();
+      this.move(event.touches, event.altKey);
+    }
+  }, {
+    key: "move",
+    value: function move(pointers, altKey) {
+      if (pointers.length === 1) {
+        if (altKey) {
+          var p1 = this.clientToPixel(pointers[0]);
+          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
+          this.pinchMove(p1, p2);
+        } else {
+          this.dragMove(this.clientToPixel(pointers[0]));
+        }
+      }
+      if (pointers.length === 2) {
+        this.pinchMove(this.clientToPixel(pointers[0]), this.clientToPixel(pointers[1]));
+      }
+    }
+  }, {
+    key: "touchEnd",
+    value: function touchEnd(event) {
+      event.preventDefault();
+      this._element.removeEventListener('touchmove', this.touchMove);
+      this._element.addEventListener('touchend', this.touchEnd);
+    }
+  }, {
+    key: "transform",
+    value: function transform(position, scale, rotation) {
+      this._position = position;
+      this._rotation = rotation;
+      this._scale = scale;
+      var index = this._index;
+      this._element.style.transform = ("translate(").concat(position.x, "em, ").concat(position.y, "em) rotate(").concat(rotation, "rad) scale(").concat(scale, ") translateZ(").concat(index, "px)");
+      this._element.style.outlineWidth = ("").concat(2 / scale, "em");
+    }
+  }, {
+    key: "bindEventListeners",
+    value: function bindEventListeners() {
+      // TODO: Find a better way. This is ugly:
+      this.touchStart = this.touchStart.bind(this);
+      this.touchMove = this.touchMove.bind(this);
+      this.touchEnd = this.touchEnd.bind(this);
+      this.pointerDown = this.pointerDown.bind(this);
+      this.pointerMove = this.pointerMove.bind(this);
+      this.pointerUp = this.pointerUp.bind(this);
+    }
+  }, {
+    key: "dragStart",
+    value: function dragStart(position) {
+      this._localDragPosition = _utilsPointDefault.default.subtract(position, this.position);
+    }
+  }, {
+    key: "dragMove",
+    value: function dragMove(position) {
+      position.subtract(this._localDragPosition);
+      this.transform(position, this._scale, this._rotation);
+    }
+  }, {
+    key: "pinchStart",
+    value: function pinchStart(p1, p2) {
+      var center = _utilsPointDefault.default.center(p1, p2);
+      this._pinchStartDist = _utilsPointDefault.default.distance(p1, p2);
+      this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
+      this._startRotation = this._rotation;
+      this._startScale = this._scale;
+    }
+  }, {
+    key: "pinchMove",
+    value: function pinchMove(p1, p2) {
+      var center = _utilsPointDefault.default.center(p1, p2);
+      var distance = _utilsPointDefault.default.distance(p1, p2);
+      var angle = Math.atan2(p1.y - center.y, p1.x - center.x);
+      var angleChange = angle - this._pinchStartRotation;
+      var scale = this._startScale * (distance / this._pinchStartDist);
+      scale = _utilsUtilsDefault.default.clamp(0.1, 10, scale);
+      var position = _utilsPointDefault.default.center(p1, p2);
+      position.x -= 0.5 * this.width;
+      position.y -= 0.5 * this.height;
+      var rotation = this._startRotation + angleChange;
+      this.transform(position, scale, rotation);
+    }
+  }, {
+    key: "clientToPixel",
+    value: function clientToPixel(position1) {
+      var parent = this._element.parentElement;
+      var rect = parent.getBoundingClientRect();
+      var isPortraitOrientation = rect.height > rect.width;
+      var nx = (position1.clientX - rect.left) / rect.width;
+      var ny = (position1.clientY - rect.top) / rect.height;
+      var x = (isPortraitOrientation ? 1 - ny : nx) * _config.config.width;
+      var y = (isPortraitOrientation ? nx : ny) * _config.config.height;
+      return new _utilsPointDefault.default(x, y);
+    }
+  }]);
+  return Layer;
+})();
+
+},{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1ITGs":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return ImageLayer;
+});
+var _Layer2 = require("./Layer");
+var _Layer2Default = _parcelHelpers.interopDefault(_Layer2);
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var ImageLayer = /*#__PURE__*/(function (_Layer) {
+  _inherits(ImageLayer, _Layer);
+  var _super = _createSuper(ImageLayer);
+  _createClass(ImageLayer, [{
+    key: "image",
+    get: function get() {
+      return this._element;
+    }
+  }]);
+  function ImageLayer(parent, id, x, y, width, height) {
+    var _this;
+    _classCallCheck(this, ImageLayer);
+    _this = _super.call(this, parent, "img", id, x, y, width, height);
+    _this._element.onload = function () {
+      // if this.image.completed
+      _this.resize(_this.image.naturalWidth, _this.image.naturalHeight);
+    };
+    return _this;
+  }
+  return ImageLayer;
+})(_Layer2Default.default);
+
+},{"./Layer":"hkRDB","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"Hlzxz":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return SelectionTool;
+});
+var _Tool2 = require("./Tool");
+var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
+var _utilsPoint = require("../utils/Point");
+var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+var _utilsRect = require("../utils/Rect");
+var _utilsRectDefault = _parcelHelpers.interopDefault(_utilsRect);
+var _storageImageStorage = require("../storage/ImageStorage");
+var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _utilsUtils = require("../utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+var _config = require("../config");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+      return desc.value;
+    };
+  }
+  return _get(target, property, receiver || target);
+}
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+  return object;
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+function _defineProperty(obj, key, value) {
+  if ((key in obj)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+// Provides a floating selection the user can manipulate
+var SelectionTool = /*#__PURE__*/(function (_Tool) {
+  _inherits(SelectionTool, _Tool);
+  var _super = _createSuper(SelectionTool);
+  _createClass(SelectionTool, [{
+    key: "selectionLayer",
+    get: function get() {
+      return this.painter.getLayer(this.selectionLayerId);
+    }
+  }, {
+    key: "selection",
+    get: function get() {
+      return this._selection;
+    }
+  }, {
+    key: "hasFloatingSelection",
+    get: function get() {
+      return this._hasFloatingSelection;
+    },
+    set: function set(value) {
+      this._hasFloatingSelection = value;
+      this.toggleFloatingSelectionButtons(value);
+    }
+  }, {
+    key: "isInShapesPalette",
+    get: function get() {
+      return this._isInShapesPalette;
+    },
+    set: function set(value) {
+      this._isInShapesPalette = value;
+      this._saveButton.classList.toggle("disabled", value);
+    }
+  }]);
+  function SelectionTool(painter, buttonId) {
+    var _this;
+    _classCallCheck(this, SelectionTool);
+    _this = _super.call(this, painter, buttonId);
+    _defineProperty(_assertThisInitialized(_this), "selectionLayerId", "selection-layer");
+    _defineProperty(_assertThisInitialized(_this), "_selection", _utilsRectDefault.default.Empty());
+    _this._deleteButton = document.getElementById("selection-delete-button");
+    _utilsUtilsDefault.default.addFastClick(_this._deleteButton, function () {
+      return _this.clearSelection();
+    });
+    _this._stampButton = document.getElementById("selection-stamp-button");
+    _utilsUtilsDefault.default.addFastClick(_this._stampButton, function () {
+      return _this.paintSelectionToCanvas();
+    });
+    _this._saveButton = document.getElementById("selection-save-button");
+    _utilsUtilsDefault.default.addFastClick(_this._saveButton, function () {
+      return _this.saveSelectionAsNewStamp();
+    });
+    _this._downloadButton = document.getElementById("selection-download-button");
+    var anchorElement = _this._downloadButton.firstElementChild;
+    _utilsUtilsDefault.default.addFastClick(anchorElement, function () {
+      anchorElement.href = _this.selectionLayer.canvas.toDataURL();
+    });
+    _this.hasFloatingSelection = false;
+    return _this;
+  }
+  _createClass(SelectionTool, [{
+    key: "toggleFloatingSelectionButtons",
+    value: function toggleFloatingSelectionButtons(visible) {
+      this._deleteButton.classList.toggle("hidden", !visible);
+      this._stampButton.classList.toggle("hidden", !visible);
+      this._downloadButton.classList.toggle("hidden", !visible);
+      this._saveButton.classList.toggle("hidden", !visible);
+    }
+  }, {
+    key: "enable",
+    value: function enable() {
+      _get(_getPrototypeOf(SelectionTool.prototype), "enable", this).call(this);
+      this.createSelectionLayer();
+      this.hasFloatingSelection = false;
+      this.isInShapesPalette = false;
+    }
+  }, {
+    key: "disable",
+    value: function disable() {
+      _get(_getPrototypeOf(SelectionTool.prototype), "disable", this).call(this);
+      this.paintSelectionToCanvas();
+      this.destroySelectionLayer();
+      this.hasFloatingSelection = false;
+    }
+  }, {
+    key: "down",
+    value: function down() {
+      this.startNewSelection();
+    }
+  }, {
+    key: "startNewSelection",
+    value: function startNewSelection() {
+      this.paintSelectionToCanvas();
+      this.selectionLayer.setPositionAndSize(0, 0, this.painter.width, this.painter.height);
+      this.selectionLayer.transform(new _utilsPointDefault.default(0, 0), 1, 0);
+      this.selectionLayer.floating = false;
+      this.hasFloatingSelection = false;
+      this.isInShapesPalette = false;
+      this._startPosition = this.getMousePosition();
+      var ctx = this.selectionLayer.ctx;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.strokeStyle = "black";
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      this.requestDrawSelectionOutline();
+    }
+  }, {
+    key: "getMousePosition",
+    value: function getMousePosition() {
+      return this.mouse.copy().round().clamp(0, 0, this.painter.width - 1, this.painter.height - 1);
+    }
+  }, {
+    key: "move",
+    value: function move() {
+      if (!this.painting) {
+        return;
+      }
+      this.mouse.round();
+      this.requestDrawSelectionOutline();
+    }
+  }, {
+    key: "up",
+    value: function up() {
+      this.cutSelection();
+    }
+  }, {
+    key: "tick",
+    value: function tick(delta) {
+      if (this._drawSelectionOutlineRequested) {
+        this.updateSelectionAndDrawOutline();
+        this._drawSelectionOutlineRequested = false;
+      }
+    }
+  }, {
+    key: "keyDown",
+    value: function keyDown(event) {
+      switch (event.code) {
+        case 'Backspace':
+          this.clearSelection();
+          break;
+        case 'KeyC':
+          if (event.metaKey) {
+            this.copyToClipboard();
+          }
+          break;
+      }
+    }
+  }, {
+    key: "clearSelection",
+    value: function clearSelection() {
+      this.selectionLayer.clear();
+      this.startNewSelection();
+    }
+  }, {
+    key: "setImage",
+    value: function setImage(image) {
+      this.hasFloatingSelection = true;
+      this.selectionLayer.resize(image.width, image.height);
+      this.selectionLayer.floating = true;
+      this.selectionLayer.drawImage(image);
+      this.isInShapesPalette = true;
+    }
+  }, {
+    key: "setImageUrl",
+    value: function setImageUrl(url) {
+      var _this2 = this;
+      var img = new Image();
+      img.src = url;
+      img.onload = function () {
+        _this2.setImage(img);
+      };
+    }
+  }, {
+    key: "requestDrawSelectionOutline",
+    value: function requestDrawSelectionOutline() {
+      this._drawSelectionOutlineRequested = true;
+    }
+  }, {
+    key: "updateSelectionAndDrawOutline",
+    value: function updateSelectionAndDrawOutline() {
+      if (this.hasFloatingSelection) {
+        return;
+      }
+      this.selectionLayer.clear();
+      var ctx = this.selectionLayer.ctx;
+      var position = this.getMousePosition();
+      var x = Math.min(this._startPosition.x, position.x);
+      var y = Math.min(this._startPosition.y, position.y);
+      var width = Math.abs(this._startPosition.x - position.x);
+      var height = Math.abs(this._startPosition.y - position.y);
+      this._selection = new _utilsRectDefault.default(x, y, width, height);
+      ctx.strokeRect(x, y, width, height);
+    }
+  }, {
+    key: "destroySelectionLayer",
+    value: function destroySelectionLayer() {
+      this.painter.removeLayer(this.selectionLayer);
+    }
+  }, {
+    key: "createSelectionLayer",
+    value: function createSelectionLayer() {
+      var _this3 = this;
+      if (this.selectionLayer) {
+        return;
+      }
+      this.painter.addCanvasLayer(this.selectionLayerId, 0, 0, this.painter.width, this.painter.height, false);
+      this.selectionLayer.onDoubleTap = function (event) {
+        if (event.altKey) {
+          _this3.saveSelectionAsNewStamp();
+          return;
+        }
+        _this3.paintSelectionToCanvas();
+      };
+    }
+  }, {
+    key: "cutSelection",
+    value: function cutSelection() {
+      this.selectionLayer.clear();
+      this._selection = _utilsUtilsDefault.default.getVisiblePixelFrame(this.painter.baseLayer.ctx, this.selection);
+      if (this.selection.isEmpty()) {
+        return;
+      }
+      this.hasFloatingSelection = true;
+      var _this$selection = this.selection, x = _this$selection.x, y = _this$selection.y, width = _this$selection.width, height = _this$selection.height;
+      this.selectionLayer.setPositionAndSize(x, y, width, height);
+      this.selectionLayer.floating = true;
+      this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
+      this.painter.baseLayer.clear(this.selection);
+    }
+  }, {
+    key: "paintSelectionToCanvas",
+    value: function paintSelectionToCanvas() {
+      if (!this.hasFloatingSelection) {
+        return;
+      }
+      this.painter.recordUndo();
+      this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
+      this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
+    }
+  }, {
+    key: "saveSelectionAsNewStamp",
+    value: function saveSelectionAsNewStamp() {
+      var _this4 = this;
+      _storageImageStorageDefault.default.keys().then(function (keys) {
+        var shapesIds = keys.filter(function (x) {
+          return x.startsWith("Shape");
+        });
+        if (shapesIds.length >= _config.config.maxShapeCount) {
+          console.log("Cannot save selection as shape because there are already too many in storage.");
+          return;
+        }
+        var id = "Shape" + Date.now();
+        console.log(("Saving selection as: ").concat(id));
+        _this4.selectionLayer.canvas.toBlob(function (blob) {
+          return _storageImageStorageDefault.default.saveImage(id, blob);
+        });
+        _this4.isInShapesPalette = true;
+      });
+    }
+  }, {
+    key: "copyToClipboard",
+    value: function copyToClipboard() {
+      this.selectionLayer.canvas.toBlob(function (blob) {
+        return navigator.clipboard.write([new ClipboardItem({
+          'image/png': blob
+        })]);
+      });
+      console.log("copied selection to clipboard");
+    }
+  }, {
+    key: "pasteFromClipboard",
+    value: function pasteFromClipboard() {
+      var _this5 = this;
+      navigator.permissions.query({
+        name: "clipboard-read"
+      }).then(function (result) {
+        if (!(result.state == "granted" || result.state == "prompt")) {
+          return;
+        }
+        navigator.clipboard.read().then(function (data) {
+          for (var i = 0; i < data.length; i++) {
+            if (!data[i].types.includes("image/png")) {
+              continue;
+            }
+            data[i].getType("image/png").then(function (blob) {
+              _this5.setImageUrl(URL.createObjectURL(blob));
+            });
+          }
+        });
+      });
+    }
+  }, {
+    key: "showSelectionInFullscreen",
+    value: function showSelectionInFullscreen() {
+      var img = new Image();
+      this.selectionLayer.canvas.toBlob(function (blob) {
+        return img.src = URL.createObjectURL(blob);
+      });
+      img.classList.add("fullscreen");
+      // Utils.addFastClick(img, () => {
+      // img.remove();
+      // })
+      document.body.appendChild(img);
+    }
+  }, {
+    key: "selectAll",
+    value: function selectAll() {
+      this.startNewSelection();
+      this._selection = new _utilsRectDefault.default(0, 0, this.painter.width, this.painter.height);
+      this.cutSelection();
+    }
+  }]);
+  return SelectionTool;
+})(_Tool2Default.default);
+
+},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5EiOX":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "Toolbar", function () {
+  return Toolbar;
+});
+var _viewsView = require("./views/View");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var Toolbar = /*#__PURE__*/(function (_View) {
+  _inherits(Toolbar, _View);
+  var _super = _createSuper(Toolbar);
+  function Toolbar(id) {
+    var _this;
+    _classCallCheck(this, Toolbar);
+    _this = _super.call(this, id);
+    _this.show();
+    return _this;
+  }
+  _createClass(Toolbar, [{
+    key: "flip",
+    value: function flip() {
+      if (this._element.classList.contains("left") || this._element.classList.contains("right")) {
+        this._element.classList.toggle("left");
+        this._element.classList.toggle("right");
+      }
+      if (this._element.classList.contains("top") || this._element.classList.contains("bottom")) {
+        this._element.classList.toggle("top");
+        this._element.classList.toggle("bottom");
+      }
+    }
+  }]);
+  return Toolbar;
+})(_viewsView.View);
+
+},{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5P39T":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return SettingsView;
+});
+var _View2 = require("./View");
+var _utilsUtils = require("../utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+var _PeerToPeer = require("../PeerToPeer");
+var _PeerToPeerDefault = _parcelHelpers.interopDefault(_PeerToPeer);
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+      return desc.value;
+    };
+  }
+  return _get(target, property, receiver || target);
+}
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+  return object;
+}
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  });
+  return _setPrototypeOf(o, p);
+}
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+var version = require('/package').version;
+var SettingsView = /*#__PURE__*/(function (_View) {
+  _inherits(SettingsView, _View);
+  var _super = _createSuper(SettingsView);
+  function SettingsView(id, onBackClicked) {
+    var _this;
+    _classCallCheck(this, SettingsView);
+    _this = _super.call(this, id);
+    var backButton = _this._element.getElementsByClassName("button back")[0];
+    _utilsUtilsDefault.default.addFastClick(backButton, function () {
+      return onBackClicked();
+    });
+    _this._peerList = document.getElementById("peer-list");
+    var info = document.getElementById("info");
+    info.innerText = // @ts-ignore
+    ("PeerJS browser: ").concat(peerjs.util.browser, "\nVersion: ").concat(version, "\n");
+    return _this;
+  }
+  _createClass(SettingsView, [{
+    key: "show",
+    value: function show() {
+      _get(_getPrototypeOf(SettingsView.prototype), "show", this).call(this);
+      this._peerList.value = _PeerToPeerDefault.default.instance.peerList.join("\n");
+    }
+  }, {
+    key: "hide",
+    value: function hide() {
+      if (this._peerList) {
+        _PeerToPeerDefault.default.instance.peerList = this._peerList.value.split("\n");
+      }
+      _get(_getPrototypeOf(SettingsView.prototype), "hide", this).call(this);
+    }
+  }]);
+  return SettingsView;
+})(_View2.View);
+
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -16597,3313 +19915,9 @@ parcelRequire = (function (e, r, t, n) {
   }]
 }, {}, ["iTK6"], null);
 
-},{}],"1Zutj":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return PaintView;
-});
-var _View2 = require("./View");
-var _palettesColorPalette = require("../palettes/ColorPalette");
-var _palettesColorPaletteDefault = _parcelHelpers.interopDefault(_palettesColorPalette);
-var _palettesSizePalette = require("../palettes/SizePalette");
-var _palettesSizePaletteDefault = _parcelHelpers.interopDefault(_palettesSizePalette);
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-var _toolsPenTool = require("../tools/PenTool");
-var _toolsPenToolDefault = _parcelHelpers.interopDefault(_toolsPenTool);
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
-var _palettesPalette = require("../palettes/Palette");
-var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
-var _config = require("../config");
-var _palettesShapePalette = require("../palettes/ShapePalette");
-var _palettesShapePaletteDefault = _parcelHelpers.interopDefault(_palettesShapePalette);
-var _CanvasLayer = require("../CanvasLayer");
-var _CanvasLayerDefault = _parcelHelpers.interopDefault(_CanvasLayer);
-var _ImageLayer = require("../ImageLayer ");
-var _ImageLayerDefault = _parcelHelpers.interopDefault(_ImageLayer);
-var _toolsSelectionTool = require("../tools/SelectionTool");
-var _toolsSelectionToolDefault = _parcelHelpers.interopDefault(_toolsSelectionTool);
-var _Toolbar = require("../Toolbar");
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _get(target, property, receiver) {
-  if (typeof Reflect !== "undefined" && Reflect.get) {
-    _get = Reflect.get;
-  } else {
-    _get = function _get(target, property, receiver) {
-      var base = _superPropBase(target, property);
-      if (!base) return;
-      var desc = Object.getOwnPropertyDescriptor(base, property);
-      if (desc.get) {
-        return desc.get.call(receiver);
-      }
-      return desc.value;
-    };
-  }
-  return _get(target, property, receiver || target);
-}
-function _superPropBase(object, property) {
-  while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = _getPrototypeOf(object);
-    if (object === null) break;
-  }
-  return object;
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
-// var Pressure = require('pressure');
-var PaintView = /*#__PURE__*/(function (_View) {
-  _inherits(PaintView, _View);
-  var _super = _createSuper(PaintView);
-  _createClass(PaintView, [{
-    key: "color",
-    get: function get() {
-      return this._color;
-    }
-  }, {
-    key: "stamp",
-    get: function get() {
-      return this._stamp;
-    }
-  }, {
-    key: "opacity",
-    get: function get() {
-      return this._opacity;
-    }
-  }, {
-    key: "lineWidth",
-    get: function get() {
-      return this._lineWidth;
-    }
-  }, {
-    key: "autoMaskCtx",
-    get: function get() {
-      return this._autoMaskCtx;
-    }
-  }, {
-    key: "baseLayer",
-    // get layers(): Layer[] { return this._layers; }
-    // get layers(): Layer[] { return this._layers; }
-    get: function get() {
-      return this._layers["base-layer"];
-    }
-  }, {
-    key: "overlayLayer",
-    get: function get() {
-      return this._layers["overlay-layer"];
-    }
-  }]);
-  function PaintView(id, onBackClicked) {
-    var _this;
-    _classCallCheck(this, PaintView);
-    _this = _super.call(this, id);
-    _defineProperty(_assertThisInitialized(_this), "scaleFactor", 1);
-    _defineProperty(_assertThisInitialized(_this), "_currentTouchId", 0);
-    _defineProperty(_assertThisInitialized(_this), "_layers", {});
-    _defineProperty(_assertThisInitialized(_this), "getPointerEventPaintingFlag", function (e) {
-      return e.pointerType === "touch" ? true : e.buttons === 1;
-    });
-    _this._sheet = document.getElementById("sheet");
-    _this.width = _config.config.width;
-    _this.height = _config.config.height;
-    _utilsUtilsDefault.default.log(("Setting PaintView size to ").concat(_this.width, " x ").concat(_this.height));
-    _this.addCanvasLayer("base-layer", 0, 0, _this.width, _this.height, false);
-    _this.addEventListeners();
-    _this.createButtons(onBackClicked);
-    _this.createToolbar();
-    _this.createPalettes();
-    _this.createTools();
-    var autoMaskCanvas = document.createElement("canvas");
-    autoMaskCanvas.id = "auto-mask";
-    autoMaskCanvas.width = _this.width;
-    autoMaskCanvas.height = _this.height;
-    _this._autoMaskCtx = autoMaskCanvas.getContext("2d", {
-      alpha: true
-    });
-    return _this;
-  }
-  _createClass(PaintView, [{
-    key: "getLayer",
-    value: function getLayer(id) {
-      return this._layers[id];
-    }
-  }, {
-    key: "createButtons",
-    value: function createButtons(onBackClicked) {
-      var _this2 = this;
-      var backButton = this._element.getElementsByClassName("button back")[0];
-      _utilsUtilsDefault.default.addFastClick(backButton, function () {
-        return onBackClicked();
-      });
-      this._undoButton = document.getElementById("undo-button");
-      _utilsUtilsDefault.default.addFastClick(this._undoButton, function () {
-        return _this2.undo();
-      });
-      var importImageField = document.getElementById("import-image-field");
-      importImageField.addEventListener("change", function (files) {
-        if (importImageField.files.length == 0) {
-          return;
-        }
-        var file = importImageField.files[0];
-        var image = new Image();
-        image.src = URL.createObjectURL(file);
-        image.onload = function () {
-          _this2.setTool(_this2.selectionTool);
-          _this2.selectionTool.setImage(image);
-        };
-      });
-      this._importImageButton = document.getElementById("import-image-button");
-      _utilsUtilsDefault.default.addFastClick(this._importImageButton, function () {
-        return importImageField.click();
-      });
-    }
-  }, {
-    key: "addLayer",
-    value: function addLayer(layer) {
-      layer.index = Object.keys(this._layers).length;
-      this._layers[layer.id] = layer;
-      return layer;
-    }
-  }, {
-    key: "addImageLayer",
-    value: function addImageLayer(id, x, y, width, height, floating) {
-      var layer = new _ImageLayerDefault.default(this._sheet, id, x, y, width, height);
-      layer.floating = floating;
-      this.addLayer(layer);
-      return layer;
-    }
-  }, {
-    key: "addCanvasLayer",
-    value: function addCanvasLayer(id, x, y, width, height, floating) {
-      var layer = new _CanvasLayerDefault.default(this._sheet, id, x, y, width, height);
-      layer.floating = floating;
-      this.addLayer(layer);
-      return layer;
-    }
-  }, {
-    key: "removeLayer",
-    value: function removeLayer(layer) {
-      if (!layer) {
-        return;
-      }
-      layer.remove();
-      delete this._layers[layer.id];
-    }
-  }, {
-    key: "createOverlay",
-    value: function createOverlay() {
-      if (this.overlayLayer) {
-        return;
-      }
-      this.addLayer(new _ImageLayerDefault.default(this._sheet, "overlay-layer", 0, 0, this.width, this.height));
-    }
-  }, {
-    key: "removeOverlay",
-    value: function removeOverlay() {
-      this.removeLayer(this.overlayLayer);
-    }
-  }, {
-    key: "setOverlay",
-    value: function setOverlay(url) {
-      if (!url) {
-        this.removeOverlay();
-        return;
-      }
-      this.createOverlay();
-      this.overlayLayer.image.src = url;
-    }
-  }, {
-    key: "createTools",
-    value: function createTools() {
-      var _this3 = this;
-      var penButton = document.getElementById("tool-pen");
-      _utilsUtilsDefault.default.addLongClick(penButton, function () {
-        return _this3.fill();
-      });
-      _utilsUtilsDefault.default.addFastClick(penButton, function () {
-        return _this3.setTool(_this3.markerTool);
-      });
-      var eraserButton = document.getElementById("tool-eraser");
-      _utilsUtilsDefault.default.addLongClick(eraserButton, function () {
-        return _this3.clear(true, true);
-      });
-      _utilsUtilsDefault.default.addFastClick(eraserButton, function () {
-        return _this3.setTool(_this3.eraserTool);
-      });
-      var selectionButton = document.getElementById("tool-selection");
-      _utilsUtilsDefault.default.addFastClick(selectionButton, function () {
-        return _this3.setTool(_this3.selectionTool);
-      });
-      _utilsUtilsDefault.default.addLongClick(selectionButton, function () {
-        _this3.setTool(_this3.selectionTool);
-        _this3.selectionTool.selectAll();
-      });
-      this._tools = [];
-      // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
-      this.markerTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-pen", "darken"));
-      this.eraserTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-eraser", "destination-out"));
-      this.selectionTool = this.addTool(new _toolsSelectionToolDefault.default(this, "tool-selection"));
-      // this.paintBucketTool = this.addTool(new PaintBucketTool(this));
-      // this._currentTool = this.brushTool;
-      this.setTool(this.markerTool);
-    }
-  }, {
-    key: "addTool",
-    value: function addTool(tool) {
-      this._tools.push(tool);
-      return tool;
-    }
-  }, {
-    key: "createToolbar",
-    value: function createToolbar() {
-      this._mainToolbar = new _Toolbar.Toolbar("main-toolbar");
-      this._contextToolbar = new _Toolbar.Toolbar("context-toolbar");
-    }
-  }, {
-    key: "createPalettes",
-    value: function createPalettes() {
-      var _this4 = this;
-      this._sizePalette = new _palettesSizePaletteDefault.default("size-palette");
-      this._sizePalette.onSelectionChanged = function (lineWidth) {
-        _this4._lineWidth = lineWidth;
-      };
-      this._lineWidth = this._sizePalette.size;
-      this._colorPalette = new _palettesColorPaletteDefault.default("color-palette");
-      this._colorPalette.onSelectionChanged = function (color) {
-        return _this4._color = color;
-      };
-      this._color = this._colorPalette.color;
-      this._shapePalette = new _palettesShapePaletteDefault.default("stamp-palette");
-      this._shapePalette.onSelectionChanged = function (stamp) {
-        _this4._stamp = stamp;
-        _this4.setTool(_this4.selectionTool);
-        _this4.selectionTool.setImageUrl(_this4.stamp);
-      };
-      this._stamp = this._shapePalette.stamp;
-      this._opacity = 1;
-    }
-  }, {
-    key: "setTool",
-    value: function setTool(tool) {
-      if (this._currentTool == tool) {
-        return;
-      }
-      if (this._currentTool) {
-        this._currentTool.disable();
-      }
-      this._currentTool = tool;
-      if (this._currentTool) {
-        this._currentTool.enable();
-      }
-      this._colorPalette.setVisible(this._currentTool == this.markerTool);
-      this._sizePalette.setVisible(this._currentTool == this.markerTool || this._currentTool == this.eraserTool);
-    }
-  }, {
-    key: "addEventListeners",
-    value: function addEventListeners() {
-      var _this5 = this;
-      var canvas = this.baseLayer.canvas;
-      canvas.style.pointerEvents = "auto";
-      // canvas.addEventListener('keydown', event => this.keyDown(event));
-      document.addEventListener('keydown', function (event) {
-        return _this5.keyDown(event);
-      });
-      canvas.addEventListener('click', function (event) {
-        return event.preventDefault();
-      });
-      if (window.PointerEvent != null) {
-        // Required to prevent pointerDown events from being choked when tapping repeatedly:
-        canvas.addEventListener('touchstart', function (event) {
-          return event.preventDefault();
-        });
-        canvas.addEventListener('pointerdown', function (event) {
-          return _this5.pointerDown(event);
-        });
-        canvas.addEventListener('pointermove', function (event) {
-          return _this5.pointerMove(event);
-        });
-        canvas.addEventListener('pointerup', function (event) {
-          return _this5.pointerUp(event);
-        });
-        canvas.addEventListener('pointercancel', function (event) {
-          return event.preventDefault();
-        });
-      } else {
-        canvas.addEventListener('touchstart', function (event) {
-          return _this5.touchStart(event);
-        });
-        canvas.addEventListener('touchmove', function (event) {
-          return _this5.touchMove(event);
-        });
-        canvas.addEventListener('touchend', function (event) {
-          return _this5.touchEnd(event);
-        });
-        canvas.addEventListener('touchcancel', function (event) {
-          return event.preventDefault();
-        });
-      }
-    }
-  }, {
-    key: "getPointerEventPosition",
-    value: function getPointerEventPosition(event) {
-      var target = event.target;
-      var rect = target.getBoundingClientRect();
-      var isPortraitOrientation = rect.height > rect.width;
-      var nx = (event.clientX - rect.left) / rect.width;
-      var ny = (event.clientY - rect.top) / rect.height;
-      var x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
-      var y = (isPortraitOrientation ? nx : ny) * this.height;
-      if (_config.config.pixelPerfect) {
-        x = Math.round(x);
-        y = Math.round(y);
-      }
-      return new _utilsPointDefault.default(x, y);
-    }
-  }, {
-    key: "getTouchEventPosition",
-    value: function getTouchEventPosition(touch) {
-      var rect = this.baseLayer.canvas.getBoundingClientRect();
-      var isPortraitOrientation = rect.height > rect.width;
-      var nx = (touch.clientX - rect.left) / rect.width;
-      var ny = (touch.clientY - rect.top) / rect.height;
-      var x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
-      var y = (isPortraitOrientation ? nx : ny) * this.height;
-      if (_config.config.pixelPerfect) {
-        x = Math.round(x);
-        y = Math.round(y);
-      }
-      return new _utilsPointDefault.default(x, y);
-    }
-  }, {
-    key: "keyDown",
-    value: function keyDown(event) {
-      if (!this.isVisible()) {
-        return;
-      }
-      switch (event.code) {
-        case 'KeyV':
-          if (event.metaKey) {
-            this.setTool(this.selectionTool);
-            this.selectionTool.pasteFromClipboard();
-          }
-          break;
-      }
-      if (!this._currentTool) {
-        return;
-      }
-      this._currentTool.keyDown(event);
-    }
-  }, {
-    key: "pointerDown",
-    value: function pointerDown(event) {
-      event.preventDefault();
-      if (event.pointerType == 'touch' && this._currentTouchId !== 0) {
-        return;
-      }
-      if (event.pointerType != 'touch' && event.buttons !== 1) {
-        return;
-      }
-      var target = event.target;
-      target.setPointerCapture(event.pointerId);
-      this._currentTouchId = event.pointerId;
-      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.3, 1, event.pressure * 2) : 1;
-      this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
-    }
-  }, {
-    key: "pointerMove",
-    value: function pointerMove(event) {
-      event.preventDefault();
-      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
-        return;
-      }
-      if (event.pointerType != 'touch' && event.buttons !== 1) {
-        return;
-      }
-      // normalize pressure:
-      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 1, event.pressure * 2) : 1;
-      this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
-    }
-  }, {
-    key: "pointerUp",
-    value: function pointerUp(event) {
-      event.preventDefault();
-      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
-        return;
-      }
-      // Return if this was not the left mouse button:
-      // if (event.pointerType != 'touch' && event.buttons !== 1){
-      // return;
-      // }
-      var target = event.target;
-      target.releasePointerCapture(event.pointerId);
-      this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
-      this._currentTouchId = 0;
-    }
-  }, {
-    key: "pressureChanged",
-    value: function pressureChanged(force) {
-      var pressure = _utilsUtilsDefault.default.clamp(0.3, 1, force * 2);
-      this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
-      this._currentTool.pressureChanged();
-    }
-  }, {
-    key: "touchStart",
-    value: function touchStart(event) {
-      event.preventDefault();
-      if (this._currentTouchId !== 0) {
-        return;
-      }
-      this._currentTouchId = event.targetTouches[0].identifier;
-      this.down(event.timeStamp, true, this.getTouchEventPosition(event.targetTouches[0]), 1);
-    }
-  }, {
-    key: "touchMove",
-    value: function touchMove(event) {
-      event.preventDefault();
-      var touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-      if (touch == null) {
-        return;
-      }
-      this.move(event.timeStamp, true, this.getTouchEventPosition(touch), 1);
-    }
-  }, {
-    key: "touchEnd",
-    value: function touchEnd(event) {
-      event.preventDefault();
-      var touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-      if (touch != null) {
-        return;
-      }
-      this.up(true, event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
-      this._currentTouchId = 0;
-    }
-  }, {
-    key: "move",
-    value: function move(timeStamp, isPainting, mouse, pressure) {
-      if (!this._currentTool) {
-        return;
-      }
-      // this._currentTool.painting = isPainting;
-      this._currentTool.pressure = pressure;
-      var newMouse = mouse;
-      var delta = _utilsPointDefault.default.distance(this._currentTool.mouse, newMouse);
-      if (delta > 2) {
-        var timeDelta = timeStamp - this._timeStamp;
-        this._timeStamp = timeStamp;
-        var speed = delta / timeDelta;
-        this._currentTool.speed = _utilsUtilsDefault.default.lerp(this._currentTool.speed, speed, 0.2);
-        this._currentTool.mouse = newMouse;
-        this._currentTool.move();
-      }
-    }
-  }, {
-    key: "down",
-    value: function down(timeStamp, isPainting, mouse, pressure) {
-      _palettesPalette.Palette.collapseAll();
-      if (!this._currentTool) {
-        return;
-      }
-      this.recordUndo();
-      this._timeStamp = timeStamp;
-      this._currentTool.speed = 1;
-      this._currentTool.painting = isPainting;
-      this._currentTool.pressure = pressure;
-      this._currentTool.mouse = mouse;
-      this._currentTool.down();
-    }
-  }, {
-    key: "up",
-    value: function up(isPainting, mouse) {
-      if (!this._currentTool) {
-        return;
-      }
-      this._currentTool.painting = isPainting;
-      this._currentTool.mouse = mouse;
-      this._currentTool.up();
-      this.saveImage();
-    }
-  }, {
-    key: "clear",
-    value: function clear() {
-      var registerUndo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      if (registerUndo) {
-        this.recordUndo();
-      }
-      this.baseLayer.clear();
-      if (save) {
-        this.saveImage();
-      }
-    }
-  }, {
-    key: "fill",
-    value: function fill() {
-      this.recordUndo();
-      this.baseLayer.ctx.fillStyle = this.color;
-      this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
-    }
-  }, {
-    key: "recordUndo",
-    value: function recordUndo() {
-      this._undoBuffer = this.baseLayer.getData();
-      this.updateUndoButtonState();
-    }
-  }, {
-    key: "clearUndoBuffer",
-    value: function clearUndoBuffer() {
-      this._undoBuffer = null;
-      this.updateUndoButtonState();
-    }
-  }, {
-    key: "updateUndoButtonState",
-    value: function updateUndoButtonState() {
-      this._undoButton.classList.toggle("disabled", this._undoBuffer == null);
-    }
-  }, {
-    key: "undo",
-    value: function undo() {
-      var swapBuffers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-      if (!this._undoBuffer) {
-        return;
-      }
-      var undoBuffer = this._undoBuffer;
-      if (swapBuffers) {
-        this.recordUndo();
-      }
-      this.baseLayer.putData(undoBuffer);
-    }
-  }, {
-    key: "loadImage",
-    value: function loadImage(id) {
-      var _this6 = this;
-      return _storageImageStorageDefault.default.loadImage(id).then(function (image) {
-        _this6._imageId = id;
-        _this6.clear();
-        if (image) {
-          _this6.baseLayer.drawImage(image);
-        }
-        _this6.setOverlay(_utilsUtilsDefault.default.getOverlayPath(id));
-      });
-    }
-  }, {
-    key: "saveImage",
-    value: function saveImage() {
-      var _this7 = this;
-      _utilsUtilsDefault.default.log("Saving image");
-      this.baseLayer.canvas.toBlob(function (blob) {
-        return _storageImageStorageDefault.default.saveImage(_this7._imageId, blob);
-      });
-    }
-  }, {
-    key: "show",
-    value: function show() {
-      var _this8 = this;
-      _get(_getPrototypeOf(PaintView.prototype), "show", this).call(this);
-      this._currentTouchId = 0;
-      this.clearUndoBuffer();
-      this._autoMaskCaptured = false;
-      window.requestAnimationFrame(function (timeStamp) {
-        return _this8.tick(timeStamp);
-      });
-      this._currentTool.enable();
-    }
-  }, {
-    key: "hide",
-    value: function hide() {
-      if (this._layers) {
-        this.saveImage();
-      }
-      if (this._currentTool) {
-        this._currentTool.disable();
-      }
-      _get(_getPrototypeOf(PaintView.prototype), "hide", this).call(this);
-    }
-  }, {
-    key: "tick",
-    value: function tick(timeStamp) {
-      var _this9 = this;
-      if (!this.isVisible()) {
-        return;
-      }
-      window.requestAnimationFrame(function (timeStamp) {
-        return _this9.tick(timeStamp);
-      });
-      if (_config.config.debug) {
-        _utilsUtilsDefault.default.updateFPSCounter();
-      }
-      if (!this._currentTool) {
-        return;
-      }
-      var delta = timeStamp - this._tickTimeStamp;
-      this._tickTimeStamp = timeStamp;
-      this._currentTool.tick(delta);
-    }
-  }, {
-    key: "captureAutoMask",
-    value: function captureAutoMask(position) {
-      this._autoMaskCaptured = true;
-      if (!this.overlayLayer) {
-        return;
-      }
-    }
-  }, {
-    key: "processOverlay",
-    value: function processOverlay(ctx) {
-      var imageData = ctx.getImageData(0, 0, this.width, this.height);
-      var pixels = imageData.data;
-      for (var i = pixels.length - 1; i >= 0; i--) {
-        pixels[i] = pixels[i] > 64 ? 255 : 0;
-      }
-      ctx.putImageData(imageData, 0, 0);
-    }
-  }], [{
-    key: "findTouch",
-    value: function findTouch(touches, id) {
-      for (var i = 0; i < touches.length; i++) {
-        if (touches[i].identifier == id) {
-          return touches[i];
-        }
-      }
-      return null;
-    }
-  }]);
-  return PaintView;
-})(_View2.View);
-
-},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return ColorPalette;
-});
-var _Palette2 = require("./Palette");
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var ColorPalette = /*#__PURE__*/(function (_Palette) {
-  _inherits(ColorPalette, _Palette);
-  var _super = _createSuper(ColorPalette);
-  _createClass(ColorPalette, [{
-    key: "color",
-    get: function get() {
-      return this.selectedOption;
-    },
-    set: function set(value) {
-      this.selectedOption = value;
-    }
-  }]);
-  function ColorPalette(id) {
-    var _this;
-    _classCallCheck(this, ColorPalette);
-    // 16 color Mac palette
-    // https://en.wikipedia.org/wiki/List_of_software_palettes#Apple_Macintosh_default_16-color_palette
-    // let colors: string[] = [
-    // "#FFFFFF", "#f5f60d", "#f5650a", "#d50406",
-    // "#f50695", "#330496", "#0306c5", "#0692f0",
-    // "#06a606", "#026405", "#643403", "#946434",
-    // "#b5b5b5", "#848484", "#444444", "#030303",
-    // ];
-    // 32 color palette
-    // https://github.com/geoffb/dawnbringer-palettes
-    var colors = ["#000000", "#222034", "#45283c", "#663931", "#8f563b", "#df7126", "#d9a066", "#eec39a", "#fbf236", "#99e550", "#6abe30", "#37946e", "#4b692f", "#524b24", "#323c39", "#3f3f74", "#306082", "#5b6ee1", "#639bff", "#5fcde4", "#cbdbfc", "#ffffff", "#9badb7", "#847e87", "#696a6a", "#595652", "#76428a", "#ac3232", "#d95763", "#d77bba", "#8f974a", "#8a6f30"];
-    _this = _super.call(this, id, colors);
-    _this.selectedIndex = 15;
-    return _this;
-  }
-  _createClass(ColorPalette, [{
-    key: "updateOptionElement",
-    value: function updateOptionElement(element, option) {
-      element.style.background = option;
-    }
-  }]);
-  return ColorPalette;
-})(_Palette2.Palette);
-
-},{"./Palette":"1J0Eg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1J0Eg":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "Palette", function () {
-  return Palette;
-});
-var _viewsView = require("../views/View");
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-function _createForOfIteratorHelper(o, allowArrayLike) {
-  var it;
-  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
-    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-      if (it) o = it;
-      var i = 0;
-      var F = function F() {};
-      return {
-        s: F,
-        n: function n() {
-          if (i >= o.length) return {
-            done: true
-          };
-          return {
-            done: false,
-            value: o[i++]
-          };
-        },
-        e: function e(_e) {
-          throw _e;
-        },
-        f: F
-      };
-    }
-    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-  var normalCompletion = true, didErr = false, err;
-  return {
-    s: function s() {
-      it = o[Symbol.iterator]();
-    },
-    n: function n() {
-      var step = it.next();
-      normalCompletion = step.done;
-      return step;
-    },
-    e: function e(_e2) {
-      didErr = true;
-      err = _e2;
-    },
-    f: function f() {
-      try {
-        if (!normalCompletion && it.return != null) it.return();
-      } finally {
-        if (didErr) throw err;
-      }
-    }
-  };
-}
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
-}
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-  for (var i = 0, arr2 = new Array(len); i < len; i++) {
-    arr2[i] = arr[i];
-  }
-  return arr2;
-}
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var Palette = /*#__PURE__*/(function (_View) {
-  _inherits(Palette, _View);
-  var _super = _createSuper(Palette);
-  _createClass(Palette, [{
-    key: "selectedIndex",
-    get: function get() {
-      return this._selectedIndex;
-    },
-    set: function set(value) {
-      this._selectedIndex = Math.max(0, Math.min(this._options.length - 1, value));
-      this.updateSelectedOptionElement(this._selectedElement, this.selectedOption);
-    }
-  }, {
-    key: "selectedOption",
-    get: function get() {
-      return this._options[this._selectedIndex];
-    },
-    set: function set(value) {
-      var index = this._options.indexOf(value);
-      if (index === -1) {
-        return;
-      }
-      this.selectedIndex = index;
-    }
-  }, {
-    key: "isCollapsed",
-    get: function get() {
-      return this._element.classList.contains("collapsed");
-    }
-  }]);
-  function Palette(id, options) {
-    var _this;
-    var rightAlign = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    _classCallCheck(this, Palette);
-    _this = _super.call(this, id);
-    _this._options = options;
-    _this._optionElements = [];
-    _this._selectedIndex = 0;
-    _this.createOptions();
-    _this.show();
-    _this.collapse();
-    return _this;
-  }
-  _createClass(Palette, [{
-    key: "createOptions",
-    value: function createOptions() {
-      this.addSelectedOption();
-      this.addOptionElements();
-    }
-  }, {
-    key: "recreateOptions",
-    value: function recreateOptions() {
-      this.clear();
-      this.createOptions();
-    }
-  }, {
-    key: "collapse",
-    value: function collapse() {
-      this._element.classList.add("collapsed");
-      if (Palette._expandedPalette == this) {
-        Palette._expandedPalette = null;
-      }
-    }
-  }, {
-    key: "expand",
-    value: function expand() {
-      Palette.collapseAll();
-      this._element.classList.remove("collapsed");
-      Palette._expandedPalette = this;
-    }
-  }, {
-    key: "toggle",
-    value: function toggle() {
-      if (this.isCollapsed) {
-        this.expand();
-      } else {
-        this.collapse();
-      }
-    }
-  }, {
-    key: "addOption",
-    value: function addOption(value) {
-      this._options.push(value);
-      this.addOptionElement(this._options.length - 1, value);
-      this.updateOptionsWidth();
-    }
-  }, {
-    key: "removeOption",
-    value: function removeOption(index) {
-      this._options.splice(index, 1);
-      this._optionElements[index].remove();
-      this._optionElements.splice(index, 1);
-      // update the index assigned to each element:
-      this.recreateOptions();
-    }
-  }, {
-    key: "addSelectedOption",
-    value: function addSelectedOption() {
-      var _this2 = this;
-      var element = document.createElement("div");
-      element.classList.add("option");
-      this._selectedElement = element;
-      _utilsUtilsDefault.default.addFastClick(element, function () {
-        return _this2.toggle();
-      });
-      this.updateSelectedOptionElement(element, this.selectedOption);
-      this._element.appendChild(element);
-    }
-  }, {
-    key: "addOptionElements",
-    value: function addOptionElements() {
-      var element = document.createElement("div");
-      element.classList.add("options");
-      this._optionsElement = element;
-      this.addArrowElement();
-      var i = 0;
-      var _iterator = _createForOfIteratorHelper(this._options), _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-          var option = _step.value;
-          this.addOptionElement(i, option);
-          i++;
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-      this.updateOptionsWidth();
-      this._element.appendChild(element);
-    }
-  }, {
-    key: "updateOptionsWidth",
-    value: function updateOptionsWidth() {
-      this._optionsElement.style.width = Math.min(8, this._options.length) * 1.25 + "em";
-    }
-  }, {
-    key: "addArrowElement",
-    value: function addArrowElement() {
-      var element = document.createElement("div");
-      element.classList.add("arrow");
-      this._optionsElement.appendChild(element);
-    }
-  }, {
-    key: "addOptionElement",
-    value: function addOptionElement(index, option) {
-      var _this3 = this;
-      var element = document.createElement("div");
-      element.classList.add("option");
-      element.dataset.index = ("").concat(index);
-      _utilsUtilsDefault.default.addLongClick(element, function (event) {
-        return _this3.optionLongClicked(event, option, index);
-      });
-      _utilsUtilsDefault.default.addFastClick(element, function (event) {
-        return _this3.optionClicked(event, option, index);
-      });
-      this.updateOptionElement(element, option);
-      this._optionsElement.appendChild(element);
-      this._optionElements[index] = element;
-    }
-  }, {
-    key: "optionClicked",
-    value: function optionClicked(event, option, index) {
-      this.selectedIndex = index;
-      this.collapse();
-      if (this.onSelectionChanged) {
-        this.onSelectionChanged(option, index);
-      }
-    }
-  }, {
-    key: "optionLongClicked",
-    value: function optionLongClicked(event, option, index) {}
-  }, {
-    key: "updateOptionElement",
-    value: function updateOptionElement(element, option) {}
-  }, {
-    key: "updateSelectedOptionElement",
-    value: function updateSelectedOptionElement(element, option) {
-      this.updateOptionElement(element, option);
-    }
-  }], [{
-    key: "collapseAll",
-    value: function collapseAll() {
-      if (Palette._expandedPalette) {
-        Palette._expandedPalette.collapse();
-      }
-    }
-  }]);
-  return Palette;
-})(_viewsView.View);
-
-},{"../views/View":"30r6k","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5u02W":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return SizePalette;
-});
-var _Palette2 = require("./Palette");
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var SizePalette = /*#__PURE__*/(function (_Palette) {
-  _inherits(SizePalette, _Palette);
-  var _super = _createSuper(SizePalette);
-  _createClass(SizePalette, [{
-    key: "size",
-    get: function get() {
-      return this.selectedOption;
-    },
-    set: function set(value) {
-      this.selectedOption = value;
-    }
-  }]);
-  function SizePalette(id) {
-    var _this;
-    _classCallCheck(this, SizePalette);
-    var sizes = [2, 8, 24, 40];
-    _this = _super.call(this, id, sizes, true);
-    _this.selectedIndex = 1;
-    return _this;
-  }
-  _createClass(SizePalette, [{
-    key: "updateOptionElement",
-    value: function updateOptionElement(element, option) {
-      var width = option / 40;
-      element.innerHTML = '<div class="line-width" style="width:' + width + 'em"></div>';
-    }
-  }]);
-  return SizePalette;
-})(_Palette2.Palette);
-
-},{"./Palette":"1J0Eg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6lba4":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return PenTool;
-});
-var _Tool2 = require("./Tool");
-var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
-// Paints lines with varying stroke width
-var PenTool = /*#__PURE__*/(function (_Tool) {
-  _inherits(PenTool, _Tool);
-  var _super = _createSuper(PenTool);
-  function PenTool(painter, buttonId) {
-    var _this;
-    var operation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "darken";
-    _classCallCheck(this, PenTool);
-    _this = _super.call(this, painter, buttonId);
-    _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _utilsPointDefault.default(0, 0));
-    _this._operation = operation;
-    return _this;
-  }
-  _createClass(PenTool, [{
-    key: "down",
-    value: function down() {
-      this.painter.captureAutoMask(this.mouse.copy().round());
-      this._lastPoint = this.mouse.copy();
-      this._points = [this._lastPoint];
-      this._widths = [this.getWidth()];
-      var ctx = this.getBufferCtx();
-      ctx.strokeStyle = this.color;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      this.painter.baseLayer.ctx.globalCompositeOperation = this._operation;
-      this.requestDrawPath();
-    }
-  }, {
-    key: "tick",
-    value: function tick(delta) {
-      if (this._drawPathRequested) {
-        this.drawPath();
-        this._drawPathRequested = false;
-      }
-    }
-  }, {
-    key: "requestDrawPath",
-    value: function requestDrawPath() {
-      this._drawPathRequested = true;
-    }
-  }, {
-    key: "drawPath",
-    value: function drawPath() {
-      var ctx = this.getBufferCtx();
-      if (this._points.length > 0) {
-        this.painter.undo(false);
-        ctx.clearRect(0, 0, this.painter.width, this.painter.height);
-        var point = this._points[0];
-        var oldPoint = point;
-        for (var i = 0; i < this._points.length; i++) {
-          var lastPoint = this._points[Math.max(0, i - 1)];
-          point = this._points[i].copy();
-          // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-          // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-          var midPoint = new _utilsPointDefault.default((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
-          ctx.lineWidth = this._widths[i];
-          ctx.beginPath();
-          ctx.moveTo(oldPoint.x, oldPoint.y);
-          ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
-          ctx.stroke();
-          oldPoint = midPoint;
-        }
-        ctx.moveTo(oldPoint.x, oldPoint.y);
-        ctx.quadraticCurveTo(point.x, point.y, this._lastPoint.x, this._lastPoint.y);
-        ctx.stroke();
-        var radius = this.getWidth() * 0.5;
-        ctx.beginPath();
-        ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = ctx.strokeStyle;
-        ctx.fill();
-        // this.applyAutoMask();
-        this.painter.baseLayer.ctx.globalAlpha = this.opacity;
-        this.painter.baseLayer.drawImage(ctx.canvas);
-        this.painter.baseLayer.ctx.globalAlpha = 1;
-      }
-    }
-  }, {
-    key: "move",
-    value: function move() {
-      if (!this.painting) {
-        return;
-      }
-      this._lastPoint = this.mouse.copy();
-      var width = this.getWidth();
-      this._points.push(this._lastPoint);
-      var lastWidth = this._widths[this._widths.length - 1];
-      this._widths.push(_utilsUtilsDefault.default.clamp(lastWidth - 1, lastWidth + 1, width));
-      this.requestDrawPath();
-    }
-  }, {
-    key: "pressureChanged",
-    value: function pressureChanged() {
-      this.requestDrawPath();
-    }
-  }, {
-    key: "getWidth",
-    value: function getWidth() {
-      var pressure = _utilsUtilsDefault.default.clamp(0.5, 2, this.pressure * 2);
-      var speed = _utilsUtilsDefault.default.clamp(1, 5, this.speed);
-      return this.lineWidth * pressure / speed;
-    }
-  }, {
-    key: "applyAutoMask",
-    value: function applyAutoMask() {
-      if (!this.painter.overlayLayer || !this.painter.autoMaskCtx) {
-        return;
-      }
-      var ctx = this.getBufferCtx();
-      ctx.globalCompositeOperation = "destination-in";
-      ctx.drawImage(this.painter.autoMaskCtx.canvas, 0, 0);
-      ctx.globalCompositeOperation = "source-over";
-    }
-  }]);
-  return PenTool;
-})(_Tool2Default.default);
-
-},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7utpK":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return Tool;
-});
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
-// Base class for all tools
-var Tool = /*#__PURE__*/(function () {
-  _createClass(Tool, [{
-    key: "color",
-    get: function get() {
-      return this.painter.color;
-    }
-  }, {
-    key: "opacity",
-    get: function get() {
-      return this.painter.opacity;
-    }
-  }, {
-    key: "lineWidth",
-    get: function get() {
-      return this.painter.lineWidth;
-    }
-  }]);
-  function Tool(painter, buttonId) {
-    _classCallCheck(this, Tool);
-    _defineProperty(this, "painting", false);
-    _defineProperty(this, "pressure", 1);
-    this.painter = painter;
-    this.mouse = new _utilsPointDefault.default(0, 0);
-    this._buttonElement = document.getElementById(buttonId);
-  }
-  _createClass(Tool, [{
-    key: "createBufferCtx",
-    // creates a context to draw the current stroke to so we can draw the complete stroke with a different
-    // operation. The buffer can be shared by different tools.
-    // creates a context to draw the current stroke to so we can draw the complete stroke with a different
-    // operation. The buffer can be shared by different tools.
-    value: function createBufferCtx() {
-      var brushCanvas = document.createElement("canvas");
-      brushCanvas.id = "buffer";
-      brushCanvas.width = this.painter.width;
-      brushCanvas.height = this.painter.height;
-      Tool._bufferCtx = brushCanvas.getContext("2d", {
-        alpha: true
-      });
-      Tool._bufferCtx.imageSmoothingQuality = "high";
-      Tool._bufferCtx.imageSmoothingEnabled = true;
-    }
-  }, {
-    key: "getBufferCtx",
-    value: function getBufferCtx() {
-      if (Tool._bufferCtx == null) {
-        this.createBufferCtx();
-      }
-      return Tool._bufferCtx;
-    }
-  }, {
-    key: "enable",
-    value: function enable() {
-      this._buttonElement.classList.add("selected");
-    }
-  }, {
-    key: "disable",
-    value: function disable() {
-      this._buttonElement.classList.remove("selected");
-    }
-  }, {
-    key: "down",
-    value: function down() {}
-  }, {
-    key: "move",
-    value: function move() {}
-  }, {
-    key: "up",
-    value: function up() {}
-  }, {
-    key: "pressureChanged",
-    value: function pressureChanged() {}
-  }, {
-    key: "tick",
-    value: function tick(delta) {}
-  }, {
-    key: "keyDown",
-    value: function keyDown(event) {}
-  }]);
-  return Tool;
-})();
-
-},{"../utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"4aYdj":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return ShapePalette;
-});
-var _Palette2 = require("./Palette");
-var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
-function _createForOfIteratorHelper(o, allowArrayLike) {
-  var it;
-  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
-    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-      if (it) o = it;
-      var i = 0;
-      var F = function F() {};
-      return {
-        s: F,
-        n: function n() {
-          if (i >= o.length) return {
-            done: true
-          };
-          return {
-            done: false,
-            value: o[i++]
-          };
-        },
-        e: function e(_e) {
-          throw _e;
-        },
-        f: F
-      };
-    }
-    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-  var normalCompletion = true, didErr = false, err;
-  return {
-    s: function s() {
-      it = o[Symbol.iterator]();
-    },
-    n: function n() {
-      var step = it.next();
-      normalCompletion = step.done;
-      return step;
-    },
-    e: function e(_e2) {
-      didErr = true;
-      err = _e2;
-    },
-    f: function f() {
-      try {
-        if (!normalCompletion && it.return != null) it.return();
-      } finally {
-        if (didErr) throw err;
-      }
-    }
-  };
-}
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
-}
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-  for (var i = 0, arr2 = new Array(len); i < len; i++) {
-    arr2[i] = arr[i];
-  }
-  return arr2;
-}
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var ShapePalette = /*#__PURE__*/(function (_Palette) {
-  _inherits(ShapePalette, _Palette);
-  var _super = _createSuper(ShapePalette);
-  _createClass(ShapePalette, [{
-    key: "stamp",
-    get: function get() {
-      return this.selectedOption;
-    }
-  }]);
-  function ShapePalette(id) {
-    var _this;
-    _classCallCheck(this, ShapePalette);
-    var shapeUrls = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
-    _this = _super.call(this, id, shapeUrls, true);
-    _this._shapeIds = {};
-    _this.selectedIndex = 0;
-    _storageImageStorageDefault.default.keys().then(function (keys) {
-      var shapesIds = keys.filter(function (x) {
-        return x.startsWith("Shape");
-      });
-      var _iterator = _createForOfIteratorHelper(shapesIds), _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-          var shapeId = _step.value;
-          _this.addShapeFromImageId(shapeId);
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-    });
-    _this._element.addEventListener("imagesaved", function (event) {
-      var id = event.detail;
-      if (id.startsWith("Shape")) {
-        _this.addShapeFromImageId(id);
-      }
-    });
-    return _this;
-  }
-  _createClass(ShapePalette, [{
-    key: "addShapeFromImageId",
-    value: function addShapeFromImageId(stampId) {
-      var _this2 = this;
-      _storageImageStorageDefault.default.loadBlob(stampId).then(function (blob) {
-        var url = URL.createObjectURL(blob);
-        _this2._shapeIds[url] = stampId;
-        _this2.addOption(url);
-      });
-    }
-  }, {
-    key: "optionLongClicked",
-    value: function optionLongClicked(event, option, index) {
-      this.deleteShape(index);
-    }
-  }, {
-    key: "updateOptionElement",
-    value: function updateOptionElement(element, option) {
-      element.style.backgroundImage = ("url(\"").concat(option, "\")");
-    }
-  }, {
-    key: "updateSelectedOptionElement",
-    value: function updateSelectedOptionElement(element, option) {
-      element.innerHTML = '<i class="fas fa-shapes"></i>';
-    }
-  }, {
-    key: "deleteShape",
-    value: function deleteShape(index) {
-      var _this3 = this;
-      var option = this._options[index];
-      var stampId = this._shapeIds[option];
-      if (!stampId) {
-        return;
-      }
-      _storageImageStorageDefault.default.deleteImage(stampId).then(function () {
-        delete _this3._shapeIds[option];
-        _this3.removeOption(index);
-        if (_this3.selectedIndex == index) {
-          // select the following item that now has the same index
-          _this3.selectedIndex = index;
-        }
-      });
-    }
-  }]);
-  return ShapePalette;
-})(_Palette2.Palette);
-
-},{"./Palette":"1J0Eg","../storage/ImageStorage":"3kpel","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6xo2a":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return CanvasLayer;
-});
-var _config = require("./config");
-var _Layer2 = require("./Layer");
-var _Layer2Default = _parcelHelpers.interopDefault(_Layer2);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var CanvasLayer = /*#__PURE__*/(function (_Layer) {
-  _inherits(CanvasLayer, _Layer);
-  var _super = _createSuper(CanvasLayer);
-  _createClass(CanvasLayer, [{
-    key: "canvas",
-    get: function get() {
-      return this._element;
-    }
-  }, {
-    key: "ctx",
-    get: function get() {
-      return this._ctx;
-    }
-  }]);
-  function CanvasLayer(parent, id, x, y, width, height) {
-    var _this;
-    _classCallCheck(this, CanvasLayer);
-    _this = _super.call(this, parent, "canvas", id, x, y, width, height);
-    _this._ctx = _this.canvas.getContext("2d", {
-      alpha: true
-    });
-    _this._ctx.imageSmoothingQuality = "high";
-    _this._ctx.imageSmoothingEnabled = _config.config.imageSmoothing;
-    return _this;
-  }
-  _createClass(CanvasLayer, [{
-    key: "getData",
-    value: function getData() {
-      return this._ctx.getImageData(0, 0, this.width, this.height);
-    }
-  }, {
-    key: "putData",
-    value: function putData(data) {
-      this._ctx.putImageData(data, 0, 0);
-    }
-  }, {
-    key: "drawImage",
-    value: function drawImage(image, rect) {
-      var _ref = rect || ({
-        x: 0,
-        y: 0,
-        width: this.width,
-        height: this.height
-      }), x = _ref.x, y = _ref.y, width = _ref.width, height = _ref.height;
-      this._ctx.drawImage(image, x, y, width, height);
-    }
-  }, {
-    key: "clear",
-    value: function clear(rect) {
-      var _ref2 = rect || ({
-        x: 0,
-        y: 0,
-        width: this.width,
-        height: this.height
-      }), x = _ref2.x, y = _ref2.y, width = _ref2.width, height = _ref2.height;
-      this._ctx.clearRect(x, y, width, height);
-    }
-  }]);
-  return CanvasLayer;
-})(_Layer2Default.default);
-
-},{"./config":"1tzQg","./Layer":"hkRDB","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"hkRDB":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return Layer;
-});
-var _config = require("./config");
-var _utilsUtils = require("./utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-var _utilsPoint = require("./utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
-var Layer = /*#__PURE__*/(function () {
-  _createClass(Layer, [{
-    key: "id",
-    get: function get() {
-      return this._element.id;
-    }
-  }, {
-    key: "index",
-    get: function get() {
-      return this._index;
-    },
-    set: function set(v) {
-      this._index = v;
-      this.transform(this.position, this.scale, this.rotation);
-    }
-  }, {
-    key: "width",
-    get: function get() {
-      return this._width;
-    }
-  }, {
-    key: "height",
-    get: function get() {
-      return this._height;
-    }
-  }, {
-    key: "position",
-    get: function get() {
-      return this._position;
-    }
-  }, {
-    key: "rotation",
-    get: function get() {
-      return this._rotation;
-    }
-  }, {
-    key: "scale",
-    get: function get() {
-      return this._scale;
-    }
-  }, {
-    key: "floating",
-    get: function get() {
-      return this._element.classList.contains("floating");
-    },
-    set: function set(value) {
-      this._element.classList.toggle("floating", value);
-      this._element.style.pointerEvents = value ? "auto" : "none";
-      if (value) {
-        this.addEventListeners();
-      } else {
-        this.removeEventListeners();
-      }
-    }
-  }]);
-  function Layer(parent, tag, id, x, y, width, height) {
-    _classCallCheck(this, Layer);
-    _defineProperty(this, "_startScale", 1);
-    _defineProperty(this, "_startRotation", 0);
-    _defineProperty(this, "_position", new _utilsPointDefault.default(0, 0));
-    _defineProperty(this, "_scale", 1);
-    _defineProperty(this, "_rotation", 0);
-    _defineProperty(this, "_lastTouchStartTime", 0);
-    _defineProperty(this, "_pointers", []);
-    this._element = document.createElement(tag);
-    this._element.id = id;
-    this._element.classList.add("layer");
-    this._index = 0;
-    this._width = width;
-    this._height = height;
-    this._element.width = width;
-    this._element.height = height;
-    this._element.style.width = ("").concat(width, "em");
-    this._element.style.height = ("").concat(height, "em");
-    this._element.style.pointerEvents = "none";
-    parent.appendChild(this._element);
-    this.transform(new _utilsPointDefault.default(x, y), 1, 0);
-    this.bindEventListeners();
-  }
-  _createClass(Layer, [{
-    key: "remove",
-    value: function remove() {
-      this._element.remove();
-    }
-  }, {
-    key: "resize",
-    value: function resize(width, height) {
-      var x = this.position.x + 0.5 * (this.width - width);
-      var y = this.position.y + 0.5 * (this.height - height);
-      this.setPositionAndSize(x, y, width, height);
-    }
-  }, {
-    key: "setPositionAndSize",
-    value: function setPositionAndSize(x, y, width, height) {
-      this._width = width;
-      this._height = height;
-      this._element.width = width;
-      this._element.height = height;
-      this._element.style.width = ("").concat(width, "em");
-      this._element.style.height = ("").concat(height, "em");
-      this.transform(new _utilsPointDefault.default(x, y), this.scale, this.rotation);
-    }
-  }, {
-    key: "drawToCanvas",
-    value: function drawToCanvas(ctx) {
-      ctx.save();
-      var x = this._position.x + 0.5 * this.width;
-      var y = this._position.y + 0.5 * this.height;
-      ctx.setTransform(this._scale, 0, 0, this._scale, x, y);
-      ctx.rotate(this._rotation);
-      ctx.translate(-0.5 * this.width, -0.5 * this.height);
-      ctx.drawImage(this._element, 0, 0);
-      ctx.restore();
-    }
-  }, {
-    key: "addEventListeners",
-    value: function addEventListeners() {
-      // pinch gesture handling inspired by https://codepen.io/hanseklund/pen/izloq
-      this._element.addEventListener('click', this.preventDefault);
-      if (_utilsUtilsDefault.default.pointerEventsSupported()) {
-        this._element.addEventListener('touchstart', this.preventDefault);
-        this._element.addEventListener('pointerdown', this.pointerDown);
-      } else {
-        this._element.addEventListener('touchstart', this.touchStart);
-      }
-    }
-  }, {
-    key: "removeEventListeners",
-    value: function removeEventListeners() {
-      this._element.removeEventListener('click', this.preventDefault);
-      if (_utilsUtilsDefault.default.pointerEventsSupported()) {
-        this._element.removeEventListener('touchstart', this.preventDefault);
-        this._element.removeEventListener('pointerdown', this.pointerDown);
-      } else {
-        this._element.removeEventListener('touchstart', this.touchStart);
-      }
-    }
-  }, {
-    key: "preventDefault",
-    value: function preventDefault(event) {
-      event.preventDefault();
-    }
-  }, {
-    key: "doubleTap",
-    value: function doubleTap(event) {
-      if (this.onDoubleTap) {
-        this.onDoubleTap(event);
-      }
-    }
-  }, {
-    key: "pointerDown",
-    value: function pointerDown(event) {
-      event.preventDefault();
-      this._element.setPointerCapture(event.pointerId);
-      this.addPointerEvent(event);
-      if (this._pointers.length === 1) {
-        if (event.timeStamp < this._lastTouchStartTime + _config.config.doubleTapDelay) {
-          this.doubleTap(event);
-        }
-        this._lastTouchStartTime = event.timeStamp;
-        this._element.addEventListener("pointermove", this.pointerMove);
-        this._element.addEventListener("pointerup", this.pointerUp);
-        this._pinchCenter = new _utilsPointDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
-        if (event.altKey) {
-          var p1 = this.clientToPixel(this._pointers[0]);
-          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
-          this.pinchStart(p1, p2);
-        } else {
-          this.dragStart(this.clientToPixel(this._pointers[0]));
-        }
-      }
-      if (this._pointers.length === 2) {
-        this.pinchStart(this.clientToPixel(this._pointers[0]), this.clientToPixel(this._pointers[1]));
-      }
-    }
-  }, {
-    key: "addPointerEvent",
-    value: function addPointerEvent(event) {
-      var index = this._pointers.findIndex(function (x) {
-        return x.pointerId == event.pointerId;
-      });
-      if (index < 0) {
-        this._pointers.push(event);
-      } else {
-        this._pointers[index] = event;
-      }
-    }
-  }, {
-    key: "removePointerEvent",
-    value: function removePointerEvent(event) {
-      var index = this._pointers.findIndex(function (x) {
-        return x.pointerId == event.pointerId;
-      });
-      if (index >= 0) {
-        this._pointers.splice(index, 1);
-      }
-    }
-  }, {
-    key: "pointerMove",
-    value: function pointerMove(event) {
-      event.preventDefault();
-      this.addPointerEvent(event);
-      this.move(this._pointers, event.altKey);
-    }
-  }, {
-    key: "pointerUp",
-    value: function pointerUp(event) {
-      event.preventDefault();
-      this._element.releasePointerCapture(event.pointerId);
-      this.removePointerEvent(event);
-      if (this._pointers.length == 1) {
-        this.dragStart(this.clientToPixel(this._pointers[0]));
-      }
-      if (this._pointers.length == 0) {
-        this._element.removeEventListener("pointermove", this.pointerMove);
-        this._element.removeEventListener("pointerup", this.pointerUp);
-      }
-    }
-  }, {
-    key: "touchStart",
-    value: function touchStart(event) {
-      event.preventDefault();
-      if (event.touches.length === 1) {
-        if (event.timeStamp < this._lastTouchStartTime + _config.config.doubleTapDelay) {
-          this.doubleTap(event);
-        }
-        this._lastTouchStartTime = event.timeStamp;
-        this._element.addEventListener('touchmove', this.touchMove);
-        this._element.addEventListener('touchend', this.touchEnd);
-        this._pinchCenter = new _utilsPointDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
-        if (event.altKey) {
-          var p1 = this.clientToPixel(event.touches[0]);
-          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
-          this.pinchStart(p1, p2);
-        } else {
-          this.dragStart(this.clientToPixel(event.touches[0]));
-        }
-      }
-      if (event.touches.length === 2) {
-        this.pinchStart(this.clientToPixel(event.touches[0]), this.clientToPixel(event.touches[1]));
-      }
-    }
-  }, {
-    key: "touchMove",
-    value: function touchMove(event) {
-      event.preventDefault();
-      this.move(event.touches, event.altKey);
-    }
-  }, {
-    key: "move",
-    value: function move(pointers, altKey) {
-      if (pointers.length === 1) {
-        if (altKey) {
-          var p1 = this.clientToPixel(pointers[0]);
-          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
-          this.pinchMove(p1, p2);
-        } else {
-          this.dragMove(this.clientToPixel(pointers[0]));
-        }
-      }
-      if (pointers.length === 2) {
-        this.pinchMove(this.clientToPixel(pointers[0]), this.clientToPixel(pointers[1]));
-      }
-    }
-  }, {
-    key: "touchEnd",
-    value: function touchEnd(event) {
-      event.preventDefault();
-      this._element.removeEventListener('touchmove', this.touchMove);
-      this._element.addEventListener('touchend', this.touchEnd);
-    }
-  }, {
-    key: "transform",
-    value: function transform(position, scale, rotation) {
-      this._position = position;
-      this._rotation = rotation;
-      this._scale = scale;
-      var index = this._index;
-      this._element.style.transform = ("translate(").concat(position.x, "em, ").concat(position.y, "em) rotate(").concat(rotation, "rad) scale(").concat(scale, ") translateZ(").concat(index, "px)");
-      this._element.style.outlineWidth = ("").concat(2 / scale, "em");
-    }
-  }, {
-    key: "bindEventListeners",
-    value: function bindEventListeners() {
-      // TODO: Find a better way. This is ugly:
-      this.touchStart = this.touchStart.bind(this);
-      this.touchMove = this.touchMove.bind(this);
-      this.touchEnd = this.touchEnd.bind(this);
-      this.pointerDown = this.pointerDown.bind(this);
-      this.pointerMove = this.pointerMove.bind(this);
-      this.pointerUp = this.pointerUp.bind(this);
-    }
-  }, {
-    key: "dragStart",
-    value: function dragStart(position) {
-      this._localDragPosition = _utilsPointDefault.default.subtract(position, this.position);
-    }
-  }, {
-    key: "dragMove",
-    value: function dragMove(position) {
-      position.subtract(this._localDragPosition);
-      this.transform(position, this._scale, this._rotation);
-    }
-  }, {
-    key: "pinchStart",
-    value: function pinchStart(p1, p2) {
-      var center = _utilsPointDefault.default.center(p1, p2);
-      this._pinchStartDist = _utilsPointDefault.default.distance(p1, p2);
-      this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
-      this._startRotation = this._rotation;
-      this._startScale = this._scale;
-    }
-  }, {
-    key: "pinchMove",
-    value: function pinchMove(p1, p2) {
-      var center = _utilsPointDefault.default.center(p1, p2);
-      var distance = _utilsPointDefault.default.distance(p1, p2);
-      var angle = Math.atan2(p1.y - center.y, p1.x - center.x);
-      var angleChange = angle - this._pinchStartRotation;
-      var scale = this._startScale * (distance / this._pinchStartDist);
-      scale = _utilsUtilsDefault.default.clamp(0.1, 10, scale);
-      var position = _utilsPointDefault.default.center(p1, p2);
-      position.x -= 0.5 * this.width;
-      position.y -= 0.5 * this.height;
-      var rotation = this._startRotation + angleChange;
-      this.transform(position, scale, rotation);
-    }
-  }, {
-    key: "clientToPixel",
-    value: function clientToPixel(position1) {
-      var parent = this._element.parentElement;
-      var rect = parent.getBoundingClientRect();
-      var isPortraitOrientation = rect.height > rect.width;
-      var nx = (position1.clientX - rect.left) / rect.width;
-      var ny = (position1.clientY - rect.top) / rect.height;
-      var x = (isPortraitOrientation ? 1 - ny : nx) * _config.config.width;
-      var y = (isPortraitOrientation ? nx : ny) * _config.config.height;
-      return new _utilsPointDefault.default(x, y);
-    }
-  }]);
-  return Layer;
-})();
-
-},{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1ITGs":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return ImageLayer;
-});
-var _Layer2 = require("./Layer");
-var _Layer2Default = _parcelHelpers.interopDefault(_Layer2);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var ImageLayer = /*#__PURE__*/(function (_Layer) {
-  _inherits(ImageLayer, _Layer);
-  var _super = _createSuper(ImageLayer);
-  _createClass(ImageLayer, [{
-    key: "image",
-    get: function get() {
-      return this._element;
-    }
-  }]);
-  function ImageLayer(parent, id, x, y, width, height) {
-    var _this;
-    _classCallCheck(this, ImageLayer);
-    _this = _super.call(this, parent, "img", id, x, y, width, height);
-    _this._element.onload = function () {
-      // if this.image.completed
-      _this.resize(_this.image.naturalWidth, _this.image.naturalHeight);
-    };
-    return _this;
-  }
-  return ImageLayer;
-})(_Layer2Default.default);
-
-},{"./Layer":"hkRDB","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"Hlzxz":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return SelectionTool;
-});
-var _Tool2 = require("./Tool");
-var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
-var _utilsRect = require("../utils/Rect");
-var _utilsRectDefault = _parcelHelpers.interopDefault(_utilsRect);
-var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-var _config = require("../config");
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _get(target, property, receiver) {
-  if (typeof Reflect !== "undefined" && Reflect.get) {
-    _get = Reflect.get;
-  } else {
-    _get = function _get(target, property, receiver) {
-      var base = _superPropBase(target, property);
-      if (!base) return;
-      var desc = Object.getOwnPropertyDescriptor(base, property);
-      if (desc.get) {
-        return desc.get.call(receiver);
-      }
-      return desc.value;
-    };
-  }
-  return _get(target, property, receiver || target);
-}
-function _superPropBase(object, property) {
-  while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = _getPrototypeOf(object);
-    if (object === null) break;
-  }
-  return object;
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
-// Provides a floating selection the user can manipulate
-var SelectionTool = /*#__PURE__*/(function (_Tool) {
-  _inherits(SelectionTool, _Tool);
-  var _super = _createSuper(SelectionTool);
-  _createClass(SelectionTool, [{
-    key: "selectionLayer",
-    get: function get() {
-      return this.painter.getLayer(this.selectionLayerId);
-    }
-  }, {
-    key: "selection",
-    get: function get() {
-      return this._selection;
-    }
-  }, {
-    key: "hasFloatingSelection",
-    get: function get() {
-      return this._hasFloatingSelection;
-    },
-    set: function set(value) {
-      this._hasFloatingSelection = value;
-      this.toggleFloatingSelectionButtons(value);
-    }
-  }, {
-    key: "isInShapesPalette",
-    get: function get() {
-      return this._isInShapesPalette;
-    },
-    set: function set(value) {
-      this._isInShapesPalette = value;
-      this._saveButton.classList.toggle("disabled", value);
-    }
-  }]);
-  function SelectionTool(painter, buttonId) {
-    var _this;
-    _classCallCheck(this, SelectionTool);
-    _this = _super.call(this, painter, buttonId);
-    _defineProperty(_assertThisInitialized(_this), "selectionLayerId", "selection-layer");
-    _defineProperty(_assertThisInitialized(_this), "_selection", _utilsRectDefault.default.Empty());
-    _this._deleteButton = document.getElementById("selection-delete-button");
-    _utilsUtilsDefault.default.addFastClick(_this._deleteButton, function () {
-      return _this.clearSelection();
-    });
-    _this._stampButton = document.getElementById("selection-stamp-button");
-    _utilsUtilsDefault.default.addFastClick(_this._stampButton, function () {
-      return _this.paintSelectionToCanvas();
-    });
-    _this._saveButton = document.getElementById("selection-save-button");
-    _utilsUtilsDefault.default.addFastClick(_this._saveButton, function () {
-      return _this.saveSelectionAsNewStamp();
-    });
-    _this._downloadButton = document.getElementById("selection-download-button");
-    var anchorElement = _this._downloadButton.firstElementChild;
-    _utilsUtilsDefault.default.addFastClick(anchorElement, function () {
-      anchorElement.href = _this.selectionLayer.canvas.toDataURL();
-    });
-    _this.hasFloatingSelection = false;
-    return _this;
-  }
-  _createClass(SelectionTool, [{
-    key: "toggleFloatingSelectionButtons",
-    value: function toggleFloatingSelectionButtons(visible) {
-      this._deleteButton.classList.toggle("hidden", !visible);
-      this._stampButton.classList.toggle("hidden", !visible);
-      this._downloadButton.classList.toggle("hidden", !visible);
-      this._saveButton.classList.toggle("hidden", !visible);
-    }
-  }, {
-    key: "enable",
-    value: function enable() {
-      _get(_getPrototypeOf(SelectionTool.prototype), "enable", this).call(this);
-      this.createSelectionLayer();
-      this.hasFloatingSelection = false;
-      this.isInShapesPalette = false;
-    }
-  }, {
-    key: "disable",
-    value: function disable() {
-      _get(_getPrototypeOf(SelectionTool.prototype), "disable", this).call(this);
-      this.paintSelectionToCanvas();
-      this.destroySelectionLayer();
-      this.hasFloatingSelection = false;
-    }
-  }, {
-    key: "down",
-    value: function down() {
-      this.startNewSelection();
-    }
-  }, {
-    key: "startNewSelection",
-    value: function startNewSelection() {
-      this.paintSelectionToCanvas();
-      this.selectionLayer.setPositionAndSize(0, 0, this.painter.width, this.painter.height);
-      this.selectionLayer.transform(new _utilsPointDefault.default(0, 0), 1, 0);
-      this.selectionLayer.floating = false;
-      this.hasFloatingSelection = false;
-      this.isInShapesPalette = false;
-      this._startPosition = this.getMousePosition();
-      var ctx = this.selectionLayer.ctx;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.strokeStyle = "black";
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      this.requestDrawSelectionOutline();
-    }
-  }, {
-    key: "getMousePosition",
-    value: function getMousePosition() {
-      return this.mouse.copy().round().clamp(0, 0, this.painter.width - 1, this.painter.height - 1);
-    }
-  }, {
-    key: "move",
-    value: function move() {
-      if (!this.painting) {
-        return;
-      }
-      this.mouse.round();
-      this.requestDrawSelectionOutline();
-    }
-  }, {
-    key: "up",
-    value: function up() {
-      this.cutSelection();
-    }
-  }, {
-    key: "tick",
-    value: function tick(delta) {
-      if (this._drawSelectionOutlineRequested) {
-        this.updateSelectionAndDrawOutline();
-        this._drawSelectionOutlineRequested = false;
-      }
-    }
-  }, {
-    key: "keyDown",
-    value: function keyDown(event) {
-      switch (event.code) {
-        case 'Backspace':
-          this.clearSelection();
-          break;
-        case 'KeyC':
-          if (event.metaKey) {
-            this.copyToClipboard();
-          }
-          break;
-      }
-    }
-  }, {
-    key: "clearSelection",
-    value: function clearSelection() {
-      this.selectionLayer.clear();
-      this.startNewSelection();
-    }
-  }, {
-    key: "setImage",
-    value: function setImage(image) {
-      this.hasFloatingSelection = true;
-      this.selectionLayer.resize(image.width, image.height);
-      this.selectionLayer.floating = true;
-      this.selectionLayer.drawImage(image);
-      this.isInShapesPalette = true;
-    }
-  }, {
-    key: "setImageUrl",
-    value: function setImageUrl(url) {
-      var _this2 = this;
-      var img = new Image();
-      img.src = url;
-      img.onload = function () {
-        _this2.setImage(img);
-      };
-    }
-  }, {
-    key: "requestDrawSelectionOutline",
-    value: function requestDrawSelectionOutline() {
-      this._drawSelectionOutlineRequested = true;
-    }
-  }, {
-    key: "updateSelectionAndDrawOutline",
-    value: function updateSelectionAndDrawOutline() {
-      if (this.hasFloatingSelection) {
-        return;
-      }
-      this.selectionLayer.clear();
-      var ctx = this.selectionLayer.ctx;
-      var position = this.getMousePosition();
-      var x = Math.min(this._startPosition.x, position.x);
-      var y = Math.min(this._startPosition.y, position.y);
-      var width = Math.abs(this._startPosition.x - position.x);
-      var height = Math.abs(this._startPosition.y - position.y);
-      this._selection = new _utilsRectDefault.default(x, y, width, height);
-      ctx.strokeRect(x, y, width, height);
-    }
-  }, {
-    key: "destroySelectionLayer",
-    value: function destroySelectionLayer() {
-      this.painter.removeLayer(this.selectionLayer);
-    }
-  }, {
-    key: "createSelectionLayer",
-    value: function createSelectionLayer() {
-      var _this3 = this;
-      if (this.selectionLayer) {
-        return;
-      }
-      this.painter.addCanvasLayer(this.selectionLayerId, 0, 0, this.painter.width, this.painter.height, false);
-      this.selectionLayer.onDoubleTap = function (event) {
-        if (event.altKey) {
-          _this3.saveSelectionAsNewStamp();
-          return;
-        }
-        _this3.paintSelectionToCanvas();
-      };
-    }
-  }, {
-    key: "cutSelection",
-    value: function cutSelection() {
-      this.selectionLayer.clear();
-      this._selection = _utilsUtilsDefault.default.getVisiblePixelFrame(this.painter.baseLayer.ctx, this.selection);
-      if (this.selection.isEmpty()) {
-        return;
-      }
-      this.hasFloatingSelection = true;
-      var _this$selection = this.selection, x = _this$selection.x, y = _this$selection.y, width = _this$selection.width, height = _this$selection.height;
-      this.selectionLayer.setPositionAndSize(x, y, width, height);
-      this.selectionLayer.floating = true;
-      this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
-      this.painter.baseLayer.clear(this.selection);
-    }
-  }, {
-    key: "paintSelectionToCanvas",
-    value: function paintSelectionToCanvas() {
-      if (!this.hasFloatingSelection) {
-        return;
-      }
-      this.painter.recordUndo();
-      this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
-      this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
-    }
-  }, {
-    key: "saveSelectionAsNewStamp",
-    value: function saveSelectionAsNewStamp() {
-      var _this4 = this;
-      _storageImageStorageDefault.default.keys().then(function (keys) {
-        var shapesIds = keys.filter(function (x) {
-          return x.startsWith("Shape");
-        });
-        if (shapesIds.length >= _config.config.maxShapeCount) {
-          console.log("Cannot save selection as shape because there are already too many in storage.");
-          return;
-        }
-        var id = "Shape" + Date.now();
-        console.log(("Saving selection as: ").concat(id));
-        _this4.selectionLayer.canvas.toBlob(function (blob) {
-          return _storageImageStorageDefault.default.saveImage(id, blob);
-        });
-        _this4.isInShapesPalette = true;
-      });
-    }
-  }, {
-    key: "copyToClipboard",
-    value: function copyToClipboard() {
-      this.selectionLayer.canvas.toBlob(function (blob) {
-        return navigator.clipboard.write([new ClipboardItem({
-          'image/png': blob
-        })]);
-      });
-      console.log("copied selection to clipboard");
-    }
-  }, {
-    key: "pasteFromClipboard",
-    value: function pasteFromClipboard() {
-      var _this5 = this;
-      navigator.permissions.query({
-        name: "clipboard-read"
-      }).then(function (result) {
-        if (!(result.state == "granted" || result.state == "prompt")) {
-          return;
-        }
-        navigator.clipboard.read().then(function (data) {
-          for (var i = 0; i < data.length; i++) {
-            if (!data[i].types.includes("image/png")) {
-              continue;
-            }
-            data[i].getType("image/png").then(function (blob) {
-              _this5.setImageUrl(URL.createObjectURL(blob));
-            });
-          }
-        });
-      });
-    }
-  }, {
-    key: "showSelectionInFullscreen",
-    value: function showSelectionInFullscreen() {
-      var img = new Image();
-      this.selectionLayer.canvas.toBlob(function (blob) {
-        return img.src = URL.createObjectURL(blob);
-      });
-      img.classList.add("fullscreen");
-      // Utils.addFastClick(img, () => {
-      // img.remove();
-      // })
-      document.body.appendChild(img);
-    }
-  }, {
-    key: "selectAll",
-    value: function selectAll() {
-      this.startNewSelection();
-      this._selection = new _utilsRectDefault.default(0, 0, this.painter.width, this.painter.height);
-      this.cutSelection();
-    }
-  }]);
-  return SelectionTool;
-})(_Tool2Default.default);
-
-},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5EiOX":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "Toolbar", function () {
-  return Toolbar;
-});
-var _viewsView = require("./views/View");
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var Toolbar = /*#__PURE__*/(function (_View) {
-  _inherits(Toolbar, _View);
-  var _super = _createSuper(Toolbar);
-  function Toolbar(id) {
-    var _this;
-    _classCallCheck(this, Toolbar);
-    _this = _super.call(this, id);
-    _this.show();
-    return _this;
-  }
-  _createClass(Toolbar, [{
-    key: "flip",
-    value: function flip() {
-      if (this._element.classList.contains("left") || this._element.classList.contains("right")) {
-        this._element.classList.toggle("left");
-        this._element.classList.toggle("right");
-      }
-      if (this._element.classList.contains("top") || this._element.classList.contains("bottom")) {
-        this._element.classList.toggle("top");
-        this._element.classList.toggle("bottom");
-      }
-    }
-  }]);
-  return Toolbar;
-})(_viewsView.View);
-
-},{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5P39T":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return SettingsView;
-});
-var _View2 = require("./View");
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-var _PeerToPeer = require("../PeerToPeer");
-var _PeerToPeerDefault = _parcelHelpers.interopDefault(_PeerToPeer);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-function _get(target, property, receiver) {
-  if (typeof Reflect !== "undefined" && Reflect.get) {
-    _get = Reflect.get;
-  } else {
-    _get = function _get(target, property, receiver) {
-      var base = _superPropBase(target, property);
-      if (!base) return;
-      var desc = Object.getOwnPropertyDescriptor(base, property);
-      if (desc.get) {
-        return desc.get.call(receiver);
-      }
-      return desc.value;
-    };
-  }
-  return _get(target, property, receiver || target);
-}
-function _superPropBase(object, property) {
-  while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = _getPrototypeOf(object);
-    if (object === null) break;
-  }
-  return object;
-}
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || (function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  });
-  return _setPrototypeOf(o, p);
-}
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = _getPrototypeOf(Derived), result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return _possibleConstructorReturn(this, result);
-  };
-}
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-  return _assertThisInitialized(self);
-}
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
-}
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-var version = require('/package').version;
-var SettingsView = /*#__PURE__*/(function (_View) {
-  _inherits(SettingsView, _View);
-  var _super = _createSuper(SettingsView);
-  function SettingsView(id, onBackClicked) {
-    var _this;
-    _classCallCheck(this, SettingsView);
-    _this = _super.call(this, id);
-    var backButton = _this._element.getElementsByClassName("button back")[0];
-    _utilsUtilsDefault.default.addFastClick(backButton, function () {
-      return onBackClicked();
-    });
-    _this._peerList = document.getElementById("peer-list");
-    var info = document.getElementById("info");
-    info.innerText = // @ts-ignore
-    ("PeerJS browser: ").concat(peerjs.util.browser, "\nVersion: ").concat(version, "\n");
-    return _this;
-  }
-  _createClass(SettingsView, [{
-    key: "show",
-    value: function show() {
-      _get(_getPrototypeOf(SettingsView.prototype), "show", this).call(this);
-      this._peerList.value = _PeerToPeerDefault.default.instance.peerList.join("\n");
-    }
-  }, {
-    key: "hide",
-    value: function hide() {
-      if (this._peerList) {
-        _PeerToPeerDefault.default.instance.peerList = this._peerList.value.split("\n");
-      }
-      _get(_getPrototypeOf(SettingsView.prototype), "hide", this).call(this);
-    }
-  }]);
-  return SettingsView;
-})(_View2.View);
-
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"2O4yD","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2O4yD":[function(require,module,exports) {
+},{}],"5xv2G":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.535\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.4b759c43.js.map
+//# sourceMappingURL=index.6c27e68b.js.map
