@@ -30,6 +30,8 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     private _rotation: number = 0;
     private _lastTouchStartTime: number = 0;
     private _pointers: PointerEvent[] = [];
+    private _width: number;
+    private _height: number;
     
     get id(): string { return this._element.id; }
     get index(): number { return this._index; }
@@ -37,8 +39,8 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         this._index = v;
         this.transform(this.position, this.scale, this.rotation);
     }
-    get width(): number { return this._element.width; };
-    get height(): number { return this._element.height; };
+    get width(): number { return this._width; };
+    get height(): number { return this._height; };
     get position() { return this._position; }
     get rotation() { return this._rotation; }
     get scale() { return this._scale; }
@@ -60,6 +62,8 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         this._element.id = id;
         this._element.classList.add("layer");
         this._index = 0;
+        this._width = width;
+        this._height = height;
         this._element.width = width;
         this._element.height = height;
         this._element.style.width = `${width}em`;
@@ -83,6 +87,8 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     }
 
     setPositionAndSize(x: number, y: number, width: number, height: number) {
+        this._width = width;
+        this._height = height;
         this._element.width = width;
         this._element.height = height;
         this._element.style.width = `${width}em`;

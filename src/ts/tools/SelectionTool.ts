@@ -32,7 +32,7 @@ export default class SelectionTool extends Tool {
     private _deleteButton: HTMLDivElement;
     private _stampButton: HTMLDivElement;
     private _saveButton: HTMLDivElement;
-    private _fullscreenButton: HTMLDivElement;
+    private _downloadButton: HTMLDivElement;
 
     constructor(painter: PaintView, buttonId: string) {
         super(painter, buttonId);
@@ -42,15 +42,20 @@ export default class SelectionTool extends Tool {
         Utils.addFastClick(this._stampButton, () => this.paintSelectionToCanvas());
         this._saveButton = <HTMLDivElement>document.getElementById("selection-save-button");
         Utils.addFastClick(this._saveButton, () => this.saveSelectionAsNewStamp());
-        this._fullscreenButton = <HTMLDivElement>document.getElementById("selection-fullscreen-button");
-        Utils.addFastClick(this._fullscreenButton, () => this.showSelectionInFullscreen());
+        
+        this._downloadButton = <HTMLDivElement>document.getElementById("selection-download-button");
+        const anchorElement = <HTMLAnchorElement>this._downloadButton.firstElementChild;
+        Utils.addFastClick(anchorElement, () => {
+            anchorElement.href = this.selectionLayer.canvas.toDataURL();
+        });
+        
         this.hasFloatingSelection = false;
     }
     
     toggleFloatingSelectionButtons(visible: boolean){
         this._deleteButton.classList.toggle("hidden", !visible);
         this._stampButton.classList.toggle("hidden", !visible);
-        this._fullscreenButton.classList.toggle("hidden", !visible);
+        this._downloadButton.classList.toggle("hidden", !visible);
         this._saveButton.classList.toggle("hidden", !visible);
     }
 
@@ -264,9 +269,9 @@ export default class SelectionTool extends Tool {
         let img = new Image();
         this.selectionLayer.canvas.toBlob(blob => img.src = URL.createObjectURL(blob));
         img.classList.add("fullscreen");
-        Utils.addFastClick(img, () => {
-            img.remove();
-        })
+        // Utils.addFastClick(img, () => {
+        //     img.remove();
+        // })
         document.body.appendChild(img);
     }
 

@@ -212,6 +212,13 @@ body, input, textarea {
     z-index: 100;
 }
 
+.button a{
+    width: 100%;
+    height: 100%;
+    display: block;
+    color: black;    
+}
+
 .button#stamp-button{
     font-size: 1.25rem;
     position: absolute;
@@ -423,12 +430,4 @@ body, input, textarea {
 .selected {
     background: #58b0ff!important;
     color: white;
-}
-
-.fullscreen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: white;
-    object-fit: scale-down;
 }
