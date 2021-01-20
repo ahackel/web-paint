@@ -112,6 +112,9 @@ export default class PaintView extends View {
                 this.setTool(this.selectionTool);
                 this.selectionTool.setImage(image);
             }
+            
+            // Reset input field so the change event will be triggered again if the user selects the same asset again
+            importImageField.value = null;
         })
         this._importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
         Utils.addFastClick(this._importImageButton, () => importImageField.click());
