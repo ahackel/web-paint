@@ -1,13 +1,21 @@
 import Utils from "../utils/Utils";
 import ImageStorage from "../storage/ImageStorage";
-import PeerToPeer from "../PeerToPeer";
 
 export default class Thumbnail {
     
     private _element: HTMLDivElement;
-    private _image: HTMLImageElement;
-    private _overlay: HTMLImageElement;
+    private _imageUrl: string;
+    private _overlayUrl: string;
+    
     get id() { return this._element.id; }
+    set imageUrl(src: string){
+        this._imageUrl = src;
+        this.updateBackgroundImages();
+    }
+    set overlayUrl(src: string){
+        this._overlayUrl = src;
+        this.updateBackgroundImages();
+    }
 
     constructor(parent: HTMLElement, id: string, onImageSelected: Function | undefined) {
         let element = <HTMLDivElement>document.createElement("div");
@@ -27,7 +35,7 @@ export default class Thumbnail {
         //         });
         // });
         
-        Utils.addFastClick(element, () => {
+        element.addEventListener("click", () => {
             if (onImageSelected) {
                 onImageSelected(id);
             }
@@ -40,37 +48,30 @@ export default class Thumbnail {
             this.loadImage();
         });
         
-        this._image = new Image();
-        this._image.draggable = false;
-        this.preventContextMenu(this._image);
-        element.appendChild(this._image);
-
-        let overlayPath = Utils.getOverlayPath(id);
-        if (overlayPath){
-            this._overlay = new Image();
-            this._overlay.draggable = false;
-            this._overlay.src = overlayPath;
-            this.preventContextMenu(this._overlay);
-            element.appendChild(this._overlay);            
-        }
+        this.overlayUrl = Utils.getImageOverlayUrl(id);
 
         parent.appendChild(element);
         this.loadImage();
-        //this.addOverlay(overlay, thumbnail);
     }
 
     private loadImage() {
         ImageStorage.loadBlob(this.id)
             .then(blob => {
-                this._image.src = blob ? URL.createObjectURL(blob) : "//:0";
-                this._image.style.display = blob ? "initial" : "none";
+                this.imageUrl = blob ? URL.createObjectURL(blob) : null;
             });
     }
-    
-    setImageSrc(src: string){
-        this._image.src = src;
+
+    private updateBackgroundImages() {
+        let urls = [];
+        if (this._overlayUrl){
+            urls.push(`url(${this._overlayUrl})`);
+        }
+        if (this._imageUrl){
+            urls.push(`url(${this._imageUrl})`);
+        }
+        this._element.style.backgroundImage = urls.join(",");
     }
-    
+
     preventContextMenu(element: HTMLElement){
         element.addEventListener("contextmenu", event => event.preventDefault());
         element.addEventListener("touchend", event => event.preventDefault());

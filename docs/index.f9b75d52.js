@@ -8136,70 +8136,6 @@ var _Thumbnail = require("./Thumbnail");
 var _ThumbnailDefault = _parcelHelpers.interopDefault(_Thumbnail);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-function _createForOfIteratorHelper(o, allowArrayLike) {
-  var it;
-  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
-    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-      if (it) o = it;
-      var i = 0;
-      var F = function F() {};
-      return {
-        s: F,
-        n: function n() {
-          if (i >= o.length) return {
-            done: true
-          };
-          return {
-            done: false,
-            value: o[i++]
-          };
-        },
-        e: function e(_e) {
-          throw _e;
-        },
-        f: F
-      };
-    }
-    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-  var normalCompletion = true, didErr = false, err;
-  return {
-    s: function s() {
-      it = o[Symbol.iterator]();
-    },
-    n: function n() {
-      var step = it.next();
-      normalCompletion = step.done;
-      return step;
-    },
-    e: function e(_e2) {
-      didErr = true;
-      err = _e2;
-    },
-    f: function f() {
-      try {
-        if (!normalCompletion && it.return != null) it.return();
-      } finally {
-        if (didErr) throw err;
-      }
-    }
-  };
-}
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
-}
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-  for (var i = 0, arr2 = new Array(len); i < len; i++) {
-    arr2[i] = arr[i];
-  }
-  return arr2;
-}
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8331,19 +8267,12 @@ var BookView = /*#__PURE__*/(function (_View) {
         return;
       }
       this._thumbnails = [];
-      var _iterator = _createForOfIteratorHelper(_config.config.sheets), _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-          var sheet = _step.value;
-          var thumbnail = new _ThumbnailDefault.default(this._element, sheet.id, function (id) {
-            return _this2.onImageSelected(id);
-          });
-          this._thumbnails.push(thumbnail);
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
+      for (var i = 0; i < _config.config.imageCount; i++) {
+        var imageId = ("image").concat(("" + (i + 1)).padStart(2, "0"));
+        var thumbnail = new _ThumbnailDefault.default(this._element, imageId, function (id) {
+          return _this2.onImageSelected(id);
+        });
+        this._thumbnails.push(thumbnail);
       }
     }
   }]);
@@ -8481,43 +8410,21 @@ var config = {
   width: 1024,
   height: 768,
   defaultShapes: defaultShapes,
-  sheets: [{
-    id: "image01",
-    overlay: "./img/overlays/spirit.png"
-  }, {
-    id: "image02",
-    overlay: "./img/overlays/spirit2.png"
-  }, {
-    id: "image03",
-    overlay: "./img/overlays/spirit3.png"
-  }, {
-    id: "image04",
-    overlay: "./img/overlays/santa.png"
-  }, {
-    id: "image05"
-  }, {
-    id: "image06"
-  }, {
-    id: "image07"
-  }, {
-    id: "image08"
-  }, {
-    id: "image09"
-  }, {
-    id: "image10"
-  }, {
-    id: "image11"
-  }, {
-    id: "image12"
-  }, {
-    id: "image13"
-  }, {
-    id: "image14"
-  }, {
-    id: "image15"
-  }, {
-    id: "image16"
-  }]
+  imageCount: 32,
+  images: {
+    "image01": {
+      overlay: "./img/overlays/spirit.png"
+    },
+    "image02": {
+      overlay: "./img/overlays/spirit2.png"
+    },
+    "image03": {
+      overlay: "./img/overlays/spirit3.png"
+    },
+    "image04": {
+      overlay: "./img/overlays/santa.png"
+    }
+  }
 };
 
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6v2zT":[function(require,module,exports) {
@@ -8555,6 +8462,18 @@ var Thumbnail = /*#__PURE__*/(function () {
     get: function get() {
       return this._element.id;
     }
+  }, {
+    key: "imageUrl",
+    set: function set(src) {
+      this._imageUrl = src;
+      this.updateBackgroundImages();
+    }
+  }, {
+    key: "overlayUrl",
+    set: function set(src) {
+      this._overlayUrl = src;
+      this.updateBackgroundImages();
+    }
   }]);
   function Thumbnail(parent, id, onImageSelected) {
     var _this = this;
@@ -8574,7 +8493,7 @@ var Thumbnail = /*#__PURE__*/(function () {
     // PeerToPeer.instance.sendData(peerName, blob);
     // });
     // });
-    _utilsUtilsDefault.default.addFastClick(element, function () {
+    element.addEventListener("click", function () {
       if (onImageSelected) {
         onImageSelected(id);
       }
@@ -8585,18 +8504,7 @@ var Thumbnail = /*#__PURE__*/(function () {
       }
       _this.loadImage();
     });
-    this._image = new Image();
-    this._image.draggable = false;
-    this.preventContextMenu(this._image);
-    element.appendChild(this._image);
-    var overlayPath = _utilsUtilsDefault.default.getOverlayPath(id);
-    if (overlayPath) {
-      this._overlay = new Image();
-      this._overlay.draggable = false;
-      this._overlay.src = overlayPath;
-      this.preventContextMenu(this._overlay);
-      element.appendChild(this._overlay);
-    }
+    this.overlayUrl = _utilsUtilsDefault.default.getImageOverlayUrl(id);
     parent.appendChild(element);
     this.loadImage();
   }
@@ -8605,14 +8513,20 @@ var Thumbnail = /*#__PURE__*/(function () {
     value: function loadImage() {
       var _this2 = this;
       _storageImageStorageDefault.default.loadBlob(this.id).then(function (blob) {
-        _this2._image.src = blob ? URL.createObjectURL(blob) : "//:0";
-        _this2._image.style.display = blob ? "initial" : "none";
+        _this2.imageUrl = blob ? URL.createObjectURL(blob) : null;
       });
     }
   }, {
-    key: "setImageSrc",
-    value: function setImageSrc(src) {
-      this._image.src = src;
+    key: "updateBackgroundImages",
+    value: function updateBackgroundImages() {
+      var urls = [];
+      if (this._overlayUrl) {
+        urls.push(("url(").concat(this._overlayUrl, ")"));
+      }
+      if (this._imageUrl) {
+        urls.push(("url(").concat(this._imageUrl, ")"));
+      }
+      this._element.style.backgroundImage = urls.join(",");
     }
   }, {
     key: "preventContextMenu",
@@ -8689,12 +8603,10 @@ var Utils = /*#__PURE__*/(function () {
       return window.PointerEvent != null;
     }
   }, {
-    key: "getOverlayPath",
-    value: function getOverlayPath(id) {
-      var page = _config.config.sheets.find(function (e) {
-        return e.id == id;
-      });
-      return page == null ? null : page.overlay;
+    key: "getImageOverlayUrl",
+    value: function getImageOverlayUrl(id) {
+      var _config$images$id;
+      return (_config$images$id = _config.config.images[id]) === null || _config$images$id === void 0 ? void 0 : _config$images$id.overlay;
     }
   }, {
     key: "log",
@@ -12392,7 +12304,9 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (window.PointerEvent != null) {
         // Required to prevent pointerDown events from being choked when tapping repeatedly:
         canvas.addEventListener('touchstart', function (event) {
-          return event.preventDefault();
+          if (event.cancelable) {
+            event.preventDefault();
+          }
         });
         canvas.addEventListener('pointerdown', function (event) {
           return _this5.pointerDown(event);
@@ -12660,7 +12574,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         if (image) {
           _this6.baseLayer.drawImage(image);
         }
-        _this6.setOverlay(_utilsUtilsDefault.default.getOverlayPath(id));
+        _this6.setOverlay(_utilsUtilsDefault.default.getImageOverlayUrl(id));
       });
     }
   }, {
@@ -14758,10 +14672,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       return _this.saveSelectionAsNewStamp();
     });
     _this._downloadButton = document.getElementById("selection-download-button");
-    var anchorElement = _this._downloadButton.firstElementChild;
-    _utilsUtilsDefault.default.addFastClick(anchorElement, function () {
-      anchorElement.href = _this.selectionLayer.canvas.toDataURL();
-    });
+    _this._downloadAnchor = _this._downloadButton.firstElementChild;
     _this.hasFloatingSelection = false;
     return _this;
   }
@@ -14868,6 +14779,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this.selectionLayer.floating = true;
       this.selectionLayer.drawImage(image);
       this.isInShapesPalette = true;
+      this.updateDownloadAnchor();
     }
   }, {
     key: "setImageUrl",
@@ -14935,6 +14847,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this.selectionLayer.floating = true;
       this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
       this.painter.baseLayer.clear(this.selection);
+      this.updateDownloadAnchor();
     }
   }, {
     key: "paintSelectionToCanvas",
@@ -14999,24 +14912,19 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       });
     }
   }, {
-    key: "showSelectionInFullscreen",
-    value: function showSelectionInFullscreen() {
-      var img = new Image();
-      this.selectionLayer.canvas.toBlob(function (blob) {
-        return img.src = URL.createObjectURL(blob);
-      });
-      img.classList.add("fullscreen");
-      // Utils.addFastClick(img, () => {
-      // img.remove();
-      // })
-      document.body.appendChild(img);
-    }
-  }, {
     key: "selectAll",
     value: function selectAll() {
       this.startNewSelection();
       this._selection = new _utilsRectDefault.default(0, 0, this.painter.width, this.painter.height);
       this.cutSelection();
+    }
+  }, {
+    key: "updateDownloadAnchor",
+    value: function updateDownloadAnchor() {
+      var _this6 = this;
+      this.selectionLayer.canvas.toBlob(function (blob) {
+        _this6._downloadAnchor.href = URL.createObjectURL(blob);
+      });
     }
   }]);
   return SelectionTool;
@@ -15287,7 +15195,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"2O4yD","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -19915,9 +19823,8 @@ parcelRequire = (function (e, r, t, n) {
   }]
 }, {}, ["iTK6"], null);
 
-},{}],"5xv2G":[function(require,module,exports) {
-module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.535\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
+},{}],"2O4yD":[function(require,module,exports) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.6c27e68b.js.map
+//# sourceMappingURL=index.f9b75d52.js.map

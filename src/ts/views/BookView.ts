@@ -32,8 +32,9 @@ export default class BookView extends View {
         
         this._thumbnails = [];
         
-        for (let sheet of config.sheets) {
-            let thumbnail = new Thumbnail(this._element, sheet.id, (id: string) => this.onImageSelected(id))
+        for (let i=0; i<config.imageCount; i++) {
+            const imageId = `image${("" + (i + 1)).padStart(2, "0")}`;
+            let thumbnail = new Thumbnail(this._element, imageId, (id: string) => this.onImageSelected(id))
             this._thumbnails.push(thumbnail);
         }
     }

@@ -25,9 +25,8 @@ export default class Utils {
         return window.PointerEvent != null;
     }
 
-    static getOverlayPath(id: string) {
-        let page = config.sheets.find(e => e.id == id);
-        return page == null ? null : page.overlay;
+    static getImageOverlayUrl(id: string) {
+        return config.images[id]?.overlay;
     }
     
     public static log(message?: any, ...optionalParams: any[]){

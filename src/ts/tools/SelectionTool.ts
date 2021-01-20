@@ -33,6 +33,7 @@ export default class SelectionTool extends Tool {
     private _stampButton: HTMLDivElement;
     private _saveButton: HTMLDivElement;
     private _downloadButton: HTMLDivElement;
+    private _downloadAnchor: HTMLAnchorElement;
 
     constructor(painter: PaintView, buttonId: string) {
         super(painter, buttonId);
@@ -44,10 +45,7 @@ export default class SelectionTool extends Tool {
         Utils.addFastClick(this._saveButton, () => this.saveSelectionAsNewStamp());
         
         this._downloadButton = <HTMLDivElement>document.getElementById("selection-download-button");
-        const anchorElement = <HTMLAnchorElement>this._downloadButton.firstElementChild;
-        Utils.addFastClick(anchorElement, () => {
-            anchorElement.href = this.selectionLayer.canvas.toDataURL();
-        });
+        this._downloadAnchor = <HTMLAnchorElement>this._downloadButton.firstElementChild;
         
         this.hasFloatingSelection = false;
     }
@@ -145,6 +143,7 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.floating = true;
         this.selectionLayer.drawImage(image);
         this.isInShapesPalette = true;
+        this.updateDownloadAnchor();
     }
 
     setImageUrl(url: string){
@@ -211,6 +210,7 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.floating = true;
         this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
         this.painter.baseLayer.clear(this.selection);
+        this.updateDownloadAnchor();
     }
 
     private paintSelectionToCanvas() {
@@ -265,19 +265,15 @@ export default class SelectionTool extends Tool {
             });
     }
 
-    private showSelectionInFullscreen() {
-        let img = new Image();
-        this.selectionLayer.canvas.toBlob(blob => img.src = URL.createObjectURL(blob));
-        img.classList.add("fullscreen");
-        // Utils.addFastClick(img, () => {
-        //     img.remove();
-        // })
-        document.body.appendChild(img);
-    }
-
     selectAll() {
         this.startNewSelection();
         this._selection = new Rect(0, 0, this.painter.width, this.painter.height);
         this.cutSelection();
+    }
+
+    private updateDownloadAnchor() {
+        this.selectionLayer.canvas.toBlob(blob => {
+            this._downloadAnchor.href = URL.createObjectURL(blob);
+        })
     }
 }

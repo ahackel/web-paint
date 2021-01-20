@@ -6,7 +6,26 @@ const defaultShapes = [
     "img/stamps/snail.png"
 ]
 
-export const config = {
+interface IImageConfig{
+    overlay: string;
+}
+
+interface  IAppConfig{
+    debug: boolean;
+    doubleTapDelay: number;
+    longClickDelay: number;
+    maxShapeCount: number;
+    fullScreenCanvas: boolean;
+    pixelPerfect: boolean;
+    imageSmoothing: boolean;
+    width: number;
+    height: number;
+    defaultShapes: string[];
+    imageCount: number;
+    images: { [id: string]: IImageConfig };
+}
+
+export const config: IAppConfig = {
     debug: false,
     doubleTapDelay: 400,
     longClickDelay: 1200,
@@ -17,58 +36,11 @@ export const config = {
     width: 1024,
     height: 768,
     defaultShapes: defaultShapes,
-    sheets:[
-        {
-            id: "image01",
-            overlay: "./img/overlays/spirit.png"
-        },
-        {
-            id: "image02",
-            overlay: "./img/overlays/spirit2.png"
-        },
-        {
-            id: "image03",
-            overlay: "./img/overlays/spirit3.png"
-        },
-        {
-            id: "image04",
-            overlay: "./img/overlays/santa.png"
-        },
-        {
-            id: "image05"
-        },
-        {
-            id: "image06"
-        },
-        {
-            id: "image07"
-        },
-        {
-            id: "image08"
-        },
-        {
-            id: "image09"
-        },
-        {
-            id: "image10"
-        },
-        {
-            id: "image11"
-        },
-        {
-            id: "image12"
-        },
-        {
-            id: "image13"
-        },
-        {
-            id: "image14"
-        },
-        {
-            id: "image15"
-        },
-        {
-            id: "image16"
-        }
-    ]
+    imageCount: 32,
+    images: {
+        "image01": {overlay: "./img/overlays/spirit.png"},
+        "image02": {overlay: "./img/overlays/spirit2.png"},
+        "image03": {overlay: "./img/overlays/spirit3.png"},
+        "image04": {overlay: "./img/overlays/santa.png"}
+    }
 };

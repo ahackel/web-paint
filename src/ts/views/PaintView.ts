@@ -256,7 +256,11 @@ export default class PaintView extends View {
 
         if (window.PointerEvent != null){
             // Required to prevent pointerDown events from being choked when tapping repeatedly: 
-            canvas.addEventListener('touchstart', event => event.preventDefault());
+            canvas.addEventListener('touchstart', event => {
+                if (event.cancelable){
+                    event.preventDefault();
+                }
+            });
             
             canvas.addEventListener('pointerdown', event => this.pointerDown(event));
             canvas.addEventListener('pointermove', event => this.pointerMove(event));
@@ -526,7 +530,7 @@ export default class PaintView extends View {
                     this.baseLayer.drawImage(image);
                 }
                 
-                this.setOverlay(Utils.getOverlayPath(id));
+                this.setOverlay(Utils.getImageOverlayUrl(id));
             })
     }
 
