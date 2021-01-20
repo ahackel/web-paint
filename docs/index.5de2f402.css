@@ -64,6 +64,10 @@ body, input, textarea {
     transform: scale(0.9);
 }
 
+.button i{
+    line-height: 1.5rem;
+}
+
 #dropbox-button{
     border-radius: 3px;
     background-color: #007ee5;
@@ -440,4 +444,4 @@ body, input, textarea {
     color: white;
 }
 
-/*# sourceMappingURL=index.7b3f8bd4.css.map */
+/*# sourceMappingURL=index.5de2f402.css.map */
