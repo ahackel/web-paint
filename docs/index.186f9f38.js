@@ -8407,6 +8407,7 @@ var config = {
   imageSmoothing: true,
   // Whether to use smooth pixel filtering or to draw hard pixel edges
   // Whether to use smooth pixel filtering or to draw hard pixel edges
+  maxUndoSteps: 10,
   width: 1024,
   height: 768,
   defaultShapes: defaultShapes,
@@ -11924,6 +11925,7 @@ var _ImageLayerDefault = _parcelHelpers.interopDefault(_ImageLayer);
 var _toolsSelectionTool = require("../tools/SelectionTool");
 var _toolsSelectionToolDefault = _parcelHelpers.interopDefault(_toolsSelectionTool);
 var _Toolbar = require("../Toolbar");
+var _History = require("../History");
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -12093,6 +12095,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
     _defineProperty(_assertThisInitialized(_this), "getPointerEventPaintingFlag", function (e) {
       return e.pointerType === "touch" ? true : e.buttons === 1;
     });
+    _this._history = new _History.History();
     _this._sheet = document.getElementById("sheet");
     _this.width = _config.config.width;
     _this.height = _config.config.height;
@@ -12128,6 +12131,10 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this._undoButton = document.getElementById("undo-button");
       _utilsUtilsDefault.default.addFastClick(this._undoButton, function () {
         return _this2.undo();
+      });
+      this._redoButton = document.getElementById("redo-button");
+      _utilsUtilsDefault.default.addFastClick(this._redoButton, function () {
+        return _this2.redo();
       });
       var importImageField = document.getElementById("import-image-field");
       importImageField.addEventListener("change", function (files) {
@@ -12497,7 +12504,6 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (!this._currentTool) {
         return;
       }
-      this.recordUndo();
       this._timeStamp = timeStamp;
       this._currentTool.speed = 1;
       this._currentTool.painting = isPainting;
@@ -12514,17 +12520,18 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this._currentTool.painting = isPainting;
       this._currentTool.mouse = mouse;
       this._currentTool.up();
+      // TODO: Move ti recordHistoryState
       this.saveImage();
     }
   }, {
     key: "clear",
     value: function clear() {
-      var registerUndo = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var recordHistoryState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      if (registerUndo) {
-        this.recordUndo();
-      }
       this.baseLayer.clear();
+      if (recordHistoryState) {
+        this.recordHistoryState();
+      }
       if (save) {
         this.saveImage();
       }
@@ -12532,39 +12539,51 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "fill",
     value: function fill() {
-      this.recordUndo();
       this.baseLayer.ctx.fillStyle = this.color;
       this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
+      this.recordHistoryState();
     }
   }, {
-    key: "recordUndo",
-    value: function recordUndo() {
-      this._undoBuffer = this.baseLayer.getData();
-      this.updateUndoButtonState();
+    key: "ResetHistory",
+    value: function ResetHistory() {
+      this._history.clear();
+      this.recordHistoryState();
+      this.updateUndoButtons();
     }
   }, {
-    key: "clearUndoBuffer",
-    value: function clearUndoBuffer() {
-      this._undoBuffer = null;
-      this.updateUndoButtonState();
+    key: "recordHistoryState",
+    value: function recordHistoryState() {
+      this._history.recordState(this.baseLayer.getData());
+      this.updateUndoButtons();
     }
   }, {
-    key: "updateUndoButtonState",
-    value: function updateUndoButtonState() {
-      this._undoButton.classList.toggle("disabled", this._undoBuffer == null);
+    key: "updateUndoButtons",
+    value: function updateUndoButtons() {
+      this._undoButton.classList.toggle("disabled", !this._history.canUndo);
+      this._redoButton.classList.toggle("disabled", !this._history.canRedo);
     }
   }, {
     key: "undo",
     value: function undo() {
-      var swapBuffers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-      if (!this._undoBuffer) {
+      if (!this._history.canUndo) {
         return;
       }
-      var undoBuffer = this._undoBuffer;
-      if (swapBuffers) {
-        this.recordUndo();
+      this.baseLayer.putData(this._history.undo());
+      this.updateUndoButtons();
+    }
+  }, {
+    key: "redo",
+    value: function redo() {
+      if (!this._history.canRedo) {
+        return;
       }
-      this.baseLayer.putData(undoBuffer);
+      this.baseLayer.putData(this._history.redo());
+      this.updateUndoButtons();
+    }
+  }, {
+    key: "restoreCurrentHistoryState",
+    value: function restoreCurrentHistoryState() {
+      this.baseLayer.putData(this._history.getCurrentState());
     }
   }, {
     key: "loadImage",
@@ -12577,6 +12596,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
           _this6.baseLayer.drawImage(image);
         }
         _this6.setOverlay(_utilsUtilsDefault.default.getImageOverlayUrl(id));
+        _this6.ResetHistory();
       });
     }
   }, {
@@ -12594,7 +12614,6 @@ var PaintView = /*#__PURE__*/(function (_View) {
       var _this8 = this;
       _get(_getPrototypeOf(PaintView.prototype), "show", this).call(this);
       this._currentTouchId = 0;
-      this.clearUndoBuffer();
       this._autoMaskCaptured = false;
       window.requestAnimationFrame(function (timeStamp) {
         return _this8.tick(timeStamp);
@@ -12604,11 +12623,14 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "hide",
     value: function hide() {
+      if (this._currentTool) {
+        this._currentTool.disable();
+      }
       if (this._layers) {
         this.saveImage();
       }
-      if (this._currentTool) {
-        this._currentTool.disable();
+      if (this._history) {
+        this._history.clear();
       }
       _get(_getPrototypeOf(PaintView.prototype), "hide", this).call(this);
     }
@@ -12664,7 +12686,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   return PaintView;
 })(_View2.View);
 
-},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
+},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","../History":"27fq9"}],"diaTM":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -13388,6 +13410,11 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       this.requestDrawPath();
     }
   }, {
+    key: "up",
+    value: function up() {
+      this.painter.recordHistoryState();
+    }
+  }, {
     key: "tick",
     value: function tick(delta) {
       if (this._drawPathRequested) {
@@ -13405,7 +13432,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     value: function drawPath() {
       var ctx = this.getBufferCtx();
       if (this._points.length > 0) {
-        this.painter.undo(false);
+        this.painter.restoreCurrentHistoryState();
         ctx.clearRect(0, 0, this.painter.width, this.painter.height);
         var point = this._points[0];
         var oldPoint = point;
@@ -14849,6 +14876,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this.selectionLayer.floating = true;
       this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
       this.painter.baseLayer.clear(this.selection);
+      this.painter.recordHistoryState();
       this.updateDownloadAnchor();
     }
   }, {
@@ -14857,9 +14885,9 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       if (!this.hasFloatingSelection) {
         return;
       }
-      this.painter.recordUndo();
       this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
       this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
+      this.painter.recordHistoryState();
     }
   }, {
     key: "saveSelectionAsNewStamp",
@@ -15046,7 +15074,107 @@ var Toolbar = /*#__PURE__*/(function (_View) {
   return Toolbar;
 })(_viewsView.View);
 
-},{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5P39T":[function(require,module,exports) {
+},{"./views/View":"30r6k","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"27fq9":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "History", function () {
+  return History;
+});
+var _config = require("./config");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _defineProperty(obj, key, value) {
+  if ((key in obj)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+var History = /*#__PURE__*/(function () {
+  function History() {
+    _classCallCheck(this, History);
+    _defineProperty(this, "_states", []);
+    _defineProperty(this, "_position", -1);
+  }
+  _createClass(History, [{
+    key: "recordState",
+    value: function recordState(data) {
+      if (this._position == _config.config.maxUndoSteps - 1) {
+        this._states.shift();
+        this._position--;
+      }
+      // remove all future steps
+      this._states.splice(this._position + 1, this._states.length - this._position + 1);
+      this._position++;
+      this._states[this._position] = data;
+    }
+  }, {
+    key: "undo",
+    value: function undo() {
+      if (!this.canUndo) {
+        return null;
+      }
+      this._position--;
+      return this._states[this._position];
+    }
+  }, {
+    key: "redo",
+    value: function redo() {
+      if (!this.canRedo) {
+        return null;
+      }
+      this._position++;
+      return this._states[this._position];
+    }
+  }, {
+    key: "getCurrentState",
+    value: function getCurrentState() {
+      return this._position > -1 && this._position < this._states.length ? this._states[this._position] : null;
+    }
+  }, {
+    key: "clear",
+    value: function clear() {
+      this._states = [];
+      this._position = -1;
+    }
+  }, {
+    key: "canUndo",
+    get: function get() {
+      return this._position > 0;
+    }
+  }, {
+    key: "canRedo",
+    get: function get() {
+      return this._position < this._states.length - 1;
+    }
+  }]);
+  return History;
+})();
+
+},{"./config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5P39T":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -19830,4 +19958,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.49485f4d.js.map
+//# sourceMappingURL=index.186f9f38.js.map

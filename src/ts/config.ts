@@ -18,6 +18,7 @@ interface  IAppConfig{
     fullScreenCanvas: boolean;
     pixelPerfect: boolean;
     imageSmoothing: boolean;
+    maxUndoSteps: number;
     width: number;
     height: number;
     defaultShapes: string[];
@@ -33,6 +34,7 @@ export const config: IAppConfig = {
     fullScreenCanvas: true, // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
     pixelPerfect: false,   // Make sure to perform painting operations on rounded pixel positions
     imageSmoothing: true,  // Whether to use smooth pixel filtering or to draw hard pixel edges
+    maxUndoSteps: 10,
     width: 1024,
     height: 768,
     defaultShapes: defaultShapes,

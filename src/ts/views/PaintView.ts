@@ -20,6 +20,7 @@ import CanvasLayer from "../CanvasLayer";
 import ImageLayer from "../ImageLayer ";
 import SelectionTool from "../tools/SelectionTool";
 import {Toolbar} from "../Toolbar";
+import {History} from "../History";
 
 // var Pressure = require('pressure');
 
@@ -47,8 +48,9 @@ export default class PaintView extends View {
     private _shapePalette: ShapePalette;
     private _tools: Tool[];
     private _currentTouchId: number = 0;
-    private _undoBuffer: ImageData;
+    private _history: History;
     private _undoButton: HTMLDivElement;
+    private _redoButton: HTMLDivElement;
     private _timeStamp: number;
     private _tickTimeStamp: number;
     private _autoMaskCaptured: boolean;
@@ -69,6 +71,7 @@ export default class PaintView extends View {
     constructor(id: string, onBackClicked: Function) {
         super(id);
         
+        this._history = new History();
         this._sheet = document.getElementById("sheet");
 
         this.width = config.width;
@@ -99,6 +102,9 @@ export default class PaintView extends View {
 
         this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
         Utils.addFastClick(this._undoButton, () => this.undo());
+
+        this._redoButton = <HTMLDivElement>document.getElementById("redo-button");
+        Utils.addFastClick(this._redoButton, () => this.redo());
 
         let importImageField = <HTMLInputElement>document.getElementById("import-image-field");
         importImageField.addEventListener("change", files => {
@@ -463,7 +469,6 @@ export default class PaintView extends View {
             return;
         }
         
-        this.recordUndo();
         this._timeStamp = timeStamp;
         this._currentTool.speed = 1;
         this._currentTool.painting = isPainting;
@@ -480,48 +485,60 @@ export default class PaintView extends View {
         this._currentTool.painting = isPainting;
         this._currentTool.mouse = mouse;
         this._currentTool.up();
+        // TODO: Move ti recordHistoryState
         this.saveImage();
     }
 
-    clear(registerUndo: boolean = false, save: boolean = false) {
-        if (registerUndo){
-            this.recordUndo();
-        }
+    clear(recordHistoryState: boolean = false, save: boolean = false) {
         this.baseLayer.clear();
+        if (recordHistoryState){
+            this.recordHistoryState();
+        }
         if (save){
             this.saveImage();
         }
     }
 
     fill() {
-        this.recordUndo();
         this.baseLayer.ctx.fillStyle = this.color;
         this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
+        this.recordHistoryState();
     }
 
-    recordUndo(){
-        this._undoBuffer = this.baseLayer.getData();
-        this.updateUndoButtonState();
+    private ResetHistory() {
+        this._history.clear();
+        this.recordHistoryState();
+        this.updateUndoButtons();
     }
 
-    clearUndoBuffer(){
-        this._undoBuffer = null;
-        this.updateUndoButtonState();
+    recordHistoryState(){
+        this._history.recordState(this.baseLayer.getData());
+        this.updateUndoButtons();
     }
 
-    updateUndoButtonState(){
-        this._undoButton.classList.toggle("disabled", this._undoBuffer == null);
+    updateUndoButtons(){
+        this._undoButton.classList.toggle("disabled", !this._history.canUndo);
+        this._redoButton.classList.toggle("disabled", !this._history.canRedo);
     }
 
-    undo(swapBuffers = true) {
-        if (!this._undoBuffer){
+    undo() {
+        if (!this._history.canUndo){
             return;
         }
-        let undoBuffer = this._undoBuffer;
-        if (swapBuffers){
-            this.recordUndo();
+        this.baseLayer.putData(this._history.undo());
+        this.updateUndoButtons();
+    }
+    
+    redo() {
+        if (!this._history.canRedo){
+            return;
         }
-        this.baseLayer.putData(undoBuffer);
+        this.baseLayer.putData(this._history.redo());
+        this.updateUndoButtons()
+    }
+
+    restoreCurrentHistoryState(){
+        this.baseLayer.putData(this._history.getCurrentState());
     }
 
     loadImage(id: string) {
@@ -534,6 +551,7 @@ export default class PaintView extends View {
                 }
                 
                 this.setOverlay(Utils.getImageOverlayUrl(id));
+                this.ResetHistory();
             })
     }
 
@@ -545,18 +563,20 @@ export default class PaintView extends View {
     show(){
         super.show();
         this._currentTouchId = 0;
-        this.clearUndoBuffer();
         this._autoMaskCaptured = false;
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
         this._currentTool.enable();
     }
     
     hide(){
+        if (this._currentTool){
+            this._currentTool.disable();
+        }
         if (this._layers){
             this.saveImage();
         }
-        if (this._currentTool){
-            this._currentTool.disable();
+        if (this._history){
+            this._history.clear();
         }
         super.hide();
     }

@@ -37,6 +37,10 @@ export default class PenTool extends Tool {
         this.requestDrawPath();
     }
     
+    up(): void{
+        this.painter.recordHistoryState();
+    }
+    
     tick(delta: number) {
         if (this._drawPathRequested){
             this.drawPath();
@@ -51,7 +55,7 @@ export default class PenTool extends Tool {
     drawPath(){
         let ctx = this.getBufferCtx();
         if (this._points.length > 0){
-            this.painter.undo(false);
+            this.painter.restoreCurrentHistoryState();
             ctx.clearRect(0, 0, this.painter.width, this.painter.height);
 
             let point = this._points[0];

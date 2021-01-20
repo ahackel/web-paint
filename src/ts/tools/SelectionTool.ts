@@ -210,6 +210,7 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.floating = true;
         this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
         this.painter.baseLayer.clear(this.selection);
+        this.painter.recordHistoryState();
         this.updateDownloadAnchor();
     }
 
@@ -217,9 +218,9 @@ export default class SelectionTool extends Tool {
         if (!this.hasFloatingSelection){
             return;
         }
-        this.painter.recordUndo();
         this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
         this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
+        this.painter.recordHistoryState();
     }
 
     private saveSelectionAsNewStamp() {

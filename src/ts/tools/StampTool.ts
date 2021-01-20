@@ -55,8 +55,6 @@ export default class StampTool extends Tool {
     }
     
     performStamp(){
-        this.painter.recordUndo();
-
         const ctx = this.getBufferCtx();
         ctx.fillStyle = this.painter.color;
         ctx.fillRect(0, 0, this.painter.width, this.painter.height);

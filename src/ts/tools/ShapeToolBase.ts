@@ -43,7 +43,7 @@ export default abstract class ShapeToolBase extends Tool {
     updateShape() {
         let ctx = this.getBufferCtx();
 
-        this.painter.undo(false);
+        this.painter.restoreCurrentHistoryState();
         ctx.clearRect(0, 0, this.painter.width, this.painter.height);
 
         const x = Math.min(this._startPosition.x, this.mouse.x);
