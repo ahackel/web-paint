@@ -84,12 +84,6 @@ export default class PaintView extends View {
         this.createToolbar();
         this.createPalettes();
         this.createTools();
-
-        let autoMaskCanvas = document.createElement("canvas");
-        autoMaskCanvas.id = "auto-mask";
-        autoMaskCanvas.width = this.width;
-        autoMaskCanvas.height = this.height;
-        this._autoMaskCtx = <CanvasRenderingContext2D>autoMaskCanvas.getContext("2d", {alpha: true});
     }
     
     getLayer(id: string){
@@ -602,23 +596,35 @@ export default class PaintView extends View {
     }
 
     captureAutoMask(position: Point) {
-        this._autoMaskCaptured = true;
-        if (!this.overlayLayer){
+        if (!config.useAutoMask){
             return;
         }
         
-        // let imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
-        //
-        // // avoid expensive floodfill:
-        // const index = (position.x + position.y * this.width) * 4 + 3;
+        this._autoMaskCaptured = true;
+        // if (!this.overlayLayer){
+        //     return;
+        // }
+
+        if (!this._autoMaskCtx){
+            let autoMaskCanvas = document.createElement("canvas");
+            autoMaskCanvas.id = "auto-mask";
+            autoMaskCanvas.width = this.width;
+            autoMaskCanvas.height = this.height;
+            this._autoMaskCtx = <CanvasRenderingContext2D>autoMaskCanvas.getContext("2d", {alpha: true});
+        }
+
+        let imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
+
+        // avoid expensive floodfill:
+        const index = (position.x + position.y * this.width) * 4 + 3;
         // if (this._autoMaskCaptured && imageData.data[index] > 0){
         //     return;
         // }
-        //
-        // Utils.log("capturing auto mask");
-        // Utils.floodFill(this.overlayLayer.ctx, imageData.data, position);
-        // Utils.dilateMask(imageData.data, this.width, this.height);
-        // this._autoMaskCtx.putImageData(imageData, 0, 0);
+
+        Utils.log("capturing auto mask");
+        Utils.floodFill(this.baseLayer.ctx, imageData.data, position, this.color);
+        Utils.dilateMask(imageData.data, this.width, this.height);
+        this._autoMaskCtx.putImageData(imageData, 0, 0);
     }
 
     private processOverlay(ctx: CanvasRenderingContext2D) {

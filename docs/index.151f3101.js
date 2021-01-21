@@ -8407,6 +8407,7 @@ var config = {
   imageSmoothing: true,
   // Whether to use smooth pixel filtering or to draw hard pixel edges
   // Whether to use smooth pixel filtering or to draw hard pixel edges
+  useAutoMask: false,
   maxUndoSteps: 10,
   width: 1024,
   height: 768,
@@ -8761,7 +8762,7 @@ var Utils = /*#__PURE__*/(function () {
     }
   }, {
     key: "floodFill",
-    value: function floodFill(sourceCtx, mask, startPosition) {
+    value: function floodFill(sourceCtx, mask, startPosition, color) {
       var threshold = 0.5;
       var width = sourceCtx.canvas.width;
       var height = sourceCtx.canvas.height;
@@ -8769,14 +8770,21 @@ var Utils = /*#__PURE__*/(function () {
       var sourcePixels = sourceData.data;
       startPosition = startPosition.copy().round();
       var startIndex = startPosition.x + startPosition.y * width;
-      var startR = sourcePixels[startIndex * 4];
-      var startG = sourcePixels[startIndex * 4 + 1];
-      var startB = sourcePixels[startIndex * 4 + 2];
-      var startA = sourcePixels[startIndex * 4 + 3];
+      // const startR = sourcePixels[startIndex * 4];
+      // const startG = sourcePixels[startIndex * 4 + 1];
+      // const startB = sourcePixels[startIndex * 4 + 2];
+      // const startA = sourcePixels[startIndex * 4 + 3];
+      var startR = parseInt(color[1] + color[2], 16);
+      var startG = parseInt(color[3] + color[4], 16);
+      var startB = parseInt(color[5] + color[6], 16);
+      // take into account that transparent pixels appear white (due to white bg) but their rgb value is 0:
+      // const startBrightness = startA < 5 ? 255 : 0.333 * (startR + startG + startB);
+      var startBrightness = 0.333 * (startR + startG + startB);
       // clear alpha channel:
       for (var i = 0; i < width * height; i++) {
         mask[i * 4 + 3] = 0;
       }
+      // start at multiple positions around start position:
       var stack = [];
       stack.push(startPosition);
       if (startPosition.x > 1) {
@@ -8838,10 +8846,10 @@ var Utils = /*#__PURE__*/(function () {
         if (mask[indexA]) {
           return true;
         }
-        // let r = sourcePixels[index];
-        // let g = sourcePixels[index + 1];
-        // let b = sourcePixels[index + 2];
-        // let a = sourcePixels[index + 3];
+        var r = sourcePixels[index];
+        var g = sourcePixels[index + 1];
+        var b = sourcePixels[index + 2];
+        var a = sourcePixels[index + 3];
         // 
         // let difference = Math.max(
         // Math.abs(r - startR),
@@ -8849,7 +8857,8 @@ var Utils = /*#__PURE__*/(function () {
         // Math.abs(b - startB),
         // Math.abs(a - startA)
         // ) / 255;
-        if (sourcePixels[indexA] === 0) {
+        var brightness = 0.333 * (r + g + b);
+        if (a < 250 || brightness >= startBrightness) {
           if (setValue) {
             mask[indexA] = 255;
           }
@@ -12106,13 +12115,6 @@ var PaintView = /*#__PURE__*/(function (_View) {
     _this.createToolbar();
     _this.createPalettes();
     _this.createTools();
-    var autoMaskCanvas = document.createElement("canvas");
-    autoMaskCanvas.id = "auto-mask";
-    autoMaskCanvas.width = _this.width;
-    autoMaskCanvas.height = _this.height;
-    _this._autoMaskCtx = autoMaskCanvas.getContext("2d", {
-      alpha: true
-    });
     return _this;
   }
   _createClass(PaintView, [{
@@ -12657,10 +12659,32 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "captureAutoMask",
     value: function captureAutoMask(position) {
-      this._autoMaskCaptured = true;
-      if (!this.overlayLayer) {
+      if (!_config.config.useAutoMask) {
         return;
       }
+      this._autoMaskCaptured = true;
+      // if (!this.overlayLayer){
+      // return;
+      // }
+      if (!this._autoMaskCtx) {
+        var autoMaskCanvas = document.createElement("canvas");
+        autoMaskCanvas.id = "auto-mask";
+        autoMaskCanvas.width = this.width;
+        autoMaskCanvas.height = this.height;
+        this._autoMaskCtx = autoMaskCanvas.getContext("2d", {
+          alpha: true
+        });
+      }
+      var imageData = this._autoMaskCtx.getImageData(0, 0, this.width, this.height);
+      // avoid expensive floodfill:
+      var index = (position.x + position.y * this.width) * 4 + 3;
+      // if (this._autoMaskCaptured && imageData.data[index] > 0){
+      // return;
+      // }
+      _utilsUtilsDefault.default.log("capturing auto mask");
+      _utilsUtilsDefault.default.floodFill(this.baseLayer.ctx, imageData.data, position, this.color);
+      _utilsUtilsDefault.default.dilateMask(imageData.data, this.width, this.height);
+      this._autoMaskCtx.putImageData(imageData, 0, 0);
     }
   }, {
     key: "processOverlay",
@@ -12686,7 +12710,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   return PaintView;
 })(_View2.View);
 
-},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","../History":"27fq9"}],"diaTM":[function(require,module,exports) {
+},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","../History":"27fq9","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -13457,7 +13481,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
         ctx.fillStyle = ctx.strokeStyle;
         ctx.fill();
-        // this.applyAutoMask();
+        this.applyAutoMask();
         this.painter.baseLayer.ctx.globalAlpha = this.opacity;
         this.painter.baseLayer.drawImage(ctx.canvas);
         this.painter.baseLayer.ctx.globalAlpha = 1;
@@ -13491,7 +13515,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "applyAutoMask",
     value: function applyAutoMask() {
-      if (!this.painter.overlayLayer || !this.painter.autoMaskCtx) {
+      if (!this.painter.autoMaskCtx) {
         return;
       }
       var ctx = this.getBufferCtx();
@@ -19958,4 +19982,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.186f9f38.js.map
+//# sourceMappingURL=index.151f3101.js.map

@@ -177,7 +177,7 @@ export default class Utils {
         return 0xFF000000 + r + (g << 8) + (b << 16);
     }
  
-    public static floodFill(sourceCtx: CanvasRenderingContext2D, mask: Uint8ClampedArray,  startPosition: Point) {
+    public static floodFill(sourceCtx: CanvasRenderingContext2D, mask: Uint8ClampedArray,  startPosition: Point, color: string) {
         const threshold = 0.5;
         const width = sourceCtx.canvas.width;
         const height = sourceCtx.canvas.height;
@@ -188,16 +188,25 @@ export default class Utils {
         startPosition = startPosition.copy().round();
         const startIndex: number = startPosition.x + startPosition.y * width;
         
-        const startR = sourcePixels[startIndex * 4];
-        const startG = sourcePixels[startIndex * 4 + 1];
-        const startB = sourcePixels[startIndex * 4 + 2];
-        const startA = sourcePixels[startIndex * 4 + 3];
+        // const startR = sourcePixels[startIndex * 4];
+        // const startG = sourcePixels[startIndex * 4 + 1];
+        // const startB = sourcePixels[startIndex * 4 + 2];
+        // const startA = sourcePixels[startIndex * 4 + 3];
+
+        const startR = parseInt(color[1] + color[2], 16);
+        const startG = parseInt(color[3] + color[4], 16);
+        const startB = parseInt(color[5] + color[6], 16);
+
+        // take into account that transparent pixels appear white (due to white bg) but their rgb value is 0:
+        // const startBrightness = startA < 5 ? 255 : 0.333 * (startR + startG + startB);
+        const startBrightness = 0.333 * (startR + startG + startB);
         
         // clear alpha channel:
         for (let i = 0; i < width * height; i++) {
             mask[i * 4 + 3] = 0;
         }
 
+        // start at multiple positions around start position:
         let stack: Point[] = [];
         stack.push(startPosition);
         if (startPosition.x > 1){
@@ -271,16 +280,16 @@ export default class Utils {
         }
 
         function isBorderPixel(x: number, y: number, setValue: boolean): boolean {
-            let index = (x + y * width) * 4;
-            let indexA = index + 3;
+            const index = (x + y * width) * 4;
+            const indexA = index + 3;
             if (mask[indexA]){
                 return true;
             }
 
-            // let r = sourcePixels[index];
-            // let g = sourcePixels[index + 1];
-            // let b = sourcePixels[index + 2];
-            // let a = sourcePixels[index + 3];
+            const r = sourcePixels[index];
+            const g = sourcePixels[index + 1];
+            const b = sourcePixels[index + 2];
+            const a = sourcePixels[index + 3];
             //
             // let difference = Math.max(
             //     Math.abs(r - startR),
@@ -288,8 +297,9 @@ export default class Utils {
             //     Math.abs(b - startB),
             //     Math.abs(a - startA)
             // ) / 255;
+            const brightness = 0.333 * (r + g + b);
             
-            if (sourcePixels[indexA] === 0){
+            if (a < 250 || brightness >= startBrightness){
                 if (setValue){
                     mask[indexA] = 255;
                 }

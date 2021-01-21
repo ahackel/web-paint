@@ -89,7 +89,7 @@ export default class PenTool extends Tool {
             ctx.fillStyle = ctx.strokeStyle;
             ctx.fill();
             
-            //this.applyAutoMask();
+            this.applyAutoMask();
             
             this.painter.baseLayer.ctx.globalAlpha = this.opacity;
             this.painter.baseLayer.drawImage(ctx.canvas);
@@ -122,7 +122,7 @@ export default class PenTool extends Tool {
     }
 
     private applyAutoMask() {
-        if (!this.painter.overlayLayer || !this.painter.autoMaskCtx){
+        if (!this.painter.autoMaskCtx){
             return;
         }
         
