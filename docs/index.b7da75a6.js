@@ -174,10 +174,10 @@ var App = /*#__PURE__*/(function () {
     // App.preventOverScroll();
     // PeerToPeer.createInstance();
     this._sheet = document.getElementById("sheet");
-    window.addEventListener('resize', function (event) {
-      _this.OnResize();
-    });
-    this.OnResize();
+    // window.addEventListener('resize', event => {
+    // this.OnResize();
+    // });
+    // this.OnResize();
     this._bookView = new _viewsBookViewDefault.default("book", function () {
       _this.openView(_this._settingsView);
     });
@@ -8495,11 +8495,11 @@ var Thumbnail = /*#__PURE__*/(function () {
     // PeerToPeer.instance.sendData(peerName, blob);
     // });
     // });
-    element.addEventListener("click", function () {
-      if (onImageSelected) {
-        onImageSelected(id);
-      }
-    });
+    // element.addEventListener("click", () => {
+    // if (onImageSelected) {
+    // onImageSelected(id);
+    // }
+    // });
     element.addEventListener("imagesaved", function (event) {
       if (event.detail != _this.id) {
         return;
@@ -19981,4 +19981,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.86f04537.js.map
+//# sourceMappingURL=index.b7da75a6.js.map

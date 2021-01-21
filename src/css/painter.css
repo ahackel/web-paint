@@ -144,9 +144,9 @@ body, input, textarea {
     background-size: contain;
 }
 
-.thumbnail:active {
-    transform: scale(0.9);
-}
+/*.thumbnail:active {*/
+/*    transform: scale(0.9);*/
+/*}*/
 
 .thumbnail img {
     position: absolute;

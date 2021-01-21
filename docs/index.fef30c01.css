@@ -144,9 +144,9 @@ body, input, textarea {
     background-size: contain;
 }
 
-.thumbnail:active {
-    transform: scale(0.9);
-}
+/*.thumbnail:active {*/
+/*    transform: scale(0.9);*/
+/*}*/
 
 .thumbnail img {
     position: absolute;
@@ -444,4 +444,4 @@ body, input, textarea {
     color: white;
 }
 
-/*# sourceMappingURL=index.df5751ba.css.map */
+/*# sourceMappingURL=index.fef30c01.css.map */
