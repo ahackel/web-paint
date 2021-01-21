@@ -59,9 +59,32 @@ export default class Utils {
     }
 
     public static addFastClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
-        element.addEventListener("touchstart", event => event.preventDefault());
-        element.addEventListener("touchend", callback);
-        element.addEventListener("click", callback);
+        
+        let isScrolling = false;
+        
+        element.addEventListener("touchstart", touchStart);
+        element.addEventListener("mouseup", callback);
+        
+        function touchStart(event: TouchEvent){
+            isScrolling = false;
+            element.addEventListener("touchmove", touchMove);
+            element.addEventListener("touchend", touchEnd);
+        }
+
+        function touchMove(event: TouchEvent){
+            isScrolling = true;
+        }
+
+        function touchEnd(event: TouchEvent){
+            element.removeEventListener("touchmove", touchMove);
+            element.removeEventListener("touchend", touchEnd);
+            if (isScrolling){
+                return;
+            }
+            
+            event.preventDefault();
+            callback.call(event.target, event);
+        }
     }
 
     public static addLongClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){

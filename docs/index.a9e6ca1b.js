@@ -8495,16 +8495,11 @@ var Thumbnail = /*#__PURE__*/(function () {
     // PeerToPeer.instance.sendData(peerName, blob);
     // });
     // });
-    element.addEventListener("touchend", function () {
+    _utilsUtilsDefault.default.addFastClick(element, function () {
       if (onImageSelected) {
         onImageSelected(id);
       }
     });
-    // Utils.addFastClick(element, () => {
-    // if (onImageSelected) {
-    // onImageSelected(id);
-    // }
-    // });
     element.addEventListener("imagesaved", function (event) {
       if (event.detail != _this.id) {
         return;
@@ -8651,11 +8646,26 @@ var Utils = /*#__PURE__*/(function () {
   }, {
     key: "addFastClick",
     value: function addFastClick(element, callback) {
-      element.addEventListener("touchstart", function (event) {
-        return event.preventDefault();
-      });
-      element.addEventListener("touchend", callback);
-      element.addEventListener("click", callback);
+      var isScrolling = false;
+      element.addEventListener("touchstart", touchStart);
+      element.addEventListener("mouseup", callback);
+      function touchStart(event) {
+        isScrolling = false;
+        element.addEventListener("touchmove", touchMove);
+        element.addEventListener("touchend", touchEnd);
+      }
+      function touchMove(event) {
+        isScrolling = true;
+      }
+      function touchEnd(event) {
+        element.removeEventListener("touchmove", touchMove);
+        element.removeEventListener("touchend", touchEnd);
+        if (isScrolling) {
+          return;
+        }
+        event.preventDefault();
+        callback.call(event.target, event);
+      }
     }
   }, {
     key: "addLongClick",
@@ -19986,4 +19996,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.f9318631.js.map
+//# sourceMappingURL=index.a9e6ca1b.js.map

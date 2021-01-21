@@ -35,16 +35,11 @@ export default class Thumbnail {
         //         });
         // });
         
-        element.addEventListener("touchend", () => {
+        Utils.addFastClick(element, () => {
             if (onImageSelected) {
                 onImageSelected(id);
             }
-        });        
-        // Utils.addFastClick(element, () => {
-        //     if (onImageSelected) {
-        //         onImageSelected(id);
-        //     }
-        // });
+        });
 
         element.addEventListener("imagesaved", (event: CustomEvent) => {
             if (event.detail != this.id){
