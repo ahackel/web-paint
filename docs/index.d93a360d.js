@@ -171,13 +171,13 @@ var App = /*#__PURE__*/(function () {
   function App() {
     var _this = this;
     _classCallCheck(this, App);
-    App.preventOverScroll();
+    // App.preventOverScroll();
     // PeerToPeer.createInstance();
     this._sheet = document.getElementById("sheet");
-    window.addEventListener('resize', function (event) {
-      _this.OnResize();
-    });
-    this.OnResize();
+    // window.addEventListener('resize', event => {
+    // this.OnResize();
+    // });
+    // this.OnResize();
     this._bookView = new _viewsBookViewDefault.default("book", function () {
       _this.openView(_this._settingsView);
     });
@@ -19981,4 +19981,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.cf3a386d.js.map
+//# sourceMappingURL=index.d93a360d.js.map

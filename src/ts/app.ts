@@ -16,15 +16,15 @@ class App {
     private _sheet: HTMLElement;
 
     constructor() {
-        App.preventOverScroll();
+        // App.preventOverScroll();
         
         //PeerToPeer.createInstance();
         
         this._sheet = document.getElementById("sheet")
-        window.addEventListener('resize', event => {
-            this.OnResize();
-        });
-        this.OnResize();
+        // window.addEventListener('resize', event => {
+        //     this.OnResize();
+        // });
+        // this.OnResize();
         
         this._bookView = new BookView("book", () => {
             this.openView(this._settingsView);
