@@ -8396,7 +8396,7 @@ var defaultShapes = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamp
 var config = {
   debug: false,
   doubleTapDelay: 400,
-  longClickDelay: 1200,
+  longClickDelay: 1000,
   maxShapeCount: 64 - defaultShapes.length,
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -19996,4 +19996,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.a9e6ca1b.js.map
+//# sourceMappingURL=index.37da28c3.js.map
