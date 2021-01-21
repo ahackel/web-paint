@@ -98,7 +98,7 @@ body, input, textarea {
     flex-wrap: wrap;
     align-content: flex-start;
     justify-content: center;
-    overflow-y: scroll;
+    overflow-y: auto;
     touch-action: auto;
 }
 

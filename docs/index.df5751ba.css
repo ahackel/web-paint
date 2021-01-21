@@ -98,7 +98,7 @@ body, input, textarea {
     flex-wrap: wrap;
     align-content: flex-start;
     justify-content: center;
-    overflow-y: scroll;
+    overflow-y: auto;
     touch-action: auto;
 }
 
@@ -444,4 +444,4 @@ body, input, textarea {
     color: white;
 }
 
-/*# sourceMappingURL=index.e68d2499.css.map */
+/*# sourceMappingURL=index.df5751ba.css.map */
