@@ -8495,7 +8495,12 @@ var Thumbnail = /*#__PURE__*/(function () {
     // PeerToPeer.instance.sendData(peerName, blob);
     // });
     // });
-    element.addEventListener("click", function () {
+    // element.addEventListener("click", () => {
+    // if (onImageSelected) {
+    // onImageSelected(id);
+    // }
+    // });
+    _utilsUtilsDefault.default.addFastClick(element, function () {
       if (onImageSelected) {
         onImageSelected(id);
       }
@@ -19981,4 +19986,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.86f04537.js.map
+//# sourceMappingURL=index.22910983.js.map

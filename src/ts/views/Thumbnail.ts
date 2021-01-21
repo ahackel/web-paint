@@ -35,7 +35,12 @@ export default class Thumbnail {
         //         });
         // });
         
-        element.addEventListener("click", () => {
+        // element.addEventListener("click", () => {
+        //     if (onImageSelected) {
+        //         onImageSelected(id);
+        //     }
+        // });        
+        Utils.addFastClick(element, () => {
             if (onImageSelected) {
                 onImageSelected(id);
             }

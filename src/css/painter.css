@@ -138,6 +138,7 @@ body, input, textarea {
     width: 1em;
     height: 0.75em;
     background-size: contain;
+    cursor: pointer;
 }
 
 .thumbnail:active {
