@@ -2,7 +2,7 @@
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
-    /*touch-action: none;*/
+    touch-action: none; /* prevent pinch zoom in whole app */
 }
 
 textarea {
@@ -100,9 +100,8 @@ body, input, textarea {
     -webkit-overflow-scrolling: touch;
 }
 
-.view.book * {
-    /*-webkit-touch-callout: initial;*/
-    /*touch-action: initial;*/
+.view.book, .view.book * {
+    touch-action: pan-y;
 }
 
 .view.settings {
