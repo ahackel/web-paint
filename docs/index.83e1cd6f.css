@@ -2,7 +2,7 @@
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
-    touch-action: none;
+    /*touch-action: none;*/
 }
 
 textarea {
@@ -99,7 +99,6 @@ body, input, textarea {
     justify-content: center;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    touch-action: auto;
 }
 
 .view.book * {
@@ -131,33 +130,20 @@ body, input, textarea {
 }
 
 .thumbnail {
-    position: relative;
     margin: 0.3rem;
     color: #CCC;
     background: white;
     border-radius: 0.1rem;
     transition: transform 0.25s;
-    flex-shrink: 0;
     font-size: 5.6rem;
     width: 1em;
     height: 0.75em;
     background-size: contain;
 }
 
-.thumbnail:active {
-    transform: scale(0.9);
-}
-
-.thumbnail img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    border-radius: 4px;
-    -webkit-touch-callout: default;
-    display: flex;
-}
-
+/*.thumbnail:active {*/
+/*    transform: scale(0.9);*/
+/*}*/
 
 .paint{
     align-items: center;
@@ -444,4 +430,4 @@ body, input, textarea {
     color: white;
 }
 
-/*# sourceMappingURL=index.f0926063.css.map */
+/*# sourceMappingURL=index.83e1cd6f.css.map */
