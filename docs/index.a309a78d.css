@@ -99,6 +99,7 @@ body, input, textarea {
     align-content: flex-start;
     justify-content: center;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     touch-action: auto;
 }
 
@@ -444,4 +445,4 @@ body, input, textarea {
     color: white;
 }
 
-/*# sourceMappingURL=index.fef30c01.css.map */
+/*# sourceMappingURL=index.a309a78d.css.map */

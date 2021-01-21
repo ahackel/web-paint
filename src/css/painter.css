@@ -99,6 +99,7 @@ body, input, textarea {
     align-content: flex-start;
     justify-content: center;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     touch-action: auto;
 }
 
