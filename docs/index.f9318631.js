@@ -8495,16 +8495,16 @@ var Thumbnail = /*#__PURE__*/(function () {
     // PeerToPeer.instance.sendData(peerName, blob);
     // });
     // });
-    // element.addEventListener("click", () => {
-    // if (onImageSelected) {
-    // onImageSelected(id);
-    // }
-    // });
-    _utilsUtilsDefault.default.addFastClick(element, function () {
+    element.addEventListener("touchend", function () {
       if (onImageSelected) {
         onImageSelected(id);
       }
     });
+    // Utils.addFastClick(element, () => {
+    // if (onImageSelected) {
+    // onImageSelected(id);
+    // }
+    // });
     element.addEventListener("imagesaved", function (event) {
       if (event.detail != _this.id) {
         return;
@@ -19986,4 +19986,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.22910983.js.map
+//# sourceMappingURL=index.f9318631.js.map
