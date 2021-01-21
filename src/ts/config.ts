@@ -28,7 +28,7 @@ interface  IAppConfig{
 }
 
 export const config: IAppConfig = {
-    debug: true,
+    debug: false,
     doubleTapDelay: 400,
     longClickDelay: 1200,
     maxShapeCount: 64 - defaultShapes.length,

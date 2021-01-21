@@ -8394,7 +8394,7 @@ _parcelHelpers.export(exports, "config", function () {
 });
 var defaultShapes = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
 var config = {
-  debug: true,
+  debug: false,
   doubleTapDelay: 400,
   longClickDelay: 1200,
   maxShapeCount: 64 - defaultShapes.length,
@@ -19981,4 +19981,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.d93a360d.js.map
+//# sourceMappingURL=index.b7da75a6.js.map
