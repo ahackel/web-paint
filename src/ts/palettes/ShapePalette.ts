@@ -21,9 +21,8 @@ export default class ShapePalette extends Palette {
                 }
             });
 
-        this._element.addEventListener("imagesaved", (event: CustomEvent) => {
-            const id = <string>event.detail;
-            if (id.startsWith("Shape")) {
+        ImageStorage.addChangeListener((change: string, id: string) => {
+            if (change == "save" && id.startsWith("Shape")) {
                 this.addShapeFromImageId(id);
             }
         });

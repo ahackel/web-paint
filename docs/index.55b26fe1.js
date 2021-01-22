@@ -8511,11 +8511,10 @@ var Thumbnail = /*#__PURE__*/(function () {
         onImageSelected(id);
       }
     }, true);
-    element.addEventListener("imagesaved", function (event) {
-      if (event.detail != _this.id) {
-        return;
+    _storageImageStorageDefault.default.addChangeListener(function (change, id) {
+      if (change == "save" && id == _this.id) {
+        _this.loadImage();
       }
-      _this.loadImage();
     });
     this.overlayUrl = _utilsUtilsDefault.default.getImageOverlayUrl(id);
     parent.appendChild(element);
@@ -8729,14 +8728,6 @@ var Utils = /*#__PURE__*/(function () {
       }, {
         polyfillSpeedUp: _config.config.longClickDelay * 2
       });
-    }
-  }, {
-    key: "DispatchEventToAllElements",
-    value: function DispatchEventToAllElements(event) {
-      var elements = document.getElementsByTagName("*");
-      for (var i = 0; i < elements.length; i++) {
-        elements[i].dispatchEvent(event);
-      }
     }
   }, {
     key: "createNewImageId",
@@ -9482,8 +9473,70 @@ _parcelHelpers.export(exports, "default", function () {
 });
 var _LocalForageAdapter = require("./LocalForageAdapter");
 var _LocalForageAdapterDefault = _parcelHelpers.interopDefault(_LocalForageAdapter);
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it;
+  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+      var F = function F() {};
+      return {
+        s: F,
+        n: function n() {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function e(_e) {
+          throw _e;
+        },
+        f: F
+      };
+    }
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  var normalCompletion = true, didErr = false, err;
+  return {
+    s: function s() {
+      it = o[Symbol.iterator]();
+    },
+    n: function n() {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function e(_e2) {
+      didErr = true;
+      err = _e2;
+    },
+    f: function f() {
+      try {
+        if (!normalCompletion && it.return != null) it.return();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
+}
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+  return arr2;
+}
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -9586,7 +9639,6 @@ var ImageStorage = /*#__PURE__*/(function () {
     key: "saveImage",
     value: (function () {
       var _saveImage = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(id, blob) {
-        var event;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -9601,11 +9653,8 @@ var ImageStorage = /*#__PURE__*/(function () {
                 _context.prev = 5;
                 _context.t0 = _context["catch"](0);
               case 7:
-                event = new CustomEvent("imagesaved", {
-                  detail: id
-                });
-                _utilsUtilsDefault.default.DispatchEventToAllElements(event);
-              case 9:
+                this.dispatchChangeEvent("save", id);
+              case 8:
               case "end":
                 return _context.stop();
             }
@@ -9620,17 +9669,35 @@ var ImageStorage = /*#__PURE__*/(function () {
   }, {
     key: "deleteImage",
     value: function deleteImage(id) {
+      var _this2 = this;
       return this.adapter.removeItem(id).then(function () {
-        var event = new CustomEvent("imagedeleted", {
-          detail: id
-        });
-        _utilsUtilsDefault.default.DispatchEventToAllElements(event);
+        _this2.dispatchChangeEvent("delete", id);
       });
     }
   }, {
     key: "keys",
     value: function keys() {
       return this.adapter.keys();
+    }
+  }, {
+    key: "addChangeListener",
+    value: function addChangeListener(callback) {
+      this._changeListeners.push(callback);
+    }
+  }, {
+    key: "dispatchChangeEvent",
+    value: function dispatchChangeEvent(change, id) {
+      var _iterator = _createForOfIteratorHelper(this._changeListeners), _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+          var changeListener = _step.value;
+          changeListener(change, id);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
     }
   }, {
     key: "adapter",
@@ -9644,7 +9711,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   return ImageStorage;
 })();
 
-},{"./LocalForageAdapter":"6C5Ef","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6C5Ef":[function(require,module,exports) {
+},{"./LocalForageAdapter":"6C5Ef","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6C5Ef":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -14199,9 +14266,8 @@ var ShapePalette = /*#__PURE__*/(function (_Palette) {
         _iterator.f();
       }
     });
-    _this._element.addEventListener("imagesaved", function (event) {
-      var id = event.detail;
-      if (id.startsWith("Shape")) {
+    _storageImageStorageDefault.default.addChangeListener(function (change, id) {
+      if (change == "save" && id.startsWith("Shape")) {
         _this.addShapeFromImageId(id);
       }
     });
@@ -15712,7 +15778,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"2O4yD","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -20340,9 +20406,8 @@ parcelRequire = (function (e, r, t, n) {
   }]
 }, {}, ["iTK6"], null);
 
-},{}],"5xv2G":[function(require,module,exports) {
-module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.540\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
+},{}],"2O4yD":[function(require,module,exports) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.8f59b9dc.js.map
+//# sourceMappingURL=index.55b26fe1.js.map

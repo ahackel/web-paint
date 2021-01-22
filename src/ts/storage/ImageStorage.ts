@@ -6,6 +6,7 @@ import StorageAdapter from "./StorageAdapter";
 export default class ImageStorage {
 
 	private static _adapter: StorageAdapter;
+	private static _changeListeners: Function[];
 	
 	public static get adapter() {
 		if (this._adapter == null) {
@@ -62,15 +63,14 @@ export default class ImageStorage {
 		}
 		catch (e) {
 		}
-		const event = new CustomEvent<string>("imagesaved", {detail: id})
-		Utils.DispatchEventToAllElements(event);
+		
+		this.dispatchChangeEvent("save", id);
 	}
 	
 	public static deleteImage(id: string){
 		return this.adapter.removeItem(id)
 			.then(() => {
-				const event = new CustomEvent<string>("imagedeleted", {detail: id})
-				Utils.DispatchEventToAllElements(event);
+				this.dispatchChangeEvent("delete", id);
 			})		
 	}
 
@@ -78,5 +78,13 @@ export default class ImageStorage {
 		return this.adapter.keys();
 	}
 
+	public static addChangeListener(callback: Function){
+		this._changeListeners.push(callback);
+	}
 
+	private static dispatchChangeEvent(change: string, id: string) {
+		for (let changeListener of this._changeListeners) {
+			changeListener(change, id);
+		}
+	}
 }

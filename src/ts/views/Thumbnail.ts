@@ -41,11 +41,10 @@ export default class Thumbnail {
             }
         }, true);
 
-        element.addEventListener("imagesaved", (event: CustomEvent) => {
-            if (event.detail != this.id){
-                return;
+        ImageStorage.addChangeListener((change: string, id: string) => {
+            if (change == "save" && id == this.id) {
+                this.loadImage();
             }
-            this.loadImage();
         });
         
         this.overlayUrl = Utils.getImageOverlayUrl(id);

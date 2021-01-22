@@ -173,13 +173,6 @@ export default class Utils {
         // }
     }
 
-    public static DispatchEventToAllElements(event: Event) {
-        const elements = document.getElementsByTagName("*");
-        for (let i = 0; i < elements.length; i++) {
-            elements[i].dispatchEvent(event);
-        }
-    }
-
     public static createNewImageId(): string {
         return Date.now().toString();
     }
