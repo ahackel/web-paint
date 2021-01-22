@@ -420,7 +420,8 @@ export default class PaintView extends View {
     touchEnd(event: TouchEvent) {
         event.preventDefault();
         let touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-        if (touch == null){
+        if (touch != null){
+            // current touch is still in the list of target touches, this means it has not ended yet
             return;
         }
         this.up(event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);

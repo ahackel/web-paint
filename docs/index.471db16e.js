@@ -13010,7 +13010,8 @@ var PaintView = /*#__PURE__*/(function (_View) {
     value: function touchEnd(event) {
       event.preventDefault();
       var touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-      if (touch == null) {
+      if (touch != null) {
+        // current touch is still in the list of target touches, this means it has not ended yet
         return;
       }
       this.up(event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
@@ -20528,4 +20529,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.0b00b5e8.js.map
+//# sourceMappingURL=index.471db16e.js.map
