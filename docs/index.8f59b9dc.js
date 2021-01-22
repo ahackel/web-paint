@@ -198,6 +198,15 @@ var App = /*#__PURE__*/(function () {
     this.openView(this._bookView);
   }
   _createClass(App, [{
+    key: "getIOSVersion",
+    value: function getIOSVersion() {
+      if ((/iP(hone|od|ad)/).test(navigator.platform)) {
+        // supports iOS 2.0 and later: <http://bit.ly/TJjs1V>
+        var v = navigator.appVersion.match(/OS (\d+)_(\d+)_?(\d+)?/);
+        return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || 0, 10)];
+      }
+    }
+  }, {
     key: "OnResize",
     value: function OnResize() {
       var docWidth = document.documentElement.clientWidth;
@@ -8248,7 +8257,7 @@ var BookView = /*#__PURE__*/(function (_View) {
     _classCallCheck(this, BookView);
     _this = _super.call(this, id);
     var settingsButton = _this._element.getElementsByClassName("button settings")[0];
-    _utilsUtilsDefault.default.addFastClick(settingsButton, function () {
+    _utilsUtilsDefault.default.addClick(settingsButton, function () {
       return onSettingsClicked();
     });
     return _this;
@@ -8397,6 +8406,8 @@ var config = {
   debug: false,
   doubleTapDelay: 400,
   longClickDelay: 1000,
+  minScrollDistance: 30,
+  maxScrollDelay: 500,
   maxShapeCount: 64 - defaultShapes.length,
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -8495,11 +8506,11 @@ var Thumbnail = /*#__PURE__*/(function () {
     // PeerToPeer.instance.sendData(peerName, blob);
     // });
     // });
-    _utilsUtilsDefault.default.addFastClick(element, function () {
+    _utilsUtilsDefault.default.addClick(element, function () {
       if (onImageSelected) {
         onImageSelected(id);
       }
-    });
+    }, true);
     element.addEventListener("imagesaved", function (event) {
       if (event.detail != _this.id) {
         return;
@@ -8574,6 +8585,7 @@ function _createClass(Constructor, protoProps, staticProps) {
   if (staticProps) _defineProperties(Constructor, staticProps);
   return Constructor;
 }
+var Pressure = require('pressure');
 var _times = [];
 var _fps = 60;
 var _fpsDisplay;
@@ -8644,25 +8656,67 @@ var Utils = /*#__PURE__*/(function () {
       _fpsDisplay.innerText = _fps.toFixed(0);
     }
   }, {
-    key: "addFastClick",
-    value: function addFastClick(element, callback) {
-      var isScrolling = false;
+    key: "addClick",
+    value: function addClick(element, callback) {
+      var supportScrolling = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var scrollStartX;
+      var scrollStartY;
+      var touchId;
+      var isTracking;
+      var startTimeStamp;
+      var scrolled;
       element.addEventListener("touchstart", touchStart);
-      element.addEventListener("mouseup", callback);
+      element.addEventListener("mouseup", mouseUp);
+      function mouseUp(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        callback.call(event.target, event);
+      }
       function touchStart(event) {
-        isScrolling = false;
+        if (isTracking || event.touches.length > 1) {
+          return;
+        }
+        var touch = event.changedTouches[0];
+        isTracking = true;
+        touchId = touch.identifier;
+        scrolled = false;
+        scrollStartX = touch.pageX;
+        scrollStartY = touch.pageY;
+        startTimeStamp = event.timeStamp;
+        element.classList.add("down");
         element.addEventListener("touchmove", touchMove);
         element.addEventListener("touchend", touchEnd);
       }
       function touchMove(event) {
-        isScrolling = true;
+        if (!isTracking) {
+          return;
+        }
+        var touch = event.changedTouches[0];
+        if (document.elementFromPoint(touch.pageX, touch.pageY) != element) {
+          isTracking = false;
+          element.classList.remove("down");
+        }
+        if (scrolled || event.timeStamp < startTimeStamp + _config.config.maxScrollDelay) {
+          if (supportScrolling && (Math.abs(touch.pageX - scrollStartX) > _config.config.minScrollDistance || Math.abs(touch.pageY - scrollStartY) > _config.config.minScrollDistance)) {
+            isTracking = false;
+            element.classList.remove("down");
+          }
+        }
+        if (event.timeStamp < startTimeStamp + _config.config.maxScrollDelay) {
+          if (Math.abs(touch.pageX - scrollStartX) > 2 || Math.abs(touch.pageY - scrollStartY) > 2) {
+            scrolled = true;
+          }
+        }
       }
       function touchEnd(event) {
         element.removeEventListener("touchmove", touchMove);
         element.removeEventListener("touchend", touchEnd);
-        if (isScrolling) {
+        element.classList.remove("down");
+        if (!isTracking) {
           return;
         }
+        isTracking = false;
+        touchId = null;
         event.preventDefault();
         callback.call(event.target, event);
       }
@@ -8670,28 +8724,11 @@ var Utils = /*#__PURE__*/(function () {
   }, {
     key: "addLongClick",
     value: function addLongClick(element, callback) {
-      var timer;
-      var caller = this;
-      var called = false;
-      element.addEventListener("touchstart", down);
-      element.addEventListener("touchend", up);
-      element.addEventListener("mousedown", down);
-      element.addEventListener("mouseup", up);
-      function down(event) {
-        called = false;
-        timer = setTimeout(function () {
-          callback.call(caller, event);
-          called = true;
-        }, _config.config.longClickDelay);
-      }
-      function up(event) {
-        if (called) {
-          event.stopImmediatePropagation();
-          called = false;
-        } else {
-          clearTimeout(timer);
-        }
-      }
+      Pressure.set(element, {
+        startDeepPress: callback
+      }, {
+        polyfillSpeedUp: _config.config.longClickDelay * 2
+      });
     }
   }, {
     key: "DispatchEventToAllElements",
@@ -8956,7 +8993,7 @@ var Utils = /*#__PURE__*/(function () {
   return Utils;
 })();
 
-},{"./Point":"6AhXm","../config":"1tzQg","./Rect":"3WeR4","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6AhXm":[function(require,module,exports) {
+},{"./Point":"6AhXm","../config":"1tzQg","./Rect":"3WeR4","pressure":"7hv3G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6AhXm":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -9126,7 +9163,318 @@ var Rect = /*#__PURE__*/(function () {
   return Rect;
 })();
 
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"3kpel":[function(require,module,exports) {
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7hv3G":[function(require,module,exports) {
+var define;
+// Pressure v2.2.0 | Created By Stuart Yamartino | MIT License | 2015 - 2020
+!(function (e, t) {
+  "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? module.exports = t() : e.Pressure = t();
+})(this, function () {
+  "use strict";
+  function i(e) {
+    return (i = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
+      return typeof e;
+    } : function (e) {
+      return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+    })(e);
+  }
+  function e(e, t) {
+    if ("function" != typeof t && null !== t) throw new TypeError("Super expression must either be null or a function");
+    (e.prototype = Object.create(t && t.prototype, {
+      constructor: {
+        value: e,
+        writable: !0,
+        configurable: !0
+      }
+    }), t && s(e, t));
+  }
+  function s(e, t) {
+    return (s = Object.setPrototypeOf || (function (e, t) {
+      return (e.__proto__ = t, e);
+    }))(e, t);
+  }
+  function t(s) {
+    var n = (function () {
+      if ("undefined" == typeof Reflect || !Reflect.construct) return !1;
+      if (Reflect.construct.sham) return !1;
+      if ("function" == typeof Proxy) return !0;
+      try {
+        return (Date.prototype.toString.call(Reflect.construct(Date, [], function () {})), !0);
+      } catch (e) {
+        return !1;
+      }
+    })();
+    return function () {
+      var e, t = r(s);
+      return (e = n ? (e = r(this).constructor, Reflect.construct(t, arguments, e)) : t.apply(this, arguments), t = this, !(e = e) || "object" !== i(e) && "function" != typeof e ? (function (e) {
+        if (void 0 !== e) return e;
+        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+      })(t) : e);
+    };
+  }
+  function r(e) {
+    return (r = Object.setPrototypeOf ? Object.getPrototypeOf : function (e) {
+      return e.__proto__ || Object.getPrototypeOf(e);
+    })(e);
+  }
+  function o(e, t) {
+    if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
+  }
+  function n(e, t) {
+    for (var s = 0; s < t.length; s++) {
+      var n = t[s];
+      (n.enumerable = n.enumerable || !1, n.configurable = !0, ("value" in n) && (n.writable = !0), Object.defineProperty(e, n.key, n));
+    }
+  }
+  function u(e, t, s) {
+    return (t && n(e.prototype, t), s && n(e, s), e);
+  }
+  var h = {
+    set: function (e, t, s) {
+      y(e, t, s);
+    },
+    config: function (e) {
+      p.set(e);
+    },
+    map: function () {
+      return v.apply(null, arguments);
+    }
+  }, c = (function () {
+    function n(e, t, s) {
+      (o(this, n), this.routeEvents(e, t, s), this.preventSelect(e, s));
+    }
+    return (u(n, [{
+      key: "routeEvents",
+      value: function (e, t, s) {
+        var n = p.get("only", s);
+        this.adapter = !b || "mouse" !== n && null !== n ? !m || "pointer" !== n && null !== n ? !g || "touch" !== n && null !== n ? new l(e, t).bindUnsupportedEvent() : new d(e, t, s).bindEvents() : new f(e, t, s).bindEvents() : new a(e, t, s).bindEvents();
+      }
+    }, {
+      key: "preventSelect",
+      value: function (e, t) {
+        p.get("preventSelect", t) && (e.style.webkitTouchCallout = "none", e.style.webkitUserSelect = "none", e.style.khtmlUserSelect = "none", e.style.MozUserSelect = "none", e.style.msUserSelect = "none", e.style.userSelect = "none");
+      }
+    }]), n);
+  })(), l = (function () {
+    function n(e, t, s) {
+      (o(this, n), this.el = e, this.block = t, this.options = s, this.pressed = !1, this.deepPressed = !1, this.nativeSupport = !1, this.runningPolyfill = !1, this.runKey = Math.random());
+    }
+    return (u(n, [{
+      key: "setPressed",
+      value: function (e) {
+        this.pressed = e;
+      }
+    }, {
+      key: "setDeepPressed",
+      value: function (e) {
+        this.deepPressed = e;
+      }
+    }, {
+      key: "isPressed",
+      value: function () {
+        return this.pressed;
+      }
+    }, {
+      key: "isDeepPressed",
+      value: function () {
+        return this.deepPressed;
+      }
+    }, {
+      key: "add",
+      value: function (e, t) {
+        this.el.addEventListener(e, t, !1);
+      }
+    }, {
+      key: "runClosure",
+      value: function (e) {
+        (e in this.block) && this.block[e].apply(this.el, Array.prototype.slice.call(arguments, 1));
+      }
+    }, {
+      key: "fail",
+      value: function (e, t) {
+        p.get("polyfill", this.options) ? this.runKey === t && this.runPolyfill(e) : this.runClosure("unsupported", e);
+      }
+    }, {
+      key: "bindUnsupportedEvent",
+      value: function () {
+        var t = this;
+        this.add(g ? "touchstart" : "mousedown", function (e) {
+          return t.runClosure("unsupported", e);
+        });
+      }
+    }, {
+      key: "_startPress",
+      value: function (e) {
+        !1 === this.isPressed() && (this.runningPolyfill = !1, this.setPressed(!0), this.runClosure("start", e));
+      }
+    }, {
+      key: "_startDeepPress",
+      value: function (e) {
+        this.isPressed() && !1 === this.isDeepPressed() && (this.setDeepPressed(!0), this.runClosure("startDeepPress", e));
+      }
+    }, {
+      key: "_changePress",
+      value: function (e, t) {
+        (this.nativeSupport = !0, this.runClosure("change", e, t));
+      }
+    }, {
+      key: "_endDeepPress",
+      value: function () {
+        this.isPressed() && this.isDeepPressed() && (this.setDeepPressed(!1), this.runClosure("endDeepPress"));
+      }
+    }, {
+      key: "_endPress",
+      value: function () {
+        !1 === this.runningPolyfill ? (this.isPressed() && (this._endDeepPress(), this.setPressed(!1), this.runClosure("end")), this.runKey = Math.random(), this.nativeSupport = !1) : this.setPressed(!1);
+      }
+    }, {
+      key: "deepPress",
+      value: function (e, t) {
+        .5 <= e ? this._startDeepPress(t) : this._endDeepPress();
+      }
+    }, {
+      key: "runPolyfill",
+      value: function (e) {
+        (this.increment = 0 === p.get("polyfillSpeedUp", this.options) ? 1 : 10 / p.get("polyfillSpeedUp", this.options), this.decrement = 0 === p.get("polyfillSpeedDown", this.options) ? 1 : 10 / p.get("polyfillSpeedDown", this.options), this.setPressed(!0), this.runClosure("start", e), !1 === this.runningPolyfill && this.loopPolyfillForce(0, e));
+      }
+    }, {
+      key: "loopPolyfillForce",
+      value: function (e, t) {
+        !1 === this.nativeSupport && (this.isPressed() ? (this.runningPolyfill = !0, e = 1 < e + this.increment ? 1 : e + this.increment, this.runClosure("change", e, t), this.deepPress(e, t), setTimeout(this.loopPolyfillForce.bind(this, e, t), 10)) : ((e = e - this.decrement < 0 ? 0 : e - this.decrement) < .5 && this.isDeepPressed() && (this.setDeepPressed(!1), this.runClosure("endDeepPress")), 0 === e ? (this.runningPolyfill = !1, this.setPressed(!0), this._endPress()) : (this.runClosure("change", e, t), this.deepPress(e, t), setTimeout(this.loopPolyfillForce.bind(this, e, t), 10))));
+      }
+    }]), n);
+  })(), a = (function () {
+    e(i, l);
+    var n = t(i);
+    function i(e, t, s) {
+      return (o(this, i), n.call(this, e, t, s));
+    }
+    return (u(i, [{
+      key: "bindEvents",
+      value: function () {
+        (this.add("webkitmouseforcewillbegin", this._startPress.bind(this)), this.add("mousedown", this.support.bind(this)), this.add("webkitmouseforcechanged", this.change.bind(this)), this.add("webkitmouseforcedown", this._startDeepPress.bind(this)), this.add("webkitmouseforceup", this._endDeepPress.bind(this)), this.add("mouseleave", this._endPress.bind(this)), this.add("mouseup", this._endPress.bind(this)));
+      }
+    }, {
+      key: "support",
+      value: function (e) {
+        !1 === this.isPressed() && this.fail(e, this.runKey);
+      }
+    }, {
+      key: "change",
+      value: function (e) {
+        this.isPressed() && 0 < e.webkitForce && this._changePress(this.normalizeForce(e.webkitForce), e);
+      }
+    }, {
+      key: "normalizeForce",
+      value: function (e) {
+        return this.reachOne(v(e, 1, 3, 0, 1));
+      }
+    }, {
+      key: "reachOne",
+      value: function (e) {
+        return .995 < e ? 1 : e;
+      }
+    }]), i);
+  })(), d = (function () {
+    e(i, l);
+    var n = t(i);
+    function i(e, t, s) {
+      return (o(this, i), n.call(this, e, t, s));
+    }
+    return (u(i, [{
+      key: "bindEvents",
+      value: function () {
+        (k ? (this.add("touchforcechange", this.start.bind(this)), this.add("touchstart", this.support.bind(this, 0))) : this.add("touchstart", this.startLegacy.bind(this)), this.add("touchend", this._endPress.bind(this)));
+      }
+    }, {
+      key: "start",
+      value: function (e) {
+        0 < e.touches.length && (this._startPress(e), this.touch = this.selectTouch(e), this.touch && this._changePress(this.touch.force, e));
+      }
+    }, {
+      key: "support",
+      value: function (e, t, s) {
+        s = 2 < arguments.length && void 0 !== s ? s : this.runKey;
+        !1 === this.isPressed() && (e <= 6 ? (e++, setTimeout(this.support.bind(this, e, t, s), 10)) : this.fail(t, s));
+      }
+    }, {
+      key: "startLegacy",
+      value: function (e) {
+        (this.initialForce = e.touches[0].force, this.supportLegacy(0, e, this.runKey, this.initialForce));
+      }
+    }, {
+      key: "supportLegacy",
+      value: function (e, t, s, n) {
+        n !== this.initialForce ? (this._startPress(t), this.loopForce(t)) : e <= 6 ? (e++, setTimeout(this.supportLegacy.bind(this, e, t, s, n), 10)) : this.fail(t, s);
+      }
+    }, {
+      key: "loopForce",
+      value: function (e) {
+        this.isPressed() && (this.touch = this.selectTouch(e), setTimeout(this.loopForce.bind(this, e), 10), this._changePress(this.touch.force, e));
+      }
+    }, {
+      key: "selectTouch",
+      value: function (e) {
+        if (1 === e.touches.length) return this.returnTouch(e.touches[0], e);
+        for (var t = 0; t < e.touches.length; t++) if (e.touches[t].target === this.el || this.el.contains(e.touches[t].target)) return this.returnTouch(e.touches[t], e);
+      }
+    }, {
+      key: "returnTouch",
+      value: function (e, t) {
+        return (this.deepPress(e.force, t), e);
+      }
+    }]), i);
+  })(), f = (function () {
+    e(i, l);
+    var n = t(i);
+    function i(e, t, s) {
+      return (o(this, i), n.call(this, e, t, s));
+    }
+    return (u(i, [{
+      key: "bindEvents",
+      value: function () {
+        (this.add("pointerdown", this.support.bind(this)), this.add("pointermove", this.change.bind(this)), this.add("pointerup", this._endPress.bind(this)), this.add("pointerleave", this._endPress.bind(this)));
+      }
+    }, {
+      key: "support",
+      value: function (e) {
+        !1 === this.isPressed() && (0 === e.pressure || .5 === e.pressure || 1 < e.pressure ? this.fail(e, this.runKey) : (this._startPress(e), this._changePress(e.pressure, e)));
+      }
+    }, {
+      key: "change",
+      value: function (e) {
+        this.isPressed() && 0 < e.pressure && .5 !== e.pressure && (this._changePress(e.pressure, e), this.deepPress(e.pressure, e));
+      }
+    }]), i);
+  })(), p = {
+    polyfill: !0,
+    polyfillSpeedUp: 1e3,
+    polyfillSpeedDown: 0,
+    preventSelect: !0,
+    only: null,
+    get: function (e, t) {
+      return (t.hasOwnProperty(e) ? t : this)[e];
+    },
+    set: function (e) {
+      for (var t in e) e.hasOwnProperty(t) && this.hasOwnProperty(t) && "get" != t && "set" != t && (this[t] = e[t]);
+    }
+  }, y = function (e, t, s) {
+    var n = 2 < arguments.length && void 0 !== s ? s : {};
+    if ("string" == typeof e || e instanceof String) for (var i = document.querySelectorAll(e), r = 0; r < i.length; r++) new c(i[r], t, n); else if (P(e)) new c(e, t, n); else for (r = 0; r < e.length; r++) new c(e[r], t, n);
+  }, P = function (e) {
+    return "object" === ("undefined" == typeof HTMLElement ? "undefined" : i(HTMLElement)) ? e instanceof HTMLElement : e && "object" === i(e) && null !== e && 1 === e.nodeType && "string" == typeof e.nodeName;
+  }, v = function (e, t, s, n, i) {
+    return (e - t) * (i - n) / (s - t) + n;
+  }, b = !1, g = !1, m = !1, w = !1, k = !1;
+  if ("undefined" != typeof window) {
+    if ("undefined" != typeof Touch) try {
+      (Touch.prototype.hasOwnProperty("force") || ("force" in new Touch())) && (w = !0);
+    } catch (e) {}
+    (g = ("ontouchstart" in window.document) && w, b = ("onmousemove" in window.document) && ("onwebkitmouseforcechanged" in window.document) && !g, m = ("onpointermove" in window.document), k = ("ontouchforcechange" in window.document));
+  }
+  return h;
+});
+
+},{}],"3kpel":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -12142,15 +12490,15 @@ var PaintView = /*#__PURE__*/(function (_View) {
     value: function createButtons(onBackClicked) {
       var _this2 = this;
       var backButton = this._element.getElementsByClassName("button back")[0];
-      _utilsUtilsDefault.default.addFastClick(backButton, function () {
+      _utilsUtilsDefault.default.addClick(backButton, function () {
         return onBackClicked();
       });
       this._undoButton = document.getElementById("undo-button");
-      _utilsUtilsDefault.default.addFastClick(this._undoButton, function () {
+      _utilsUtilsDefault.default.addClick(this._undoButton, function () {
         return _this2.undo();
       });
       this._redoButton = document.getElementById("redo-button");
-      _utilsUtilsDefault.default.addFastClick(this._redoButton, function () {
+      _utilsUtilsDefault.default.addClick(this._redoButton, function () {
         return _this2.redo();
       });
       var importImageField = document.getElementById("import-image-field");
@@ -12169,7 +12517,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         importImageField.value = null;
       });
       this._importImageButton = document.getElementById("import-image-button");
-      _utilsUtilsDefault.default.addFastClick(this._importImageButton, function () {
+      _utilsUtilsDefault.default.addClick(this._importImageButton, function () {
         return importImageField.click();
       });
     }
@@ -12236,18 +12584,18 @@ var PaintView = /*#__PURE__*/(function (_View) {
       _utilsUtilsDefault.default.addLongClick(penButton, function () {
         return _this3.fill();
       });
-      _utilsUtilsDefault.default.addFastClick(penButton, function () {
+      _utilsUtilsDefault.default.addClick(penButton, function () {
         return _this3.setTool(_this3.markerTool);
       });
       var eraserButton = document.getElementById("tool-eraser");
       _utilsUtilsDefault.default.addLongClick(eraserButton, function () {
         return _this3.clear(true, true);
       });
-      _utilsUtilsDefault.default.addFastClick(eraserButton, function () {
+      _utilsUtilsDefault.default.addClick(eraserButton, function () {
         return _this3.setTool(_this3.eraserTool);
       });
       var selectionButton = document.getElementById("tool-selection");
-      _utilsUtilsDefault.default.addFastClick(selectionButton, function () {
+      _utilsUtilsDefault.default.addClick(selectionButton, function () {
         return _this3.setTool(_this3.selectionTool);
       });
       _utilsUtilsDefault.default.addLongClick(selectionButton, function () {
@@ -13108,7 +13456,7 @@ var Palette = /*#__PURE__*/(function (_View) {
       var element = document.createElement("div");
       element.classList.add("option");
       this._selectedElement = element;
-      _utilsUtilsDefault.default.addFastClick(element, function () {
+      _utilsUtilsDefault.default.addClick(element, function () {
         return _this2.toggle();
       });
       this.updateSelectedOptionElement(element, this.selectedOption);
@@ -13159,7 +13507,7 @@ var Palette = /*#__PURE__*/(function (_View) {
       _utilsUtilsDefault.default.addLongClick(element, function (event) {
         return _this3.optionLongClicked(event, option, index);
       });
-      _utilsUtilsDefault.default.addFastClick(element, function (event) {
+      _utilsUtilsDefault.default.addClick(element, function (event) {
         return _this3.optionClicked(event, option, index);
       });
       this.updateOptionElement(element, option);
@@ -14728,15 +15076,15 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     _defineProperty(_assertThisInitialized(_this), "selectionLayerId", "selection-layer");
     _defineProperty(_assertThisInitialized(_this), "_selection", _utilsRectDefault.default.Empty());
     _this._deleteButton = document.getElementById("selection-delete-button");
-    _utilsUtilsDefault.default.addFastClick(_this._deleteButton, function () {
+    _utilsUtilsDefault.default.addClick(_this._deleteButton, function () {
       return _this.clearSelection();
     });
     _this._stampButton = document.getElementById("selection-stamp-button");
-    _utilsUtilsDefault.default.addFastClick(_this._stampButton, function () {
+    _utilsUtilsDefault.default.addClick(_this._stampButton, function () {
       return _this.paintSelectionToCanvas();
     });
     _this._saveButton = document.getElementById("selection-save-button");
-    _utilsUtilsDefault.default.addFastClick(_this._saveButton, function () {
+    _utilsUtilsDefault.default.addClick(_this._saveButton, function () {
       return _this.saveSelectionAsNewStamp();
     });
     _this._downloadButton = document.getElementById("selection-download-button");
@@ -15337,7 +15685,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
     _classCallCheck(this, SettingsView);
     _this = _super.call(this, id);
     var backButton = _this._element.getElementsByClassName("button back")[0];
-    _utilsUtilsDefault.default.addFastClick(backButton, function () {
+    _utilsUtilsDefault.default.addClick(backButton, function () {
       return onBackClicked();
     });
     _this._peerList = document.getElementById("peer-list");
@@ -15364,7 +15712,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"2O4yD","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -19992,8 +20340,9 @@ parcelRequire = (function (e, r, t, n) {
   }]
 }, {}, ["iTK6"], null);
 
-},{}],"2O4yD":[function(require,module,exports) {
+},{}],"5xv2G":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.540\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.37da28c3.js.map
+//# sourceMappingURL=index.8f59b9dc.js.map

@@ -13,7 +13,7 @@ export default class BookView extends View {
     constructor(id: string, onSettingsClicked: Function) {
         super(id);
         let settingsButton = <HTMLDivElement>this._element.getElementsByClassName("button settings")[0];
-        Utils.addFastClick(settingsButton, () => onSettingsClicked());
+        Utils.addClick(settingsButton, () => onSettingsClicked());
     }
 
     show(): void {

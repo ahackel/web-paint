@@ -1,6 +1,7 @@
 import Point from "./Point";
 import {config} from "../config";
 import Rect from "./Rect";
+const Pressure = require('pressure');
 
 let _times: number[] = [];
 let _fps: number = 60;
@@ -58,30 +59,82 @@ export default class Utils {
         _fpsDisplay.innerText = _fps.toFixed(0);
     }
 
-    public static addFastClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
+    public static addClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any,
+                           supportScrolling: boolean = false){
         
-        let isScrolling = false;
+        let scrollStartX: number;
+        let scrollStartY: number;
+        let touchId: number;
+        let isTracking: boolean;
+        let startTimeStamp: number;
+        let scrolled: boolean;
         
         element.addEventListener("touchstart", touchStart);
-        element.addEventListener("mouseup", callback);
+        element.addEventListener("mouseup", mouseUp);
+        
+        function mouseUp(event: Event){
+            event.preventDefault();
+            event.stopPropagation();
+            callback.call(event.target, event);
+        }
         
         function touchStart(event: TouchEvent){
-            isScrolling = false;
+            if (isTracking || event.touches.length > 1){
+                return;
+            }
+            const touch = event.changedTouches[0];
+
+            isTracking = true;
+            touchId = touch.identifier;
+            scrolled = false;
+            scrollStartX = touch.pageX;
+            scrollStartY = touch.pageY;
+            startTimeStamp = event.timeStamp;
+            element.classList.add("down");
+
             element.addEventListener("touchmove", touchMove);
             element.addEventListener("touchend", touchEnd);
         }
 
         function touchMove(event: TouchEvent){
-            isScrolling = true;
+            if (!isTracking){
+                return;
+            }
+            const touch = event.changedTouches[0];
+            
+            if (document.elementFromPoint(touch.pageX,touch.pageY) != element){
+                isTracking = false;
+                element.classList.remove("down");
+            }
+
+            if (scrolled || event.timeStamp < startTimeStamp + config.maxScrollDelay){
+                if (supportScrolling &&
+                    (Math.abs(touch.pageX - scrollStartX) > config.minScrollDistance ||
+                        Math.abs(touch.pageY - scrollStartY) > config.minScrollDistance)){
+                    isTracking = false;
+                    element.classList.remove("down");
+                }
+            }
+
+            if (event.timeStamp < startTimeStamp + config.maxScrollDelay){
+                if (Math.abs(touch.pageX - scrollStartX) > 2 ||
+                    Math.abs(touch.pageY - scrollStartY) > 2){
+                    scrolled = true;
+                }
+            }
         }
 
         function touchEnd(event: TouchEvent){
             element.removeEventListener("touchmove", touchMove);
             element.removeEventListener("touchend", touchEnd);
-            if (isScrolling){
+            element.classList.remove("down");
+            
+            if (!isTracking){
                 return;
             }
-            
+            isTracking = false;
+            touchId = null;
+
             event.preventDefault();
             callback.call(event.target, event);
         }
@@ -89,31 +142,35 @@ export default class Utils {
 
     public static addLongClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
         
-        let timer: any;
-        let caller = this;
-        let called: boolean = false;
+        Pressure.set(element, {
+            startDeepPress: callback
+        }, {polyfillSpeedUp: config.longClickDelay * 2}); // deep press will be triggered at 50%
         
-        element.addEventListener("touchstart", down);
-        element.addEventListener("touchend", up);
-        element.addEventListener("mousedown", down);
-        element.addEventListener("mouseup", up);
-
-        function down(event: Event) {
-            called = false;
-            timer = setTimeout(() => {
-                callback.call(caller, event);
-                called = true;
-            }, config.longClickDelay);
-        }
-
-        function up(event: Event) {
-            if (called) {
-                event.stopImmediatePropagation();
-                called = false;
-            } else {
-                clearTimeout(timer);
-            }
-        }
+        // let timer: any;
+        // let caller = this;
+        // let called: boolean = false;
+        //
+        // element.addEventListener("touchstart", down);
+        // element.addEventListener("touchend", up);
+        // element.addEventListener("mousedown", down);
+        // element.addEventListener("mouseup", up);
+        //
+        // function down(event: Event) {
+        //     called = false;
+        //     timer = setTimeout(() => {
+        //         callback.call(caller, event);
+        //         called = true;
+        //     }, config.longClickDelay);
+        // }
+        //
+        // function up(event: Event) {
+        //     if (called) {
+        //         event.stopImmediatePropagation();
+        //         called = false;
+        //     } else {
+        //         clearTimeout(timer);
+        //     }
+        // }
     }
 
     public static DispatchEventToAllElements(event: Event) {

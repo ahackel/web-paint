@@ -38,11 +38,11 @@ export default class SelectionTool extends Tool {
     constructor(painter: PaintView, buttonId: string) {
         super(painter, buttonId);
         this._deleteButton = <HTMLDivElement>document.getElementById("selection-delete-button");
-        Utils.addFastClick(this._deleteButton, () => this.clearSelection());
+        Utils.addClick(this._deleteButton, () => this.clearSelection());
         this._stampButton = <HTMLDivElement>document.getElementById("selection-stamp-button");
-        Utils.addFastClick(this._stampButton, () => this.paintSelectionToCanvas());
+        Utils.addClick(this._stampButton, () => this.paintSelectionToCanvas());
         this._saveButton = <HTMLDivElement>document.getElementById("selection-save-button");
-        Utils.addFastClick(this._saveButton, () => this.saveSelectionAsNewStamp());
+        Utils.addClick(this._saveButton, () => this.saveSelectionAsNewStamp());
         
         this._downloadButton = <HTMLDivElement>document.getElementById("selection-download-button");
         this._downloadAnchor = <HTMLAnchorElement>this._downloadButton.firstElementChild;

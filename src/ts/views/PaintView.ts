@@ -92,13 +92,13 @@ export default class PaintView extends View {
 
     private createButtons(onBackClicked: Function) {
         let backButton = <HTMLDivElement>this._element.getElementsByClassName("button back")[0];
-        Utils.addFastClick(backButton, () => onBackClicked());
+        Utils.addClick(backButton, () => onBackClicked());
 
         this._undoButton = <HTMLDivElement>document.getElementById("undo-button");
-        Utils.addFastClick(this._undoButton, () => this.undo());
+        Utils.addClick(this._undoButton, () => this.undo());
 
         this._redoButton = <HTMLDivElement>document.getElementById("redo-button");
-        Utils.addFastClick(this._redoButton, () => this.redo());
+        Utils.addClick(this._redoButton, () => this.redo());
 
         let importImageField = <HTMLInputElement>document.getElementById("import-image-field");
         importImageField.addEventListener("change", files => {
@@ -117,7 +117,7 @@ export default class PaintView extends View {
             importImageField.value = null;
         })
         this._importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
-        Utils.addFastClick(this._importImageButton, () => importImageField.click());
+        Utils.addClick(this._importImageButton, () => importImageField.click());
     }
 
     private addLayer(layer: ILayer): ILayer {
@@ -177,12 +177,12 @@ export default class PaintView extends View {
     private createTools() {
         let penButton = document.getElementById("tool-pen");
         Utils.addLongClick(penButton, () => this.fill());
-        Utils.addFastClick(penButton, () => this.setTool(this.markerTool));
+        Utils.addClick(penButton, () => this.setTool(this.markerTool));
         let eraserButton = document.getElementById("tool-eraser");
         Utils.addLongClick(eraserButton, () => this.clear(true, true));
-        Utils.addFastClick(eraserButton, () => this.setTool(this.eraserTool));
+        Utils.addClick(eraserButton, () => this.setTool(this.eraserTool));
         let selectionButton = document.getElementById("tool-selection");
-        Utils.addFastClick(selectionButton, () => this.setTool(this.selectionTool));
+        Utils.addClick(selectionButton, () => this.setTool(this.selectionTool));
         Utils.addLongClick(selectionButton, () => {
             this.setTool(this.selectionTool);
             this.selectionTool.selectAll();

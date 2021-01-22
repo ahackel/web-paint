@@ -19,7 +19,7 @@ export default class StampTool extends Tool {
     constructor(painter: PaintView) {
         super(painter);
         this._stampButton = <HTMLDivElement>document.getElementById("stamp-button");
-        Utils.addFastClick(this._stampButton, () => this.performStamp());
+        Utils.addClick(this._stampButton, () => this.performStamp());
         this._stampButton.hidden = true;
     }
 

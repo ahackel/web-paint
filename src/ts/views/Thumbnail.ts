@@ -35,11 +35,11 @@ export default class Thumbnail {
         //         });
         // });
         
-        Utils.addFastClick(element, () => {
+        Utils.addClick(element, () => {
             if (onImageSelected) {
                 onImageSelected(id);
             }
-        });
+        }, true);
 
         element.addEventListener("imagesaved", (event: CustomEvent) => {
             if (event.detail != this.id){

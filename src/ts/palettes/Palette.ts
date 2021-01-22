@@ -96,7 +96,7 @@ export class Palette extends View {
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("option");
         this._selectedElement = element;
-        Utils.addFastClick(element, () => this.toggle());
+        Utils.addClick(element, () => this.toggle());
         this.updateSelectedOptionElement(element, this.selectedOption);
         this._element.appendChild(element);
     }
@@ -131,7 +131,7 @@ export class Palette extends View {
         element.classList.add("option");
         element.dataset.index = `${index}`;
         Utils.addLongClick(element, event => this.optionLongClicked(event, option, index));
-        Utils.addFastClick(element, event => this.optionClicked(event, option, index));
+        Utils.addClick(element, event => this.optionClicked(event, option, index));
         this.updateOptionElement(element, option);
         this._optionsElement.appendChild(element);
         this._optionElements[index] = element;
