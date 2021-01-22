@@ -13157,7 +13157,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         return _storageImageStorageDefault.default.saveImage(_this7._imageId, blob);
       });
       this._isDirty = false;
-      this._lastSaveTimestamp = performance.now();
+      this._lastSaveTimestamp = Date.now();
     }
   }, {
     key: "setDirty",
@@ -13213,7 +13213,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
           return;
         }
       }
-      if (this._isDirty && timeStamp > this._lastSaveTimestamp + _config.config.saveInterval) {
+      if (this._isDirty && Date.now() > this._lastSaveTimestamp + _config.config.saveInterval) {
         this.saveImage();
       }
     }
@@ -20537,4 +20537,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.312f9fb7.js.map
+//# sourceMappingURL=index.5a7cfb37.js.map
