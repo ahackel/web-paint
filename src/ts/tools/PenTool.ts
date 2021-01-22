@@ -56,7 +56,7 @@ export default class PenTool extends Tool {
     }
 
     drawPath(){
-        if (this._points.length == 0 || this._startIndex >= this._points.length - 2) {
+        if (this._points.length == 0) {
             return;
         }
 
@@ -66,9 +66,9 @@ export default class PenTool extends Tool {
         
         if (this._startIndex == 0) {
             let radius = this._widths[0] * 0.5;
+            ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = this.color;
             ctx.fill();
         }
         

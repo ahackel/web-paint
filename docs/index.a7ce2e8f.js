@@ -14004,16 +14004,16 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "drawPath",
     value: function drawPath() {
-      if (this._points.length == 0 || this._startIndex >= this._points.length - 2) {
+      if (this._points.length == 0) {
         return;
       }
       var ctx = this.painter.baseLayer.ctx;
       var p1 = this._points[this._startIndex];
       if (this._startIndex == 0) {
         var radius = this._widths[0] * 0.5;
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = this.color;
         ctx.fill();
       }
       if (this._points.length == 1) {
@@ -20530,4 +20530,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.692b4a99.js.map
+//# sourceMappingURL=index.a7ce2e8f.js.map
