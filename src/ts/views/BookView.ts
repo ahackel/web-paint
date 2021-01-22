@@ -24,11 +24,21 @@ export default class BookView extends View {
         //     this._thumbnails[0].setImageSrc(URL.createObjectURL(new Blob([data])));
         // }
     }
+    
+    hide(){
+        super.hide();
+        if (this._thumbnails){
+            for (let thumbnail of this._thumbnails) {
+                thumbnail.remove();
+            }
+            this._thumbnails = null;
+        }
+    }
 
     private createImages() {
-        if (this._thumbnails){
-            return;
-        }
+        // if (this._thumbnails){
+        //     return;
+        // }
         
         this._thumbnails = [];
         

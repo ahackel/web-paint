@@ -41,16 +41,20 @@ export default class Thumbnail {
             }
         }, true);
 
-        ImageStorage.addChangeListener((change: string, id: string) => {
-            if (change == "save" && id == this.id) {
-                this.loadImage();
-            }
-        });
+        // ImageStorage.addChangeListener((change: string, id: string) => {
+        //     if (change == "save" && id == this.id) {
+        //         this.loadImage();
+        //     }
+        // });
         
         this.overlayUrl = Utils.getImageOverlayUrl(id);
 
         parent.appendChild(element);
         this.loadImage();
+    }
+
+    remove() {
+        this._element.remove();
     }
 
     private loadImage() {
@@ -69,10 +73,5 @@ export default class Thumbnail {
             urls.push(`url(${this._imageUrl})`);
         }
         this._element.style.backgroundImage = urls.join(",");
-    }
-
-    preventContextMenu(element: HTMLElement){
-        element.addEventListener("contextmenu", event => event.preventDefault());
-        element.addEventListener("touchend", event => event.preventDefault());
     }
 }

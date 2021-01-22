@@ -8145,6 +8145,70 @@ var _Thumbnail = require("./Thumbnail");
 var _ThumbnailDefault = _parcelHelpers.interopDefault(_Thumbnail);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it;
+  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+      var F = function F() {};
+      return {
+        s: F,
+        n: function n() {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function e(_e) {
+          throw _e;
+        },
+        f: F
+      };
+    }
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  var normalCompletion = true, didErr = false, err;
+  return {
+    s: function s() {
+      it = o[Symbol.iterator]();
+    },
+    n: function n() {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function e(_e2) {
+      didErr = true;
+      err = _e2;
+    },
+    f: function f() {
+      try {
+        if (!normalCompletion && it.return != null) it.return();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
+}
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+  return arr2;
+}
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8269,12 +8333,31 @@ var BookView = /*#__PURE__*/(function (_View) {
       this.createImages();
     }
   }, {
+    key: "hide",
+    value: function hide() {
+      _get(_getPrototypeOf(BookView.prototype), "hide", this).call(this);
+      if (this._thumbnails) {
+        var _iterator = _createForOfIteratorHelper(this._thumbnails), _step;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+            var thumbnail = _step.value;
+            thumbnail.remove();
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+        this._thumbnails = null;
+      }
+    }
+  }, {
     key: "createImages",
     value: function createImages() {
       var _this2 = this;
-      if (this._thumbnails) {
-        return;
-      }
+      // if (this._thumbnails){
+      // return;
+      // }
       this._thumbnails = [];
       for (var i = 0; i < _config.config.imageCount; i++) {
         var imageId = ("image").concat(("" + (i + 1)).padStart(2, "0"));
@@ -8489,7 +8572,6 @@ var Thumbnail = /*#__PURE__*/(function () {
     }
   }]);
   function Thumbnail(parent, id, onImageSelected) {
-    var _this = this;
     _classCallCheck(this, Thumbnail);
     var element = document.createElement("div");
     this._element = element;
@@ -8511,21 +8593,26 @@ var Thumbnail = /*#__PURE__*/(function () {
         onImageSelected(id);
       }
     }, true);
-    _storageImageStorageDefault.default.addChangeListener(function (change, id) {
-      if (change == "save" && id == _this.id) {
-        _this.loadImage();
-      }
-    });
+    // ImageStorage.addChangeListener((change: string, id: string) => {
+    // if (change == "save" && id == this.id) {
+    // this.loadImage();
+    // }
+    // });
     this.overlayUrl = _utilsUtilsDefault.default.getImageOverlayUrl(id);
     parent.appendChild(element);
     this.loadImage();
   }
   _createClass(Thumbnail, [{
+    key: "remove",
+    value: function remove() {
+      this._element.remove();
+    }
+  }, {
     key: "loadImage",
     value: function loadImage() {
-      var _this2 = this;
+      var _this = this;
       _storageImageStorageDefault.default.loadBlob(this.id).then(function (blob) {
-        _this2.imageUrl = blob ? URL.createObjectURL(blob) : null;
+        _this.imageUrl = blob ? URL.createObjectURL(blob) : null;
       });
     }
   }, {
@@ -8539,16 +8626,6 @@ var Thumbnail = /*#__PURE__*/(function () {
         urls.push(("url(").concat(this._imageUrl, ")"));
       }
       this._element.style.backgroundImage = urls.join(",");
-    }
-  }, {
-    key: "preventContextMenu",
-    value: function preventContextMenu(element) {
-      element.addEventListener("contextmenu", function (event) {
-        return event.preventDefault();
-      });
-      element.addEventListener("touchend", function (event) {
-        return event.preventDefault();
-      });
     }
   }]);
   return Thumbnail;
@@ -20424,4 +20501,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.ec9ca323.js.map
+//# sourceMappingURL=index.9ed09f99.js.map
