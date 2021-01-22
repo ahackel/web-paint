@@ -42,7 +42,7 @@ export const config: IAppConfig = {
     imageSmoothing: true,  // Whether to use smooth pixel filtering or to draw hard pixel edges
     useAutoMask: false,
     maxUndoSteps: 10,
-    saveInterval: 1000,
+    saveInterval: 5000,
     width: 1024,
     height: 768,
     defaultShapes: defaultShapes,

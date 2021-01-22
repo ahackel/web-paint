@@ -8503,7 +8503,7 @@ var config = {
   // Whether to use smooth pixel filtering or to draw hard pixel edges
   useAutoMask: false,
   maxUndoSteps: 10,
-  saveInterval: 1000,
+  saveInterval: 5000,
   width: 1024,
   height: 768,
   defaultShapes: defaultShapes,
@@ -8827,6 +8827,7 @@ var Utils = /*#__PURE__*/(function () {
       function up(event) {
         if (called) {
           event.stopImmediatePropagation();
+          element.classList.remove("down");
           called = false;
         } else {
           clearTimeout(timer);
@@ -20530,4 +20531,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.a7ce2e8f.js.map
+//# sourceMappingURL=index.d4f9e0ad.js.map

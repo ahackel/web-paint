@@ -172,6 +172,7 @@ export default class Utils {
         function up(event: Event) {
             if (called) {
                 event.stopImmediatePropagation();
+                element.classList.remove("down");
                 called = false;
             } else {
                 clearTimeout(timer);
