@@ -8749,6 +8749,9 @@ var Utils = /*#__PURE__*/(function () {
         callback.call(event.target, event);
       }
       function touchStart(event) {
+        if (!supportScrolling) {
+          event.preventDefault();
+        }
         if (isTracking || event.touches.length > 1) {
           return;
         }
@@ -8764,11 +8767,15 @@ var Utils = /*#__PURE__*/(function () {
         element.addEventListener("touchend", touchEnd);
       }
       function touchMove(event) {
+        if (!supportScrolling) {
+          event.preventDefault();
+        }
         if (!isTracking) {
           return;
         }
         var touch = event.changedTouches[0];
-        if (document.elementFromPoint(touch.pageX, touch.pageY) != element) {
+        // user dragged out of the element:
+        if (document.elementFromPoint(touch.pageX, touch.pageY) != event.target) {
           isTracking = false;
           element.classList.remove("down");
         }
@@ -8778,6 +8785,8 @@ var Utils = /*#__PURE__*/(function () {
             element.classList.remove("down");
           }
         }
+        // After tapping and holding for a while the element does not start scrolling any more.
+        // In that case we don't want perform the scroll check above any more:
         if (event.timeStamp < startTimeStamp + _config.config.maxScrollDelay) {
           if (Math.abs(touch.pageX - scrollStartX) > 2 || Math.abs(touch.pageY - scrollStartY) > 2) {
             scrolled = true;
@@ -8785,6 +8794,7 @@ var Utils = /*#__PURE__*/(function () {
         }
       }
       function touchEnd(event) {
+        event.preventDefault();
         element.removeEventListener("touchmove", touchMove);
         element.removeEventListener("touchend", touchEnd);
         element.classList.remove("down");
@@ -8793,18 +8803,34 @@ var Utils = /*#__PURE__*/(function () {
         }
         isTracking = false;
         touchId = null;
-        event.preventDefault();
         callback.call(event.target, event);
       }
     }
   }, {
     key: "addLongClick",
     value: function addLongClick(element, callback) {
-      Pressure.set(element, {
-        startDeepPress: callback
-      }, {
-        polyfillSpeedUp: _config.config.longClickDelay * 2
-      });
+      var timer;
+      var caller = this;
+      var called = false;
+      element.addEventListener("touchstart", down);
+      element.addEventListener("touchend", up);
+      element.addEventListener("mousedown", down);
+      element.addEventListener("mouseup", up);
+      function down(event) {
+        called = false;
+        timer = setTimeout(function () {
+          callback.call(caller, event);
+          called = true;
+        }, _config.config.longClickDelay);
+      }
+      function up(event) {
+        if (called) {
+          event.stopImmediatePropagation();
+          called = false;
+        } else {
+          clearTimeout(timer);
+        }
+      }
     }
   }, {
     key: "createNewImageId",
@@ -20501,4 +20527,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.9ed09f99.js.map
+//# sourceMappingURL=index.cf330f7a.js.map

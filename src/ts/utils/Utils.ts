@@ -79,6 +79,10 @@ export default class Utils {
         }
         
         function touchStart(event: TouchEvent){
+            if (!supportScrolling){
+                event.preventDefault();
+            }
+            
             if (isTracking || event.touches.length > 1){
                 return;
             }
@@ -97,12 +101,17 @@ export default class Utils {
         }
 
         function touchMove(event: TouchEvent){
+            if (!supportScrolling){
+                event.preventDefault();
+            }
+
             if (!isTracking){
                 return;
             }
             const touch = event.changedTouches[0];
             
-            if (document.elementFromPoint(touch.pageX,touch.pageY) != element){
+            // user dragged out of the element:
+            if (document.elementFromPoint(touch.pageX,touch.pageY) != event.target){
                 isTracking = false;
                 element.classList.remove("down");
             }
@@ -116,6 +125,8 @@ export default class Utils {
                 }
             }
 
+            // After tapping and holding for a while the element does not start scrolling any more.
+            // In that case we don't want perform the scroll check above any more:
             if (event.timeStamp < startTimeStamp + config.maxScrollDelay){
                 if (Math.abs(touch.pageX - scrollStartX) > 2 ||
                     Math.abs(touch.pageY - scrollStartY) > 2){
@@ -125,6 +136,7 @@ export default class Utils {
         }
 
         function touchEnd(event: TouchEvent){
+            event.preventDefault();
             element.removeEventListener("touchmove", touchMove);
             element.removeEventListener("touchend", touchEnd);
             element.classList.remove("down");
@@ -135,42 +147,36 @@ export default class Utils {
             isTracking = false;
             touchId = null;
 
-            event.preventDefault();
             callback.call(event.target, event);
         }
     }
 
     public static addLongClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any){
-        
-        Pressure.set(element, {
-            startDeepPress: callback
-        }, {polyfillSpeedUp: config.longClickDelay * 2}); // deep press will be triggered at 50%
-        
-        // let timer: any;
-        // let caller = this;
-        // let called: boolean = false;
-        //
-        // element.addEventListener("touchstart", down);
-        // element.addEventListener("touchend", up);
-        // element.addEventListener("mousedown", down);
-        // element.addEventListener("mouseup", up);
-        //
-        // function down(event: Event) {
-        //     called = false;
-        //     timer = setTimeout(() => {
-        //         callback.call(caller, event);
-        //         called = true;
-        //     }, config.longClickDelay);
-        // }
-        //
-        // function up(event: Event) {
-        //     if (called) {
-        //         event.stopImmediatePropagation();
-        //         called = false;
-        //     } else {
-        //         clearTimeout(timer);
-        //     }
-        // }
+        let timer: any;
+        let caller = this;
+        let called: boolean = false;
+
+        element.addEventListener("touchstart", down);
+        element.addEventListener("touchend", up);
+        element.addEventListener("mousedown", down);
+        element.addEventListener("mouseup", up);
+
+        function down(event: Event) {
+            called = false;
+            timer = setTimeout(() => {
+                callback.call(caller, event);
+                called = true;
+            }, config.longClickDelay);
+        }
+
+        function up(event: Event) {
+            if (called) {
+                event.stopImmediatePropagation();
+                called = false;
+            } else {
+                clearTimeout(timer);
+            }
+        }
     }
 
     public static createNewImageId(): string {
