@@ -8495,7 +8495,7 @@ var config = {
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
-  pixelPerfect: true,
+  pixelPerfect: false,
   // Make sure to perform painting operations on rounded pixel positions
   // Make sure to perform painting operations on rounded pixel positions
   imageSmoothing: true,
@@ -14009,18 +14009,24 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         // this.painter.restoreCurrentHistoryState();
         // ctx.clearRect(0, 0, this.painter.width, this.painter.height);
         var p1 = this._points[this._startIndex];
-        if (this._points.length == 1) {
+        if (this._startIndex == 0) {
           var radius = this.getWidth() * 0.5;
           ctx.beginPath();
           ctx.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
           ctx.fillStyle = ctx.strokeStyle;
           ctx.fill();
+        }
+        if (this._points.length < 2) {
           return;
         }
         var p2 = this._points[this._startIndex + 1];
         var midPoint = _utilsPointDefault.default.center(p1, p2);
         ctx.beginPath();
-        ctx.moveTo(midPoint.x, midPoint.y);
+        if (this._startIndex == 0) {
+          ctx.moveTo(p1.x, p1.y);
+        } else {
+          ctx.moveTo(midPoint.x, midPoint.y);
+        }
         for (var i = this._startIndex + 1; i < this._points.length; i++) {
           // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
           // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
@@ -20529,4 +20535,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.471db16e.js.map
+//# sourceMappingURL=index.4921b71d.js.map

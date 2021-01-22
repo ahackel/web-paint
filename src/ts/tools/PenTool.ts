@@ -63,12 +63,15 @@ export default class PenTool extends Tool {
 
             let p1 = this._points[this._startIndex];
             
-            if (this._points.length == 1){
+            if (this._startIndex == 0){
                 let radius = this.getWidth() * 0.5;
                 ctx.beginPath();
                 ctx.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
                 ctx.fillStyle = ctx.strokeStyle;
                 ctx.fill();
+            }
+            
+            if (this._points.length < 2){
                 return;
             }
 
@@ -76,7 +79,12 @@ export default class PenTool extends Tool {
             let midPoint: Point = Point.center(p1, p2);
 
             ctx.beginPath();
-            ctx.moveTo(midPoint.x, midPoint.y);
+            if (this._startIndex == 0){
+                ctx.moveTo(p1.x, p1.y);
+            }
+            else{
+                ctx.moveTo(midPoint.x, midPoint.y);
+            }
 
             for (let i = this._startIndex + 1; i < this._points.length; i++){
                 // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
