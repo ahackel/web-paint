@@ -10,6 +10,7 @@ import brushPath from "url:../../img/brush.png";
 export default class PenTool extends Tool {
 
     private _lastPoint: Point = new Point(0, 0);
+    private _startIndex: number;
     private _points: Point[];
     private _widths: number[];
     private _drawPathRequested: boolean;
@@ -27,6 +28,7 @@ export default class PenTool extends Tool {
         this._lastPoint = this.mouse.copy()
         this._points = [this._lastPoint];
         this._widths = [this.getWidth()];
+        this._startIndex = 0; 
 
         let ctx = this.painter.baseLayer.ctx;
         ctx.strokeStyle = this.color;
@@ -59,41 +61,41 @@ export default class PenTool extends Tool {
             // this.painter.restoreCurrentHistoryState();
             //ctx.clearRect(0, 0, this.painter.width, this.painter.height);
 
-            let point = this._points[0];
-            let oldPoint = point;
-            ctx.beginPath();
-            ctx.moveTo(point.x, point.y);
-
-            for (let i = 0; i < this._points.length; i++){
-                // let lastPoint = this._points[Math.max(0, i - 1)];
-                // point = this._points[i].copy();
-                // // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-                // // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-                //
-                // let midPoint = new Point(
-                //     (point.x + lastPoint.x) * 0.5,
-                //     (point.y + lastPoint.y) * 0.5,
-                //     );
-
-                ctx.lineWidth = this._widths[i];
-                // ctx.moveTo(oldPoint.x, oldPoint.y);
-                point = this._points[i];
-                ctx.lineTo(point.x, point.y)
-                //ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
-                ctx.stroke();
-                //oldPoint = midPoint;
+            let p1 = this._points[this._startIndex];
+            
+            if (this._points.length == 1){
+                let radius = this.getWidth() * 0.5;
+                ctx.beginPath();
+                ctx.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = ctx.strokeStyle;
+                ctx.fill();
+                return;
             }
-            this._points.splice(0, this._points.length - 1);
-            this._widths.splice(0, this._widths.length - 1);
+
+            let p2 = this._points[this._startIndex + 1];
+            let midPoint: Point = Point.center(p1, p2);
+
+            ctx.beginPath();
+            ctx.moveTo(midPoint.x, midPoint.y);
+
+            for (let i = this._startIndex + 1; i < this._points.length; i++){
+                // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+                // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+
+                midPoint = Point.center(p1, p2);
+                ctx.lineWidth = this._widths[i];
+                // point = this._points[i];
+                // ctx.lineTo(point.x, point.y)
+                ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+                ctx.stroke();
+                p1 = this._points[i];
+                p2 = this._points[i + 1];
+            }
+            this._startIndex = this._points.length - 2;
             // ctx.moveTo(oldPoint.x, oldPoint.y);
             // ctx.quadraticCurveTo(point.x, point.y, this._lastPoint.x, this._lastPoint.y);
             // ctx.stroke();
             //
-            // let radius = this.getWidth() * 0.5;
-            // ctx.beginPath();
-            // ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
-            // ctx.fillStyle = ctx.strokeStyle;
-            // ctx.fill();
             
             // this.applyAutoMask();
             //

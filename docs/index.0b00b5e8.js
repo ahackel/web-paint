@@ -9689,19 +9689,6 @@ function _createClass(Constructor, protoProps, staticProps) {
   if (staticProps) _defineProperties(Constructor, staticProps);
   return Constructor;
 }
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
 var ImageStorage = /*#__PURE__*/(function () {
   function ImageStorage() {
     _classCallCheck(this, ImageStorage);
@@ -9799,6 +9786,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   }, {
     key: "addChangeListener",
     value: function addChangeListener(callback) {
+      this._changeListeners = this._changeListeners || [];
       this._changeListeners.push(callback);
     }
   }, {
@@ -9827,7 +9815,6 @@ var ImageStorage = /*#__PURE__*/(function () {
   }]);
   return ImageStorage;
 })();
-_defineProperty(ImageStorage, "_changeListeners", []);
 
 },{"./LocalForageAdapter":"6C5Ef","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6C5Ef":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -13987,6 +13974,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       this._lastPoint = this.mouse.copy();
       this._points = [this._lastPoint];
       this._widths = [this.getWidth()];
+      this._startIndex = 0;
       var ctx = this.painter.baseLayer.ctx;
       ctx.strokeStyle = this.color;
       ctx.lineCap = "round";
@@ -14019,29 +14007,32 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       if (this._points.length > 0) {
         // this.painter.restoreCurrentHistoryState();
         // ctx.clearRect(0, 0, this.painter.width, this.painter.height);
-        var point = this._points[0];
-        var oldPoint = point;
-        ctx.beginPath();
-        ctx.moveTo(point.x, point.y);
-        for (var i = 0; i < this._points.length; i++) {
-          // let lastPoint = this._points[Math.max(0, i - 1)];
-          // point = this._points[i].copy();
-          // // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-          // // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-          // 
-          // let midPoint = new Point(
-          // (point.x + lastPoint.x) * 0.5,
-          // (point.y + lastPoint.y) * 0.5,
-          // );
-          ctx.lineWidth = this._widths[i];
-          // ctx.moveTo(oldPoint.x, oldPoint.y);
-          point = this._points[i];
-          ctx.lineTo(point.x, point.y);
-          // ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
-          ctx.stroke();
+        var p1 = this._points[this._startIndex];
+        if (this._points.length == 1) {
+          var radius = this.getWidth() * 0.5;
+          ctx.beginPath();
+          ctx.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
+          ctx.fillStyle = ctx.strokeStyle;
+          ctx.fill();
+          return;
         }
-        this._points.splice(0, this._points.length - 1);
-        this._widths.splice(0, this._widths.length - 1);
+        var p2 = this._points[this._startIndex + 1];
+        var midPoint = _utilsPointDefault.default.center(p1, p2);
+        ctx.beginPath();
+        ctx.moveTo(midPoint.x, midPoint.y);
+        for (var i = this._startIndex + 1; i < this._points.length; i++) {
+          // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+          // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+          midPoint = _utilsPointDefault.default.center(p1, p2);
+          ctx.lineWidth = this._widths[i];
+          // point = this._points[i];
+          // ctx.lineTo(point.x, point.y)
+          ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+          ctx.stroke();
+          p1 = this._points[i];
+          p2 = this._points[i + 1];
+        }
+        this._startIndex = this._points.length - 2;
       }
     }
   }, {
@@ -20537,4 +20528,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.5a7cfb37.js.map
+//# sourceMappingURL=index.0b00b5e8.js.map

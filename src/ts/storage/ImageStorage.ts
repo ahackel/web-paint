@@ -6,7 +6,7 @@ import StorageAdapter from "./StorageAdapter";
 export default class ImageStorage {
 
 	private static _adapter: StorageAdapter;
-	private static _changeListeners: Function[] = [];
+	private static _changeListeners: Function[];
 	
 	public static get adapter() {
 		if (this._adapter == null) {
@@ -79,6 +79,7 @@ export default class ImageStorage {
 	}
 
 	public static addChangeListener(callback: Function){
+		this._changeListeners = this._changeListeners || [];
 		this._changeListeners.push(callback);
 	}
 
