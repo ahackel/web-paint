@@ -554,7 +554,7 @@ export default class PaintView extends View {
         Utils.log("Saving image");
         this.baseLayer.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
         this._isDirty = false;
-        this._lastSaveTimestamp = performance.now();
+        this._lastSaveTimestamp = Date.now();
     }
 
     setDirty() {
@@ -606,7 +606,7 @@ export default class PaintView extends View {
             }
         }
         
-        if (this._isDirty && timeStamp > this._lastSaveTimestamp + config.saveInterval){
+        if (this._isDirty && Date.now() > this._lastSaveTimestamp + config.saveInterval){
             this.saveImage();
         }
     }
