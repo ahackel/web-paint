@@ -22,6 +22,7 @@ interface  IAppConfig{
     imageSmoothing: boolean;
     useAutoMask: boolean;
     maxUndoSteps: number;
+    saveInterval: number;
     width: number;
     height: number;
     defaultShapes: string[];
@@ -37,10 +38,11 @@ export const config: IAppConfig = {
     maxScrollDelay: 500,
     maxShapeCount: 64 - defaultShapes.length,
     fullScreenCanvas: true, // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
-    pixelPerfect: false,   // Make sure to perform painting operations on rounded pixel positions
+    pixelPerfect: true,   // Make sure to perform painting operations on rounded pixel positions
     imageSmoothing: true,  // Whether to use smooth pixel filtering or to draw hard pixel edges
     useAutoMask: false,
     maxUndoSteps: 10,
+    saveInterval: 1000,
     width: 1024,
     height: 768,
     defaultShapes: defaultShapes,

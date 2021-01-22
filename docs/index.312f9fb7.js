@@ -8495,7 +8495,7 @@ var config = {
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
-  pixelPerfect: false,
+  pixelPerfect: true,
   // Make sure to perform painting operations on rounded pixel positions
   // Make sure to perform painting operations on rounded pixel positions
   imageSmoothing: true,
@@ -8503,6 +8503,7 @@ var config = {
   // Whether to use smooth pixel filtering or to draw hard pixel edges
   useAutoMask: false,
   maxUndoSteps: 10,
+  saveInterval: 1000,
   width: 1024,
   height: 768,
   defaultShapes: defaultShapes,
@@ -12648,6 +12649,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
     _defineProperty(_assertThisInitialized(_this), "scaleFactor", 1);
     _defineProperty(_assertThisInitialized(_this), "_currentTouchId", 0);
     _defineProperty(_assertThisInitialized(_this), "_layers", {});
+    _defineProperty(_assertThisInitialized(_this), "_lastSaveTimestamp", 0);
     _defineProperty(_assertThisInitialized(_this), "getPointerEventPaintingFlag", function (e) {
       return e.pointerType === "touch" ? true : e.buttons === 1;
     });
@@ -12773,7 +12775,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       });
       var eraserButton = document.getElementById("tool-eraser");
       _utilsUtilsDefault.default.addLongClick(eraserButton, function () {
-        return _this3.clear(true, true);
+        return _this3.clear(true);
       });
       _utilsUtilsDefault.default.addClick(eraserButton, function () {
         return _this3.setTool(_this3.eraserTool);
@@ -12986,7 +12988,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       // }
       var target = event.target;
       target.releasePointerCapture(event.pointerId);
-      this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+      this.up(this.getPointerEventPosition(event));
       this._currentTouchId = 0;
     }
   }, {
@@ -13021,10 +13023,10 @@ var PaintView = /*#__PURE__*/(function (_View) {
     value: function touchEnd(event) {
       event.preventDefault();
       var touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-      if (touch != null) {
+      if (touch == null) {
         return;
       }
-      this.up(true, event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
+      this.up(event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
       this._currentTouchId = 0;
     }
   }, {
@@ -13062,27 +13064,21 @@ var PaintView = /*#__PURE__*/(function (_View) {
     }
   }, {
     key: "up",
-    value: function up(isPainting, mouse) {
+    value: function up(mouse) {
       if (!this._currentTool) {
         return;
       }
-      this._currentTool.painting = isPainting;
+      this._currentTool.painting = false;
       this._currentTool.mouse = mouse;
       this._currentTool.up();
-      // TODO: Move ti recordHistoryState
-      this.saveImage();
     }
   }, {
     key: "clear",
     value: function clear() {
       var recordHistoryState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       this.baseLayer.clear();
       if (recordHistoryState) {
         this.recordHistoryState();
-      }
-      if (save) {
-        this.saveImage();
       }
     }
   }, {
@@ -13104,6 +13100,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
     value: function recordHistoryState() {
       this._history.recordState(this.baseLayer.getData());
       this.updateUndoButtons();
+      this.setDirty();
     }
   }, {
     key: "updateUndoButtons",
@@ -13119,6 +13116,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       }
       this.baseLayer.putData(this._history.undo());
       this.updateUndoButtons();
+      this.setDirty();
     }
   }, {
     key: "redo",
@@ -13128,6 +13126,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       }
       this.baseLayer.putData(this._history.redo());
       this.updateUndoButtons();
+      this.setDirty();
     }
   }, {
     key: "restoreCurrentHistoryState",
@@ -13146,6 +13145,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         }
         _this6.setOverlay(_utilsUtilsDefault.default.getImageOverlayUrl(id));
         _this6.ResetHistory();
+        _this6._isDirty = false;
       });
     }
   }, {
@@ -13156,6 +13156,13 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.baseLayer.canvas.toBlob(function (blob) {
         return _storageImageStorageDefault.default.saveImage(_this7._imageId, blob);
       });
+      this._isDirty = false;
+      this._lastSaveTimestamp = performance.now();
+    }
+  }, {
+    key: "setDirty",
+    value: function setDirty() {
+      this._isDirty = true;
     }
   }, {
     key: "show",
@@ -13176,6 +13183,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         this._currentTool.disable();
       }
       if (this._layers) {
+        // Always save when closing the paint view in case we forgot to set the dirty flag somewhere:
         this.saveImage();
       }
       if (this._history) {
@@ -13196,12 +13204,18 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (_config.config.debug) {
         _utilsUtilsDefault.default.updateFPSCounter();
       }
-      if (!this._currentTool) {
-        return;
-      }
       var delta = timeStamp - this._tickTimeStamp;
       this._tickTimeStamp = timeStamp;
-      this._currentTool.tick(delta);
+      if (this._currentTool) {
+        this._currentTool.tick(delta);
+        // never save while painting to avoid lags:
+        if (this._currentTool.painting) {
+          return;
+        }
+      }
+      if (this._isDirty && timeStamp > this._lastSaveTimestamp + _config.config.saveInterval) {
+        this.saveImage();
+      }
     }
   }, {
     key: "captureAutoMask",
@@ -20523,4 +20537,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.2898a2e4.js.map
+//# sourceMappingURL=index.312f9fb7.js.map

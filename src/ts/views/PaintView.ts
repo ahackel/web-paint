@@ -58,6 +58,8 @@ export default class PaintView extends View {
     private _layers: { [id : string] : ILayer } = {};
     private _sheet: HTMLElement;
     private _importImageButton: HTMLDivElement;
+    private _isDirty: boolean;
+    private _lastSaveTimestamp: number = 0;
 
     get color(): string { return this._color; }
     get stamp(): string { return this._stamp; }
@@ -179,7 +181,7 @@ export default class PaintView extends View {
         Utils.addLongClick(penButton, () => this.fill());
         Utils.addClick(penButton, () => this.setTool(this.markerTool));
         let eraserButton = document.getElementById("tool-eraser");
-        Utils.addLongClick(eraserButton, () => this.clear(true, true));
+        Utils.addLongClick(eraserButton, () => this.clear(true));
         Utils.addClick(eraserButton, () => this.setTool(this.eraserTool));
         let selectionButton = document.getElementById("tool-selection");
         Utils.addClick(selectionButton, () => this.setTool(this.selectionTool));
@@ -385,7 +387,7 @@ export default class PaintView extends View {
         let target = <HTMLElement>event.target;
         target.releasePointerCapture(event.pointerId);
 
-        this.up(this.getPointerEventPaintingFlag(event), this.getPointerEventPosition(event));
+        this.up(this.getPointerEventPosition(event));
         this._currentTouchId = 0;
     }
 
@@ -418,10 +420,10 @@ export default class PaintView extends View {
     touchEnd(event: TouchEvent) {
         event.preventDefault();
         let touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-        if (touch != null){
+        if (touch == null){
             return;
         }
-        this.up(true,event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
+        this.up(event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
         this._currentTouchId = 0;
     }
 
@@ -471,25 +473,20 @@ export default class PaintView extends View {
         this._currentTool.down();
     }
 
-    private up(isPainting: boolean, mouse: Point) {
+    private up(mouse: Point) {
         if (!this._currentTool) {
             return;
         }
 
-        this._currentTool.painting = isPainting;
+        this._currentTool.painting = false;
         this._currentTool.mouse = mouse;
         this._currentTool.up();
-        // TODO: Move ti recordHistoryState
-        this.saveImage();
     }
 
-    clear(recordHistoryState: boolean = false, save: boolean = false) {
+    clear(recordHistoryState: boolean = false) {
         this.baseLayer.clear();
         if (recordHistoryState){
             this.recordHistoryState();
-        }
-        if (save){
-            this.saveImage();
         }
     }
 
@@ -508,6 +505,7 @@ export default class PaintView extends View {
     recordHistoryState(){
         this._history.recordState(this.baseLayer.getData());
         this.updateUndoButtons();
+        this.setDirty();
     }
 
     updateUndoButtons(){
@@ -521,6 +519,7 @@ export default class PaintView extends View {
         }
         this.baseLayer.putData(this._history.undo());
         this.updateUndoButtons();
+        this.setDirty();
     }
     
     redo() {
@@ -529,6 +528,7 @@ export default class PaintView extends View {
         }
         this.baseLayer.putData(this._history.redo());
         this.updateUndoButtons()
+        this.setDirty();
     }
 
     restoreCurrentHistoryState(){
@@ -546,12 +546,19 @@ export default class PaintView extends View {
                 
                 this.setOverlay(Utils.getImageOverlayUrl(id));
                 this.ResetHistory();
+                this._isDirty = false;
             })
     }
 
-    saveImage() {
+    private saveImage() {
         Utils.log("Saving image");
         this.baseLayer.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
+        this._isDirty = false;
+        this._lastSaveTimestamp = performance.now();
+    }
+
+    setDirty() {
+        this._isDirty = true;
     }
 
     show(){
@@ -567,6 +574,7 @@ export default class PaintView extends View {
             this._currentTool.disable();
         }
         if (this._layers){
+            // Always save when closing the paint view in case we forgot to set the dirty flag somewhere:
             this.saveImage();
         }
         if (this._history){
@@ -586,13 +594,21 @@ export default class PaintView extends View {
             Utils.updateFPSCounter();
         }
 
-        if (!this._currentTool) {
-            return;
-        }
-        
         let delta = timeStamp - this._tickTimeStamp;
         this._tickTimeStamp = timeStamp;
-        this._currentTool.tick(delta);
+
+        if (this._currentTool) {
+            this._currentTool.tick(delta);
+            
+            // never save while painting to avoid lags:
+            if (this._currentTool.painting){
+                return;
+            }
+        }
+        
+        if (this._isDirty && timeStamp > this._lastSaveTimestamp + config.saveInterval){
+            this.saveImage();
+        }
     }
 
     captureAutoMask(position: Point) {
