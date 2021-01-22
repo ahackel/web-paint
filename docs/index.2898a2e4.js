@@ -13973,7 +13973,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       this._lastPoint = this.mouse.copy();
       this._points = [this._lastPoint];
       this._widths = [this.getWidth()];
-      var ctx = this.getBufferCtx();
+      var ctx = this.painter.baseLayer.ctx;
       ctx.strokeStyle = this.color;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -14001,37 +14001,33 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "drawPath",
     value: function drawPath() {
-      var ctx = this.getBufferCtx();
+      var ctx = this.painter.baseLayer.ctx;
       if (this._points.length > 0) {
-        this.painter.restoreCurrentHistoryState();
-        ctx.clearRect(0, 0, this.painter.width, this.painter.height);
+        // this.painter.restoreCurrentHistoryState();
+        // ctx.clearRect(0, 0, this.painter.width, this.painter.height);
         var point = this._points[0];
         var oldPoint = point;
-        for (var i = 0; i < this._points.length; i++) {
-          var lastPoint = this._points[Math.max(0, i - 1)];
-          point = this._points[i].copy();
-          // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-          // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
-          var midPoint = new _utilsPointDefault.default((point.x + lastPoint.x) * 0.5, (point.y + lastPoint.y) * 0.5);
-          ctx.lineWidth = this._widths[i];
-          ctx.beginPath();
-          ctx.moveTo(oldPoint.x, oldPoint.y);
-          ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
-          ctx.stroke();
-          oldPoint = midPoint;
-        }
-        ctx.moveTo(oldPoint.x, oldPoint.y);
-        ctx.quadraticCurveTo(point.x, point.y, this._lastPoint.x, this._lastPoint.y);
-        ctx.stroke();
-        var radius = this.getWidth() * 0.5;
         ctx.beginPath();
-        ctx.arc(this._lastPoint.x, this._lastPoint.y, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = ctx.strokeStyle;
-        ctx.fill();
-        this.applyAutoMask();
-        this.painter.baseLayer.ctx.globalAlpha = this.opacity;
-        this.painter.baseLayer.drawImage(ctx.canvas);
-        this.painter.baseLayer.ctx.globalAlpha = 1;
+        ctx.moveTo(point.x, point.y);
+        for (var i = 0; i < this._points.length; i++) {
+          // let lastPoint = this._points[Math.max(0, i - 1)];
+          // point = this._points[i].copy();
+          // // point.x += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+          // // point.y += (this.random(i) - 0.5) * this._widths[i] * 0.3;
+          // 
+          // let midPoint = new Point(
+          // (point.x + lastPoint.x) * 0.5,
+          // (point.y + lastPoint.y) * 0.5,
+          // );
+          ctx.lineWidth = this._widths[i];
+          // ctx.moveTo(oldPoint.x, oldPoint.y);
+          point = this._points[i];
+          ctx.lineTo(point.x, point.y);
+          // ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
+          ctx.stroke();
+        }
+        this._points.splice(0, this._points.length - 1);
+        this._widths.splice(0, this._widths.length - 1);
       }
     }
   }, {
@@ -20527,4 +20523,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.cf330f7a.js.map
+//# sourceMappingURL=index.2898a2e4.js.map
