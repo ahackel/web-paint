@@ -9585,6 +9585,19 @@ function _createClass(Constructor, protoProps, staticProps) {
   if (staticProps) _defineProperties(Constructor, staticProps);
   return Constructor;
 }
+function _defineProperty(obj, key, value) {
+  if ((key in obj)) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
 var ImageStorage = /*#__PURE__*/(function () {
   function ImageStorage() {
     _classCallCheck(this, ImageStorage);
@@ -9710,6 +9723,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   }]);
   return ImageStorage;
 })();
+_defineProperty(ImageStorage, "_changeListeners", []);
 
 },{"./LocalForageAdapter":"6C5Ef","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6C5Ef":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -20410,4 +20424,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.55b26fe1.js.map
+//# sourceMappingURL=index.ec9ca323.js.map
