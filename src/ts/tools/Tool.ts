@@ -1,24 +1,18 @@
-import Point from "../utils/Point";
-import PaintView from "../views/PaintView";
+import {PaintView, IPointerData} from "../views/PaintView";
 
 // Base class for all tools
 export default abstract class Tool {
-    mouse: Point;
-    painting: boolean = false;
-    pressure: number = 1;
-    painter: PaintView;
-    speed: number;
+    protected _painter: PaintView;
     
-    get color() { return this.painter.color };
-    get opacity() { return this.painter.opacity }
-    get lineWidth() { return this.painter.lineWidth };
+    get color() { return this._painter.color };
+    get opacity() { return this._painter.opacity }
+    get lineWidth() { return this._painter.lineWidth };
     
     private static _bufferCtx: CanvasRenderingContext2D;
     protected _buttonElement: HTMLElement; 
 
     constructor(painter: PaintView, buttonId: string) {
-        this.painter = painter;
-        this.mouse = new Point(0,0);
+        this._painter = painter;
         this._buttonElement = document.getElementById(buttonId);
     }
 
@@ -27,8 +21,8 @@ export default abstract class Tool {
     private createBufferCtx() {
         let brushCanvas = document.createElement("canvas");
         brushCanvas.id = "buffer";
-        brushCanvas.width = this.painter.width;
-        brushCanvas.height = this.painter.height;
+        brushCanvas.width = this._painter.width;
+        brushCanvas.height = this._painter.height;
         Tool._bufferCtx = <CanvasRenderingContext2D>brushCanvas.getContext("2d", {alpha: true});
         Tool._bufferCtx.imageSmoothingQuality = "high";
         Tool._bufferCtx.imageSmoothingEnabled = true;
@@ -47,9 +41,12 @@ export default abstract class Tool {
     disable(): void {
         this._buttonElement.classList.remove("selected");
     }
-    down(): void {}
-    move(): void {}
-    up(): void {}
+    down(data: IPointerData): void {}
+
+    move(data: IPointerData): void {}
+    
+    up(data: IPointerData): void {}
+    
     pressureChanged(): void {}
     tick(delta: number): void {}
     keyDown(event: KeyboardEvent): void {}

@@ -4,14 +4,14 @@ import CanvasLayer from "../CanvasLayer";
 import Rect from "../utils/Rect";
 import ImageStorage from "../storage/ImageStorage";
 import Utils from "../utils/Utils";
-import PaintView from "../views/PaintView";
+import {PaintView, IPointerData} from "../views/PaintView";
 import {config} from "../config";
 
 // Provides a floating selection the user can manipulate 
 export default class SelectionTool extends Tool {
     readonly selectionLayerId = "selection-layer";
 
-    get selectionLayer(): CanvasLayer { return <CanvasLayer>this.painter.getLayer(this.selectionLayerId) }
+    get selectionLayer(): CanvasLayer { return <CanvasLayer>this._painter.getLayer(this.selectionLayerId) }
     get selection(): Rect { return this._selection; }
     get hasFloatingSelection(): boolean { return this._hasFloatingSelection; }
     set hasFloatingSelection(value: boolean) { 
@@ -24,6 +24,7 @@ export default class SelectionTool extends Tool {
         this._saveButton.classList.toggle("disabled", value);
     }
     
+    protected _position: Point;
     protected _startPosition: Point;
     protected _selection: Rect = Rect.Empty();
     private _hasFloatingSelection: boolean;
@@ -48,6 +49,7 @@ export default class SelectionTool extends Tool {
         this._downloadAnchor = <HTMLAnchorElement>this._downloadButton.firstElementChild;
         
         this.hasFloatingSelection = false;
+        this._position = new Point(0, 0);
     }
     
     toggleFloatingSelectionButtons(visible: boolean){
@@ -71,19 +73,29 @@ export default class SelectionTool extends Tool {
         this.hasFloatingSelection = false;
     }
     
-    down() {
+    down(data: IPointerData) {
+        this._position = this.getClampedPosition(data);
         this.startNewSelection();
+    }
+
+    move(data: IPointerData): void {
+        this._position = this.getClampedPosition(data);
+        this.requestDrawSelectionOutline();
+    }
+
+    up(data: IPointerData): void {
+        this.cutSelection();
     }
 
     private startNewSelection() {
         this.paintSelectionToCanvas();
-        this.selectionLayer.setPositionAndSize(0, 0, this.painter.width, this.painter.height);
+        this.selectionLayer.setPositionAndSize(0, 0, this._painter.width, this._painter.height);
         this.selectionLayer.transform(new Point(0, 0), 1, 0);
         this.selectionLayer.floating = false;
 
         this.hasFloatingSelection = false;
         this.isInShapesPalette = false;
-        this._startPosition = this.getMousePosition();
+        this._startPosition = this._position;
         
         let ctx = this.selectionLayer.ctx;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -95,21 +107,8 @@ export default class SelectionTool extends Tool {
         this.requestDrawSelectionOutline();
     }
 
-    private getMousePosition() {
-        return this.mouse.copy().round().clamp(0, 0, this.painter.width - 1, this.painter.height - 1);
-    }
-
-    move(): void {
-        if (!this.painting) {
-            return;
-        }
-        this.mouse.round();
-
-        this.requestDrawSelectionOutline();
-    }
-    
-    up(): void {
-        this.cutSelection();
+    private getClampedPosition(data: IPointerData) {
+        return data.position.round().clamp(0, 0, this._painter.width - 1, this._painter.height - 1);
     }
 
     tick(delta: number) {
@@ -165,19 +164,17 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.clear();
         let ctx = this.selectionLayer.ctx;
 
-        const position = this.getMousePosition();
-
-        const x = Math.min(this._startPosition.x, position.x);
-        const y = Math.min(this._startPosition.y, position.y);
-        const width = Math.abs(this._startPosition.x - position.x);
-        const height = Math.abs(this._startPosition.y - position.y);
+        const x = Math.min(this._startPosition.x, this._position.x);
+        const y = Math.min(this._startPosition.y, this._position.y);
+        const width = Math.abs(this._startPosition.x - this._position.x);
+        const height = Math.abs(this._startPosition.y - this._position.y);
         this._selection = new Rect(x, y, width, height);
 
         ctx.strokeRect(x, y, width, height);
     }
     
     private destroySelectionLayer() {
-        this.painter.removeLayer(this.selectionLayer);
+        this._painter.removeLayer(this.selectionLayer);
     }
 
     private createSelectionLayer() {
@@ -185,7 +182,7 @@ export default class SelectionTool extends Tool {
             return;
         }
 
-        this.painter.addCanvasLayer(this.selectionLayerId, 0, 0, this.painter.width, this.painter.height, false);
+        this._painter.addCanvasLayer(this.selectionLayerId, 0, 0, this._painter.width, this._painter.height, false);
         this.selectionLayer.onDoubleTap = (event: TouchEvent) => {
             if (event.altKey){
                 this.saveSelectionAsNewStamp();
@@ -197,7 +194,7 @@ export default class SelectionTool extends Tool {
     
     private cutSelection() {
         this.selectionLayer.clear();
-        this._selection = Utils.getVisiblePixelFrame(this.painter.baseLayer.ctx, this.selection);
+        this._selection = Utils.getVisiblePixelFrame(this._painter.baseLayer.ctx, this.selection);
         
         if (this.selection.isEmpty()){
             return;
@@ -208,9 +205,9 @@ export default class SelectionTool extends Tool {
         
         this.selectionLayer.setPositionAndSize(x, y, width, height);
         this.selectionLayer.floating = true;
-        this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
-        this.painter.baseLayer.clear(this.selection);
-        this.painter.recordHistoryState();
+        this.selectionLayer.ctx.drawImage(this._painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
+        this._painter.baseLayer.clear(this.selection);
+        this._painter.recordHistoryState();
         this.updateDownloadAnchor();
     }
 
@@ -218,9 +215,9 @@ export default class SelectionTool extends Tool {
         if (!this.hasFloatingSelection){
             return;
         }
-        this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
-        this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
-        this.painter.recordHistoryState();
+        this._painter.baseLayer.ctx.globalCompositeOperation = "source-over";
+        this.selectionLayer.drawToCanvas(this._painter.baseLayer.ctx);
+        this._painter.recordHistoryState();
     }
 
     private saveSelectionAsNewStamp() {
@@ -268,7 +265,7 @@ export default class SelectionTool extends Tool {
 
     selectAll() {
         this.startNewSelection();
-        this._selection = new Rect(0, 0, this.painter.width, this.painter.height);
+        this._selection = new Rect(0, 0, this._painter.width, this._painter.height);
         this.cutSelection();
     }
 

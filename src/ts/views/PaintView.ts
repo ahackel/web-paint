@@ -23,8 +23,16 @@ import {Toolbar} from "../Toolbar";
 import {History} from "../History";
 
 // var Pressure = require('pressure');
+export interface IPointerData {
+    timeStamp: number;
+    position: Point;
+    radius: Point;
+    pressure: number;
+    speed: number;
+    isPressed: boolean;
+}
 
-export default class PaintView extends View {
+export class PaintView extends View {
     public readonly scaleFactor = 1;
     public readonly width: number;
     public readonly height: number;
@@ -51,7 +59,7 @@ export default class PaintView extends View {
     private _history: History;
     private _undoButton: HTMLDivElement;
     private _redoButton: HTMLDivElement;
-    private _timeStamp: number;
+    private _lastPointerData: IPointerData;
     private _tickTimeStamp: number;
     private _autoMaskCaptured: boolean;
     private _stamp: string;
@@ -347,6 +355,7 @@ export default class PaintView extends View {
         }
 
         if (event.pointerType != 'touch' && event.buttons !== 1){
+            // ignore mouse move events with no button pressed
             return;
         }
 
@@ -355,7 +364,14 @@ export default class PaintView extends View {
 
         this._currentTouchId = event.pointerId;
         let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
-        this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
+        this.down({
+            timeStamp: event.timeStamp,
+            position: this.getPointerEventPosition(event),
+            radius: new Point(event.width, event.height),
+            pressure: pressure,
+            speed: 1,
+            isPressed: true
+        });
      }
 
     pointerMove(event: PointerEvent) {
@@ -365,12 +381,20 @@ export default class PaintView extends View {
         }
 
         if (event.pointerType != 'touch' && event.buttons !== 1){
+            // ignore mouse move events with no button pressed
             return;
         }
 
         // normalize pressure:
         let pressure = event.pointerType == "pen" ? Utils.clamp(0.5, 1, event.pressure * 2) : 1;
-        this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
+        this.move({
+            timeStamp: event.timeStamp,
+            position: this.getPointerEventPosition(event),
+            radius: new Point(event.width, event.height),
+            pressure: pressure,
+            speed: 1,
+            isPressed: true
+        });
     }
 
     pointerUp(event: PointerEvent) {
@@ -387,16 +411,21 @@ export default class PaintView extends View {
         let target = <HTMLElement>event.target;
         target.releasePointerCapture(event.pointerId);
 
-        this.up(this.getPointerEventPosition(event));
+        this.up({
+            timeStamp: event.timeStamp,
+            position: this.getPointerEventPosition(event),
+            radius: new Point(event.width, event.height),
+            pressure: 1,
+            speed: 1,
+            isPressed: false
+        });
         this._currentTouchId = 0;
     }
-
-    private getPointerEventPaintingFlag = (e: PointerEvent) => e.pointerType === "touch" ? true : e.buttons === 1;
-
+    
     pressureChanged(force: number){
-        let pressure = Utils.clamp(0.3, 1, force * 2);
-        this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
-        this._currentTool.pressureChanged();
+        // let pressure = Utils.clamp(0.3, 1, force * 2);
+        // this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
+        // this._currentTool.pressureChanged();
     }
 
     touchStart(event: TouchEvent) {
@@ -404,8 +433,16 @@ export default class PaintView extends View {
         if (this._currentTouchId !== 0){
             return;
         }
-        this._currentTouchId = event.targetTouches[0].identifier;
-        this.down(event.timeStamp,true, this.getTouchEventPosition(event.targetTouches[0]), 1);
+        const touch = event.targetTouches[0];
+        this._currentTouchId = touch.identifier;
+        this.down({
+            timeStamp: event.timeStamp,
+            position: this.getTouchEventPosition(touch),
+            radius: new Point(touch.radiusX, touch.radiusY),
+            pressure: touch.force,
+            speed: 1,
+            isPressed: true
+        });
     }
 
     touchMove(event: TouchEvent) {
@@ -414,7 +451,14 @@ export default class PaintView extends View {
         if (touch == null){
             return;
         }
-        this.move(event.timeStamp, true, this.getTouchEventPosition(touch), 1);
+        this.move({
+            timeStamp: event.timeStamp,
+            position: this.getTouchEventPosition(touch),
+            radius: new Point(touch.radiusX, touch.radiusY),
+            pressure: 1,
+            speed: 1,
+            isPressed: true
+        });
     }
 
     touchEnd(event: TouchEvent) {
@@ -424,7 +468,14 @@ export default class PaintView extends View {
             // current touch is still in the list of target touches, this means it has not ended yet
             return;
         }
-        this.up(event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
+        this.up({
+            timeStamp: event.timeStamp,
+            position: new Point(0 ,0),
+            radius: new Point(0 ,0),
+            pressure: 1,
+            speed: 1,
+            isPressed: false
+        });
         this._currentTouchId = 0;
     }
 
@@ -437,51 +488,41 @@ export default class PaintView extends View {
         return null;
     }
 
-    private move(timeStamp: number, isPainting: boolean, mouse: Point, pressure: number) {
+    private move(data: IPointerData) {
         if (!this._currentTool) {
             return;
         }
 
-        // this._currentTool.painting = isPainting;
-        this._currentTool.pressure = pressure;
+        let delta = Point.distance(this._lastPointerData.position, data.position);
 
-        let newMouse = mouse;
-        let delta = Point.distance(this._currentTool.mouse, newMouse);
-
-        if (delta > 2) {
-            let timeDelta = timeStamp - this._timeStamp;
-            this._timeStamp = timeStamp;
-            let speed = delta / timeDelta;
-
-            this._currentTool.speed = Utils.lerp(this._currentTool.speed, speed, 0.2);
-            this._currentTool.mouse = newMouse;
-            this._currentTool.move();
-        }
+        // if (delta > 2) {
+            this._lastPointerData = this._lastPointerData || data;
+            let timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
+            const speed = delta / timeDelta;
+            data.speed = Utils.lerp(this._lastPointerData.speed, speed, 0.2);
+            this._lastPointerData = data;
+            this._currentTool.move(data);
+        // }
     }
 
-    private down(timeStamp: number, isPainting: boolean, mouse: Point, pressure: number) {
+    private down(data: IPointerData) {
         Palette.collapseAll();
 
         if (!this._currentTool) {
             return;
         }
-        
-        this._timeStamp = timeStamp;
-        this._currentTool.speed = 1;
-        this._currentTool.painting = isPainting;
-        this._currentTool.pressure = pressure;
-        this._currentTool.mouse = mouse;
-        this._currentTool.down();
+
+        this._lastPointerData = data;
+        this._currentTool.down(data);
     }
 
-    private up(mouse: Point) {
+    private up(data: IPointerData) {
         if (!this._currentTool) {
             return;
         }
 
-        this._currentTool.painting = false;
-        this._currentTool.mouse = mouse;
-        this._currentTool.up();
+        this._lastPointerData = data;
+        this._currentTool.up(data);
     }
 
     clear(recordHistoryState: boolean = false) {
@@ -571,6 +612,8 @@ export default class PaintView extends View {
     }
     
     hide(){
+        Palette.collapseAll();
+
         if (this._currentTool){
             this._currentTool.disable();
         }
@@ -602,7 +645,7 @@ export default class PaintView extends View {
             this._currentTool.tick(delta);
             
             // never save while painting to avoid lags:
-            if (this._currentTool.painting){
+            if (this._lastPointerData && this._lastPointerData.isPressed){
                 return;
             }
         }

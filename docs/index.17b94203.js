@@ -144,7 +144,6 @@ var _viewsBookView = require("./views/BookView");
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 var _viewsBookViewDefault = _parcelHelpers.interopDefault(_viewsBookView);
 var _viewsPaintView = require("./views/PaintView");
-var _viewsPaintViewDefault = _parcelHelpers.interopDefault(_viewsPaintView);
 var _config = require("./config");
 var _viewsSettingsView = require("./views/SettingsView");
 var _viewsSettingsViewDefault = _parcelHelpers.interopDefault(_viewsSettingsView);
@@ -186,7 +185,7 @@ var App = /*#__PURE__*/(function () {
         _this.openView(_this._paintView);
       });
     };
-    this._paintView = new _viewsPaintViewDefault.default("paint", function () {
+    this._paintView = new _viewsPaintView.PaintView("paint", function () {
       _this.openView(_this._bookView);
     });
     this._settingsView = new _viewsSettingsViewDefault.default("settings", function () {
@@ -203,7 +202,7 @@ var App = /*#__PURE__*/(function () {
       if ((/iP(hone|od|ad)/).test(navigator.platform)) {
         // supports iOS 2.0 and later: <http://bit.ly/TJjs1V>
         var v = navigator.appVersion.match(/OS (\d+)_(\d+)_?(\d+)?/);
-        return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || 0, 10)];
+        return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || "0", 10)];
       }
     }
   }, {
@@ -12443,7 +12442,7 @@ var StorageAdapter = function StorageAdapter() {
 },{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1Zutj":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
+_parcelHelpers.export(exports, "PaintView", function () {
   return PaintView;
 });
 var _View2 = require("./View");
@@ -12588,7 +12587,6 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
-// var Pressure = require('pressure');
 var PaintView = /*#__PURE__*/(function (_View) {
   _inherits(PaintView, _View);
   var _super = _createSuper(PaintView);
@@ -12638,9 +12636,6 @@ var PaintView = /*#__PURE__*/(function (_View) {
     _defineProperty(_assertThisInitialized(_this), "_currentTouchId", 0);
     _defineProperty(_assertThisInitialized(_this), "_layers", {});
     _defineProperty(_assertThisInitialized(_this), "_lastSaveTimestamp", 0);
-    _defineProperty(_assertThisInitialized(_this), "getPointerEventPaintingFlag", function (e) {
-      return e.pointerType === "touch" ? true : e.buttons === 1;
-    });
     _this._history = new _History.History();
     _this._sheet = document.getElementById("sheet");
     _this.width = _config.config.width;
@@ -12941,13 +12936,21 @@ var PaintView = /*#__PURE__*/(function (_View) {
         return;
       }
       if (event.pointerType != 'touch' && event.buttons !== 1) {
+        // ignore mouse move events with no button pressed
         return;
       }
       var target = event.target;
       target.setPointerCapture(event.pointerId);
       this._currentTouchId = event.pointerId;
       var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.3, 1, event.pressure * 2) : 1;
-      this.down(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
+      this.down({
+        timeStamp: event.timeStamp,
+        position: this.getPointerEventPosition(event),
+        radius: new _utilsPointDefault.default(event.width, event.height),
+        pressure: pressure,
+        speed: 1,
+        isPressed: true
+      });
     }
   }, {
     key: "pointerMove",
@@ -12957,11 +12960,19 @@ var PaintView = /*#__PURE__*/(function (_View) {
         return;
       }
       if (event.pointerType != 'touch' && event.buttons !== 1) {
+        // ignore mouse move events with no button pressed
         return;
       }
       // normalize pressure:
       var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 1, event.pressure * 2) : 1;
-      this.move(event.timeStamp, true, this.getPointerEventPosition(event), pressure);
+      this.move({
+        timeStamp: event.timeStamp,
+        position: this.getPointerEventPosition(event),
+        radius: new _utilsPointDefault.default(event.width, event.height),
+        pressure: pressure,
+        speed: 1,
+        isPressed: true
+      });
     }
   }, {
     key: "pointerUp",
@@ -12976,16 +12987,19 @@ var PaintView = /*#__PURE__*/(function (_View) {
       // }
       var target = event.target;
       target.releasePointerCapture(event.pointerId);
-      this.up(this.getPointerEventPosition(event));
+      this.up({
+        timeStamp: event.timeStamp,
+        position: this.getPointerEventPosition(event),
+        radius: new _utilsPointDefault.default(event.width, event.height),
+        pressure: 1,
+        speed: 1,
+        isPressed: false
+      });
       this._currentTouchId = 0;
     }
   }, {
     key: "pressureChanged",
-    value: function pressureChanged(force) {
-      var pressure = _utilsUtilsDefault.default.clamp(0.3, 1, force * 2);
-      this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
-      this._currentTool.pressureChanged();
-    }
+    value: function pressureChanged(force) {}
   }, {
     key: "touchStart",
     value: function touchStart(event) {
@@ -12993,8 +13007,16 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (this._currentTouchId !== 0) {
         return;
       }
-      this._currentTouchId = event.targetTouches[0].identifier;
-      this.down(event.timeStamp, true, this.getTouchEventPosition(event.targetTouches[0]), 1);
+      var touch = event.targetTouches[0];
+      this._currentTouchId = touch.identifier;
+      this.down({
+        timeStamp: event.timeStamp,
+        position: this.getTouchEventPosition(touch),
+        radius: new _utilsPointDefault.default(touch.radiusX, touch.radiusY),
+        pressure: touch.force,
+        speed: 1,
+        isPressed: true
+      });
     }
   }, {
     key: "touchMove",
@@ -13004,7 +13026,14 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (touch == null) {
         return;
       }
-      this.move(event.timeStamp, true, this.getTouchEventPosition(touch), 1);
+      this.move({
+        timeStamp: event.timeStamp,
+        position: this.getTouchEventPosition(touch),
+        radius: new _utilsPointDefault.default(touch.radiusX, touch.radiusY),
+        pressure: 1,
+        speed: 1,
+        isPressed: true
+      });
     }
   }, {
     key: "touchEnd",
@@ -13015,51 +13044,49 @@ var PaintView = /*#__PURE__*/(function (_View) {
         // current touch is still in the list of target touches, this means it has not ended yet
         return;
       }
-      this.up(event.touches.length > 0 ? this.getTouchEventPosition(touch) : this._currentTool.mouse);
+      this.up({
+        timeStamp: event.timeStamp,
+        position: new _utilsPointDefault.default(0, 0),
+        radius: new _utilsPointDefault.default(0, 0),
+        pressure: 1,
+        speed: 1,
+        isPressed: false
+      });
       this._currentTouchId = 0;
     }
   }, {
     key: "move",
-    value: function move(timeStamp, isPainting, mouse, pressure) {
+    value: function move(data) {
       if (!this._currentTool) {
         return;
       }
-      // this._currentTool.painting = isPainting;
-      this._currentTool.pressure = pressure;
-      var newMouse = mouse;
-      var delta = _utilsPointDefault.default.distance(this._currentTool.mouse, newMouse);
-      if (delta > 2) {
-        var timeDelta = timeStamp - this._timeStamp;
-        this._timeStamp = timeStamp;
-        var speed = delta / timeDelta;
-        this._currentTool.speed = _utilsUtilsDefault.default.lerp(this._currentTool.speed, speed, 0.2);
-        this._currentTool.mouse = newMouse;
-        this._currentTool.move();
-      }
+      var delta = _utilsPointDefault.default.distance(this._lastPointerData.position, data.position);
+      // if (delta > 2) {
+      this._lastPointerData = this._lastPointerData || data;
+      var timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
+      var speed = delta / timeDelta;
+      data.speed = _utilsUtilsDefault.default.lerp(this._lastPointerData.speed, speed, 0.2);
+      this._lastPointerData = data;
+      this._currentTool.move(data);
     }
   }, {
     key: "down",
-    value: function down(timeStamp, isPainting, mouse, pressure) {
+    value: function down(data) {
       _palettesPalette.Palette.collapseAll();
       if (!this._currentTool) {
         return;
       }
-      this._timeStamp = timeStamp;
-      this._currentTool.speed = 1;
-      this._currentTool.painting = isPainting;
-      this._currentTool.pressure = pressure;
-      this._currentTool.mouse = mouse;
-      this._currentTool.down();
+      this._lastPointerData = data;
+      this._currentTool.down(data);
     }
   }, {
     key: "up",
-    value: function up(mouse) {
+    value: function up(data) {
       if (!this._currentTool) {
         return;
       }
-      this._currentTool.painting = false;
-      this._currentTool.mouse = mouse;
-      this._currentTool.up();
+      this._lastPointerData = data;
+      this._currentTool.up(data);
     }
   }, {
     key: "clear",
@@ -13168,6 +13195,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "hide",
     value: function hide() {
+      _palettesPalette.Palette.collapseAll();
       if (this._currentTool) {
         this._currentTool.disable();
       }
@@ -13198,7 +13226,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (this._currentTool) {
         this._currentTool.tick(delta);
         // never save while painting to avoid lags:
-        if (this._currentTool.painting) {
+        if (this._lastPointerData && this._lastPointerData.isPressed) {
           return;
         }
       }
@@ -13967,27 +13995,45 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     _this = _super.call(this, painter, buttonId);
     _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _utilsPointDefault.default(0, 0));
     _this._operation = operation;
+    _this.createBrushCtx();
     return _this;
   }
   _createClass(PenTool, [{
+    key: "createBrushCtx",
+    value: function createBrushCtx() {
+      var brushCanvas = document.createElement("canvas");
+      brushCanvas.id = "brush";
+      brushCanvas.width = 64;
+      brushCanvas.height = 64;
+      this._brushCtx = brushCanvas.getContext("2d", {
+        alpha: true
+      });
+      this._brushCtx.imageSmoothingQuality = "high";
+      this._brushCtx.imageSmoothingEnabled = true;
+    }
+  }, {
     key: "down",
-    value: function down() {
-      this.painter.captureAutoMask(this.mouse.copy().round());
-      this._lastPoint = this.mouse.copy();
+    value: function down(data) {
+      this._painter.captureAutoMask(data.position.copy().round());
+      this._lastPoint = data.position.copy();
       this._points = [this._lastPoint];
-      this._widths = [this.getWidth()];
+      this._widths = [this.getWidth(data.pressure, data.speed)];
       this._startIndex = 0;
-      var ctx = this.painter.baseLayer.ctx;
-      ctx.strokeStyle = this.color;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      this.painter.baseLayer.ctx.globalCompositeOperation = this._operation;
+      var ctx = this._brushCtx;
+      var brushWidth = ctx.canvas.width;
+      ctx.clearRect(0, 0, brushWidth, brushWidth);
+      ctx.fillStyle = this.color;
+      var radius = brushWidth * 0.5;
+      ctx.beginPath();
+      ctx.arc(radius, radius, radius - 1, 0, 2 * Math.PI);
+      ctx.fill();
+      this._painter.baseLayer.ctx.globalCompositeOperation = this._operation;
       this.requestDrawPath();
     }
   }, {
     key: "up",
     value: function up() {
-      this.painter.recordHistoryState();
+      this._painter.recordHistoryState();
     }
   }, {
     key: "tick",
@@ -14008,44 +14054,45 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       if (this._points.length == 0) {
         return;
       }
-      var ctx = this.painter.baseLayer.ctx;
-      var p1 = this._points[this._startIndex];
-      if (this._startIndex == 0) {
-        var radius = this._widths[0] * 0.5;
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(p1.x, p1.y, radius, 0, 2 * Math.PI);
-        ctx.fill();
-      }
-      if (this._points.length == 1) {
+      var ctx = this._painter.baseLayer.ctx;
+      ctx.fillStyle = this.color;
+      if (this._points.length - this._startIndex == 1) {
+        var p = this._points[this._startIndex];
+        this.drawBrush(ctx, p.x, p.y, this._widths[this._startIndex]);
         return;
       }
-      var p2 = this._points[this._startIndex + 1];
-      var midPoint = _utilsPointDefault.default.center(p1, p2);
-      ctx.beginPath();
-      if (this._startIndex == 0) {
-        ctx.moveTo(p1.x, p1.y);
-      } else {
-        ctx.moveTo(midPoint.x, midPoint.y);
+      for (var i = this._startIndex; i < this._points.length - 1; i++) {
+        var p1 = this._points[i];
+        var p2 = this._points[i + 1];
+        var w1 = this._widths[i];
+        var w2 = this._widths[i + 1];
+        var dist = _utilsPointDefault.default.distance(p1, p2);
+        var step = Math.max(1, 0.125 * Math.min(w1, w2, 64));
+        for (var d = 0; d <= dist; d += step) {
+          var a = d / dist;
+          var _p = _utilsPointDefault.default.lerp(p1, p2, a);
+          var w = _utilsUtilsDefault.default.lerp(w1, w2, a);
+          this.drawBrush(ctx, _p.x, _p.y, w);
+        }
       }
-      for (var i = this._startIndex + 1; i < this._points.length; i++) {
-        midPoint = _utilsPointDefault.default.center(p1, p2);
-        ctx.lineWidth = this._widths[i];
-        ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
-        p1 = this._points[i];
-        p2 = this._points[i + 1];
-      }
-      ctx.stroke();
-      this._startIndex = this._points.length - 2;
+      this._startIndex = this._points.length - 1;
+    }
+  }, {
+    key: "drawBrush",
+    value: function drawBrush(ctx, x, y, width) {
+      var radius = width * 0.5;
+      x -= radius;
+      y -= radius;
+      // x = Math.floor(x - radius);
+      // y = Math.floor(y - radius);
+      // width = Math.ceil(width);
+      ctx.drawImage(this._brushCtx.canvas, x, y, width, width);
     }
   }, {
     key: "move",
-    value: function move() {
-      if (!this.painting) {
-        return;
-      }
-      this._lastPoint = this.mouse.copy();
-      var width = this.getWidth();
+    value: function move(data) {
+      this._lastPoint = data.position.copy();
+      var width = this.getWidth(data.pressure, data.speed);
       this._points.push(this._lastPoint);
       var lastWidth = this._widths[this._widths.length - 1];
       this._widths.push(_utilsUtilsDefault.default.clamp(lastWidth - 1, lastWidth + 1, width));
@@ -14058,20 +14105,20 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     }
   }, {
     key: "getWidth",
-    value: function getWidth() {
-      var pressure = _utilsUtilsDefault.default.clamp(0.5, 2, this.pressure * 2);
-      var speed = _utilsUtilsDefault.default.clamp(1, 5, this.speed);
+    value: function getWidth(pressure, speed) {
+      pressure = _utilsUtilsDefault.default.clamp(0.5, 2, pressure * 2);
+      speed = _utilsUtilsDefault.default.clamp(1, 5, speed);
       return this.lineWidth * pressure / speed;
     }
   }, {
     key: "applyAutoMask",
     value: function applyAutoMask() {
-      if (!this.painter.autoMaskCtx) {
+      if (!this._painter.autoMaskCtx) {
         return;
       }
       var ctx = this.getBufferCtx();
       ctx.globalCompositeOperation = "destination-in";
-      ctx.drawImage(this.painter.autoMaskCtx.canvas, 0, 0);
+      ctx.drawImage(this._painter.autoMaskCtx.canvas, 0, 0);
       ctx.globalCompositeOperation = "source-over";
     }
   }]);
@@ -14084,8 +14131,6 @@ _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
   return Tool;
 });
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -14105,43 +14150,27 @@ function _createClass(Constructor, protoProps, staticProps) {
   if (staticProps) _defineProperties(Constructor, staticProps);
   return Constructor;
 }
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
 // Base class for all tools
 var Tool = /*#__PURE__*/(function () {
   _createClass(Tool, [{
     key: "color",
     get: function get() {
-      return this.painter.color;
+      return this._painter.color;
     }
   }, {
     key: "opacity",
     get: function get() {
-      return this.painter.opacity;
+      return this._painter.opacity;
     }
   }, {
     key: "lineWidth",
     get: function get() {
-      return this.painter.lineWidth;
+      return this._painter.lineWidth;
     }
   }]);
   function Tool(painter, buttonId) {
     _classCallCheck(this, Tool);
-    _defineProperty(this, "painting", false);
-    _defineProperty(this, "pressure", 1);
-    this.painter = painter;
-    this.mouse = new _utilsPointDefault.default(0, 0);
+    this._painter = painter;
     this._buttonElement = document.getElementById(buttonId);
   }
   _createClass(Tool, [{
@@ -14153,8 +14182,8 @@ var Tool = /*#__PURE__*/(function () {
     value: function createBufferCtx() {
       var brushCanvas = document.createElement("canvas");
       brushCanvas.id = "buffer";
-      brushCanvas.width = this.painter.width;
-      brushCanvas.height = this.painter.height;
+      brushCanvas.width = this._painter.width;
+      brushCanvas.height = this._painter.height;
       Tool._bufferCtx = brushCanvas.getContext("2d", {
         alpha: true
       });
@@ -14181,13 +14210,13 @@ var Tool = /*#__PURE__*/(function () {
     }
   }, {
     key: "down",
-    value: function down() {}
+    value: function down(data) {}
   }, {
     key: "move",
-    value: function move() {}
+    value: function move(data) {}
   }, {
     key: "up",
-    value: function up() {}
+    value: function up(data) {}
   }, {
     key: "pressureChanged",
     value: function pressureChanged() {}
@@ -14201,7 +14230,7 @@ var Tool = /*#__PURE__*/(function () {
   return Tool;
 })();
 
-},{"../utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"4aYdj":[function(require,module,exports) {
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"4aYdj":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -15230,7 +15259,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
   _createClass(SelectionTool, [{
     key: "selectionLayer",
     get: function get() {
-      return this.painter.getLayer(this.selectionLayerId);
+      return this._painter.getLayer(this.selectionLayerId);
     }
   }, {
     key: "selection",
@@ -15277,6 +15306,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     _this._downloadButton = document.getElementById("selection-download-button");
     _this._downloadAnchor = _this._downloadButton.firstElementChild;
     _this.hasFloatingSelection = false;
+    _this._position = new _utilsPointDefault.default(0, 0);
     return _this;
   }
   _createClass(SelectionTool, [{
@@ -15305,19 +15335,31 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     }
   }, {
     key: "down",
-    value: function down() {
+    value: function down(data) {
+      this._position = this.getClampedPosition(data);
       this.startNewSelection();
+    }
+  }, {
+    key: "move",
+    value: function move(data) {
+      this._position = this.getClampedPosition(data);
+      this.requestDrawSelectionOutline();
+    }
+  }, {
+    key: "up",
+    value: function up(data) {
+      this.cutSelection();
     }
   }, {
     key: "startNewSelection",
     value: function startNewSelection() {
       this.paintSelectionToCanvas();
-      this.selectionLayer.setPositionAndSize(0, 0, this.painter.width, this.painter.height);
+      this.selectionLayer.setPositionAndSize(0, 0, this._painter.width, this._painter.height);
       this.selectionLayer.transform(new _utilsPointDefault.default(0, 0), 1, 0);
       this.selectionLayer.floating = false;
       this.hasFloatingSelection = false;
       this.isInShapesPalette = false;
-      this._startPosition = this.getMousePosition();
+      this._startPosition = this._position;
       var ctx = this.selectionLayer.ctx;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.strokeStyle = "black";
@@ -15328,23 +15370,9 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       this.requestDrawSelectionOutline();
     }
   }, {
-    key: "getMousePosition",
-    value: function getMousePosition() {
-      return this.mouse.copy().round().clamp(0, 0, this.painter.width - 1, this.painter.height - 1);
-    }
-  }, {
-    key: "move",
-    value: function move() {
-      if (!this.painting) {
-        return;
-      }
-      this.mouse.round();
-      this.requestDrawSelectionOutline();
-    }
-  }, {
-    key: "up",
-    value: function up() {
-      this.cutSelection();
+    key: "getClampedPosition",
+    value: function getClampedPosition(data) {
+      return data.position.round().clamp(0, 0, this._painter.width - 1, this._painter.height - 1);
     }
   }, {
     key: "tick",
@@ -15407,18 +15435,17 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       }
       this.selectionLayer.clear();
       var ctx = this.selectionLayer.ctx;
-      var position = this.getMousePosition();
-      var x = Math.min(this._startPosition.x, position.x);
-      var y = Math.min(this._startPosition.y, position.y);
-      var width = Math.abs(this._startPosition.x - position.x);
-      var height = Math.abs(this._startPosition.y - position.y);
+      var x = Math.min(this._startPosition.x, this._position.x);
+      var y = Math.min(this._startPosition.y, this._position.y);
+      var width = Math.abs(this._startPosition.x - this._position.x);
+      var height = Math.abs(this._startPosition.y - this._position.y);
       this._selection = new _utilsRectDefault.default(x, y, width, height);
       ctx.strokeRect(x, y, width, height);
     }
   }, {
     key: "destroySelectionLayer",
     value: function destroySelectionLayer() {
-      this.painter.removeLayer(this.selectionLayer);
+      this._painter.removeLayer(this.selectionLayer);
     }
   }, {
     key: "createSelectionLayer",
@@ -15427,7 +15454,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       if (this.selectionLayer) {
         return;
       }
-      this.painter.addCanvasLayer(this.selectionLayerId, 0, 0, this.painter.width, this.painter.height, false);
+      this._painter.addCanvasLayer(this.selectionLayerId, 0, 0, this._painter.width, this._painter.height, false);
       this.selectionLayer.onDoubleTap = function (event) {
         if (event.altKey) {
           _this3.saveSelectionAsNewStamp();
@@ -15440,7 +15467,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     key: "cutSelection",
     value: function cutSelection() {
       this.selectionLayer.clear();
-      this._selection = _utilsUtilsDefault.default.getVisiblePixelFrame(this.painter.baseLayer.ctx, this.selection);
+      this._selection = _utilsUtilsDefault.default.getVisiblePixelFrame(this._painter.baseLayer.ctx, this.selection);
       if (this.selection.isEmpty()) {
         return;
       }
@@ -15448,9 +15475,9 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       var _this$selection = this.selection, x = _this$selection.x, y = _this$selection.y, width = _this$selection.width, height = _this$selection.height;
       this.selectionLayer.setPositionAndSize(x, y, width, height);
       this.selectionLayer.floating = true;
-      this.selectionLayer.ctx.drawImage(this.painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
-      this.painter.baseLayer.clear(this.selection);
-      this.painter.recordHistoryState();
+      this.selectionLayer.ctx.drawImage(this._painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
+      this._painter.baseLayer.clear(this.selection);
+      this._painter.recordHistoryState();
       this.updateDownloadAnchor();
     }
   }, {
@@ -15459,9 +15486,9 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
       if (!this.hasFloatingSelection) {
         return;
       }
-      this.painter.baseLayer.ctx.globalCompositeOperation = "source-over";
-      this.selectionLayer.drawToCanvas(this.painter.baseLayer.ctx);
-      this.painter.recordHistoryState();
+      this._painter.baseLayer.ctx.globalCompositeOperation = "source-over";
+      this.selectionLayer.drawToCanvas(this._painter.baseLayer.ctx);
+      this._painter.recordHistoryState();
     }
   }, {
     key: "saveSelectionAsNewStamp",
@@ -15519,7 +15546,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     key: "selectAll",
     value: function selectAll() {
       this.startNewSelection();
-      this._selection = new _utilsRectDefault.default(0, 0, this.painter.width, this.painter.height);
+      this._selection = new _utilsRectDefault.default(0, 0, this._painter.width, this._painter.height);
       this.cutSelection();
     }
   }, {
@@ -20531,4 +20558,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.d4f9e0ad.js.map
+//# sourceMappingURL=index.17b94203.js.map

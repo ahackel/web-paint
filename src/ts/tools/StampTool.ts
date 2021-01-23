@@ -4,7 +4,7 @@ import Point from "../utils/Point";
 // @ts-ignore
 import brushPath from "url:../../img/stamps/star.png";
 import Utils from "../utils/Utils";
-import PaintView from "../views/PaintView";
+import {PaintView, IPointerData} from "../views/PaintView";
 import ImageLayer from "../ImageLayer ";
 
 // Fills an area with the selected color 
@@ -14,7 +14,7 @@ export default class StampTool extends Tool {
 
     readonly stampLayerId = "stamp-layer";
 
-    get stampLayer(): ImageLayer { return <ImageLayer>this.painter.getLayer(this.stampLayerId) }
+    get stampLayer(): ImageLayer { return <ImageLayer>this._painter.getLayer(this.stampLayerId) }
     
     constructor(painter: PaintView) {
         super(painter);
@@ -24,12 +24,12 @@ export default class StampTool extends Tool {
     }
 
     tick(delta: number) {
-        if (!this.painter.stamp || !this.stampLayer){
+        if (!this._painter.stamp || !this.stampLayer){
             return;
         }
         
-        if (this.getFileName(this.stampLayer.image.src) != this.getFileName(this.painter.stamp)){
-            this.setStampImage(this.painter.stamp);
+        if (this.getFileName(this.stampLayer.image.src) != this.getFileName(this._painter.stamp)){
+            this.setStampImage(this._painter.stamp);
             return;
         }
         
@@ -44,7 +44,7 @@ export default class StampTool extends Tool {
     }
 
     enable() {
-        this.mouse = new Point(this.painter.width * 0.5, this.painter.height * 0.5);
+        this.mouse = new Point(this._painter.width * 0.5, this._painter.height * 0.5);
         this.showStampLayer();
         this._stampButton.hidden = false;
     }
@@ -56,14 +56,14 @@ export default class StampTool extends Tool {
     
     performStamp(){
         const ctx = this.getBufferCtx();
-        ctx.fillStyle = this.painter.color;
-        ctx.fillRect(0, 0, this.painter.width, this.painter.height);
+        ctx.fillStyle = this._painter.color;
+        ctx.fillRect(0, 0, this._painter.width, this._painter.height);
         ctx.globalCompositeOperation = "destination-in";
         this.stampLayer.drawToCanvas(ctx);
         ctx.globalCompositeOperation = "source-over";
-        this.painter.baseLayer.ctx.drawImage(ctx.canvas, 0, 0);
+        this._painter.baseLayer.ctx.drawImage(ctx.canvas, 0, 0);
 
-        this.painter.saveImage();
+        this._painter.saveImage();
     }
     
     keyDown(event: KeyboardEvent) {
@@ -75,7 +75,7 @@ export default class StampTool extends Tool {
     }
 
     private hideStampLayer() {
-        this.painter.removeLayer(this.stampLayer);
+        this._painter.removeLayer(this.stampLayer);
     }
 
     private showStampLayer() {
@@ -85,8 +85,8 @@ export default class StampTool extends Tool {
         
         const x = this.mouse.x - 0.5 * 10;
         const y = this.mouse.y - 0.5 * 10;
-        this.painter.addImageLayer(this.stampLayerId, x, y, 10, 10, true);
-        this.setStampImage(this.painter.stamp);
+        this._painter.addImageLayer(this.stampLayerId, x, y, 10, 10, true);
+        this.setStampImage(this._painter.stamp);
     }    
     
     // private drawStampImage() {
@@ -106,7 +106,7 @@ export default class StampTool extends Tool {
     // }
 
     private setStampImage(id: string) {
-        this.stampLayer.image.src = this.painter.stamp;
+        this.stampLayer.image.src = this._painter.stamp;
 
         // this.loadStampImage(id)
         //     .then(img => {
