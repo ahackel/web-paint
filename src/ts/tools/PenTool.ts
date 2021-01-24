@@ -118,21 +118,24 @@ export default class PenTool extends Tool {
         ctx.beginPath();
         let p1 = points[0];
         ctx.moveTo(p1.x, p1.y);
+        ctx.lineWidth = widths[0];
 
         if (pointCount == 1) {
-            ctx.lineWidth = widths[0];
             ctx.lineTo(p1.x, p1.y);
             ctx.stroke();
             return;
         }
 
         for (let i = 1; i < pointCount; i++) {
-            ctx.beginPath();
-            ctx.lineWidth = widths[i];
-            ctx.moveTo(points[i-1].x, points[i-1].y);
+            if (ctx.lineWidth != widths[i]) {
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.lineWidth = widths[i];
+                ctx.moveTo(points[i-1].x, points[i-1].y);
+            }
             ctx.lineTo(points[i].x, points[i].y);
-            ctx.stroke();
         }
+        ctx.stroke();
     }
     
     
@@ -160,7 +163,7 @@ export default class PenTool extends Tool {
         width = Utils.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
 
         for (let i = 0; i < numSegments; i++) {
-            this._widths.push(Utils.lerp(lastWidth, width, i / numSegments));
+            this._widths.push(Math.round(Utils.lerp(lastWidth, width, i / numSegments)));
         }
 
         this.requestDrawPath();

@@ -14125,19 +14125,22 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       ctx.beginPath();
       var p1 = points[0];
       ctx.moveTo(p1.x, p1.y);
+      ctx.lineWidth = widths[0];
       if (pointCount == 1) {
-        ctx.lineWidth = widths[0];
         ctx.lineTo(p1.x, p1.y);
         ctx.stroke();
         return;
       }
       for (var i = 1; i < pointCount; i++) {
-        ctx.beginPath();
-        ctx.lineWidth = widths[i];
-        ctx.moveTo(points[i - 1].x, points[i - 1].y);
+        if (ctx.lineWidth != widths[i]) {
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.lineWidth = widths[i];
+          ctx.moveTo(points[i - 1].x, points[i - 1].y);
+        }
         ctx.lineTo(points[i].x, points[i].y);
-        ctx.stroke();
       }
+      ctx.stroke();
     }
   }, {
     key: "drawBrush",
@@ -14163,7 +14166,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       var maxWidthDifference = 2 * numSegments;
       width = _utilsUtilsDefault.default.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
       for (var i = 0; i < numSegments; i++) {
-        this._widths.push(_utilsUtilsDefault.default.lerp(lastWidth, width, i / numSegments));
+        this._widths.push(Math.round(_utilsUtilsDefault.default.lerp(lastWidth, width, i / numSegments)));
       }
       this.requestDrawPath();
     }
@@ -20658,4 +20661,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.790f362c.js.map
+//# sourceMappingURL=index.589fd9f7.js.map
