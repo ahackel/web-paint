@@ -14170,7 +14170,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "interpolatePoints",
     value: function interpolatePoints(newPoint) {
-      var segmentLength = Math.max(2, 0.1 * this.lineWidth);
+      var segmentLength = Math.max(4, 0.1 * this.lineWidth);
       var points = [];
       if (this._points.length == 0) {
         return;
@@ -20658,4 +20658,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.5dd59aee.js.map
+//# sourceMappingURL=index.790f362c.js.map

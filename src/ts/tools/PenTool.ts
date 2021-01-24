@@ -167,7 +167,7 @@ export default class PenTool extends Tool {
     }
 
     private interpolatePoints(newPoint: Point): Point[] {
-        const segmentLength = Math.max(2, 0.1 * this.lineWidth);
+        const segmentLength = Math.max(4, 0.1 * this.lineWidth);
         const points: Point[] = [];
         
         if (this._points.length == 0){
