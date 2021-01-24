@@ -13,8 +13,13 @@ export default class Point {
         return new Point(this.x, this.y);
     }
 
-    static add(a: Point, b: Point){
-        return new Point(a.x + b.x, a.y + b.y);
+    static add(a: Point, ...rest: Point[]){
+        let sum = a.copy();
+        for (let point of rest) {
+            sum.x += point.x;
+            sum.y += point.y;
+        }
+        return sum;
     }
     
     add(p: Point){
@@ -44,6 +49,30 @@ export default class Point {
         this.y = Utils.clamp(minY, maxY, this.y);
         return this;
     }
+    
+    length(): number {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    } 
+    
+    normalize() {
+        const length = this.length();
+        if (length == 0){
+            return;
+        }
+        this.x /= length;
+        this.y /= length;
+        return this;
+    }
+    
+    scale(f: number){
+        this.x *= f;
+        this.y *= f;
+        return this;
+    }
+
+    static scale(p: Point, f: number): Point{
+        return new Point(p.x * f, p.y * f);
+    }
 
     static distance(a: Point, b: Point) {
         let dx = a.x - b.x;
@@ -63,5 +92,12 @@ export default class Point {
         return new Point(
             p1.x * (1 - a) + p2.x * a,
             p1.y * (1 - a) + p2.y * a);
+    }
+
+    static cosInterp(p1: Point, p2: Point, a: number){
+        const a2 = (1 - Math.cos(a * Math.PI))/2;
+        return new Point(
+            p1.x * (1 - a) + p2.x * a,
+            p1.y * (1 - a2) + p2.y * a2);
     }
 }

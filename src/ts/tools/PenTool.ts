@@ -5,11 +5,11 @@ import Utils from "../utils/Utils";
 
 // @ts-ignore
 import brushPath from "url:../../img/brush.png";
+import Layer from "../Layer";
 
 // Paints lines with varying stroke width
 export default class PenTool extends Tool {
 
-    private _lastPoint: Point = new Point(0, 0);
     private _startIndex: number;
     private _points: Point[];
     private _widths: number[];
@@ -37,8 +37,7 @@ export default class PenTool extends Tool {
     down(data: IPointerData): void {
         this._painter.captureAutoMask(data.position.copy().round());
         
-        this._lastPoint = data.position.copy()
-        this._points = [this._lastPoint];
+        this._points = [data.position];
         this._widths = [this.getWidth(data.pressure, data.speed)];
         this._startIndex = 0;
 
@@ -81,7 +80,7 @@ export default class PenTool extends Tool {
         }
 
         let ctx = this._painter.baseLayer.ctx;
-        this.drawVaryingLines(ctx, this._points.slice(this._startIndex), this._widths.slice(this._startIndex));
+        this.drawConnectedLines(ctx, this._points.slice(this._startIndex), this._widths.slice(this._startIndex));
         
         // if (this._points.length - this._startIndex == 1){
         //     const p = this._points[this._startIndex];
@@ -118,80 +117,24 @@ export default class PenTool extends Tool {
         ctx.lineJoin = "round";
         ctx.beginPath();
         let p1 = points[0];
-        
+        ctx.moveTo(p1.x, p1.y);
+
         if (pointCount == 1) {
             ctx.lineWidth = widths[0];
-            ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p1.x, p1.y);
             ctx.stroke();
             return;
         }
 
-        // let p2 = this._points[this._startIndex + 1];
-        // let midPoint: Point = Point.center(p1, p2);
-
-        let p2 = points[1];
-        let midPoint = Point.center(p1, p2);
-        ctx.moveTo(midPoint.x, midPoint.y);
-
-        for (let i = 0; i < pointCount - 1; i++) {
-            p1 = points[i];
-            p2 = points[i + 1];
-            midPoint = Point.center(p1, p2);
+        for (let i = 1; i < pointCount; i++) {
+            ctx.beginPath();
             ctx.lineWidth = widths[i];
-            ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+            ctx.moveTo(points[i-1].x, points[i-1].y);
+            ctx.lineTo(points[i].x, points[i].y);
+            ctx.stroke();
         }
-        ctx.stroke();
     }
     
-    drawVaryingLines(ctx: CanvasRenderingContext2D, points: Point[], widths: number[]){
-        const pointCount = points.length;
-        if (pointCount == 0){
-            return;
-        }
-        
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        let p1 = points[0];
-
-        if (pointCount == 1) {
-            ctx.beginPath();
-            ctx.lineWidth = widths[0];
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p1.x, p1.y);
-            ctx.stroke();
-            return;
-        }
-
-        let p2 = points[1];
-        for (let i = 0; i < pointCount - 1; i++) {
-            p1 = points[i];
-            p2 = points[i + 1];
-            this.varLine(ctx, p1.x, p1.y, p2.x, p2.y, widths[i], widths[i+1]);
-        }
-    }
-
-    varLine(ctx, x1, y1, x2, y2, w1, w2) {
-        var dx = (x2 - x1),  shiftx = 0;
-        var dy = (y2 - y1),  shifty = 0;
-        w1 /= 2;   w2 /= 2; // we only use w1/2 and w2/2 for computations.    
-        // length of the AB vector
-        var length = Math.sqrt(dx * dx + dy * dy);
-        if (!length) return; // exit if zero length
-        dx /= length ;    dy /= length ;
-        shiftx = - dy * w1 ;  // compute AA1 vector's x
-        shifty =   dx * w1 ;  // compute AA1 vector's y
-        var angle = Math.atan2(shifty, shiftx);
-        ctx.beginPath();
-        ctx.moveTo(x1 + shiftx, y1 + shifty);
-        ctx.arc(x1,y1, w1, angle, angle+Math.PI); // draw A1A2
-        shiftx =  - dy * w2 ;  // compute BB1 vector's x
-        shifty =    dx * w2 ;  // compute BB1 vector's y
-        ctx.lineTo(x2 - shiftx, y2 - shifty); // draw A2B1
-        ctx.arc(x2,y2, w2, angle+Math.PI, angle); // draw A1A2    
-        ctx.closePath(); // draw B2A1
-        ctx.fill();
-    }
     
     drawBrush(ctx: CanvasRenderingContext2D, x: number, y: number, width: number){
         let radius = width * 0.5;
@@ -204,13 +147,60 @@ export default class PenTool extends Tool {
     }
 
     move(data: IPointerData): void {
-        this._lastPoint = data.position.copy();
+        let newPoints = this.interpolatePoints(data.position);
+        console.log(newPoints);
+
+        this._points = this._points.concat(newPoints);
+        const numSegments = newPoints.length;
+
         let width = this.getWidth(data.pressure, data.speed);
-        this._points.push(this._lastPoint);
         const lastWidth = this._widths[this._widths.length - 1];
-        this._widths.push(Utils.clamp(lastWidth - 1, lastWidth + 1, width));
+        const maxWidthDifferencePerSegment = 2;
+        const maxWidthDifference = 2 * numSegments;
+        width = Utils.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
+
+        for (let i = 0; i < numSegments; i++) {
+            this._widths.push(Utils.lerp(lastWidth, width, i / numSegments));
+        }
 
         this.requestDrawPath();
+    }
+
+    private interpolatePoints(newPoint: Point): Point[] {
+        const segmentLength = Math.max(2, 0.1 * this.lineWidth);
+        const points: Point[] = [];
+        
+        if (this._points.length == 0){
+            return;
+        }
+        
+        const start = this._points[this._points.length - 1];
+        const end = newPoint;
+        const dist = Point.distance(start, end);
+
+        if (dist < segmentLength){
+            return points;
+        }
+
+        let control = start;
+        if (this._points.length > 1){
+            const tangent = Point.subtract(start, this._points[this._points.length - 2]).normalize();
+            control = Point.add(start, tangent.copy().scale(0.3 * dist));
+        }
+        
+        const a = segmentLength / dist;
+        for (let i = a; i <= 1; i += a) {
+            const point = this.pointOnQuadraticCurve(start, control, end, i);
+            points.push(point);
+        }
+        return points;
+    }
+
+    private pointOnQuadraticCurve(start : Point, control: Point, end: Point, a: number): Point {
+        return Point.add(Point.scale(start, (1 - a) * (1 - a)),
+            Point.scale(control, 2 * a * (1 - a)),
+            Point.scale(end, a * a)
+        );
     }
 
     pressureChanged(){
@@ -219,7 +209,7 @@ export default class PenTool extends Tool {
 
     getWidth(pressure: number, speed: number){
         pressure = Utils.clamp(0.5, 2, pressure * 2);
-        speed = Utils.clamp(1, 5, speed);
+        speed = Utils.clamp(1, 3, speed);
         return this.lineWidth * pressure / speed;
     }
 

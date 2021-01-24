@@ -9154,15 +9154,52 @@ var Point = /*#__PURE__*/(function () {
       this.y = _UtilsDefault.default.clamp(minY, maxY, this.y);
       return this;
     }
+  }, {
+    key: "length",
+    value: function length() {
+      return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+  }, {
+    key: "normalize",
+    value: function normalize() {
+      var length = this.length();
+      if (length == 0) {
+        return;
+      }
+      this.x /= length;
+      this.y /= length;
+      return this;
+    }
+  }, {
+    key: "scale",
+    value: function scale(f) {
+      this.x *= f;
+      this.y *= f;
+      return this;
+    }
   }], [{
     key: "add",
-    value: function add(a, b) {
-      return new Point(a.x + b.x, a.y + b.y);
+    value: function add(a) {
+      var sum = a.copy();
+      for (var _len = arguments.length, rest = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
+      for (var _i = 0, _rest = rest; _i < _rest.length; _i++) {
+        var point = _rest[_i];
+        sum.x += point.x;
+        sum.y += point.y;
+      }
+      return sum;
     }
   }, {
     key: "subtract",
     value: function subtract(a, b) {
       return new Point(a.x - b.x, a.y - b.y);
+    }
+  }, {
+    key: "scale",
+    value: function scale(p, f) {
+      return new Point(p.x * f, p.y * f);
     }
   }, {
     key: "distance",
@@ -9185,6 +9222,12 @@ var Point = /*#__PURE__*/(function () {
     key: "lerp",
     value: function lerp(p1, p2, a) {
       return new Point(p1.x * (1 - a) + p2.x * a, p1.y * (1 - a) + p2.y * a);
+    }
+  }, {
+    key: "cosInterp",
+    value: function cosInterp(p1, p2, a) {
+      var a2 = (1 - Math.cos(a * Math.PI)) / 2;
+      return new Point(p1.x * (1 - a) + p2.x * a, p1.y * (1 - a2) + p2.y * a2);
     }
   }]);
   return Point;
@@ -13972,19 +14015,6 @@ function _getPrototypeOf(o) {
   };
   return _getPrototypeOf(o);
 }
-function _defineProperty(obj, key, value) {
-  if ((key in obj)) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
 // Paints lines with varying stroke width
 var PenTool = /*#__PURE__*/(function (_Tool) {
   _inherits(PenTool, _Tool);
@@ -13994,7 +14024,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     var operation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "darken";
     _classCallCheck(this, PenTool);
     _this = _super.call(this, painter, buttonId);
-    _defineProperty(_assertThisInitialized(_this), "_lastPoint", new _utilsPointDefault.default(0, 0));
     _this._operation = operation;
     _this.createBrushCtx();
     return _this;
@@ -14016,8 +14045,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     key: "down",
     value: function down(data) {
       this._painter.captureAutoMask(data.position.copy().round());
-      this._lastPoint = data.position.copy();
-      this._points = [this._lastPoint];
+      this._points = [data.position];
       this._widths = [this.getWidth(data.pressure, data.speed)];
       this._startIndex = 0;
       var ctx = this._painter.baseLayer.ctx;
@@ -14059,7 +14087,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         return;
       }
       var ctx = this._painter.baseLayer.ctx;
-      this.drawVaryingLines(ctx, this._points.slice(this._startIndex), this._widths.slice(this._startIndex));
+      this.drawConnectedLines(ctx, this._points.slice(this._startIndex), this._widths.slice(this._startIndex));
       // if (this._points.length - this._startIndex == 1){
       // const p = this._points[this._startIndex];
       // this.drawBrush(ctx, p.x, p.y, this._widths[this._startIndex]);
@@ -14095,86 +14123,20 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       ctx.lineJoin = "round";
       ctx.beginPath();
       var p1 = points[0];
+      ctx.moveTo(p1.x, p1.y);
       if (pointCount == 1) {
         ctx.lineWidth = widths[0];
-        ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p1.x, p1.y);
         ctx.stroke();
         return;
       }
-      // let p2 = this._points[this._startIndex + 1];
-      // let midPoint: Point = Point.center(p1, p2);
-      var p2 = points[1];
-      var midPoint = _utilsPointDefault.default.center(p1, p2);
-      ctx.moveTo(midPoint.x, midPoint.y);
-      for (var i = 0; i < pointCount - 1; i++) {
-        p1 = points[i];
-        p2 = points[i + 1];
-        midPoint = _utilsPointDefault.default.center(p1, p2);
-        ctx.lineWidth = widths[i];
-        ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
-      }
-      ctx.stroke();
-    }
-  }, {
-    key: "drawVaryingLines",
-    value: function drawVaryingLines(ctx, points, widths) {
-      var pointCount = points.length;
-      if (pointCount == 0) {
-        return;
-      }
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      var p1 = points[0];
-      if (pointCount == 1) {
+      for (var i = 1; i < pointCount; i++) {
         ctx.beginPath();
-        ctx.lineWidth = widths[0];
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p1.x, p1.y);
+        ctx.lineWidth = widths[i];
+        ctx.moveTo(points[i - 1].x, points[i - 1].y);
+        ctx.lineTo(points[i].x, points[i].y);
         ctx.stroke();
-        return;
       }
-      var p2 = points[1];
-      for (var i = 0; i < pointCount - 1; i++) {
-        p1 = points[i];
-        p2 = points[i + 1];
-        this.varLine(ctx, p1.x, p1.y, p2.x, p2.y, widths[i], widths[i + 1]);
-      }
-    }
-  }, {
-    key: "varLine",
-    value: function varLine(ctx, x1, y1, x2, y2, w1, w2) {
-      var dx = x2 - x1, shiftx = 0;
-      var dy = y2 - y1, shifty = 0;
-      w1 /= 2;
-      w2 /= 2;
-      // we only use w1/2 and w2/2 for computations.
-      // length of the AB vector
-      var length = Math.sqrt(dx * dx + dy * dy);
-      if (!length) return;
-      // exit if zero length
-      dx /= length;
-      dy /= length;
-      shiftx = -dy * w1;
-      // compute AA1 vector's x
-      shifty = dx * w1;
-      // compute AA1 vector's y
-      var angle = Math.atan2(shifty, shiftx);
-      ctx.beginPath();
-      ctx.moveTo(x1 + shiftx, y1 + shifty);
-      ctx.arc(x1, y1, w1, angle, angle + Math.PI);
-      // draw A1A2
-      shiftx = -dy * w2;
-      // compute BB1 vector's x
-      shifty = dx * w2;
-      // compute BB1 vector's y
-      ctx.lineTo(x2 - shiftx, y2 - shifty);
-      // draw A2B1
-      ctx.arc(x2, y2, w2, angle + Math.PI, angle);
-      // draw A1A2
-      ctx.closePath();
-      // draw B2A1
-      ctx.fill();
     }
   }, {
     key: "drawBrush",
@@ -14190,12 +14152,50 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "move",
     value: function move(data) {
-      this._lastPoint = data.position.copy();
+      var newPoints = this.interpolatePoints(data.position);
+      console.log(newPoints);
+      this._points = this._points.concat(newPoints);
+      var numSegments = newPoints.length;
       var width = this.getWidth(data.pressure, data.speed);
-      this._points.push(this._lastPoint);
       var lastWidth = this._widths[this._widths.length - 1];
-      this._widths.push(_utilsUtilsDefault.default.clamp(lastWidth - 1, lastWidth + 1, width));
+      var maxWidthDifferencePerSegment = 2;
+      var maxWidthDifference = 2 * numSegments;
+      width = _utilsUtilsDefault.default.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
+      for (var i = 0; i < numSegments; i++) {
+        this._widths.push(_utilsUtilsDefault.default.lerp(lastWidth, width, i / numSegments));
+      }
       this.requestDrawPath();
+    }
+  }, {
+    key: "interpolatePoints",
+    value: function interpolatePoints(newPoint) {
+      var segmentLength = Math.max(2, 0.1 * this.lineWidth);
+      var points = [];
+      if (this._points.length == 0) {
+        return;
+      }
+      var start = this._points[this._points.length - 1];
+      var end = newPoint;
+      var dist = _utilsPointDefault.default.distance(start, end);
+      if (dist < segmentLength) {
+        return points;
+      }
+      var control = start;
+      if (this._points.length > 1) {
+        var tangent = _utilsPointDefault.default.subtract(start, this._points[this._points.length - 2]).normalize();
+        control = _utilsPointDefault.default.add(start, tangent.copy().scale(0.3 * dist));
+      }
+      var a = segmentLength / dist;
+      for (var i = a; i <= 1; i += a) {
+        var point = this.pointOnQuadraticCurve(start, control, end, i);
+        points.push(point);
+      }
+      return points;
+    }
+  }, {
+    key: "pointOnQuadraticCurve",
+    value: function pointOnQuadraticCurve(start, control, end, a) {
+      return _utilsPointDefault.default.add(_utilsPointDefault.default.scale(start, (1 - a) * (1 - a)), _utilsPointDefault.default.scale(control, 2 * a * (1 - a)), _utilsPointDefault.default.scale(end, a * a));
     }
   }, {
     key: "pressureChanged",
@@ -14206,7 +14206,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     key: "getWidth",
     value: function getWidth(pressure, speed) {
       pressure = _utilsUtilsDefault.default.clamp(0.5, 2, pressure * 2);
-      speed = _utilsUtilsDefault.default.clamp(1, 5, speed);
+      speed = _utilsUtilsDefault.default.clamp(1, 3, speed);
       return this.lineWidth * pressure / speed;
     }
   }, {
@@ -20657,4 +20657,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.f55df808.js.map
+//# sourceMappingURL=index.7f136f08.js.map
