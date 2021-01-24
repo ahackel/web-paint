@@ -495,14 +495,16 @@ export class PaintView extends View {
 
         let delta = Point.distance(this._lastPointerData.position, data.position);
 
-        if (delta > 2) {
-            this._lastPointerData = this._lastPointerData || data;
-            let timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
-            const speed = delta / timeDelta;
-            data.speed = Utils.lerp(this._lastPointerData.speed, speed, 0.2);
-            this._lastPointerData = data;
-            this._currentTool.move(data);
+        if (delta <= 1) {
+            return;
         }
+        
+        this._lastPointerData = this._lastPointerData || data;
+        let timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
+        const speed = delta / timeDelta;
+        data.speed = Utils.lerp(this._lastPointerData.speed, speed, 0.2);
+        this._lastPointerData = data;
+        this._currentTool.move(data);
     }
 
     private down(data: IPointerData) {

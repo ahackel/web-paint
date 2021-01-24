@@ -13104,14 +13104,15 @@ var PaintView = /*#__PURE__*/(function (_View) {
         return;
       }
       var delta = _utilsPointDefault.default.distance(this._lastPointerData.position, data.position);
-      if (delta > 2) {
-        this._lastPointerData = this._lastPointerData || data;
-        var timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
-        var speed = delta / timeDelta;
-        data.speed = _utilsUtilsDefault.default.lerp(this._lastPointerData.speed, speed, 0.2);
-        this._lastPointerData = data;
-        this._currentTool.move(data);
+      if (delta <= 1) {
+        return;
       }
+      this._lastPointerData = this._lastPointerData || data;
+      var timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
+      var speed = delta / timeDelta;
+      data.speed = _utilsUtilsDefault.default.lerp(this._lastPointerData.speed, speed, 0.2);
+      this._lastPointerData = data;
+      this._currentTool.move(data);
     }
   }, {
     key: "down",
@@ -14206,7 +14207,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     key: "getWidth",
     value: function getWidth(pressure, speed) {
       pressure = _utilsUtilsDefault.default.clamp(0.5, 2, pressure * 2);
-      speed = _utilsUtilsDefault.default.clamp(1, 3, speed);
+      speed = _utilsUtilsDefault.default.clamp(1, 2, speed);
       return this.lineWidth * pressure / speed;
     }
   }, {
@@ -20657,4 +20658,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.7f136f08.js.map
+//# sourceMappingURL=index.5dd59aee.js.map
