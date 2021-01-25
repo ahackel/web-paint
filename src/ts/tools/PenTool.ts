@@ -38,7 +38,7 @@ export default class PenTool extends Tool {
         this._painter.captureAutoMask(data.position.copy().round());
         
         this._points = [data.position];
-        const width = data.radius.x; // this.getWidth(data.pressure, data.speed);
+        const width = this.getWidth(data.pressure, data.speed);
         this._widths = [width];
         this._startIndex = 0;
 
@@ -109,6 +109,15 @@ export default class PenTool extends Tool {
     }
     
     drawConnectedLines(ctx: CanvasRenderingContext2D, points: Point[], widths: number[]){
+        const strokeScale = 0.5;
+        const offsets = [];
+        const radius = 0.5 - 0.5 * strokeScale;
+        offsets.push(new Point(0, 0));
+        for (let i = 0; i < 6; i++) {
+            const angle = i / 3 * Math.PI;
+            offsets.push(new Point(radius * Math.cos(angle), radius * Math.sin(angle)));
+        }
+        
         const pointCount = points.length;
         if (pointCount == 0){
             return;
@@ -116,28 +125,24 @@ export default class PenTool extends Tool {
         
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
+        let start = points[0];
+        let startWidth = widths[0] * this.lineWidth;
+
+        // single dot
         ctx.beginPath();
-        let p1 = points[0];
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineWidth = widths[0];
+        ctx.arc(start.x, start.y, 0.5 * Utils.lerp(strokeScale, 1, widths[0]) * this.lineWidth, 0, 2 * Math.PI);
+        ctx.fill();
 
-        if (pointCount == 1) {
-            ctx.lineTo(p1.x, p1.y);
-            ctx.stroke();
-            return;
-        }
-
-        // TODO: Draw multiple lines to simulate thickness and reduce the number of strokes
-        for (let i = 1; i < pointCount; i++) {
-            if (ctx.lineWidth != widths[i]) {
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.lineWidth = widths[i];
-                ctx.moveTo(points[i-1].x, points[i-1].y);
+        ctx.lineWidth = this.lineWidth * strokeScale;
+        for (const offset of offsets) {
+            ctx.beginPath();
+            ctx.moveTo(start.x + offset.x * startWidth, start.y + offset.y * startWidth);
+            for (let i = 1; i < pointCount; i++) {
+                const width = widths[i] * this.lineWidth;
+                ctx.lineTo(points[i].x + offset.x * width, points[i].y + offset.y * width);
             }
-            ctx.lineTo(points[i].x, points[i].y);
+            ctx.stroke();
         }
-        ctx.stroke();
     }
     
     
@@ -160,11 +165,11 @@ export default class PenTool extends Tool {
         let width = this.getWidth(data.pressure, data.speed);
         const lastWidth = this._widths[this._widths.length - 1];
         const maxWidthDifferencePerSegment = 2;
-        const maxWidthDifference = 2 * numSegments;
+        const maxWidthDifference = maxWidthDifferencePerSegment * numSegments;
         width = Utils.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
 
         for (let i = 0; i < numSegments; i++) {
-            this._widths.push(data.radius.x); // Math.round(Utils.lerp(lastWidth, width, i / numSegments)));
+            this._widths.push(Utils.lerp(lastWidth, width, i / numSegments));
         }
 
         this.requestDrawPath();
@@ -212,9 +217,11 @@ export default class PenTool extends Tool {
     }
 
     getWidth(pressure: number, speed: number){
-        pressure = Utils.clamp(0.5, 2, pressure * 2);
+        pressure = Utils.clamp(0.5, 2, pressure);
         speed = Utils.clamp(1, 2, speed);
-        return this.lineWidth * pressure / speed;
+        const width = pressure / speed; // range: 0.5 - 1
+        return Utils.clamp(0, 1,width * 2 - 1); // remap to: 0 - 1
+        
     }
 
     private applyAutoMask() {

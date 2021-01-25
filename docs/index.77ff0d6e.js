@@ -8491,7 +8491,7 @@ var config = {
   minScrollDistance: 30,
   maxScrollDelay: 500,
   maxShapeCount: 64 - defaultShapes.length,
-  usePointerEvents: false,
+  usePointerEvents: true,
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -14043,8 +14043,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     value: function down(data) {
       this._painter.captureAutoMask(data.position.copy().round());
       this._points = [data.position];
-      var width = data.radius.x;
-      // this.getWidth(data.pressure, data.speed);
+      var width = this.getWidth(data.pressure, data.speed);
       this._widths = [width];
       this._startIndex = 0;
       var ctx = this._painter.baseLayer.ctx;
@@ -14114,32 +14113,37 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "drawConnectedLines",
     value: function drawConnectedLines(ctx, points, widths) {
+      var strokeScale = 0.5;
+      var offsets = [];
+      var radius = 0.5 - 0.5 * strokeScale;
+      offsets.push(new _utilsPointDefault.default(0, 0));
+      for (var i = 0; i < 6; i++) {
+        var angle = i / 3 * Math.PI;
+        offsets.push(new _utilsPointDefault.default(radius * Math.cos(angle), radius * Math.sin(angle)));
+      }
       var pointCount = points.length;
       if (pointCount == 0) {
         return;
       }
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
+      var start = points[0];
+      var startWidth = widths[0] * this.lineWidth;
+      // single dot
       ctx.beginPath();
-      var p1 = points[0];
-      ctx.moveTo(p1.x, p1.y);
-      ctx.lineWidth = widths[0];
-      if (pointCount == 1) {
-        ctx.lineTo(p1.x, p1.y);
-        ctx.stroke();
-        return;
-      }
-      // TODO: Draw multiple lines to simulate thickness and reduce the number of strokes
-      for (var i = 1; i < pointCount; i++) {
-        if (ctx.lineWidth != widths[i]) {
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.lineWidth = widths[i];
-          ctx.moveTo(points[i - 1].x, points[i - 1].y);
+      ctx.arc(start.x, start.y, 0.5 * _utilsUtilsDefault.default.lerp(strokeScale, 1, widths[0]) * this.lineWidth, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.lineWidth = this.lineWidth * strokeScale;
+      for (var _i = 0, _offsets = offsets; _i < _offsets.length; _i++) {
+        var offset = _offsets[_i];
+        ctx.beginPath();
+        ctx.moveTo(start.x + offset.x * startWidth, start.y + offset.y * startWidth);
+        for (var _i2 = 1; _i2 < pointCount; _i2++) {
+          var width = widths[_i2] * this.lineWidth;
+          ctx.lineTo(points[_i2].x + offset.x * width, points[_i2].y + offset.y * width);
         }
-        ctx.lineTo(points[i].x, points[i].y);
+        ctx.stroke();
       }
-      ctx.stroke();
     }
   }, {
     key: "drawBrush",
@@ -14161,10 +14165,10 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       var width = this.getWidth(data.pressure, data.speed);
       var lastWidth = this._widths[this._widths.length - 1];
       var maxWidthDifferencePerSegment = 2;
-      var maxWidthDifference = 2 * numSegments;
+      var maxWidthDifference = maxWidthDifferencePerSegment * numSegments;
       width = _utilsUtilsDefault.default.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
       for (var i = 0; i < numSegments; i++) {
-        this._widths.push(data.radius.x);
+        this._widths.push(_utilsUtilsDefault.default.lerp(lastWidth, width, i / numSegments));
       }
       this.requestDrawPath();
     }
@@ -14207,9 +14211,11 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "getWidth",
     value: function getWidth(pressure, speed) {
-      pressure = _utilsUtilsDefault.default.clamp(0.5, 2, pressure * 2);
+      pressure = _utilsUtilsDefault.default.clamp(0.5, 2, pressure);
       speed = _utilsUtilsDefault.default.clamp(1, 2, speed);
-      return this.lineWidth * pressure / speed;
+      var width = pressure / speed;
+      // range: 0.5 - 1
+      return _utilsUtilsDefault.default.clamp(0, 1, width * 2 - 1);
     }
   }, {
     key: "applyAutoMask",
@@ -20659,4 +20665,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.10c25a14.js.map
+//# sourceMappingURL=index.77ff0d6e.js.map
