@@ -109,15 +109,6 @@ export default class PenTool extends Tool {
     }
     
     drawConnectedLines(ctx: CanvasRenderingContext2D, points: Point[], widths: number[]){
-        const strokeScale = 0.5;
-        const offsets = [];
-        const radius = 0.5 - 0.5 * strokeScale;
-        offsets.push(new Point(0, 0));
-        for (let i = 0; i < 6; i++) {
-            const angle = i / 3 * Math.PI;
-            offsets.push(new Point(radius * Math.cos(angle), radius * Math.sin(angle)));
-        }
-        
         const pointCount = points.length;
         if (pointCount == 0){
             return;
@@ -128,19 +119,18 @@ export default class PenTool extends Tool {
         let start = points[0];
         let startWidth = widths[0] * this.lineWidth;
 
-        // single dot
-        ctx.beginPath();
-        ctx.arc(start.x, start.y, 0.5 * Utils.lerp(strokeScale, 1, widths[0]) * this.lineWidth, 0, 2 * Math.PI);
-        ctx.fill();
-
-        ctx.lineWidth = this.lineWidth * strokeScale;
-        for (const offset of offsets) {
+        if (pointCount == 1){
+            // single dot
             ctx.beginPath();
-            ctx.moveTo(start.x + offset.x * startWidth, start.y + offset.y * startWidth);
-            for (let i = 1; i < pointCount; i++) {
-                const width = widths[i] * this.lineWidth;
-                ctx.lineTo(points[i].x + offset.x * width, points[i].y + offset.y * width);
-            }
+            ctx.arc(start.x, start.y, 0.5 * startWidth, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        for (let i = 1; i < pointCount; i++) {
+            ctx.beginPath();
+            ctx.lineWidth = widths[i] * this.lineWidth;
+            ctx.lineTo(points[i-1].x, points[i-1].y);
+            ctx.lineTo(points[i].x, points[i].y);
             ctx.stroke();
         }
     }
@@ -219,9 +209,7 @@ export default class PenTool extends Tool {
     getWidth(pressure: number, speed: number){
         pressure = Utils.clamp(0.5, 2, pressure);
         speed = Utils.clamp(1, 2, speed);
-        const width = pressure / speed; // range: 0.5 - 1
-        return Utils.clamp(0, 1,width * 2 - 1); // remap to: 0 - 1
-        
+        return pressure / speed; // range: 0.5 - 1
     }
 
     private applyAutoMask() {

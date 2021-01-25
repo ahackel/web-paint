@@ -14113,14 +14113,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "drawConnectedLines",
     value: function drawConnectedLines(ctx, points, widths) {
-      var strokeScale = 0.5;
-      var offsets = [];
-      var radius = 0.5 - 0.5 * strokeScale;
-      offsets.push(new _utilsPointDefault.default(0, 0));
-      for (var i = 0; i < 6; i++) {
-        var angle = i / 3 * Math.PI;
-        offsets.push(new _utilsPointDefault.default(radius * Math.cos(angle), radius * Math.sin(angle)));
-      }
       var pointCount = points.length;
       if (pointCount == 0) {
         return;
@@ -14129,19 +14121,17 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       ctx.lineJoin = "round";
       var start = points[0];
       var startWidth = widths[0] * this.lineWidth;
-      // single dot
-      ctx.beginPath();
-      ctx.arc(start.x, start.y, 0.5 * _utilsUtilsDefault.default.lerp(strokeScale, 1, widths[0]) * this.lineWidth, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.lineWidth = this.lineWidth * strokeScale;
-      for (var _i = 0, _offsets = offsets; _i < _offsets.length; _i++) {
-        var offset = _offsets[_i];
+      if (pointCount == 1) {
+        // single dot
         ctx.beginPath();
-        ctx.moveTo(start.x + offset.x * startWidth, start.y + offset.y * startWidth);
-        for (var _i2 = 1; _i2 < pointCount; _i2++) {
-          var width = widths[_i2] * this.lineWidth;
-          ctx.lineTo(points[_i2].x + offset.x * width, points[_i2].y + offset.y * width);
-        }
+        ctx.arc(start.x, start.y, 0.5 * startWidth, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+      for (var i = 1; i < pointCount; i++) {
+        ctx.beginPath();
+        ctx.lineWidth = widths[i] * this.lineWidth;
+        ctx.lineTo(points[i - 1].x, points[i - 1].y);
+        ctx.lineTo(points[i].x, points[i].y);
         ctx.stroke();
       }
     }
@@ -14213,9 +14203,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     value: function getWidth(pressure, speed) {
       pressure = _utilsUtilsDefault.default.clamp(0.5, 2, pressure);
       speed = _utilsUtilsDefault.default.clamp(1, 2, speed);
-      var width = pressure / speed;
-      // range: 0.5 - 1
-      return _utilsUtilsDefault.default.clamp(0, 1, width * 2 - 1);
+      return pressure / speed;
     }
   }, {
     key: "applyAutoMask",
@@ -20665,4 +20653,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.77ff0d6e.js.map
+//# sourceMappingURL=index.1a2344c2.js.map
