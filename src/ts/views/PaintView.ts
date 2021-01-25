@@ -384,7 +384,11 @@ export class PaintView extends View {
     }
 
     getNormalizedPointerPressure(event: PointerEvent): number {
-        return event.pointerType == "pen" ? Utils.clamp(0.5, 1, event.pressure * 2) : 1;
+        return event.pointerType == "pen" ? Utils.clamp(0.5, 2, event.pressure * 4) : 1;
+    }
+
+    getNormalizedTouchPressure(touch: Touch): number {
+        return touch.touchType == "stylus" ? Utils.clamp(0.5, 2, touch.force * 4) : 1;
     }
 
     pointerUp(event: PointerEvent) {
@@ -424,7 +428,7 @@ export class PaintView extends View {
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
             radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
-            pressure: touch.force,
+            pressure: this.getNormalizedTouchPressure(touch),
             speed: 1,
             isPressed: true
         });
@@ -436,11 +440,12 @@ export class PaintView extends View {
         if (touch == null){
             return;
         }
+        console.log(touch.force)
         this.move({
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
             radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
-            pressure: 1,
+            pressure: this.getNormalizedTouchPressure(touch),
             speed: 1,
             isPressed: true
         });

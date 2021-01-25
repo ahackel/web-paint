@@ -207,7 +207,6 @@ export default class PenTool extends Tool {
     }
 
     getWidth(pressure: number, speed: number){
-        pressure = Utils.clamp(0.5, 2, pressure);
         speed = Utils.clamp(1, 2, speed);
         return pressure / speed; // range: 0.5 - 1
     }

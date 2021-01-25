@@ -13010,7 +13010,12 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "getNormalizedPointerPressure",
     value: function getNormalizedPointerPressure(event) {
-      return event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 1, event.pressure * 2) : 1;
+      return event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 2, event.pressure * 4) : 1;
+    }
+  }, {
+    key: "getNormalizedTouchPressure",
+    value: function getNormalizedTouchPressure(touch) {
+      return touch.touchType == "stylus" ? _utilsUtilsDefault.default.clamp(0.5, 2, touch.force * 4) : 1;
     }
   }, {
     key: "pointerUp",
@@ -13047,7 +13052,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
         radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
-        pressure: touch.force,
+        pressure: this.getNormalizedTouchPressure(touch),
         speed: 1,
         isPressed: true
       });
@@ -13060,11 +13065,12 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (touch == null) {
         return;
       }
+      console.log(touch.force);
       this.move({
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
         radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
-        pressure: 1,
+        pressure: this.getNormalizedTouchPressure(touch),
         speed: 1,
         isPressed: true
       });
@@ -14201,7 +14207,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "getWidth",
     value: function getWidth(pressure, speed) {
-      pressure = _utilsUtilsDefault.default.clamp(0.5, 2, pressure);
       speed = _utilsUtilsDefault.default.clamp(1, 2, speed);
       return pressure / speed;
     }
@@ -20653,4 +20658,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.1a2344c2.js.map
+//# sourceMappingURL=index.02ede9f6.js.map
