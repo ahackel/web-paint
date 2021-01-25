@@ -17,6 +17,7 @@ interface  IAppConfig{
     minScrollDistance: number;
     maxScrollDelay: number;
     maxShapeCount: number;
+    usePointerEvents: boolean;
     fullScreenCanvas: boolean;
     pixelPerfect: boolean;
     imageSmoothing: boolean;
@@ -37,6 +38,7 @@ export const config: IAppConfig = {
     minScrollDistance: 30,
     maxScrollDelay: 500,
     maxShapeCount: 64 - defaultShapes.length,
+    usePointerEvents: false,
     fullScreenCanvas: true, // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
     pixelPerfect: false,   // Make sure to perform painting operations on rounded pixel positions
     imageSmoothing: true,  // Whether to use smooth pixel filtering or to draw hard pixel edges

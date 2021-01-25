@@ -267,7 +267,7 @@ export class PaintView extends View {
         document.addEventListener('keydown', event => this.keyDown(event));
         canvas.addEventListener('click', event => event.preventDefault());
 
-        if (window.PointerEvent != null){
+        if (config.usePointerEvents && window.PointerEvent != null){
             // Required to prevent pointerDown events from being choked when tapping repeatedly: 
             canvas.addEventListener('touchstart', event => {
                 if (event.cancelable){

@@ -8491,6 +8491,7 @@ var config = {
   minScrollDistance: 30,
   maxScrollDelay: 500,
   maxShapeCount: 64 - defaultShapes.length,
+  usePointerEvents: false,
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
@@ -12887,7 +12888,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       canvas.addEventListener('click', function (event) {
         return event.preventDefault();
       });
-      if (window.PointerEvent != null) {
+      if (_config.config.usePointerEvents && window.PointerEvent != null) {
         // Required to prevent pointerDown events from being choked when tapping repeatedly:
         canvas.addEventListener('touchstart', function (event) {
           if (event.cancelable) {
@@ -20658,4 +20659,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.cf6cddfc.js.map
+//# sourceMappingURL=index.10c25a14.js.map
