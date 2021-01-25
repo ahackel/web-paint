@@ -6,7 +6,6 @@ export default class Thumbnail {
     private _element: HTMLDivElement;
     private _imageUrl: string;
     private _overlayUrl: string;
-    private _needsReload: boolean;
     
     get id() { return this._element.id; }
     set imageUrl(src: string){
@@ -44,12 +43,7 @@ export default class Thumbnail {
 
         ImageStorage.addChangeListener((change: string, id: string) => {
             if (change == "save" && id == this.id) {
-                if (this.isHidden()){
-                    this._needsReload = true;
-                }
-                else {
-                    this.loadImage();
-                }
+                this.loadImage();
             }
         });
         
@@ -63,21 +57,14 @@ export default class Thumbnail {
         this._element.remove();
     }
     
-    update() {
-        if (this._needsReload){
-            this.loadImage();
-        }
-    }
-
     private isHidden() {
         return (this._element.offsetParent === null)
     }
 
     private loadImage() {
-        ImageStorage.loadBlob(this.id)
-            .then(blob => {
-                this.imageUrl = blob ? URL.createObjectURL(blob) : null;
-                this._needsReload = false;
+        ImageStorage.loadImageUrl(this.id)
+            .then(url => {
+                this.imageUrl = url;
             });
     }
 

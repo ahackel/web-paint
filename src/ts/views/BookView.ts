@@ -27,9 +27,6 @@ export default class BookView extends View {
 
     private updateImages() {
         if (this._thumbnails){
-            for (let thumbnail of this._thumbnails) {
-                thumbnail.update();
-            }
             return;
         }
         

@@ -8144,70 +8144,6 @@ var _Thumbnail = require("./Thumbnail");
 var _ThumbnailDefault = _parcelHelpers.interopDefault(_Thumbnail);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-function _createForOfIteratorHelper(o, allowArrayLike) {
-  var it;
-  if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
-    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-      if (it) o = it;
-      var i = 0;
-      var F = function F() {};
-      return {
-        s: F,
-        n: function n() {
-          if (i >= o.length) return {
-            done: true
-          };
-          return {
-            done: false,
-            value: o[i++]
-          };
-        },
-        e: function e(_e) {
-          throw _e;
-        },
-        f: F
-      };
-    }
-    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-  var normalCompletion = true, didErr = false, err;
-  return {
-    s: function s() {
-      it = o[Symbol.iterator]();
-    },
-    n: function n() {
-      var step = it.next();
-      normalCompletion = step.done;
-      return step;
-    },
-    e: function e(_e2) {
-      didErr = true;
-      err = _e2;
-    },
-    f: function f() {
-      try {
-        if (!normalCompletion && it.return != null) it.return();
-      } finally {
-        if (didErr) throw err;
-      }
-    }
-  };
-}
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || (/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/).test(n)) return _arrayLikeToArray(o, minLen);
-}
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-  for (var i = 0, arr2 = new Array(len); i < len; i++) {
-    arr2[i] = arr[i];
-  }
-  return arr2;
-}
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8336,26 +8272,15 @@ var BookView = /*#__PURE__*/(function (_View) {
     value: function updateImages() {
       var _this2 = this;
       if (this._thumbnails) {
-        var _iterator = _createForOfIteratorHelper(this._thumbnails), _step;
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-            var thumbnail = _step.value;
-            thumbnail.update();
-          }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
-        }
         return;
       }
       this._thumbnails = [];
       for (var i = 0; i < _config.config.imageCount; i++) {
         var imageId = ("image").concat(("" + (i + 1)).padStart(2, "0"));
-        var _thumbnail = new _ThumbnailDefault.default(this._element, imageId, function (id) {
+        var thumbnail = new _ThumbnailDefault.default(this._element, imageId, function (id) {
           return _this2.onImageSelected(id);
         });
-        this._thumbnails.push(_thumbnail);
+        this._thumbnails.push(thumbnail);
       }
     }
   }]);
@@ -8589,11 +8514,7 @@ var Thumbnail = /*#__PURE__*/(function () {
     }, true);
     _storageImageStorageDefault.default.addChangeListener(function (change, id) {
       if (change == "save" && id == _this.id) {
-        if (_this.isHidden()) {
-          _this._needsReload = true;
-        } else {
-          _this.loadImage();
-        }
+        _this.loadImage();
       }
     });
     this.overlayUrl = _utilsUtilsDefault.default.getImageOverlayUrl(id);
@@ -8606,13 +8527,6 @@ var Thumbnail = /*#__PURE__*/(function () {
       this._element.remove();
     }
   }, {
-    key: "update",
-    value: function update() {
-      if (this._needsReload) {
-        this.loadImage();
-      }
-    }
-  }, {
     key: "isHidden",
     value: function isHidden() {
       return this._element.offsetParent === null;
@@ -8621,9 +8535,8 @@ var Thumbnail = /*#__PURE__*/(function () {
     key: "loadImage",
     value: function loadImage() {
       var _this2 = this;
-      _storageImageStorageDefault.default.loadBlob(this.id).then(function (blob) {
-        _this2.imageUrl = blob ? URL.createObjectURL(blob) : null;
-        _this2._needsReload = false;
+      _storageImageStorageDefault.default.loadImageUrl(this.id).then(function (url) {
+        _this2.imageUrl = url;
       });
     }
   }, {
@@ -9748,78 +9661,129 @@ var ImageStorage = /*#__PURE__*/(function () {
     _classCallCheck(this, ImageStorage);
   }
   _createClass(ImageStorage, null, [{
-    key: "loadImageFromStore",
-    value: function loadImageFromStore(id) {
-      var _this = this;
-      if (!id) {
-        return Promise.reject("Could not load image from empty id.");
-      }
-      return this.adapter.getItem(id).then(function (blob) {
-        if (!blob) {
-          // Returning null will create a new image
-          return Promise.resolve(null);
-        }
-        var img = _this.imageFromBlob(id, blob);
-        if (!img) {
-          return Promise.resolve(null);
-        }
-        if (img.decode != null) {
-          return img.decode().then(function () {
-            return Promise.resolve(img);
-          });
-        }
-        return new Promise(function (resolve) {
-          img.onload = function () {
-            return resolve(img);
-          };
-        });
-      });
-    }
-  }, {
     key: "loadImage",
-    value: function loadImage(id) {
-      return this.loadImageFromStore(id);
-    }
+    value: (function () {
+      var _loadImage = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(id) {
+        var url, img;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.loadImageUrl(id);
+              case 2:
+                url = _context.sent;
+                if (url) {
+                  _context.next = 5;
+                  break;
+                }
+                return _context.abrupt("return", null);
+              case 5:
+                img = new Image();
+                img.id = id;
+                img.src = url;
+                if (!(img.decode != null)) {
+                  _context.next = 12;
+                  break;
+                }
+                _context.next = 11;
+                return img.decode();
+              case 11:
+                return _context.abrupt("return", img);
+              case 12:
+                return _context.abrupt("return", new Promise(function (resolve) {
+                  img.onload = function () {
+                    return resolve(img);
+                  };
+                }));
+              case 13:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+      function loadImage(_x) {
+        return _loadImage.apply(this, arguments);
+      }
+      return loadImage;
+    })()
+  }, {
+    key: "loadImageUrl",
+    value: (function () {
+      var _loadImageUrl = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
+        var blob, url;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                if (!((id in this.urls))) {
+                  _context2.next = 2;
+                  break;
+                }
+                return _context2.abrupt("return", this.urls[id]);
+              case 2:
+                _context2.next = 4;
+                return this.loadBlob(id);
+              case 4:
+                blob = _context2.sent;
+                if (blob) {
+                  _context2.next = 7;
+                  break;
+                }
+                return _context2.abrupt("return", null);
+              case 7:
+                url = URL.createObjectURL(blob);
+                this.urls[id] = url;
+                return _context2.abrupt("return", url);
+              case 10:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+      function loadImageUrl(_x2) {
+        return _loadImageUrl.apply(this, arguments);
+      }
+      return loadImageUrl;
+    })()
   }, {
     key: "loadBlob",
     value: function loadBlob(id) {
       return this.adapter.getItem(id);
     }
   }, {
-    key: "imageFromBlob",
-    value: function imageFromBlob(id, blob) {
-      var img = new Image();
-      img.id = id;
-      img.src = URL.createObjectURL(blob);
-      return img;
-    }
-  }, {
     key: "saveImage",
     value: (function () {
-      var _saveImage = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(id, blob) {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+      var _saveImage = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee3(id, blob) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _context.prev = 0;
-                _context.next = 3;
+                _context3.prev = 0;
+                _context3.next = 3;
                 return this.adapter.setItem(id, blob);
               case 3:
-                _context.next = 7;
+                _context3.next = 7;
                 break;
               case 5:
-                _context.prev = 5;
-                _context.t0 = _context["catch"](0);
+                _context3.prev = 5;
+                _context3.t0 = _context3["catch"](0);
               case 7:
+                if ((id in this.urls)) {
+                  URL.revokeObjectURL(this.urls[id]);
+                }
+                this.urls[id] = URL.createObjectURL(blob);
                 this.dispatchChangeEvent("save", id);
-              case 8:
+              case 10:
               case "end":
-                return _context.stop();
+                return _context3.stop();
             }
           }
-        }, _callee, this, [[0, 5]]);
+        }, _callee3, this, [[0, 5]]);
       }));
-      function saveImage(_x, _x2) {
+      function saveImage(_x3, _x4) {
         return _saveImage.apply(this, arguments);
       }
       return saveImage;
@@ -9827,9 +9791,13 @@ var ImageStorage = /*#__PURE__*/(function () {
   }, {
     key: "deleteImage",
     value: function deleteImage(id) {
-      var _this2 = this;
+      var _this = this;
       return this.adapter.removeItem(id).then(function () {
-        _this2.dispatchChangeEvent("delete", id);
+        if ((id in _this.urls)) {
+          URL.revokeObjectURL(_this.urls[id]);
+          delete _this.urls[id];
+        }
+        _this.dispatchChangeEvent("delete", id);
       });
     }
   }, {
@@ -9861,10 +9829,18 @@ var ImageStorage = /*#__PURE__*/(function () {
   }, {
     key: "adapter",
     get: function get() {
-      if (this._adapter == null) {
+      if (!this._adapter) {
         this._adapter = new _LocalForageAdapterDefault.default();
       }
       return this._adapter;
+    }
+  }, {
+    key: "urls",
+    get: function get() {
+      if (!this._urls) {
+        this._urls = {};
+      }
+      return this._urls;
     }
   }]);
   return ImageStorage;
@@ -12731,10 +12707,12 @@ var PaintView = /*#__PURE__*/(function (_View) {
         }
         var file = importImageField.files[0];
         var image = new Image();
-        image.src = URL.createObjectURL(file);
+        var url = URL.createObjectURL(file);
+        image.src = url;
         image.onload = function () {
           _this2.setTool(_this2.selectionTool);
           _this2.selectionTool.setImage(image);
+          URL.revokeObjectURL(url);
         };
         // Reset input field so the change event will be triggered again if the user selects the same asset again
         importImageField.value = null;
@@ -14537,8 +14515,7 @@ var ShapePalette = /*#__PURE__*/(function (_Palette) {
     key: "addShapeFromImageId",
     value: function addShapeFromImageId(stampId) {
       var _this2 = this;
-      _storageImageStorageDefault.default.loadBlob(stampId).then(function (blob) {
-        var url = URL.createObjectURL(blob);
+      _storageImageStorageDefault.default.loadImageUrl(stampId).then(function (url) {
         _this2._shapeIds[url] = stampId;
         _this2.addOption(url);
       });
@@ -20668,4 +20645,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.ee3b7222.js.map
+//# sourceMappingURL=index.018019d7.js.map

@@ -29,9 +29,8 @@ export default class ShapePalette extends Palette {
     }
 
     private addShapeFromImageId(stampId: string) {
-        ImageStorage.loadBlob(stampId)
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
+        ImageStorage.loadImageUrl(stampId)
+            .then(url => {
                 this._shapeIds[url] = stampId;
                 this.addOption(url);
             })

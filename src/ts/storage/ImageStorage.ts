@@ -7,54 +7,61 @@ export default class ImageStorage {
 
 	private static _adapter: StorageAdapter;
 	private static _changeListeners: Function[];
+	private static _urls: { [id: string]: string }
 	
 	public static get adapter() {
-		if (this._adapter == null) {
+		if (!this._adapter) {
 			this._adapter = new LocalForageAdapter()
 		}
 		return this._adapter 
 	}
+	
+	public static get urls(){
+		if (!this._urls){
+			this._urls = {};
+		}
+		return this._urls;
+	}
 
-	private static loadImageFromStore(id: string): Promise<HTMLImageElement> {
-		if (!id) {
-			return Promise.reject("Could not load image from empty id.");
+	public static async loadImage(id: string): Promise<HTMLImageElement> {
+		const url: string = await this.loadImageUrl(id);
+		
+		if (!url){
+			return null;
 		}
 		
-		return this.adapter.getItem(id)
-			.then(blob => {
-				if (!blob){
-					// Returning null will create a new image
-					return Promise.resolve(null);
-				}
-				
-				let img = this.imageFromBlob(id, blob as Blob);
-				if (!img){
-					return Promise.resolve(null);
-				}
-				
-				if (img.decode != null) {
-					return img.decode().then(() => Promise.resolve(img))
-				}
-				
-				return new Promise(resolve => {
-					img.onload = () => resolve(img);
-				});
-			})
-	}
-
-	public static loadImage(id: string): Promise<HTMLImageElement> {
-		return this.loadImageFromStore(id);
-	}
-
-	public static loadBlob(id: string): Promise<Blob> {
-		return <Promise<Blob>>this.adapter.getItem(id)
-	}
-
-	private static imageFromBlob(id: string, blob: Blob) {
-		let img = new Image();
+		const img = new Image();
 		img.id = id;
-		img.src = URL.createObjectURL(blob);
-		return img;
+		img.src = url;
+
+		if (img.decode != null) {
+			await img.decode();
+			return img;
+		}
+
+		return new Promise(resolve => {
+			img.onload = () => resolve(img);
+		});
+	}
+	
+
+	public static async loadImageUrl(id: string): Promise<string> {
+		if (id in this.urls){
+			return this.urls[id];
+		}
+		
+		const blob = await this.loadBlob(id);
+		if (!blob){
+			return null;
+		}
+
+		const url = URL.createObjectURL(blob);
+		this.urls[id] = url;
+		return url;
+	}
+
+	private static loadBlob(id: string): Promise<Blob> {
+		return <Promise<Blob>>this.adapter.getItem(id)
 	}
 
 	public static async saveImage(id: string, blob: Blob){
@@ -64,12 +71,21 @@ export default class ImageStorage {
 		catch (e) {
 		}
 		
+		if (id in this.urls){
+			URL.revokeObjectURL(this.urls[id]);
+		}
+		this.urls[id] = URL.createObjectURL(blob);
+		
 		this.dispatchChangeEvent("save", id);
 	}
 	
 	public static deleteImage(id: string){
 		return this.adapter.removeItem(id)
 			.then(() => {
+				if (id in this.urls){
+					URL.revokeObjectURL(this.urls[id]);
+					delete this.urls[id];
+				}
 				this.dispatchChangeEvent("delete", id);
 			})		
 	}

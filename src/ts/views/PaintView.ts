@@ -117,10 +117,12 @@ export class PaintView extends View {
             }
             let file = importImageField.files[0];
             let image = new Image();
-            image.src = URL.createObjectURL(file);
+            const url = URL.createObjectURL(file);
+            image.src = url;
             image.onload = () => {
                 this.setTool(this.selectionTool);
                 this.selectionTool.setImage(image);
+                URL.revokeObjectURL(url);
             }
             
             // Reset input field so the change event will be triggered again if the user selects the same asset again
