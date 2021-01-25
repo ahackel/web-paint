@@ -18,27 +18,20 @@ export default class BookView extends View {
 
     show(): void {
         super.show();
-        this.createImages();
+        this.updateImages();
         
         // PeerToPeer.instance.onDataReceived = (data: ArrayBuffer) => {
         //     this._thumbnails[0].setImageSrc(URL.createObjectURL(new Blob([data])));
         // }
     }
-    
-    hide(){
-        super.hide();
+
+    private updateImages() {
         if (this._thumbnails){
             for (let thumbnail of this._thumbnails) {
-                thumbnail.remove();
+                thumbnail.update();
             }
-            this._thumbnails = null;
+            return;
         }
-    }
-
-    private createImages() {
-        // if (this._thumbnails){
-        //     return;
-        // }
         
         this._thumbnails = [];
         

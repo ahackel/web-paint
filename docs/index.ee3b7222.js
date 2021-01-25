@@ -8329,41 +8329,33 @@ var BookView = /*#__PURE__*/(function (_View) {
     key: "show",
     value: function show() {
       _get(_getPrototypeOf(BookView.prototype), "show", this).call(this);
-      this.createImages();
+      this.updateImages();
     }
   }, {
-    key: "hide",
-    value: function hide() {
-      _get(_getPrototypeOf(BookView.prototype), "hide", this).call(this);
+    key: "updateImages",
+    value: function updateImages() {
+      var _this2 = this;
       if (this._thumbnails) {
         var _iterator = _createForOfIteratorHelper(this._thumbnails), _step;
         try {
           for (_iterator.s(); !(_step = _iterator.n()).done; ) {
             var thumbnail = _step.value;
-            thumbnail.remove();
+            thumbnail.update();
           }
         } catch (err) {
           _iterator.e(err);
         } finally {
           _iterator.f();
         }
-        this._thumbnails = null;
+        return;
       }
-    }
-  }, {
-    key: "createImages",
-    value: function createImages() {
-      var _this2 = this;
-      // if (this._thumbnails){
-      // return;
-      // }
       this._thumbnails = [];
       for (var i = 0; i < _config.config.imageCount; i++) {
         var imageId = ("image").concat(("" + (i + 1)).padStart(2, "0"));
-        var thumbnail = new _ThumbnailDefault.default(this._element, imageId, function (id) {
+        var _thumbnail = new _ThumbnailDefault.default(this._element, imageId, function (id) {
           return _this2.onImageSelected(id);
         });
-        this._thumbnails.push(thumbnail);
+        this._thumbnails.push(_thumbnail);
       }
     }
   }]);
@@ -8573,6 +8565,7 @@ var Thumbnail = /*#__PURE__*/(function () {
     }
   }]);
   function Thumbnail(parent, id, onImageSelected) {
+    var _this = this;
     _classCallCheck(this, Thumbnail);
     var element = document.createElement("div");
     this._element = element;
@@ -8594,11 +8587,15 @@ var Thumbnail = /*#__PURE__*/(function () {
         onImageSelected(id);
       }
     }, true);
-    // ImageStorage.addChangeListener((change: string, id: string) => {
-    // if (change == "save" && id == this.id) {
-    // this.loadImage();
-    // }
-    // });
+    _storageImageStorageDefault.default.addChangeListener(function (change, id) {
+      if (change == "save" && id == _this.id) {
+        if (_this.isHidden()) {
+          _this._needsReload = true;
+        } else {
+          _this.loadImage();
+        }
+      }
+    });
     this.overlayUrl = _utilsUtilsDefault.default.getImageOverlayUrl(id);
     parent.appendChild(element);
     this.loadImage();
@@ -8609,11 +8606,24 @@ var Thumbnail = /*#__PURE__*/(function () {
       this._element.remove();
     }
   }, {
+    key: "update",
+    value: function update() {
+      if (this._needsReload) {
+        this.loadImage();
+      }
+    }
+  }, {
+    key: "isHidden",
+    value: function isHidden() {
+      return this._element.offsetParent === null;
+    }
+  }, {
     key: "loadImage",
     value: function loadImage() {
-      var _this = this;
+      var _this2 = this;
       _storageImageStorageDefault.default.loadBlob(this.id).then(function (blob) {
-        _this.imageUrl = blob ? URL.createObjectURL(blob) : null;
+        _this2.imageUrl = blob ? URL.createObjectURL(blob) : null;
+        _this2._needsReload = false;
       });
     }
   }, {
@@ -20658,4 +20668,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.02ede9f6.js.map
+//# sourceMappingURL=index.ee3b7222.js.map
