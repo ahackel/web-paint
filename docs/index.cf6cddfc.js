@@ -12975,22 +12975,17 @@ var PaintView = /*#__PURE__*/(function (_View) {
     key: "pointerDown",
     value: function pointerDown(event) {
       event.preventDefault();
-      if (event.pointerType == 'touch' && this._currentTouchId !== 0) {
-        return;
-      }
-      if (event.pointerType != 'touch' && event.buttons !== 1) {
-        // ignore mouse move events with no button pressed
+      if (!event.isPrimary || event.buttons !== 1) {
         return;
       }
       var target = event.target;
       target.setPointerCapture(event.pointerId);
       this._currentTouchId = event.pointerId;
-      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.3, 1, event.pressure * 2) : 1;
       this.down({
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
-        radius: new _utilsPointDefault.default(event.width, event.height),
-        pressure: pressure,
+        radius: this.screenToSheet(new _utilsPointDefault.default(event.width, event.height)),
+        pressure: this.getNormalizedPointerPressure(event),
         speed: 1,
         isPressed: true
       });
@@ -12999,35 +12994,30 @@ var PaintView = /*#__PURE__*/(function (_View) {
     key: "pointerMove",
     value: function pointerMove(event) {
       event.preventDefault();
-      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
+      if (!event.isPrimary || event.buttons !== 1) {
         return;
       }
-      if (event.pointerType != 'touch' && event.buttons !== 1) {
-        // ignore mouse move events with no button pressed
-        return;
-      }
-      // normalize pressure:
-      var pressure = event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 1, event.pressure * 2) : 1;
       this.move({
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
-        radius: new _utilsPointDefault.default(event.width, event.height),
-        pressure: pressure,
+        radius: this.screenToSheet(new _utilsPointDefault.default(event.width, event.height)),
+        pressure: this.getNormalizedPointerPressure(event),
         speed: 1,
         isPressed: true
       });
     }
   }, {
+    key: "getNormalizedPointerPressure",
+    value: function getNormalizedPointerPressure(event) {
+      return event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 1, event.pressure * 2) : 1;
+    }
+  }, {
     key: "pointerUp",
     value: function pointerUp(event) {
       event.preventDefault();
-      if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId) {
+      if (!event.isPrimary) {
         return;
       }
-      // Return if this was not the left mouse button:
-      // if (event.pointerType != 'touch' && event.buttons !== 1){
-      // return;
-      // }
       var target = event.target;
       target.releasePointerCapture(event.pointerId);
       this.up({
@@ -13055,7 +13045,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.down({
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
-        radius: new _utilsPointDefault.default(touch.radiusX, touch.radiusY),
+        radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
         pressure: touch.force,
         speed: 1,
         isPressed: true
@@ -13072,7 +13062,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.move({
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
-        radius: new _utilsPointDefault.default(touch.radiusX, touch.radiusY),
+        radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
         pressure: 1,
         speed: 1,
         isPressed: true
@@ -13318,6 +13308,11 @@ var PaintView = /*#__PURE__*/(function (_View) {
         pixels[i] = pixels[i] > 64 ? 255 : 0;
       }
       ctx.putImageData(imageData, 0, 0);
+    }
+  }, {
+    key: "screenToSheet",
+    value: function screenToSheet(p) {
+      return new _utilsPointDefault.default(p.x / screen.width * _config.config.width, p.y / screen.height * _config.config.height);
     }
   }], [{
     key: "findTouch",
@@ -14047,7 +14042,9 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     value: function down(data) {
       this._painter.captureAutoMask(data.position.copy().round());
       this._points = [data.position];
-      this._widths = [this.getWidth(data.pressure, data.speed)];
+      var width = data.radius.x;
+      // this.getWidth(data.pressure, data.speed);
+      this._widths = [width];
       this._startIndex = 0;
       var ctx = this._painter.baseLayer.ctx;
       ctx.fillStyle = this.color;
@@ -14131,6 +14128,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         ctx.stroke();
         return;
       }
+      // TODO: Draw multiple lines to simulate thickness and reduce the number of strokes
       for (var i = 1; i < pointCount; i++) {
         if (ctx.lineWidth != widths[i]) {
           ctx.stroke();
@@ -14157,7 +14155,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     key: "move",
     value: function move(data) {
       var newPoints = this.interpolatePoints(data.position);
-      console.log(newPoints);
       this._points = this._points.concat(newPoints);
       var numSegments = newPoints.length;
       var width = this.getWidth(data.pressure, data.speed);
@@ -14166,7 +14163,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       var maxWidthDifference = 2 * numSegments;
       width = _utilsUtilsDefault.default.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
       for (var i = 0; i < numSegments; i++) {
-        this._widths.push(Math.round(_utilsUtilsDefault.default.lerp(lastWidth, width, i / numSegments)));
+        this._widths.push(data.radius.x);
       }
       this.requestDrawPath();
     }
@@ -20661,4 +20658,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.589fd9f7.js.map
+//# sourceMappingURL=index.cf6cddfc.js.map

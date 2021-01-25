@@ -38,7 +38,8 @@ export default class PenTool extends Tool {
         this._painter.captureAutoMask(data.position.copy().round());
         
         this._points = [data.position];
-        this._widths = [this.getWidth(data.pressure, data.speed)];
+        const width = data.radius.x; // this.getWidth(data.pressure, data.speed);
+        this._widths = [width];
         this._startIndex = 0;
 
         let ctx = this._painter.baseLayer.ctx;
@@ -126,6 +127,7 @@ export default class PenTool extends Tool {
             return;
         }
 
+        // TODO: Draw multiple lines to simulate thickness and reduce the number of strokes
         for (let i = 1; i < pointCount; i++) {
             if (ctx.lineWidth != widths[i]) {
                 ctx.stroke();
@@ -151,7 +153,6 @@ export default class PenTool extends Tool {
 
     move(data: IPointerData): void {
         let newPoints = this.interpolatePoints(data.position);
-        console.log(newPoints);
 
         this._points = this._points.concat(newPoints);
         const numSegments = newPoints.length;
@@ -163,7 +164,7 @@ export default class PenTool extends Tool {
         width = Utils.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
 
         for (let i = 0; i < numSegments; i++) {
-            this._widths.push(Math.round(Utils.lerp(lastWidth, width, i / numSegments)));
+            this._widths.push(data.radius.x); // Math.round(Utils.lerp(lastWidth, width, i / numSegments)));
         }
 
         this.requestDrawPath();

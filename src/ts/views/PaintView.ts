@@ -349,26 +349,19 @@ export class PaintView extends View {
 
     pointerDown(event: PointerEvent) {
         event.preventDefault();
-
-        if (event.pointerType == 'touch' && this._currentTouchId !== 0){
-            return;
-        }
-
-        if (event.pointerType != 'touch' && event.buttons !== 1){
-            // ignore mouse move events with no button pressed
+        if (!event.isPrimary || event.buttons !== 1) {
             return;
         }
 
         let target = <HTMLElement>event.target;
         target.setPointerCapture(event.pointerId);
-
         this._currentTouchId = event.pointerId;
-        let pressure = event.pointerType == "pen" ? Utils.clamp(0.3, 1, event.pressure * 2) : 1;
+
         this.down({
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
-            radius: new Point(event.width, event.height),
-            pressure: pressure,
+            radius: this.screenToSheet(new Point(event.width, event.height)),
+            pressure: this.getNormalizedPointerPressure(event),
             speed: 1,
             isPressed: true
         });
@@ -376,37 +369,29 @@ export class PaintView extends View {
 
     pointerMove(event: PointerEvent) {
         event.preventDefault();
-        if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId){
+        if (!event.isPrimary || event.buttons !== 1) {
             return;
         }
 
-        if (event.pointerType != 'touch' && event.buttons !== 1){
-            // ignore mouse move events with no button pressed
-            return;
-        }
-
-        // normalize pressure:
-        let pressure = event.pointerType == "pen" ? Utils.clamp(0.5, 1, event.pressure * 2) : 1;
         this.move({
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
-            radius: new Point(event.width, event.height),
-            pressure: pressure,
+            radius: this.screenToSheet(new Point(event.width, event.height)),
+            pressure: this.getNormalizedPointerPressure(event),
             speed: 1,
             isPressed: true
         });
     }
 
+    getNormalizedPointerPressure(event: PointerEvent): number {
+        return event.pointerType == "pen" ? Utils.clamp(0.5, 1, event.pressure * 2) : 1;
+    }
+
     pointerUp(event: PointerEvent) {
         event.preventDefault();
-        if (event.pointerType == 'touch' && event.pointerId !== this._currentTouchId){
+        if (!event.isPrimary){
             return;
         }
-
-        // Return if this was not the left mouse button:
-        // if (event.pointerType != 'touch' && event.buttons !== 1){
-        //     return;
-        // }
 
         let target = <HTMLElement>event.target;
         target.releasePointerCapture(event.pointerId);
@@ -438,7 +423,7 @@ export class PaintView extends View {
         this.down({
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
-            radius: new Point(touch.radiusX, touch.radiusY),
+            radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
             pressure: touch.force,
             speed: 1,
             isPressed: true
@@ -454,7 +439,7 @@ export class PaintView extends View {
         this.move({
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
-            radius: new Point(touch.radiusX, touch.radiusY),
+            radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
             pressure: 1,
             speed: 1,
             isPressed: true
@@ -696,5 +681,9 @@ export class PaintView extends View {
             pixels[i] = pixels[i] > 64 ? 255 : 0;
         }
         ctx.putImageData(imageData, 0, 0);
+    }
+
+    private screenToSheet(p: Point): Point {
+        return new Point(p.x / screen.width * config.width, p.y / screen.height * config.height);
     }
 }
