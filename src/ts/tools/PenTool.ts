@@ -162,10 +162,10 @@ export default class PenTool extends Tool {
             return;
         }
         
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.5;
         
         if (pointCount == 1){
-            this.drawRandomPixelLine(ctx, points[0], points[0])
+            this.drawRandomPixelLine(ctx, points[0], points[0], 500);
             return;
         }
         
@@ -175,9 +175,7 @@ export default class PenTool extends Tool {
         ctx.globalAlpha = 1;
     }
 
-    private drawRandomPixelLine(ctx: CanvasRenderingContext2D, start: IPointData, end: IPointData) {
-        const maxPixelCount = 500;
-        
+    private drawRandomPixelLine(ctx: CanvasRenderingContext2D, start: IPointData, end: IPointData, maxPixelCount = 300) {
         let pixelSize = 2 * Utils.clamp(1, 6, start.width);
         const tiltInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
         //const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);

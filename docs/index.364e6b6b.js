@@ -8412,7 +8412,7 @@ var config = {
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
-  pixelPerfect: false,
+  pixelPerfect: true,
   // Make sure to perform painting operations on rounded pixel positions
   // Make sure to perform painting operations on rounded pixel positions
   imageSmoothing: true,
@@ -14165,9 +14165,9 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       if (pointCount == 0) {
         return;
       }
-      ctx.globalAlpha = 0.6;
+      ctx.globalAlpha = 0.5;
       if (pointCount == 1) {
-        this.drawRandomPixelLine(ctx, points[0], points[0]);
+        this.drawRandomPixelLine(ctx, points[0], points[0], 500);
         return;
       }
       for (var i = 1; i < pointCount; i++) {
@@ -14178,7 +14178,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "drawRandomPixelLine",
     value: function drawRandomPixelLine(ctx, start, end) {
-      var maxPixelCount = 500;
+      var maxPixelCount = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 300;
       var pixelSize = 2 * _utilsUtilsDefault.default.clamp(1, 6, start.width);
       var tiltInfluence = _utilsUtilsDefault.default.lerp(1, 0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
       // const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
@@ -20748,4 +20748,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.450d385a.js.map
+//# sourceMappingURL=index.364e6b6b.js.map
