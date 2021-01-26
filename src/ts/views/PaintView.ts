@@ -27,6 +27,7 @@ export interface IPointerData {
     timeStamp: number;
     position: Point;
     radius: Point;
+    tilt: Point;
     pressure: number;
     speed: number;
     isPressed: boolean;
@@ -363,6 +364,7 @@ export class PaintView extends View {
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
             radius: this.screenToSheet(new Point(event.width, event.height)),
+            tilt: this.getTilt(event),
             pressure: this.getNormalizedPointerPressure(event),
             speed: 1,
             isPressed: true
@@ -379,6 +381,7 @@ export class PaintView extends View {
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
             radius: this.screenToSheet(new Point(event.width, event.height)),
+            tilt: this.getTilt(event),
             pressure: this.getNormalizedPointerPressure(event),
             speed: 1,
             isPressed: true
@@ -386,11 +389,19 @@ export class PaintView extends View {
     }
 
     getNormalizedPointerPressure(event: PointerEvent): number {
-        return event.pointerType == "pen" ? Utils.clamp(0.5, 2, event.pressure * 4) : 1;
+        return event.pointerType == "pen" ? event.pressure : 1;
     }
 
     getNormalizedTouchPressure(touch: Touch): number {
-        return touch.touchType == "stylus" ? Utils.clamp(0.5, 2, touch.force * 4) : 1;
+        return touch.touchType == "stylus" ? touch.force : 1;
+    }
+
+    getTilt(event: PointerEvent): Point {
+        return event.pointerType == "pen" ? new Point(event.tiltX, event.tiltY) : new Point(0, 0);
+    }
+
+    getTiltFromTouch(touch: Touch): Point {
+        return touch.touchType == "stylus" ? new Point(0, 0) : new Point(0, 0);
     }
 
     pointerUp(event: PointerEvent) {
@@ -406,6 +417,7 @@ export class PaintView extends View {
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
             radius: new Point(event.width, event.height),
+            tilt: this.getTilt(event),
             pressure: 1,
             speed: 1,
             isPressed: false
@@ -430,6 +442,7 @@ export class PaintView extends View {
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
             radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
+            tilt: this.getTiltFromTouch(touch),
             pressure: this.getNormalizedTouchPressure(touch),
             speed: 1,
             isPressed: true
@@ -447,6 +460,7 @@ export class PaintView extends View {
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
             radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
+            tilt: this.getTiltFromTouch(touch),
             pressure: this.getNormalizedTouchPressure(touch),
             speed: 1,
             isPressed: true
@@ -464,6 +478,7 @@ export class PaintView extends View {
             timeStamp: event.timeStamp,
             position: new Point(0 ,0),
             radius: new Point(0 ,0),
+            tilt: new Point(0 ,0),
             pressure: 1,
             speed: 1,
             isPressed: false

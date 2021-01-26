@@ -12974,6 +12974,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
         radius: this.screenToSheet(new _utilsPointDefault.default(event.width, event.height)),
+        tilt: this.getTilt(event),
         pressure: this.getNormalizedPointerPressure(event),
         speed: 1,
         isPressed: true
@@ -12990,6 +12991,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
         radius: this.screenToSheet(new _utilsPointDefault.default(event.width, event.height)),
+        tilt: this.getTilt(event),
         pressure: this.getNormalizedPointerPressure(event),
         speed: 1,
         isPressed: true
@@ -12998,12 +13000,22 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "getNormalizedPointerPressure",
     value: function getNormalizedPointerPressure(event) {
-      return event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 2, event.pressure * 4) : 1;
+      return event.pointerType == "pen" ? event.pressure : 1;
     }
   }, {
     key: "getNormalizedTouchPressure",
     value: function getNormalizedTouchPressure(touch) {
-      return touch.touchType == "stylus" ? _utilsUtilsDefault.default.clamp(0.5, 2, touch.force * 4) : 1;
+      return touch.touchType == "stylus" ? touch.force : 1;
+    }
+  }, {
+    key: "getTilt",
+    value: function getTilt(event) {
+      return event.pointerType == "pen" ? new _utilsPointDefault.default(event.tiltX, event.tiltY) : new _utilsPointDefault.default(0, 0);
+    }
+  }, {
+    key: "getTiltFromTouch",
+    value: function getTiltFromTouch(touch) {
+      return touch.touchType == "stylus" ? new _utilsPointDefault.default(0, 0) : new _utilsPointDefault.default(0, 0);
     }
   }, {
     key: "pointerUp",
@@ -13018,6 +13030,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
         radius: new _utilsPointDefault.default(event.width, event.height),
+        tilt: this.getTilt(event),
         pressure: 1,
         speed: 1,
         isPressed: false
@@ -13040,6 +13053,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
         radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
+        tilt: this.getTiltFromTouch(touch),
         pressure: this.getNormalizedTouchPressure(touch),
         speed: 1,
         isPressed: true
@@ -13058,6 +13072,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
         radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
+        tilt: this.getTiltFromTouch(touch),
         pressure: this.getNormalizedTouchPressure(touch),
         speed: 1,
         isPressed: true
@@ -13076,6 +13091,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         timeStamp: event.timeStamp,
         position: new _utilsPointDefault.default(0, 0),
         radius: new _utilsPointDefault.default(0, 0),
+        tilt: new _utilsPointDefault.default(0, 0),
         pressure: 1,
         speed: 1,
         isPressed: false
@@ -13925,6 +13941,7 @@ var _utilsPoint = require("../utils/Point");
 var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+var _config = require("../config");
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -14016,6 +14033,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     _classCallCheck(this, PenTool);
     _this = _super.call(this, painter, buttonId);
     _this._operation = operation;
+    _this._mode = "crayon";
     _this.createBrushCtx();
     return _this;
   }
@@ -14036,9 +14054,14 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     key: "down",
     value: function down(data) {
       this._painter.captureAutoMask(data.position.copy().round());
-      this._points = [data.position];
-      var width = this.getWidth(data.pressure, data.speed);
-      this._widths = [width];
+      var width = this.getWidth(data.pressure, data.speed, data.tilt);
+      var position = this.getPosition(data.position, data.tilt, width);
+      this._points = [{
+        position: position,
+        width: width,
+        tilt: data.tilt,
+        speed: data.speed
+      }];
       this._startIndex = 0;
       var ctx = this._painter.baseLayer.ctx;
       ctx.fillStyle = this.color;
@@ -14079,7 +14102,11 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         return;
       }
       var ctx = this._painter.baseLayer.ctx;
-      this.drawConnectedLines(ctx, this._points.slice(this._startIndex), this._widths.slice(this._startIndex));
+      if (this._mode == "line") {
+        this.drawConnectedLines(ctx, this._points.slice(this._startIndex));
+      } else if (this._mode == "crayon") {
+        this.drawRandomPixelLines(ctx, this._points.slice(this._startIndex));
+      }
       // if (this._points.length - this._startIndex == 1){
       // const p = this._points[this._startIndex];
       // this.drawBrush(ctx, p.x, p.y, this._widths[this._startIndex]);
@@ -14106,15 +14133,15 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     }
   }, {
     key: "drawConnectedLines",
-    value: function drawConnectedLines(ctx, points, widths) {
+    value: function drawConnectedLines(ctx, points) {
       var pointCount = points.length;
       if (pointCount == 0) {
         return;
       }
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      var start = points[0];
-      var startWidth = widths[0] * this.lineWidth;
+      var start = points[0].position;
+      var startWidth = points[0].width * this.lineWidth;
       if (pointCount == 1) {
         // single dot
         ctx.beginPath();
@@ -14123,10 +14150,59 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       }
       for (var i = 1; i < pointCount; i++) {
         ctx.beginPath();
-        ctx.lineWidth = widths[i] * this.lineWidth;
-        ctx.lineTo(points[i - 1].x, points[i - 1].y);
-        ctx.lineTo(points[i].x, points[i].y);
+        ctx.lineWidth = points[i].width * this.lineWidth;
+        var lastPosition = points[i - 1].position;
+        var position = points[i].position;
+        ctx.lineTo(lastPosition.x, lastPosition.y);
+        ctx.lineTo(position.x, position.y);
         ctx.stroke();
+      }
+    }
+  }, {
+    key: "drawRandomPixelLines",
+    value: function drawRandomPixelLines(ctx, points) {
+      var pointCount = points.length;
+      if (pointCount == 0) {
+        return;
+      }
+      ctx.globalAlpha = 0.6;
+      if (pointCount == 1) {
+        this.drawRandomPixelLine(ctx, points[0], points[0]);
+        return;
+      }
+      for (var i = 1; i < pointCount; i++) {
+        this.drawRandomPixelLine(ctx, points[i - 1], points[i]);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }, {
+    key: "drawRandomPixelLine",
+    value: function drawRandomPixelLine(ctx, start, end) {
+      var pixelSize = 2 * _utilsUtilsDefault.default.clamp(1, 6, start.width);
+      var tiltInfluence = _utilsUtilsDefault.default.lerp(1, 0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
+      // const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
+      var density = tiltInfluence * 0.1 / _utilsUtilsDefault.default.clamp(1, 5, start.speed);
+      var dist = _utilsPointDefault.default.distance(start.position, end.position);
+      var averageWidth = 0.5 * (start.width + end.width) * this.lineWidth;
+      var pixelCount = (dist + averageWidth) * averageWidth * density;
+      for (var i = 0; i < pixelCount; i++) {
+        var a = Math.random();
+        var position = _utilsPointDefault.default.lerp(start.position, end.position, a);
+        var width = _utilsUtilsDefault.default.lerp(start.width, end.width, a) * this.lineWidth;
+        var radius = Math.max(0, 0.5 * width - pixelSize);
+        // use this for even distribution:
+        // const r = radius * Math.sqrt(Math.random());
+        // this will focus distribution to the center:
+        var r = radius * Math.random();
+        var angle = Math.random() * 2 * Math.PI;
+        var size = _utilsUtilsDefault.default.lerp(1, pixelSize, Math.random());
+        position.x += r * Math.cos(angle) - 0.5 * size;
+        position.y += r * Math.sin(angle) - 0.5 * size;
+        if (_config.config.pixelPerfect) {
+          position.round();
+          size = Math.ceil(size);
+        }
+        ctx.fillRect(position.x, position.y, size, size);
       }
     }
   }, {
@@ -14143,17 +14219,20 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "move",
     value: function move(data) {
-      var newPoints = this.interpolatePoints(data.position);
+      var width = this.getWidth(data.pressure, data.speed, data.tilt);
+      var position = this.getPosition(data.position, data.tilt, width);
+      var newPoints = this.interpolatePoints({
+        position: position,
+        width: width,
+        tilt: data.tilt,
+        speed: data.speed
+      });
       this._points = this._points.concat(newPoints);
-      var numSegments = newPoints.length;
-      var width = this.getWidth(data.pressure, data.speed);
-      var lastWidth = this._widths[this._widths.length - 1];
-      var maxWidthDifferencePerSegment = 2;
-      var maxWidthDifference = maxWidthDifferencePerSegment * numSegments;
-      width = _utilsUtilsDefault.default.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
-      for (var i = 0; i < numSegments; i++) {
-        this._widths.push(_utilsUtilsDefault.default.lerp(lastWidth, width, i / numSegments));
-      }
+      // const numSegments = newPoints.length;
+      // const lastWidth = this._points[this._points.length - 1];
+      // const maxWidthDifferencePerSegment = 2;
+      // const maxWidthDifference = maxWidthDifferencePerSegment * numSegments;
+      // width = Utils.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
       this.requestDrawPath();
     }
   }, {
@@ -14166,19 +14245,29 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       }
       var start = this._points[this._points.length - 1];
       var end = newPoint;
-      var dist = _utilsPointDefault.default.distance(start, end);
+      var startPosition = start.position;
+      var endPosition = end.position;
+      var startWidth = start.width;
+      var endWidth = end.width;
+      var startTilt = start.tilt;
+      var endTilt = end.tilt;
+      var dist = _utilsPointDefault.default.distance(startPosition, endPosition);
       if (dist < segmentLength) {
         return points;
       }
-      var control = start;
+      var controlPoint = startPosition;
       if (this._points.length > 1) {
-        var tangent = _utilsPointDefault.default.subtract(start, this._points[this._points.length - 2]).normalize();
-        control = _utilsPointDefault.default.add(start, tangent.copy().scale(0.3 * dist));
+        var tangent = _utilsPointDefault.default.subtract(startPosition, this._points[this._points.length - 2].position).normalize();
+        controlPoint = _utilsPointDefault.default.add(startPosition, tangent.copy().scale(0.3 * dist));
       }
       var a = segmentLength / dist;
       for (var i = a; i <= 1; i += a) {
-        var point = this.pointOnQuadraticCurve(start, control, end, i);
-        points.push(point);
+        points.push({
+          position: this.pointOnQuadraticCurve(startPosition, controlPoint, endPosition, i),
+          width: _utilsUtilsDefault.default.lerp(startWidth, endWidth, i),
+          tilt: _utilsPointDefault.default.lerp(startTilt, endTilt, i),
+          speed: _utilsUtilsDefault.default.lerp(start.speed, end.speed, i)
+        });
       }
       return points;
     }
@@ -14194,9 +14283,18 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
     }
   }, {
     key: "getWidth",
-    value: function getWidth(pressure, speed) {
+    value: function getWidth(pressure, speed, tilt) {
+      pressure = _utilsUtilsDefault.default.lerp(0.5, 2, pressure);
       speed = _utilsUtilsDefault.default.clamp(1, 2, speed);
-      return pressure / speed;
+      var tiltVariation = _utilsUtilsDefault.default.lerp(1, 8, Math.max(tilt.x, tilt.y) / 90);
+      return tiltVariation * pressure / speed;
+    }
+  }, {
+    key: "getPosition",
+    value: function getPosition(position, tilt, width) {
+      var tiltInfluence = 0.75;
+      width *= this.lineWidth * 0.5;
+      return _utilsPointDefault.default.add(position, _utilsPointDefault.default.scale(tilt, tiltInfluence * width / 90));
     }
   }, {
     key: "applyAutoMask",
@@ -14213,7 +14311,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   return PenTool;
 })(_Tool2Default.default);
 
-},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7utpK":[function(require,module,exports) {
+},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7utpK":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -20645,4 +20743,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.018019d7.js.map
+//# sourceMappingURL=index.1b6455df.js.map
