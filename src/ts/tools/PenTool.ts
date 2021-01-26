@@ -176,13 +176,21 @@ export default class PenTool extends Tool {
     }
 
     private drawRandomPixelLine(ctx: CanvasRenderingContext2D, start: IPointData, end: IPointData) {
-        const pixelSize = 2 * Utils.clamp(1, 6, start.width);
+        const maxPixelCount = 500;
+        
+        let pixelSize = 2 * Utils.clamp(1, 6, start.width);
         const tiltInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
         //const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
         const density = tiltInfluence * 0.1 / Utils.clamp(1, 5, start.speed);
         const dist = Point.distance(start.position, end.position);
         const averageWidth = 0.5 * (start.width + end.width) * this.lineWidth;
-        const pixelCount = (dist + averageWidth) * averageWidth * density;
+        let pixelCount = (dist + averageWidth) * averageWidth * density;
+        
+        if (pixelCount > maxPixelCount){
+            pixelSize *= pixelCount / maxPixelCount;
+            pixelCount = maxPixelCount;
+        }
+        
         for (let i = 0; i < pixelCount; i++) {
             const a = Math.random();
             const position = Point.lerp(start.position, end.position, a);
@@ -190,9 +198,9 @@ export default class PenTool extends Tool {
             const radius = Math.max(0, 0.5 * width - pixelSize);
 
             // use this for even distribution:
-            // const r = radius * Math.sqrt(Math.random());
+            const r = radius * Math.sqrt(Math.random());
             // this will focus distribution to the center:
-            const r = radius * Math.random();
+            // const r = radius * Math.random();
             const angle = Math.random() * 2 * Math.PI;
 
             let size = Utils.lerp(1, pixelSize, Math.random());

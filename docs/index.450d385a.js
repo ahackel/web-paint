@@ -14178,6 +14178,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "drawRandomPixelLine",
     value: function drawRandomPixelLine(ctx, start, end) {
+      var maxPixelCount = 500;
       var pixelSize = 2 * _utilsUtilsDefault.default.clamp(1, 6, start.width);
       var tiltInfluence = _utilsUtilsDefault.default.lerp(1, 0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
       // const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
@@ -14185,15 +14186,19 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       var dist = _utilsPointDefault.default.distance(start.position, end.position);
       var averageWidth = 0.5 * (start.width + end.width) * this.lineWidth;
       var pixelCount = (dist + averageWidth) * averageWidth * density;
+      if (pixelCount > maxPixelCount) {
+        pixelSize *= pixelCount / maxPixelCount;
+        pixelCount = maxPixelCount;
+      }
       for (var i = 0; i < pixelCount; i++) {
         var a = Math.random();
         var position = _utilsPointDefault.default.lerp(start.position, end.position, a);
         var width = _utilsUtilsDefault.default.lerp(start.width, end.width, a) * this.lineWidth;
         var radius = Math.max(0, 0.5 * width - pixelSize);
         // use this for even distribution:
-        // const r = radius * Math.sqrt(Math.random());
+        var r = radius * Math.sqrt(Math.random());
         // this will focus distribution to the center:
-        var r = radius * Math.random();
+        // const r = radius * Math.random();
         var angle = Math.random() * 2 * Math.PI;
         var size = _utilsUtilsDefault.default.lerp(1, pixelSize, Math.random());
         position.x += r * Math.cos(angle) - 0.5 * size;
@@ -20743,4 +20748,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.1b6455df.js.map
+//# sourceMappingURL=index.450d385a.js.map
