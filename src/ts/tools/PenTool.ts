@@ -161,27 +161,27 @@ export default class PenTool extends Tool {
         if (pointCount == 0){
             return;
         }
-        
-        ctx.globalAlpha = 0.5;
-        
+
+        // ctx.globalAlpha = 0.75;
+
         if (pointCount == 1){
-            this.drawRandomPixelLine(ctx, points[0], points[0], 500);
+            this.drawRandomPixelLine(ctx, points[0], points[0]);
             return;
         }
         
         for (let i = 1; i < pointCount; i++) {
             this.drawRandomPixelLine(ctx, points[i-1], points[i])
         }
-        ctx.globalAlpha = 1;
+        // ctx.globalAlpha = 1;
     }
 
-    private drawRandomPixelLine(ctx: CanvasRenderingContext2D, start: IPointData, end: IPointData, maxPixelCount = 300) {
-        let pixelSize = 2 * Utils.clamp(1, 6, start.width);
+    private drawRandomPixelLine(ctx: CanvasRenderingContext2D, start: IPointData, end: IPointData, maxPixelCount = 200) {
+        const averageWidth = 0.5 * (start.width + end.width);
+        let pixelSize = Utils.clamp(1, 12, averageWidth);
         const tiltInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
         //const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
-        const density = tiltInfluence * 0.1 / Utils.clamp(1, 5, start.speed);
+        const density = tiltInfluence * 0.03 / Utils.clamp(1, 5, start.speed);
         const dist = Point.distance(start.position, end.position);
-        const averageWidth = 0.5 * (start.width + end.width) * this.lineWidth;
         let pixelCount = (dist + averageWidth) * averageWidth * density;
         
         if (pixelCount > maxPixelCount){
@@ -189,11 +189,15 @@ export default class PenTool extends Tool {
             pixelCount = maxPixelCount;
         }
         
+        ctx.beginPath();
+        
         for (let i = 0; i < pixelCount; i++) {
             const a = Math.random();
             const position = Point.lerp(start.position, end.position, a);
-            const width = Utils.lerp(start.width, end.width, a) * this.lineWidth;
-            const radius = Math.max(0, 0.5 * width - pixelSize);
+            const width = Utils.lerp(start.width, end.width, a);
+
+            let size = Utils.lerp(1, pixelSize, Math.random());
+            const radius = Math.max(0, 0.5 * (width - size));
 
             // use this for even distribution:
             const r = radius * Math.sqrt(Math.random());
@@ -201,17 +205,19 @@ export default class PenTool extends Tool {
             // const r = radius * Math.random();
             const angle = Math.random() * 2 * Math.PI;
 
-            let size = Utils.lerp(1, pixelSize, Math.random());
-            position.x += r * Math.cos(angle) - 0.5 * size;
-            position.y += r * Math.sin(angle) - 0.5 * size;
+            position.x += r * Math.cos(angle);// - 0.5 * size;
+            position.y += r * Math.sin(angle);// - 0.5 * size;
             
             if (config.pixelPerfect){
                 position.round();
                 size = Math.ceil(size);
             }
             
-            ctx.fillRect(position.x, position.y, size, size);
+            ctx.arc(position.x, position.y, 0.5 * size, 0, Math.PI * 2);
+            ctx.closePath();
+            //ctx.fillRect(position.x, position.y, size, size);
         }
+        ctx.fill();
     }
 
     drawBrush(ctx: CanvasRenderingContext2D, x: number, y: number, width: number){
@@ -301,7 +307,7 @@ export default class PenTool extends Tool {
         pressure = Utils.lerp(0.5, 2, pressure);
         speed = Utils.clamp(1, 2, speed);
         const tiltVariation = Utils.lerp(1, 8, Math.max(tilt.x, tilt.y) / 90);
-        return tiltVariation * pressure / speed; // range: 0.5 - 1
+        return this.lineWidth * tiltVariation * pressure / speed; // range: 0.5 - 1
     }
 
     getPosition(position: Point, tilt: Point, width: number): Point {

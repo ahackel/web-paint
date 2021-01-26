@@ -203,7 +203,7 @@ export class PaintView extends View {
         
         this._tools = [];
         // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
-        this.markerTool = this.addTool(new PenTool(this, "tool-pen", "darken"));
+        this.markerTool = this.addTool(new PenTool(this, "tool-pen", "source-over"));
         this.eraserTool = this.addTool(new PenTool(this, "tool-eraser", "destination-out"));
         this.selectionTool = <SelectionTool>this.addTool(new SelectionTool(this, "tool-selection"));
         // this.paintBucketTool = this.addTool(new PaintBucketTool(this));

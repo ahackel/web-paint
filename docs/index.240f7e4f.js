@@ -8412,7 +8412,7 @@ var config = {
   fullScreenCanvas: true,
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
   // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
-  pixelPerfect: true,
+  pixelPerfect: false,
   // Make sure to perform painting operations on rounded pixel positions
   // Make sure to perform painting operations on rounded pixel positions
   imageSmoothing: true,
@@ -12805,7 +12805,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       });
       this._tools = [];
       // this.brushTool = this.addTool(new PenTool(this, "tool-", "source-over"));
-      this.markerTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-pen", "darken"));
+      this.markerTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-pen", "source-over"));
       this.eraserTool = this.addTool(new _toolsPenToolDefault.default(this, "tool-eraser", "destination-out"));
       this.selectionTool = this.addTool(new _toolsSelectionToolDefault.default(this, "tool-selection"));
       // this.paintBucketTool = this.addTool(new PaintBucketTool(this));
@@ -14165,50 +14165,54 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       if (pointCount == 0) {
         return;
       }
-      ctx.globalAlpha = 0.5;
+      // ctx.globalAlpha = 0.75;
       if (pointCount == 1) {
-        this.drawRandomPixelLine(ctx, points[0], points[0], 500);
+        this.drawRandomPixelLine(ctx, points[0], points[0]);
         return;
       }
       for (var i = 1; i < pointCount; i++) {
         this.drawRandomPixelLine(ctx, points[i - 1], points[i]);
       }
-      ctx.globalAlpha = 1;
     }
   }, {
     key: "drawRandomPixelLine",
     value: function drawRandomPixelLine(ctx, start, end) {
-      var maxPixelCount = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 300;
-      var pixelSize = 2 * _utilsUtilsDefault.default.clamp(1, 6, start.width);
+      var maxPixelCount = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 200;
+      var averageWidth = 0.5 * (start.width + end.width);
+      var pixelSize = _utilsUtilsDefault.default.clamp(1, 12, averageWidth);
       var tiltInfluence = _utilsUtilsDefault.default.lerp(1, 0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
       // const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
-      var density = tiltInfluence * 0.1 / _utilsUtilsDefault.default.clamp(1, 5, start.speed);
+      var density = tiltInfluence * 0.03 / _utilsUtilsDefault.default.clamp(1, 5, start.speed);
       var dist = _utilsPointDefault.default.distance(start.position, end.position);
-      var averageWidth = 0.5 * (start.width + end.width) * this.lineWidth;
       var pixelCount = (dist + averageWidth) * averageWidth * density;
       if (pixelCount > maxPixelCount) {
         pixelSize *= pixelCount / maxPixelCount;
         pixelCount = maxPixelCount;
       }
+      ctx.beginPath();
       for (var i = 0; i < pixelCount; i++) {
         var a = Math.random();
         var position = _utilsPointDefault.default.lerp(start.position, end.position, a);
-        var width = _utilsUtilsDefault.default.lerp(start.width, end.width, a) * this.lineWidth;
-        var radius = Math.max(0, 0.5 * width - pixelSize);
+        var width = _utilsUtilsDefault.default.lerp(start.width, end.width, a);
+        var size = _utilsUtilsDefault.default.lerp(1, pixelSize, Math.random());
+        var radius = Math.max(0, 0.5 * (width - size));
         // use this for even distribution:
         var r = radius * Math.sqrt(Math.random());
         // this will focus distribution to the center:
         // const r = radius * Math.random();
         var angle = Math.random() * 2 * Math.PI;
-        var size = _utilsUtilsDefault.default.lerp(1, pixelSize, Math.random());
-        position.x += r * Math.cos(angle) - 0.5 * size;
-        position.y += r * Math.sin(angle) - 0.5 * size;
+        position.x += r * Math.cos(angle);
+        // - 0.5 * size;
+        position.y += r * Math.sin(angle);
+        // - 0.5 * size;
         if (_config.config.pixelPerfect) {
           position.round();
           size = Math.ceil(size);
         }
-        ctx.fillRect(position.x, position.y, size, size);
+        ctx.arc(position.x, position.y, 0.5 * size, 0, Math.PI * 2);
+        ctx.closePath();
       }
+      ctx.fill();
     }
   }, {
     key: "drawBrush",
@@ -14292,7 +14296,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       pressure = _utilsUtilsDefault.default.lerp(0.5, 2, pressure);
       speed = _utilsUtilsDefault.default.clamp(1, 2, speed);
       var tiltVariation = _utilsUtilsDefault.default.lerp(1, 8, Math.max(tilt.x, tilt.y) / 90);
-      return tiltVariation * pressure / speed;
+      return this.lineWidth * tiltVariation * pressure / speed;
     }
   }, {
     key: "getPosition",
@@ -20748,4 +20752,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.364e6b6b.js.map
+//# sourceMappingURL=index.240f7e4f.js.map
