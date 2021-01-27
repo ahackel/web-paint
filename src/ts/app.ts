@@ -6,7 +6,7 @@ import DropboxAuthView from "./views/DropboxAuthView";
 import {config} from "./config";
 import PeerToPeer from "./PeerToPeer";
 import SettingsView from "./views/SettingsView";
-import * as PIXI from 'pixi.js';
+// import * as PIXI from 'pixi.js';
 
 class App {
     private _activeView: View;
@@ -21,13 +21,13 @@ class App {
         
         //PeerToPeer.createInstance();
         
-        const pixiApp = new PIXI.Application();
-        document.body.prepend(pixiApp.view);
-        const graphics = new PIXI.Graphics();
-        graphics.beginFill(0xFFFF00);
-        graphics.drawCircle(50, 40, 100);
-        graphics.endFill();
-        pixiApp.stage.addChild(graphics);
+        // const pixiApp = new PIXI.Application();
+        // document.body.prepend(pixiApp.view);
+        // const graphics = new PIXI.Graphics();
+        // graphics.beginFill(0xFFFF00);
+        // graphics.drawCircle(50, 40, 100);
+        // graphics.endFill();
+        // pixiApp.stage.addChild(graphics);
         
         
         this._sheet = document.getElementById("sheet")
