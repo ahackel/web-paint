@@ -57,7 +57,7 @@ export default class Point {
     normalize() {
         const length = this.length();
         if (length == 0){
-            return;
+            return this;
         }
         this.x /= length;
         this.y /= length;

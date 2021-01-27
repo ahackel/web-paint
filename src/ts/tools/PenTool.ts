@@ -162,7 +162,7 @@ export default class PenTool extends Tool {
             return;
         }
 
-        // ctx.globalAlpha = 0.75;
+        ctx.globalAlpha = 0.8;
 
         if (pointCount == 1){
             this.drawRandomPixelLine(ctx, points[0], points[0]);
@@ -172,15 +172,21 @@ export default class PenTool extends Tool {
         for (let i = 1; i < pointCount; i++) {
             this.drawRandomPixelLine(ctx, points[i-1], points[i])
         }
-        // ctx.globalAlpha = 1;
+        ctx.globalAlpha = 1;
     }
+    
+    _lastTangent: Point = new Point(1, 0)
 
-    private drawRandomPixelLine(ctx: CanvasRenderingContext2D, start: IPointData, end: IPointData, maxPixelCount = 200) {
+    private drawRandomPixelLine(ctx: CanvasRenderingContext2D, start: IPointData, end: IPointData, maxPixelCount = 300) {
+        // TODO: Get correct angle:
+        const altitude = Math.max(Math.abs(start.tilt.x), Math.abs(start.tilt.y));
+        start.width = Utils.lerp(3, 100, Math.pow(altitude / 90, 4));
+        end.width = start.width;
         const averageWidth = 0.5 * (start.width + end.width);
-        let pixelSize = Utils.clamp(1, 12, averageWidth);
+        let pixelSize = Utils.clamp(2, 12, averageWidth * 0.5);
         const tiltInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
         //const pressureInfluence = Utils.lerp(1,0.1, Math.max(start.tilt.x, start.tilt.y) / 90);
-        const density = tiltInfluence * 0.03 / Utils.clamp(1, 5, start.speed);
+        const density = tiltInfluence * 0.1 / Utils.clamp(1, 5, start.speed);
         const dist = Point.distance(start.position, end.position);
         let pixelCount = (dist + averageWidth) * averageWidth * density;
         
@@ -190,6 +196,11 @@ export default class PenTool extends Tool {
         }
         
         ctx.beginPath();
+//        const tangent = dist == 0 ? this._lastTangent : Point.subtract(start.position, end.position).normalize();
+        const tangent = start.tilt.normalize();
+        this._lastTangent = tangent;
+        // const normal = new Point(-tangent.y, tangent.x);
+        const normal = start.tilt.normalize();
         
         for (let i = 0; i < pixelCount; i++) {
             const a = Math.random();
@@ -205,8 +216,8 @@ export default class PenTool extends Tool {
             // const r = radius * Math.random();
             const angle = Math.random() * 2 * Math.PI;
 
-            position.x += r * Math.cos(angle);// - 0.5 * size;
-            position.y += r * Math.sin(angle);// - 0.5 * size;
+            const offset = Point.scale(normal,radius * Utils.lerp(-1, 1, Math.pow(Math.random(), 3)));
+            position.add(offset);
             
             if (config.pixelPerfect){
                 position.round();
@@ -312,8 +323,7 @@ export default class PenTool extends Tool {
 
     getPosition(position: Point, tilt: Point, width: number): Point {
         const tiltInfluence = 0.75;
-        width *= this.lineWidth * 0.5;
-        return Point.add(position, Point.scale(tilt, tiltInfluence * width / 90));
+        return Point.add(position, Point.scale(tilt, tiltInfluence * 0.5 * width / 90));
     }
 
     private applyAutoMask() {
