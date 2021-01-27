@@ -21,6 +21,7 @@ import ImageLayer from "../ImageLayer ";
 import SelectionTool from "../tools/SelectionTool";
 import {Toolbar} from "../Toolbar";
 import {History} from "../History";
+import * as PIXI from 'pixi.js';
 
 // var Pressure = require('pressure');
 export interface IPointerData {
@@ -81,6 +82,15 @@ export class PaintView extends View {
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
+
+        const pixiApp = new PIXI.Application();
+        this._element.appendChild(pixiApp.view);
+        
+        const graphics = new PIXI.Graphics();
+        graphics.beginFill(0xFFFF00);
+        graphics.drawCircle(50, 40, 100);
+        graphics.endFill();
+        pixiApp.stage.addChild(graphics);
         
         this._history = new History();
         this._sheet = document.getElementById("sheet");
@@ -90,6 +100,7 @@ export class PaintView extends View {
         Utils.log(`Setting PaintView size to ${this.width} x ${this.height}`);
 
         this.addCanvasLayer("base-layer", 0, 0, this.width, this.height,false);
+        this.baseLayer.canvas.classList.add("hidden");
         this.addEventListeners();
         this.createButtons(onBackClicked);
         this.createToolbar();
