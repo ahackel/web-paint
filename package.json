@@ -13,7 +13,8 @@
     "start": "cp -r static/* dist/; parcel serve ./src/index.html",
     "build": "parcel build ./src/index.html --no-scope-hoist",
     "postbuild": "cp -r static/* docs/",
-    "publish": "git push"
+    "publish": "git push",
+    "local": "cd docs; python -m SimpleHTTPServer"
   },
   "devDependencies": {
     "parcel": "^2.0.0-nightly.540",
