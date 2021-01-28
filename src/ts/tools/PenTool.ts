@@ -13,7 +13,7 @@ interface IPointData {
     speed: number
 }
 
-const maxParticles = 500;
+const maxParticles = 5000;
 
 // Paints lines with varying stroke width
 export default class PenTool extends Tool {
@@ -63,7 +63,7 @@ export default class PenTool extends Tool {
             this._particles.push(particle);
             this._brush.addChild(particle);
         }
-        // this._painter.baseLayer.sprite.addChild(this._brush);
+        this._painter.baseLayer.sprite.addChild(this._brush);
     }
 
     down(data: IPointerData): void {
@@ -112,7 +112,7 @@ export default class PenTool extends Tool {
         //     this.drawRandomPixelLines(ctx, this._points.slice(this._startIndex));
         // }
         
-        this._startIndex = Math.max(0, this._points.length - 1);
+        // this._startIndex = Math.max(0, this._points.length - 1);
     }
     
     drawConnectedLines(points: IPointData[]){
@@ -140,8 +140,8 @@ export default class PenTool extends Tool {
             particle.y = point.position.y;
         }
         
-        const rt = <PIXI.RenderTexture>this._painter.baseLayer.sprite.texture;
-        this._painter.pixi.renderer.render(this._brush, rt, false, null, true);
+        // const rt = <PIXI.RenderTexture>this._painter.baseLayer.sprite.texture;
+        // this._painter.pixi.renderer.render(this._brush, rt, false, null, true);
 
             // ctx.lineCap = "round";
         // ctx.lineJoin = "round";
@@ -239,16 +239,6 @@ export default class PenTool extends Tool {
             //ctx.fillRect(position.x, position.y, size, size);
         }
         ctx.fill();
-    }
-
-    drawBrush(ctx: CanvasRenderingContext2D, x: number, y: number, width: number){
-        let radius = width * 0.5;
-        x -= radius;
-        y -= radius;
-        // x = Math.floor(x - radius);
-        // y = Math.floor(y - radius);
-        // width = Math.ceil(width);
-        ctx.drawImage(this._brushCtx.canvas, x, y, width, width);
     }
 
     move(data: IPointerData): void {

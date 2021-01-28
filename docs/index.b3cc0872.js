@@ -13873,7 +13873,7 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
-var maxParticles = 500;
+var maxParticles = 5000;
 // Paints lines with varying stroke width
 var PenTool = /*#__PURE__*/(function (_Tool) {
   _inherits(PenTool, _Tool);
@@ -13916,6 +13916,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         this._particles.push(particle);
         this._brush.addChild(particle);
       }
+      this._painter.baseLayer.sprite.addChild(this._brush);
     }
   }, {
     key: "down",
@@ -13961,10 +13962,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       if (this._mode == "line") {
         this.drawConnectedLines(this._points.slice(this._startIndex));
       }
-      // else if (this._mode == "crayon"){
-      // this.drawRandomPixelLines(ctx, this._points.slice(this._startIndex));
-      // }
-      this._startIndex = Math.max(0, this._points.length - 1);
     }
   }, {
     key: "drawConnectedLines",
@@ -13986,8 +13983,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         particle.x = point.position.x;
         particle.y = point.position.y;
       }
-      var rt = this._painter.baseLayer.sprite.texture;
-      this._painter.pixi.renderer.render(this._brush, rt, false, null, true);
     }
   }, {
     key: "drawRandomPixelLines",
@@ -14052,17 +14047,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         ctx.closePath();
       }
       ctx.fill();
-    }
-  }, {
-    key: "drawBrush",
-    value: function drawBrush(ctx, x, y, width) {
-      var radius = width * 0.5;
-      x -= radius;
-      y -= radius;
-      // x = Math.floor(x - radius);
-      // y = Math.floor(y - radius);
-      // width = Math.ceil(width);
-      ctx.drawImage(this._brushCtx.canvas, x, y, width, width);
     }
   }, {
     key: "move",
@@ -62224,4 +62208,4 @@ parcelRequire = (function (e, r, t, n) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.78a51df1.js.map
+//# sourceMappingURL=index.b3cc0872.js.map
