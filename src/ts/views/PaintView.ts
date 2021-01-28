@@ -6,7 +6,7 @@ import SizePalette from "../palettes/SizePalette";
 import Utils from "../utils/Utils";
 import PenTool from "../tools/PenTool";
 import PaintBucketTool from "../tools/PaintBucketTool";
-import Point from "../utils/Point";
+import Vector from "../math/Vector";
 import {Palette} from "../palettes/Palette";
 import ImageStorage from "../storage/ImageStorage";
 import {config} from "../config";
@@ -25,8 +25,8 @@ import {History} from "../History";
 // var Pressure = require('pressure');
 export interface IPointerData {
     timeStamp: number;
-    position: Point;
-    radius: Point;
+    position: Vector;
+    radius: Vector;
     pressure: number;
     speed: number;
     isPressed: boolean;
@@ -309,7 +309,7 @@ export class PaintView extends View {
             x = Math.round(x);
             y = Math.round(y);
         }
-        return new Point(x, y);
+        return new Vector(x, y);
     }
 
     private getTouchEventPosition(touch: Touch) {
@@ -326,7 +326,7 @@ export class PaintView extends View {
             x = Math.round(x);
             y = Math.round(y);
         }
-        return new Point(x, y);
+        return new Vector(x, y);
     }
     
     private keyDown(event: KeyboardEvent){
@@ -362,7 +362,7 @@ export class PaintView extends View {
         this.down({
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
-            radius: this.screenToSheet(new Point(event.width, event.height)),
+            radius: this.screenToSheet(new Vector(event.width, event.height)),
             pressure: this.getNormalizedPointerPressure(event),
             speed: 1,
             isPressed: true
@@ -378,7 +378,7 @@ export class PaintView extends View {
         this.move({
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
-            radius: this.screenToSheet(new Point(event.width, event.height)),
+            radius: this.screenToSheet(new Vector(event.width, event.height)),
             pressure: this.getNormalizedPointerPressure(event),
             speed: 1,
             isPressed: true
@@ -405,7 +405,7 @@ export class PaintView extends View {
         this.up({
             timeStamp: event.timeStamp,
             position: this.getPointerEventPosition(event),
-            radius: new Point(event.width, event.height),
+            radius: new Vector(event.width, event.height),
             pressure: 1,
             speed: 1,
             isPressed: false
@@ -429,7 +429,7 @@ export class PaintView extends View {
         this.down({
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
-            radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
+            radius: this.screenToSheet(new Vector(touch.radiusX, touch.radiusY)),
             pressure: this.getNormalizedTouchPressure(touch),
             speed: 1,
             isPressed: true
@@ -446,7 +446,7 @@ export class PaintView extends View {
         this.move({
             timeStamp: event.timeStamp,
             position: this.getTouchEventPosition(touch),
-            radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
+            radius: this.screenToSheet(new Vector(touch.radiusX, touch.radiusY)),
             pressure: this.getNormalizedTouchPressure(touch),
             speed: 1,
             isPressed: true
@@ -462,8 +462,8 @@ export class PaintView extends View {
         }
         this.up({
             timeStamp: event.timeStamp,
-            position: new Point(0 ,0),
-            radius: new Point(0 ,0),
+            position: new Vector(0 ,0),
+            radius: new Vector(0 ,0),
             pressure: 1,
             speed: 1,
             isPressed: false
@@ -485,7 +485,7 @@ export class PaintView extends View {
             return;
         }
 
-        let delta = Point.distance(this._lastPointerData.position, data.position);
+        let delta = this._lastPointerData.position.distanceTo(data.position);
 
         if (delta <= 1) {
             return;
@@ -649,7 +649,7 @@ export class PaintView extends View {
         }
     }
 
-    captureAutoMask(position: Point) {
+    captureAutoMask(position: Vector) {
         if (!config.useAutoMask){
             return;
         }
@@ -690,7 +690,7 @@ export class PaintView extends View {
         ctx.putImageData(imageData, 0, 0);
     }
 
-    private screenToSheet(p: Point): Point {
-        return new Point(p.x / screen.width * config.width, p.y / screen.height * config.height);
+    private screenToSheet(p: Vector): Vector {
+        return new Vector(p.x / screen.width * config.width, p.y / screen.height * config.height);
     }
 }

@@ -1,6 +1,6 @@
-import Point from "./Point";
 import {config} from "../config";
 import Rect from "./Rect";
+import Vector from "../math/Vector";
 const Pressure = require('pressure');
 
 let _times: number[] = [];
@@ -257,7 +257,7 @@ export default class Utils {
         return 0xFF000000 + r + (g << 8) + (b << 16);
     }
  
-    public static floodFill(sourceCtx: CanvasRenderingContext2D, mask: Uint8ClampedArray,  startPosition: Point, color: string) {
+    public static floodFill(sourceCtx: CanvasRenderingContext2D, mask: Uint8ClampedArray,  startPosition: Vector, color: string) {
         const threshold = 0.5;
         const width = sourceCtx.canvas.width;
         const height = sourceCtx.canvas.height;
@@ -265,7 +265,7 @@ export default class Utils {
         const sourceData = sourceCtx.getImageData(0, 0, width, height);
         const sourcePixels = sourceData.data;
 
-        startPosition = startPosition.copy().round();
+        startPosition = startPosition.clone().round();
         const startIndex: number = startPosition.x + startPosition.y * width;
         
         // const startR = sourcePixels[startIndex * 4];
@@ -287,19 +287,19 @@ export default class Utils {
         }
 
         // start at multiple positions around start position:
-        let stack: Point[] = [];
+        let stack: Vector[] = [];
         stack.push(startPosition);
         if (startPosition.x > 1){
-            stack.push(new Point(startPosition.x - 2, startPosition.y));
+            stack.push(new Vector(startPosition.x - 2, startPosition.y));
         }
         if (startPosition.x < width - 2){
-            stack.push(new Point(startPosition.x + 2, startPosition.y));
+            stack.push(new Vector(startPosition.x + 2, startPosition.y));
         }
         if (startPosition.y > 1){
-            stack.push(new Point(startPosition.x, startPosition.y - 2));
+            stack.push(new Vector(startPosition.x, startPosition.y - 2));
         }
         if (startPosition.y < height - 2){
-            stack.push(new Point(startPosition.x, startPosition.y + 2));
+            stack.push(new Vector(startPosition.x, startPosition.y + 2));
         }
 
         while (stack.length > 0)
@@ -354,7 +354,7 @@ export default class Utils {
                 if (isBorderPixel(x, y, false)){
                     continue;
                 }
-                stack.push(new Point(x, y));
+                stack.push(new Vector(x, y));
             }
  
         }

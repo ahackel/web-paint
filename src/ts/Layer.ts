@@ -1,6 +1,6 @@
 import {config} from "./config";
 import Utils from "./utils/Utils";
-import Point from "./utils/Point";
+import Vector from "./math/Vector";
 import ILayer from "./ILayer";
 
 interface IPointer {
@@ -19,13 +19,13 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     
     protected _element: T;
     private _index: number;
-    private _pinchCenter: Point;
-    private _localDragPosition: Point;
+    private _pinchCenter: Vector;
+    private _localDragPosition: Vector;
     private _pinchStartDist: number;
     private _pinchStartRotation: number;
     private _startScale: number = 1;
     private _startRotation: number = 0;
-    private _position: Point = new Point(0, 0);
+    private _position: Vector = new Vector(0, 0);
     private _scale: number = 1;
     private _rotation: number = 0;
     private _lastTouchStartTime: number = 0;
@@ -71,7 +71,7 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         this._element.style.pointerEvents = "none";
             
         parent.appendChild(this._element);
-        this.transform(new Point(x, y), 1, 0);
+        this.transform(new Vector(x, y), 1, 0);
         this.bindEventListeners();
     }
     
@@ -93,7 +93,7 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         this._element.height = height;
         this._element.style.width = `${width}em`;
         this._element.style.height = `${height}em`;
-        this.transform(new Point(x, y), this.scale, this.rotation);
+        this.transform(new Vector(x, y), this.scale, this.rotation);
     }
 
     drawToCanvas(ctx: CanvasRenderingContext2D) {
@@ -157,13 +157,13 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
             this._element.addEventListener("pointermove", this.pointerMove);
             this._element.addEventListener("pointerup", this.pointerUp);
 
-            this._pinchCenter = new Point(
+            this._pinchCenter = new Vector(
                 this._position.x + 0.5 * this.width,
                 this._position.y + 0.5 * this.height);
 
             if (event.altKey){
                 let p1 = this.clientToPixel(this._pointers[0]);
-                let p2 = Point.mirror(p1, this._pinchCenter);
+                let p2 = this._pinchCenter.clone().multiplyScalar(2).subtract(p1);
                 this.pinchStart(p1, p2);
             }
             else{
@@ -225,13 +225,13 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
             this._element.addEventListener('touchmove', this.touchMove);
             this._element.addEventListener('touchend', this.touchEnd);
 
-            this._pinchCenter = new Point(
+            this._pinchCenter = new Vector(
                 this._position.x + 0.5 * this.width,
                 this._position.y + 0.5 * this.height);
 
             if (event.altKey){
                 let p1 = this.clientToPixel(event.touches[0]);
-                let p2 = Point.mirror(p1, this._pinchCenter);
+                let p2 = this._pinchCenter.clone().multiplyScalar(2).subtract(p1);
                 this.pinchStart(p1, p2);
             }
             else{
@@ -253,7 +253,7 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         if (pointers.length === 1) {
             if (altKey) {
                 let p1 = this.clientToPixel(pointers[0]);
-                let p2 = Point.mirror(p1, this._pinchCenter);
+                let p2 = this._pinchCenter.clone().multiplyScalar(2).subtract(p1);
                 this.pinchMove(p1, p2);
             } else {
                 this.dragMove(this.clientToPixel(pointers[0]));
@@ -270,7 +270,7 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         this._element.addEventListener('touchend', this.touchEnd);
     }
 
-    transform(position: Point, scale: number, rotation: number) {
+    transform(position: Vector, scale: number, rotation: number) {
         this._position = position;
         this._rotation = rotation;
         this._scale = scale;
@@ -291,32 +291,32 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         this.pointerUp = this.pointerUp.bind(this);
     }
 
-    private dragStart(position: Point) {
-        this._localDragPosition = Point.subtract(position, this.position);
+    private dragStart(position: Vector) {
+        this._localDragPosition = position.clone().subtract(this.position);
     }
 
-    private dragMove(position: Point) {
+    private dragMove(position: Vector) {
         position.subtract(this._localDragPosition);
         this.transform(position, this._scale, this._rotation);
     }
 
-    private pinchStart(p1: Point, p2: Point) {
-        let center = Point.center(p1, p2);
-        this._pinchStartDist = Point.distance(p1, p2);
+    private pinchStart(p1: Vector, p2: Vector) {
+        let center = p1.clone().add(p2).multiplyScalar(0.5);
+        this._pinchStartDist = p1.distanceTo(p2);
         this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
         this._startRotation = this._rotation;
         this._startScale = this._scale;       
     }
 
-    private pinchMove(p1: Point, p2: Point) {
-        let center = Point.center(p1, p2);
-        let distance = Point.distance(p1, p2);
+    private pinchMove(p1: Vector, p2: Vector) {
+        let center = p1.clone().add(p2).multiplyScalar(0.5);
+        let distance = p1.distanceTo(p2);
         let angle = Math.atan2(p1.y - center.y, p1.x - center.x);
         let angleChange = angle - this._pinchStartRotation;
 
         let scale = this._startScale * (distance / this._pinchStartDist);
         scale = Utils.clamp(0.1, 10, scale);
-        let position = Point.center(p1, p2);
+        let position = p1.clone().add(p2).multiplyScalar(0.5);
         position.x -= 0.5 * this.width;
         position.y -= 0.5 * this.height;
 
@@ -336,6 +336,6 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         let x = (isPortraitOrientation ? 1 - ny : nx) * config.width;
         let y = (isPortraitOrientation ? nx : ny) * config.height;
 
-        return new Point(x, y);
+        return new Vector(x, y);
     }
 }

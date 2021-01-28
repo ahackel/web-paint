@@ -1,5 +1,5 @@
 import Tool from "./Tool";
-import Point from "../utils/Point";
+import Vector from "../math/Vector";
 import {PaintView, IPointerData} from "../views/PaintView";
 import Utils from "../utils/Utils";
 
@@ -11,7 +11,7 @@ import Layer from "../Layer";
 export default class PenTool extends Tool {
 
     private _startIndex: number;
-    private _points: Point[];
+    private _points: Vector[];
     private _widths: number[];
     private _drawPathRequested: boolean;
     private _brushCtx: CanvasRenderingContext2D;
@@ -35,7 +35,7 @@ export default class PenTool extends Tool {
     }
 
     down(data: IPointerData): void {
-        this._painter.captureAutoMask(data.position.copy().round());
+        this._painter.captureAutoMask(data.position.clone().round());
         
         this._points = [data.position];
         const width = this.getWidth(data.pressure, data.speed);
@@ -96,11 +96,11 @@ export default class PenTool extends Tool {
         //     const w1 = this._widths[i];
         //     const w2 = this._widths[i+1];
         //
-        //     const dist = Point.distance(p1, p2);
+        //     const dist = Vector.distance(p1, p2);
         //     const step = Math.max(1, 0.125 * Math.min(w1, w2, 64));
         //     for (let d = 0; d <= dist; d += step){
         //         const a = d / dist;
-        //         const p = Point.lerp(p1, p2, a);
+        //         const p = Vector.lerp(p1, p2, a);
         //         const w = Utils.lerp(w1, w2, a);
         //         this.drawBrush(ctx, p.x, p.y, w);
         //     }
@@ -108,7 +108,7 @@ export default class PenTool extends Tool {
         this._startIndex = Math.max(0, this._points.length - 1);
     }
     
-    drawConnectedLines(ctx: CanvasRenderingContext2D, points: Point[], widths: number[]){
+    drawConnectedLines(ctx: CanvasRenderingContext2D, points: Vector[], widths: number[]){
         const pointCount = points.length;
         if (pointCount == 0){
             return;
@@ -165,9 +165,9 @@ export default class PenTool extends Tool {
         this.requestDrawPath();
     }
 
-    private interpolatePoints(newPoint: Point): Point[] {
+    private interpolatePoints(newPoint: Vector): Vector[] {
         const segmentLength = Math.max(4, 0.1 * this.lineWidth);
-        const points: Point[] = [];
+        const points: Vector[] = [];
         
         if (this._points.length == 0){
             return;
@@ -175,7 +175,7 @@ export default class PenTool extends Tool {
         
         const start = this._points[this._points.length - 1];
         const end = newPoint;
-        const dist = Point.distance(start, end);
+        const dist = start.distanceTo(end);
 
         if (dist < segmentLength){
             return points;
@@ -183,23 +183,27 @@ export default class PenTool extends Tool {
 
         let control = start;
         if (this._points.length > 1){
-            const tangent = Point.subtract(start, this._points[this._points.length - 2]).normalize();
-            control = Point.add(start, tangent.copy().scale(0.3 * dist));
+            const previous = this._points[this._points.length - 2];
+            const tangent = start.clone().subtract(previous).normalize();
+            control = start.clone().add(tangent.clone().multiplyScalar(0.3 * dist));
         }
         
         const a = segmentLength / dist;
         for (let i = a; i <= 1; i += a) {
-            const point = this.pointOnQuadraticCurve(start, control, end, i);
-            points.push(point);
+            const Vector = this.pointOnQuadraticCurve(start, control, end, i);
+            points.push(Vector);
         }
         return points;
     }
 
-    private pointOnQuadraticCurve(start : Point, control: Point, end: Point, a: number): Point {
-        return Point.add(Point.scale(start, (1 - a) * (1 - a)),
-            Point.scale(control, 2 * a * (1 - a)),
-            Point.scale(end, a * a)
-        );
+    private pointOnQuadraticCurve(start : Vector, control: Vector, end: Vector, a: number): Vector {
+        const f1 = (1 - a) * (1 - a);
+        const f2 = 2 * a * (1 - a);
+        const f3 = a * a;
+        
+        return new Vector(
+            start.x * f1 + control.x * f2 + end.x * f3,
+            start.y * f1 + control.y * f2 + end.y * f3);
     }
 
     pressureChanged(){

@@ -8561,11 +8561,11 @@ _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
   return Utils;
 });
-var _Point = require("./Point");
-var _PointDefault = _parcelHelpers.interopDefault(_Point);
 var _config = require("../config");
 var _Rect = require("./Rect");
 var _RectDefault = _parcelHelpers.interopDefault(_Rect);
+var _mathVector = require("../math/Vector");
+var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8839,7 +8839,7 @@ var Utils = /*#__PURE__*/(function () {
       var height = sourceCtx.canvas.height;
       var sourceData = sourceCtx.getImageData(0, 0, width, height);
       var sourcePixels = sourceData.data;
-      startPosition = startPosition.copy().round();
+      startPosition = startPosition.clone().round();
       var startIndex = startPosition.x + startPosition.y * width;
       // const startR = sourcePixels[startIndex * 4];
       // const startG = sourcePixels[startIndex * 4 + 1];
@@ -8859,16 +8859,16 @@ var Utils = /*#__PURE__*/(function () {
       var stack = [];
       stack.push(startPosition);
       if (startPosition.x > 1) {
-        stack.push(new _PointDefault.default(startPosition.x - 2, startPosition.y));
+        stack.push(new _mathVectorDefault.default(startPosition.x - 2, startPosition.y));
       }
       if (startPosition.x < width - 2) {
-        stack.push(new _PointDefault.default(startPosition.x + 2, startPosition.y));
+        stack.push(new _mathVectorDefault.default(startPosition.x + 2, startPosition.y));
       }
       if (startPosition.y > 1) {
-        stack.push(new _PointDefault.default(startPosition.x, startPosition.y - 2));
+        stack.push(new _mathVectorDefault.default(startPosition.x, startPosition.y - 2));
       }
       if (startPosition.y < height - 2) {
-        stack.push(new _PointDefault.default(startPosition.x, startPosition.y + 2));
+        stack.push(new _mathVectorDefault.default(startPosition.x, startPosition.y + 2));
       }
       while (stack.length > 0) {
         var pos = stack.pop();
@@ -8908,7 +8908,7 @@ var Utils = /*#__PURE__*/(function () {
           if (isBorderPixel(x, y, false)) {
             continue;
           }
-          stack.push(new _PointDefault.default(x, y));
+          stack.push(new _mathVectorDefault.default(x, y));
         }
       }
       function isBorderPixel(x, y, setValue) {
@@ -9012,152 +9012,7 @@ var Utils = /*#__PURE__*/(function () {
   return Utils;
 })();
 
-},{"./Point":"6AhXm","../config":"1tzQg","./Rect":"3WeR4","pressure":"7hv3G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6AhXm":[function(require,module,exports) {
-var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
-_parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return Point;
-});
-var _Utils = require("./Utils");
-var _UtilsDefault = _parcelHelpers.interopDefault(_Utils);
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-var Point = /*#__PURE__*/(function () {
-  function Point(x, y) {
-    _classCallCheck(this, Point);
-    this.x = x;
-    this.y = y;
-  }
-  _createClass(Point, [{
-    key: "copy",
-    value: function copy() {
-      return new Point(this.x, this.y);
-    }
-  }, {
-    key: "add",
-    value: function add(p) {
-      this.x += p.x;
-      this.y += p.y;
-      return this;
-    }
-  }, {
-    key: "subtract",
-    value: function subtract(p) {
-      this.x -= p.x;
-      this.y -= p.y;
-      return this;
-    }
-  }, {
-    key: "round",
-    value: function round() {
-      this.x = Math.round(this.x);
-      this.y = Math.round(this.y);
-      return this;
-    }
-  }, {
-    key: "clamp",
-    value: function clamp(minX, minY, maxX, maxY) {
-      this.x = _UtilsDefault.default.clamp(minX, maxX, this.x);
-      this.y = _UtilsDefault.default.clamp(minY, maxY, this.y);
-      return this;
-    }
-  }, {
-    key: "length",
-    value: function length() {
-      return Math.sqrt(this.x * this.x + this.y * this.y);
-    }
-  }, {
-    key: "normalize",
-    value: function normalize() {
-      var length = this.length();
-      if (length == 0) {
-        return;
-      }
-      this.x /= length;
-      this.y /= length;
-      return this;
-    }
-  }, {
-    key: "scale",
-    value: function scale(f) {
-      this.x *= f;
-      this.y *= f;
-      return this;
-    }
-  }], [{
-    key: "add",
-    value: function add(a) {
-      var sum = a.copy();
-      for (var _len = arguments.length, rest = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        rest[_key - 1] = arguments[_key];
-      }
-      for (var _i = 0, _rest = rest; _i < _rest.length; _i++) {
-        var point = _rest[_i];
-        sum.x += point.x;
-        sum.y += point.y;
-      }
-      return sum;
-    }
-  }, {
-    key: "subtract",
-    value: function subtract(a, b) {
-      return new Point(a.x - b.x, a.y - b.y);
-    }
-  }, {
-    key: "scale",
-    value: function scale(p, f) {
-      return new Point(p.x * f, p.y * f);
-    }
-  }, {
-    key: "distance",
-    value: function distance(a, b) {
-      var dx = a.x - b.x;
-      var dy = a.y - b.y;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-  }, {
-    key: "center",
-    value: function center(a, b) {
-      return new Point(0.5 * (a.x + b.x), 0.5 * (a.y + b.y));
-    }
-  }, {
-    key: "mirror",
-    value: function mirror(p, center) {
-      return new Point(2 * center.x - p.x, 2 * center.y - p.y);
-    }
-  }, {
-    key: "lerp",
-    value: function lerp(p1, p2, a) {
-      return new Point(p1.x * (1 - a) + p2.x * a, p1.y * (1 - a) + p2.y * a);
-    }
-  }, {
-    key: "cosInterp",
-    value: function cosInterp(p1, p2, a) {
-      var a2 = (1 - Math.cos(a * Math.PI)) / 2;
-      return new Point(p1.x * (1 - a) + p2.x * a, p1.y * (1 - a2) + p2.y * a2);
-    }
-  }]);
-  return Point;
-})();
-
-},{"./Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"3WeR4":[function(require,module,exports) {
+},{"../config":"1tzQg","./Rect":"3WeR4","../math/Vector":"1B3oQ","pressure":"7hv3G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"3WeR4":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -9225,7 +9080,143 @@ var Rect = /*#__PURE__*/(function () {
   return Rect;
 })();
 
-},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7hv3G":[function(require,module,exports) {
+},{"@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1B3oQ":[function(require,module,exports) {
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "default", function () {
+  return Vector;
+});
+var _utilsUtils = require("../utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+var Vector = /*#__PURE__*/(function () {
+  function Vector() {
+    var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    _classCallCheck(this, Vector);
+    this.x = x;
+    this.y = y;
+  }
+  _createClass(Vector, [{
+    key: "set",
+    value: function set() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : x;
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+  }, {
+    key: "clone",
+    value: function clone() {
+      return new Vector(this.x, this.y);
+    }
+  }, {
+    key: "add",
+    value: function add(v) {
+      this.x += v.x;
+      this.y += v.y;
+      return this;
+    }
+  }, {
+    key: "subtract",
+    value: function subtract(v) {
+      this.x -= v.x;
+      this.y -= v.y;
+      return this;
+    }
+  }, {
+    key: "round",
+    value: function round() {
+      this.x = Math.round(this.x);
+      this.y = Math.round(this.y);
+      return this;
+    }
+  }, {
+    key: "clamp",
+    value: function clamp(minX, minY, maxX, maxY) {
+      this.x = _utilsUtilsDefault.default.clamp(minX, maxX, this.x);
+      this.y = _utilsUtilsDefault.default.clamp(minY, maxY, this.y);
+      return this;
+    }
+  }, {
+    key: "invert",
+    value: function invert() {
+      this.x *= -1;
+      this.y *= -1;
+      return this;
+    }
+  }, {
+    key: "multiplyScalar",
+    value: function multiplyScalar(s) {
+      this.x *= s;
+      this.y *= s;
+      return this;
+    }
+  }, {
+    key: "divideScalar",
+    value: function divideScalar(s) {
+      if (s === 0) {
+        this.x = 0;
+        this.y = 0;
+      } else {
+        var invScalar = 1 / s;
+        this.x *= invScalar;
+        this.y *= invScalar;
+      }
+      return this;
+    }
+  }, {
+    key: "length",
+    value: function length() {
+      return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+  }, {
+    key: "normalize",
+    value: function normalize() {
+      return this.divideScalar(this.length());
+    }
+  }, {
+    key: "distanceToSq",
+    value: function distanceToSq(v) {
+      var dx = this.x - v.x, dy = this.y - v.y;
+      return dx * dx + dy * dy;
+    }
+  }, {
+    key: "distanceTo",
+    value: function distanceTo(v) {
+      return Math.sqrt(this.distanceToSq(v));
+    }
+  }, {
+    key: "lerp",
+    value: function lerp(v, alpha) {
+      this.x += (v.x - this.x) * alpha;
+      this.y += (v.y - this.y) * alpha;
+      return this;
+    }
+  }]);
+  return Vector;
+})();
+
+},{"../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7hv3G":[function(require,module,exports) {
 var define;
 // Pressure v2.2.0 | Created By Stuart Yamartino | MIT License | 2015 - 2020
 !(function (e, t) {
@@ -12484,8 +12475,8 @@ var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _toolsPenTool = require("../tools/PenTool");
 var _toolsPenToolDefault = _parcelHelpers.interopDefault(_toolsPenTool);
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+var _mathVector = require("../math/Vector");
+var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 var _palettesPalette = require("../palettes/Palette");
 var _storageImageStorage = require("../storage/ImageStorage");
 var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
@@ -12924,7 +12915,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         x = Math.round(x);
         y = Math.round(y);
       }
-      return new _utilsPointDefault.default(x, y);
+      return new _mathVectorDefault.default(x, y);
     }
   }, {
     key: "getTouchEventPosition",
@@ -12939,7 +12930,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
         x = Math.round(x);
         y = Math.round(y);
       }
-      return new _utilsPointDefault.default(x, y);
+      return new _mathVectorDefault.default(x, y);
     }
   }, {
     key: "keyDown",
@@ -12973,7 +12964,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.down({
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
-        radius: this.screenToSheet(new _utilsPointDefault.default(event.width, event.height)),
+        radius: this.screenToSheet(new _mathVectorDefault.default(event.width, event.height)),
         pressure: this.getNormalizedPointerPressure(event),
         speed: 1,
         isPressed: true
@@ -12989,7 +12980,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.move({
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
-        radius: this.screenToSheet(new _utilsPointDefault.default(event.width, event.height)),
+        radius: this.screenToSheet(new _mathVectorDefault.default(event.width, event.height)),
         pressure: this.getNormalizedPointerPressure(event),
         speed: 1,
         isPressed: true
@@ -13017,7 +13008,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.up({
         timeStamp: event.timeStamp,
         position: this.getPointerEventPosition(event),
-        radius: new _utilsPointDefault.default(event.width, event.height),
+        radius: new _mathVectorDefault.default(event.width, event.height),
         pressure: 1,
         speed: 1,
         isPressed: false
@@ -13039,7 +13030,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.down({
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
-        radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
+        radius: this.screenToSheet(new _mathVectorDefault.default(touch.radiusX, touch.radiusY)),
         pressure: this.getNormalizedTouchPressure(touch),
         speed: 1,
         isPressed: true
@@ -13057,7 +13048,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this.move({
         timeStamp: event.timeStamp,
         position: this.getTouchEventPosition(touch),
-        radius: this.screenToSheet(new _utilsPointDefault.default(touch.radiusX, touch.radiusY)),
+        radius: this.screenToSheet(new _mathVectorDefault.default(touch.radiusX, touch.radiusY)),
         pressure: this.getNormalizedTouchPressure(touch),
         speed: 1,
         isPressed: true
@@ -13074,8 +13065,8 @@ var PaintView = /*#__PURE__*/(function (_View) {
       }
       this.up({
         timeStamp: event.timeStamp,
-        position: new _utilsPointDefault.default(0, 0),
-        radius: new _utilsPointDefault.default(0, 0),
+        position: new _mathVectorDefault.default(0, 0),
+        radius: new _mathVectorDefault.default(0, 0),
         pressure: 1,
         speed: 1,
         isPressed: false
@@ -13088,7 +13079,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       if (!this._currentTool) {
         return;
       }
-      var delta = _utilsPointDefault.default.distance(this._lastPointerData.position, data.position);
+      var delta = this._lastPointerData.position.distanceTo(data.position);
       if (delta <= 1) {
         return;
       }
@@ -13307,7 +13298,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "screenToSheet",
     value: function screenToSheet(p) {
-      return new _utilsPointDefault.default(p.x / screen.width * _config.config.width, p.y / screen.height * _config.config.height);
+      return new _mathVectorDefault.default(p.x / screen.width * _config.config.width, p.y / screen.height * _config.config.height);
     }
   }], [{
     key: "findTouch",
@@ -13323,7 +13314,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
   return PaintView;
 })(_View2.View);
 
-},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../utils/Point":"6AhXm","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","../History":"27fq9","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
+},{"./View":"30r6k","../palettes/ColorPalette":"diaTM","../palettes/SizePalette":"5u02W","../utils/Utils":"1H53o","../tools/PenTool":"6lba4","../math/Vector":"1B3oQ","../palettes/Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","../palettes/ShapePalette":"4aYdj","../CanvasLayer":"6xo2a","../ImageLayer ":"1ITGs","../tools/SelectionTool":"Hlzxz","../Toolbar":"5EiOX","../History":"27fq9","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"diaTM":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -13921,8 +13912,8 @@ _parcelHelpers.export(exports, "default", function () {
 });
 var _Tool2 = require("./Tool");
 var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+var _mathVector = require("../math/Vector");
+var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 function _classCallCheck(instance, Constructor) {
@@ -14035,7 +14026,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "down",
     value: function down(data) {
-      this._painter.captureAutoMask(data.position.copy().round());
+      this._painter.captureAutoMask(data.position.clone().round());
       this._points = [data.position];
       var width = this.getWidth(data.pressure, data.speed);
       this._widths = [width];
@@ -14093,11 +14084,11 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       // const w1 = this._widths[i];
       // const w2 = this._widths[i+1];
       // 
-      // const dist = Point.distance(p1, p2);
+      // const dist = Vector.distance(p1, p2);
       // const step = Math.max(1, 0.125 * Math.min(w1, w2, 64));
       // for (let d = 0; d <= dist; d += step){
       // const a = d / dist;
-      // const p = Point.lerp(p1, p2, a);
+      // const p = Vector.lerp(p1, p2, a);
       // const w = Utils.lerp(w1, w2, a);
       // this.drawBrush(ctx, p.x, p.y, w);
       // }
@@ -14166,26 +14157,30 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       }
       var start = this._points[this._points.length - 1];
       var end = newPoint;
-      var dist = _utilsPointDefault.default.distance(start, end);
+      var dist = start.distanceTo(end);
       if (dist < segmentLength) {
         return points;
       }
       var control = start;
       if (this._points.length > 1) {
-        var tangent = _utilsPointDefault.default.subtract(start, this._points[this._points.length - 2]).normalize();
-        control = _utilsPointDefault.default.add(start, tangent.copy().scale(0.3 * dist));
+        var previous = this._points[this._points.length - 2];
+        var tangent = start.clone().subtract(previous).normalize();
+        control = start.clone().add(tangent.clone().multiplyScalar(0.3 * dist));
       }
       var a = segmentLength / dist;
       for (var i = a; i <= 1; i += a) {
-        var point = this.pointOnQuadraticCurve(start, control, end, i);
-        points.push(point);
+        var _Vector = this.pointOnQuadraticCurve(start, control, end, i);
+        points.push(_Vector);
       }
       return points;
     }
   }, {
     key: "pointOnQuadraticCurve",
     value: function pointOnQuadraticCurve(start, control, end, a) {
-      return _utilsPointDefault.default.add(_utilsPointDefault.default.scale(start, (1 - a) * (1 - a)), _utilsPointDefault.default.scale(control, 2 * a * (1 - a)), _utilsPointDefault.default.scale(end, a * a));
+      var f1 = (1 - a) * (1 - a);
+      var f2 = 2 * a * (1 - a);
+      var f3 = a * a;
+      return new _mathVectorDefault.default(start.x * f1 + control.x * f2 + end.x * f3, start.y * f1 + control.y * f2 + end.y * f3);
     }
   }, {
     key: "pressureChanged",
@@ -14213,7 +14208,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   return PenTool;
 })(_Tool2Default.default);
 
-},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7utpK":[function(require,module,exports) {
+},{"./Tool":"7utpK","../math/Vector":"1B3oQ","../utils/Utils":"1H53o","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"7utpK":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -14717,8 +14712,8 @@ _parcelHelpers.export(exports, "default", function () {
 var _config = require("./config");
 var _utilsUtils = require("./utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-var _utilsPoint = require("./utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+var _mathVector = require("./math/Vector");
+var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -14810,7 +14805,7 @@ var Layer = /*#__PURE__*/(function () {
     _classCallCheck(this, Layer);
     _defineProperty(this, "_startScale", 1);
     _defineProperty(this, "_startRotation", 0);
-    _defineProperty(this, "_position", new _utilsPointDefault.default(0, 0));
+    _defineProperty(this, "_position", new _mathVectorDefault.default(0, 0));
     _defineProperty(this, "_scale", 1);
     _defineProperty(this, "_rotation", 0);
     _defineProperty(this, "_lastTouchStartTime", 0);
@@ -14827,7 +14822,7 @@ var Layer = /*#__PURE__*/(function () {
     this._element.style.height = ("").concat(height, "em");
     this._element.style.pointerEvents = "none";
     parent.appendChild(this._element);
-    this.transform(new _utilsPointDefault.default(x, y), 1, 0);
+    this.transform(new _mathVectorDefault.default(x, y), 1, 0);
     this.bindEventListeners();
   }
   _createClass(Layer, [{
@@ -14851,7 +14846,7 @@ var Layer = /*#__PURE__*/(function () {
       this._element.height = height;
       this._element.style.width = ("").concat(width, "em");
       this._element.style.height = ("").concat(height, "em");
-      this.transform(new _utilsPointDefault.default(x, y), this.scale, this.rotation);
+      this.transform(new _mathVectorDefault.default(x, y), this.scale, this.rotation);
     }
   }, {
     key: "drawToCanvas",
@@ -14913,10 +14908,10 @@ var Layer = /*#__PURE__*/(function () {
         this._lastTouchStartTime = event.timeStamp;
         this._element.addEventListener("pointermove", this.pointerMove);
         this._element.addEventListener("pointerup", this.pointerUp);
-        this._pinchCenter = new _utilsPointDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
+        this._pinchCenter = new _mathVectorDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
         if (event.altKey) {
           var p1 = this.clientToPixel(this._pointers[0]);
-          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
+          var p2 = this._pinchCenter.clone().multiplyScalar(2).subtract(p1);
           this.pinchStart(p1, p2);
         } else {
           this.dragStart(this.clientToPixel(this._pointers[0]));
@@ -14980,10 +14975,10 @@ var Layer = /*#__PURE__*/(function () {
         this._lastTouchStartTime = event.timeStamp;
         this._element.addEventListener('touchmove', this.touchMove);
         this._element.addEventListener('touchend', this.touchEnd);
-        this._pinchCenter = new _utilsPointDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
+        this._pinchCenter = new _mathVectorDefault.default(this._position.x + 0.5 * this.width, this._position.y + 0.5 * this.height);
         if (event.altKey) {
           var p1 = this.clientToPixel(event.touches[0]);
-          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
+          var p2 = this._pinchCenter.clone().multiplyScalar(2).subtract(p1);
           this.pinchStart(p1, p2);
         } else {
           this.dragStart(this.clientToPixel(event.touches[0]));
@@ -15005,7 +15000,7 @@ var Layer = /*#__PURE__*/(function () {
       if (pointers.length === 1) {
         if (altKey) {
           var p1 = this.clientToPixel(pointers[0]);
-          var p2 = _utilsPointDefault.default.mirror(p1, this._pinchCenter);
+          var p2 = this._pinchCenter.clone().multiplyScalar(2).subtract(p1);
           this.pinchMove(p1, p2);
         } else {
           this.dragMove(this.clientToPixel(pointers[0]));
@@ -15046,7 +15041,7 @@ var Layer = /*#__PURE__*/(function () {
   }, {
     key: "dragStart",
     value: function dragStart(position) {
-      this._localDragPosition = _utilsPointDefault.default.subtract(position, this.position);
+      this._localDragPosition = position.clone().subtract(this.position);
     }
   }, {
     key: "dragMove",
@@ -15057,8 +15052,8 @@ var Layer = /*#__PURE__*/(function () {
   }, {
     key: "pinchStart",
     value: function pinchStart(p1, p2) {
-      var center = _utilsPointDefault.default.center(p1, p2);
-      this._pinchStartDist = _utilsPointDefault.default.distance(p1, p2);
+      var center = p1.clone().add(p2).multiplyScalar(0.5);
+      this._pinchStartDist = p1.distanceTo(p2);
       this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
       this._startRotation = this._rotation;
       this._startScale = this._scale;
@@ -15066,13 +15061,13 @@ var Layer = /*#__PURE__*/(function () {
   }, {
     key: "pinchMove",
     value: function pinchMove(p1, p2) {
-      var center = _utilsPointDefault.default.center(p1, p2);
-      var distance = _utilsPointDefault.default.distance(p1, p2);
+      var center = p1.clone().add(p2).multiplyScalar(0.5);
+      var distance = p1.distanceTo(p2);
       var angle = Math.atan2(p1.y - center.y, p1.x - center.x);
       var angleChange = angle - this._pinchStartRotation;
       var scale = this._startScale * (distance / this._pinchStartDist);
       scale = _utilsUtilsDefault.default.clamp(0.1, 10, scale);
-      var position = _utilsPointDefault.default.center(p1, p2);
+      var position = p1.clone().add(p2).multiplyScalar(0.5);
       position.x -= 0.5 * this.width;
       position.y -= 0.5 * this.height;
       var rotation = this._startRotation + angleChange;
@@ -15088,13 +15083,13 @@ var Layer = /*#__PURE__*/(function () {
       var ny = (position1.clientY - rect.top) / rect.height;
       var x = (isPortraitOrientation ? 1 - ny : nx) * _config.config.width;
       var y = (isPortraitOrientation ? nx : ny) * _config.config.height;
-      return new _utilsPointDefault.default(x, y);
+      return new _mathVectorDefault.default(x, y);
     }
   }]);
   return Layer;
 })();
 
-},{"./config":"1tzQg","./utils/Utils":"1H53o","./utils/Point":"6AhXm","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1ITGs":[function(require,module,exports) {
+},{"./config":"1tzQg","./utils/Utils":"1H53o","./math/Vector":"1B3oQ","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1ITGs":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -15213,8 +15208,8 @@ _parcelHelpers.export(exports, "default", function () {
 });
 var _Tool2 = require("./Tool");
 var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
-var _utilsPoint = require("../utils/Point");
-var _utilsPointDefault = _parcelHelpers.interopDefault(_utilsPoint);
+var _mathVector = require("../math/Vector");
+var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 var _utilsRect = require("../utils/Rect");
 var _utilsRectDefault = _parcelHelpers.interopDefault(_utilsRect);
 var _storageImageStorage = require("../storage/ImageStorage");
@@ -15393,7 +15388,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     _this._downloadButton = document.getElementById("selection-download-button");
     _this._downloadAnchor = _this._downloadButton.firstElementChild;
     _this.hasFloatingSelection = false;
-    _this._position = new _utilsPointDefault.default(0, 0);
+    _this._position = new _mathVectorDefault.default(0, 0);
     return _this;
   }
   _createClass(SelectionTool, [{
@@ -15442,7 +15437,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     value: function startNewSelection() {
       this.paintSelectionToCanvas();
       this.selectionLayer.setPositionAndSize(0, 0, this._painter.width, this._painter.height);
-      this.selectionLayer.transform(new _utilsPointDefault.default(0, 0), 1, 0);
+      this.selectionLayer.transform(new _mathVectorDefault.default(0, 0), 1, 0);
       this.selectionLayer.floating = false;
       this.hasFloatingSelection = false;
       this.isInShapesPalette = false;
@@ -15648,7 +15643,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
   return SelectionTool;
 })(_Tool2Default.default);
 
-},{"./Tool":"7utpK","../utils/Point":"6AhXm","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5EiOX":[function(require,module,exports) {
+},{"./Tool":"7utpK","../math/Vector":"1B3oQ","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5EiOX":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "Toolbar", function () {
@@ -16013,7 +16008,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"2O4yD","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -20641,8 +20636,9 @@ parcelRequire = (function (e, r, t, n) {
   }]
 }, {}, ["iTK6"], null);
 
-},{}],"2O4yD":[function(require,module,exports) {
+},{}],"5xv2G":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.540\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.018019d7.js.map
+//# sourceMappingURL=index.c8797421.js.map

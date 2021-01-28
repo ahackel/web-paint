@@ -1,5 +1,5 @@
 import Tool from "./Tool";
-import Point from "../utils/Point";
+import Vector from "../math/Vector";
 import CanvasLayer from "../CanvasLayer";
 import Rect from "../utils/Rect";
 import ImageStorage from "../storage/ImageStorage";
@@ -24,8 +24,8 @@ export default class SelectionTool extends Tool {
         this._saveButton.classList.toggle("disabled", value);
     }
     
-    protected _position: Point;
-    protected _startPosition: Point;
+    protected _position: Vector;
+    protected _startPosition: Vector;
     protected _selection: Rect = Rect.Empty();
     private _hasFloatingSelection: boolean;
     private _drawSelectionOutlineRequested: boolean;
@@ -49,7 +49,7 @@ export default class SelectionTool extends Tool {
         this._downloadAnchor = <HTMLAnchorElement>this._downloadButton.firstElementChild;
         
         this.hasFloatingSelection = false;
-        this._position = new Point(0, 0);
+        this._position = new Vector(0, 0);
     }
     
     toggleFloatingSelectionButtons(visible: boolean){
@@ -90,7 +90,7 @@ export default class SelectionTool extends Tool {
     private startNewSelection() {
         this.paintSelectionToCanvas();
         this.selectionLayer.setPositionAndSize(0, 0, this._painter.width, this._painter.height);
-        this.selectionLayer.transform(new Point(0, 0), 1, 0);
+        this.selectionLayer.transform(new Vector(0, 0), 1, 0);
         this.selectionLayer.floating = false;
 
         this.hasFloatingSelection = false;
