@@ -13,7 +13,7 @@ interface IPointData {
     speed: number
 }
 
-const maxParticles = 5000;
+const maxParticles = 500;
 
 // Paints lines with varying stroke width
 export default class PenTool extends Tool {
@@ -63,7 +63,7 @@ export default class PenTool extends Tool {
             this._particles.push(particle);
             this._brush.addChild(particle);
         }
-        this._painter.baseLayer.sprite.addChild(this._brush);
+        //this._painter.baseLayer.sprite.addChild(this._brush);
     }
 
     down(data: IPointerData): void {

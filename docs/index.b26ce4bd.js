@@ -13873,7 +13873,7 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
-var maxParticles = 5000;
+var maxParticles = 500;
 // Paints lines with varying stroke width
 var PenTool = /*#__PURE__*/(function (_Tool) {
   _inherits(PenTool, _Tool);
@@ -13916,7 +13916,6 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         this._particles.push(particle);
         this._brush.addChild(particle);
       }
-      this._painter.baseLayer.sprite.addChild(this._brush);
     }
   }, {
     key: "down",
@@ -57576,7 +57575,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"2O4yD","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -62204,9 +62203,8 @@ parcelRequire = (function (e, r, t, n) {
   }]
 }, {}, ["iTK6"], null);
 
-},{}],"5xv2G":[function(require,module,exports) {
-module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\",\"local\":\"cd docs; python -m SimpleHTTPServer\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.540\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pixi.js\":\"^5.3.7\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
+},{}],"2O4yD":[function(require,module,exports) {
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.000c9955.js.map
+//# sourceMappingURL=index.b26ce4bd.js.map
