@@ -50,9 +50,11 @@ export default class PenTool extends Tool {
             
             const circle = new PIXI.Graphics(); 
             circle.beginFill(0x000000);
-            circle.drawCircle(32, 32, 32);
+            circle.drawCircle(32, 32, 29);
             circle.endFill();
-            const rt = this._painter.pixi.renderer.generateTexture(circle, SCALE_MODES.LINEAR, 1);
+            circle.filters = [new PIXI.filters.BlurFilter(2)];
+            const bounds = new PIXI.Rectangle(0, 0, 64, 64);
+            const rt = this._painter.pixi.renderer.generateTexture(circle, SCALE_MODES.NEAREST, 1, bounds);
             circle.destroy();
             
             const particle = new PIXI.Sprite(rt);
@@ -112,7 +114,7 @@ export default class PenTool extends Tool {
         //     this.drawRandomPixelLines(ctx, this._points.slice(this._startIndex));
         // }
         
-        // this._startIndex = Math.max(0, this._points.length - 1);
+        this._startIndex = Math.max(0, this._points.length - 1);
     }
     
     drawConnectedLines(points: IPointData[]){
@@ -140,8 +142,8 @@ export default class PenTool extends Tool {
             particle.y = point.position.y;
         }
         
-        // const rt = <PIXI.RenderTexture>this._painter.baseLayer.sprite.texture;
-        // this._painter.pixi.renderer.render(this._brush, rt, false, null, true);
+        const rt = <PIXI.RenderTexture>this._painter.baseLayer.sprite.texture;
+        this._painter.pixi.renderer.render(this._brush, rt, false, null, true);
 
             // ctx.lineCap = "round";
         // ctx.lineJoin = "round";
@@ -266,7 +268,7 @@ export default class PenTool extends Tool {
     }
 
     private interpolatePoints(newPoint: IPointData): IPointData[] {
-        const segmentLength = Math.max(4, 0.1 * this.lineWidth);
+        const segmentLength = Math.max(2, 0.1 * this.lineWidth);
         const points: IPointData[] = [];
         
         if (this._points.length == 0){

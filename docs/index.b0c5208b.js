@@ -13905,9 +13905,11 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       for (var i = 0; i < maxParticles; i++) {
         var circle = new _pixiJs.Graphics();
         circle.beginFill(0x000000);
-        circle.drawCircle(32, 32, 32);
+        circle.drawCircle(32, 32, 29);
         circle.endFill();
-        var rt = this._painter.pixi.renderer.generateTexture(circle, _pixiJs.SCALE_MODES.LINEAR, 1);
+        circle.filters = [new _pixiJs.filters.BlurFilter(2)];
+        var bounds = new _pixiJs.Rectangle(0, 0, 64, 64);
+        var rt = this._painter.pixi.renderer.generateTexture(circle, _pixiJs.SCALE_MODES.NEAREST, 1, bounds);
         circle.destroy();
         var particle = new _pixiJs.Sprite(rt);
         particle.tint = 0x000000;
@@ -13961,6 +13963,10 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       if (this._mode == "line") {
         this.drawConnectedLines(this._points.slice(this._startIndex));
       }
+      // else if (this._mode == "crayon"){
+      // this.drawRandomPixelLines(ctx, this._points.slice(this._startIndex));
+      // }
+      this._startIndex = Math.max(0, this._points.length - 1);
     }
   }, {
     key: "drawConnectedLines",
@@ -13982,6 +13988,8 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
         particle.x = point.position.x;
         particle.y = point.position.y;
       }
+      var rt = this._painter.baseLayer.sprite.texture;
+      this._painter.pixi.renderer.render(this._brush, rt, false, null, true);
     }
   }, {
     key: "drawRandomPixelLines",
@@ -14070,7 +14078,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "interpolatePoints",
     value: function interpolatePoints(newPoint) {
-      var segmentLength = Math.max(4, 0.1 * this.lineWidth);
+      var segmentLength = Math.max(2, 0.1 * this.lineWidth);
       var points = [];
       if (this._points.length == 0) {
         return points;
@@ -57575,7 +57583,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"2O4yD","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../PeerToPeer":"1eo0P","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1eo0P":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -62203,8 +62211,9 @@ parcelRequire = (function (e, r, t, n) {
   }]
 }, {}, ["iTK6"], null);
 
-},{}],"2O4yD":[function(require,module,exports) {
+},{}],"5xv2G":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\",\"local\":\"cd docs; python -m SimpleHTTPServer\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.540\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.2.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pixi.js\":\"^5.3.7\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}]},{},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.b26ce4bd.js.map
+//# sourceMappingURL=index.b0c5208b.js.map
