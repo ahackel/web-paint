@@ -41,6 +41,7 @@ export default abstract class Tool {
     disable(): void {
         this._buttonElement.classList.remove("selected");
     }
+
     down(data: IPointerData): void {}
 
     move(data: IPointerData): void {}

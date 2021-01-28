@@ -10,7 +10,7 @@ export default abstract class ShapeToolBase extends Tool {
     protected _position: Point;
     private _drawShapeRequested: boolean;
 
-    down(data: IPointerData) {
+    down(data: IPointerData): void {
         this._startPosition = data.position;
         this._position = data.position;
         let ctx = this.getBufferCtx();

@@ -15,9 +15,7 @@ import LineTool from "../tools/LineTool";
 import StampTool from "../tools/StampTool";
 import ShapePalette from "../palettes/ShapePalette";
 import Layer from "../Layer";
-import ILayer from "../ILayer";
 import CanvasLayer from "../CanvasLayer";
-import ImageLayer from "../ImageLayer ";
 import SelectionTool from "../tools/SelectionTool";
 import {Toolbar} from "../Toolbar";
 import {History} from "../History";
@@ -65,11 +63,12 @@ export class PaintView extends View {
     private _tickTimeStamp: number;
     private _autoMaskCaptured: boolean;
     private _stamp: string;
-    private _layers: { [id : string] : ILayer } = {};
+    private _layers: { [id : string] : Layer } = {};
     private _sheet: HTMLElement;
     private _importImageButton: HTMLDivElement;
     private _isDirty: boolean;
     private _lastSaveTimestamp: number = 0;
+    private _pixi: PIXI.Application;
 
     get color(): string { return this._color; }
     get stamp(): string { return this._stamp; }
@@ -77,30 +76,34 @@ export class PaintView extends View {
     get lineWidth(): number { return this._lineWidth; }
     get autoMaskCtx(): CanvasRenderingContext2D { return this._autoMaskCtx; }
     //get layers(): Layer[] { return this._layers; }
-    get baseLayer(): CanvasLayer { return <CanvasLayer>this._layers["base-layer"]; }
-    get overlayLayer(): ImageLayer { return <ImageLayer>this._layers["overlay-layer"]; }
+    get baseLayer(): Layer { return <Layer>this._layers["base-layer"]; }
+    get overlayLayer(): Layer { return <Layer>this._layers["overlay-layer"]; }
+    get pixi(): PIXI.Application { return this._pixi; }
 
     constructor(id: string, onBackClicked: Function) {
         super(id);
 
-        const pixiApp = new PIXI.Application();
-        this._element.appendChild(pixiApp.view);
-        
-        const graphics = new PIXI.Graphics();
-        graphics.beginFill(0xFFFF00);
-        graphics.drawCircle(50, 40, 100);
-        graphics.endFill();
-        pixiApp.stage.addChild(graphics);
-        
-        this._history = new History();
         this._sheet = document.getElementById("sheet");
+        this._pixi = new PIXI.Application({
+            width: config.width,
+            height: config.height,
+            backgroundColor: 0xFFFFFF,
+            autoDensity: true
+        });
+        this.pixi.ticker.add(delta => this.tick(delta))
+        this._sheet.appendChild(this._pixi.view);
+        this._history = new History();
 
         this.width = config.width;
         this.height = config.height;
         Utils.log(`Setting PaintView size to ${this.width} x ${this.height}`);
 
-        this.addCanvasLayer("base-layer", 0, 0, this.width, this.height,false);
-        this.baseLayer.canvas.classList.add("hidden");
+        this.addLayer(new Layer(this._pixi.stage, "base-layer"));
+        const rt = PIXI.RenderTexture.create({
+            width: config.width,
+            height: config.height});
+        this.baseLayer.sprite.texture = rt;
+        
         this.addEventListeners();
         this.createButtons(onBackClicked);
         this.createToolbar();
@@ -144,27 +147,12 @@ export class PaintView extends View {
         Utils.addClick(this._importImageButton, () => importImageField.click());
     }
 
-    private addLayer(layer: ILayer): ILayer {
-        layer.index = Object.keys(this._layers).length;
+    private addLayer(layer: Layer): Layer {
         this._layers[layer.id] = layer;
         return layer;
     }
     
-    public addImageLayer(id: string, x: number, y: number, width: number, height: number, floating: boolean): ImageLayer{
-        const layer = new ImageLayer(this._sheet, id, x, y, width, height);
-        layer.floating = floating;
-        this.addLayer(layer);
-        return layer;
-    }
-    
-    public addCanvasLayer(id: string, x: number, y: number, width: number, height: number, floating: boolean): CanvasLayer{
-        const layer = new CanvasLayer(this._sheet, id, x, y, width, height);
-        layer.floating = floating;
-        this.addLayer(layer);
-        return layer;
-    }
-    
-    public removeLayer(layer: ILayer) {
+    public removeLayer(layer: Layer) {
         if (!layer){
             return;
         }
@@ -176,7 +164,7 @@ export class PaintView extends View {
         if (this.overlayLayer){
             return;
         }
-        this.addLayer(new ImageLayer(this._sheet, "overlay-layer", 0, 0, this.width, this.height));
+        this.addLayer(new Layer(this._pixi.stage, "overlay-layer"));
     }
     
     public removeOverlay(){
@@ -189,7 +177,7 @@ export class PaintView extends View {
             return;
         }
         this.createOverlay();
-        this.overlayLayer.image.src = url;
+        //this.overlayLayer.image.src = url;
                 //this.processOverlay(this.overlay.ctx);
 
                 // show processed overlay:
@@ -275,35 +263,24 @@ export class PaintView extends View {
     }
 
     private addEventListeners() {
-        let canvas = this.baseLayer.canvas;
-        canvas.style.pointerEvents = "auto";
-        //canvas.addEventListener('keydown', event => this.keyDown(event));
-        document.addEventListener('keydown', event => this.keyDown(event));
-        canvas.addEventListener('click', event => event.preventDefault());
-
-        if (config.usePointerEvents && window.PointerEvent != null){
-            // Required to prevent pointerDown events from being choked when tapping repeatedly: 
-            canvas.addEventListener('touchstart', event => {
-                if (event.cancelable){
-                    event.preventDefault();
-                }
-            });
-            
-            canvas.addEventListener('pointerdown', event => this.pointerDown(event));
-            canvas.addEventListener('pointermove', event => this.pointerMove(event));
-            canvas.addEventListener('pointerup', event => this.pointerUp(event));
-            canvas.addEventListener('pointercancel', event => event.preventDefault());
-        }
-        else{
-            canvas.addEventListener('touchstart', event => this.touchStart(event));
-            canvas.addEventListener('touchmove', event => this.touchMove(event));
-            canvas.addEventListener('touchend', event => this.touchEnd(event));
-            canvas.addEventListener('touchcancel', event => event.preventDefault());
-        }
-        //canvas.addEventListener('touchforcechanged', event => this.pressureChanged(<TouchEvent>event))
-        // Pressure.set(canvas, {
-        //     change: (force: number, event: Event) => this.pressureChanged(force)
-        // })
+        this.baseLayer.sprite.interactive = true;
+        this.baseLayer.sprite.on("pointerdown", (event: PIXI.InteractionEvent) => this.down(event));
+        this.baseLayer.sprite.on("pointermove", (event: PIXI.InteractionEvent)  => this.move(event));
+        this.baseLayer.sprite.on("pointerup", (event: PIXI.InteractionEvent)  => this.up(event));
+        //
+        // if (config.usePointerEvents && window.PointerEvent != null){
+        //     // Required to prevent pointerDown events from being choked when tapping repeatedly: 
+        //     canvas.addEventListener('touchstart', event => {
+        //         if (event.cancelable){
+        //             event.preventDefault();
+        //         }
+        //     });
+        //
+        //     canvas.addEventListener('pointerdown', event => this.pointerDown(event));
+        //     canvas.addEventListener('pointermove', event => this.pointerMove(event));
+        //     canvas.addEventListener('pointerup', event => this.pointerUp(event));
+        //     canvas.addEventListener('pointercancel', event => event.preventDefault());
+        // }
     }
 
     private getPointerEventPosition(event: PointerEvent) {
@@ -316,23 +293,6 @@ export class PaintView extends View {
         
         let x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
         let y = (isPortraitOrientation ? nx : ny) * this.height; 
-
-        if (config.pixelPerfect){
-            x = Math.round(x);
-            y = Math.round(y);
-        }
-        return new Point(x, y);
-    }
-
-    private getTouchEventPosition(touch: Touch) {
-        let rect = this.baseLayer.canvas.getBoundingClientRect();
-        const isPortraitOrientation = rect.height > rect.width;
-
-        let nx = (touch.clientX - rect.left) / rect.width;
-        let ny = (touch.clientY - rect.top) / rect.height;
-
-        let x = (isPortraitOrientation ? 1 - ny : nx) * this.width;
-        let y = (isPortraitOrientation ? nx : ny) * this.height;
 
         if (config.pixelPerfect){
             x = Math.round(x);
@@ -361,163 +321,68 @@ export class PaintView extends View {
         this._currentTool.keyDown(event);
     }
 
-    pointerDown(event: PointerEvent) {
-        event.preventDefault();
-        if (!event.isPrimary || event.buttons !== 1) {
-            return;
-        }
-
-        let target = <HTMLElement>event.target;
-        target.setPointerCapture(event.pointerId);
-        this._currentTouchId = event.pointerId;
-
-        this.down({
-            timeStamp: event.timeStamp,
-            position: this.getPointerEventPosition(event),
-            radius: this.screenToSheet(new Point(event.width, event.height)),
-            tilt: this.getTilt(event),
-            pressure: this.getNormalizedPointerPressure(event),
-            speed: 1,
-            isPressed: true
-        });
-     }
-
-    pointerMove(event: PointerEvent) {
-        event.preventDefault();
-        if (!event.isPrimary || event.buttons !== 1) {
-            return;
-        }
-
-        this.move({
-            timeStamp: event.timeStamp,
-            position: this.getPointerEventPosition(event),
-            radius: this.screenToSheet(new Point(event.width, event.height)),
-            tilt: this.getTilt(event),
-            pressure: this.getNormalizedPointerPressure(event),
-            speed: 1,
-            isPressed: true
-        });
+    getPressure(event: PIXI.InteractionEvent): number {
+        return event.data.pointerType == "pen" ? event.data.pressure : 1;
     }
 
-    getNormalizedPointerPressure(event: PointerEvent): number {
-        return event.pointerType == "pen" ? event.pressure : 1;
+    getTilt(event: PIXI.InteractionEvent): Point {
+        return event.data.pointerType == "pen" ? new Point(event.data.tiltX, event.data.tiltY) : new Point(0, 0);
     }
 
-    getNormalizedTouchPressure(touch: Touch): number {
-        return touch.touchType == "stylus" ? touch.force : 1;
+    private getPosition(event: PIXI.InteractionEvent): Point {
+        return Point.fromPixiPoint(event.data.getLocalPosition(this.baseLayer.sprite));
     }
 
-    getTilt(event: PointerEvent): Point {
-        return event.pointerType == "pen" ? new Point(event.tiltX, event.tiltY) : new Point(0, 0);
-    }
+    private down(event: PIXI.InteractionEvent) {
+        Palette.collapseAll();
 
-    getTiltFromTouch(touch: Touch): Point {
-        return touch.touchType == "stylus" ? new Point(0, 0) : new Point(0, 0);
-    }
-
-    pointerUp(event: PointerEvent) {
-        event.preventDefault();
-        if (!event.isPrimary){
-            return;
-        }
-
-        let target = <HTMLElement>event.target;
-        target.releasePointerCapture(event.pointerId);
-
-        this.up({
-            timeStamp: event.timeStamp,
-            position: this.getPointerEventPosition(event),
-            radius: new Point(event.width, event.height),
-            tilt: this.getTilt(event),
-            pressure: 1,
-            speed: 1,
-            isPressed: false
-        });
-        this._currentTouchId = 0;
-    }
-    
-    pressureChanged(force: number){
-        // let pressure = Utils.clamp(0.3, 1, force * 2);
-        // this._currentTool.pressure = Math.max(pressure, this._currentTool.pressure);
-        // this._currentTool.pressureChanged();
-    }
-
-    touchStart(event: TouchEvent) {
-        event.preventDefault();
-        if (this._currentTouchId !== 0){
-            return;
-        }
-        const touch = event.targetTouches[0];
-        this._currentTouchId = touch.identifier;
-        this.down({
-            timeStamp: event.timeStamp,
-            position: this.getTouchEventPosition(touch),
-            radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
-            tilt: this.getTiltFromTouch(touch),
-            pressure: this.getNormalizedTouchPressure(touch),
-            speed: 1,
-            isPressed: true
-        });
-    }
-
-    touchMove(event: TouchEvent) {
-        event.preventDefault();
-        let touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-        if (touch == null){
-            return;
-        }
-        console.log(touch.force)
-        this.move({
-            timeStamp: event.timeStamp,
-            position: this.getTouchEventPosition(touch),
-            radius: this.screenToSheet(new Point(touch.radiusX, touch.radiusY)),
-            tilt: this.getTiltFromTouch(touch),
-            pressure: this.getNormalizedTouchPressure(touch),
-            speed: 1,
-            isPressed: true
-        });
-    }
-
-    touchEnd(event: TouchEvent) {
-        event.preventDefault();
-        let touch = PaintView.findTouch(event.targetTouches, this._currentTouchId);
-        if (touch != null){
-            // current touch is still in the list of target touches, this means it has not ended yet
-            return;
-        }
-        this.up({
-            timeStamp: event.timeStamp,
-            position: new Point(0 ,0),
-            radius: new Point(0 ,0),
-            tilt: new Point(0 ,0),
-            pressure: 1,
-            speed: 1,
-            isPressed: false
-        });
-        this._currentTouchId = 0;
-    }
-
-    private static findTouch(touches: TouchList, id: number){
-        for (let i = 0; i < touches.length; i++) {
-            if (touches[i].identifier == id){
-                return touches[i];
-            }
-        }
-        return null;
-    }
-
-    private move(data: IPointerData) {
         if (!this._currentTool) {
             return;
         }
 
-        let delta = Point.distance(this._lastPointerData.position, data.position);
+        if (!event.data.isPrimary || event.data.buttons !== 1) {
+            return;
+        }
 
-        if (delta <= 1) {
+        const data: IPointerData = {
+            timeStamp: event.data.originalEvent.timeStamp,
+            position: this.getPosition(event),
+            radius: new Point(event.data.width, event.data.height),
+            tilt: this.getTilt(event),
+            pressure: this.getPressure(event),
+            speed: 1,
+            isPressed: true
+        };
+
+        this._lastPointerData = data;
+        this._currentTool.down(data);
+    }
+
+    private move(event: PIXI.InteractionEvent) {
+        if (!this._currentTool) {
+            return;
+        }
+
+        if (!event.data.isPrimary || event.data.buttons !== 1) {
+            return;
+        }
+
+        const data: IPointerData = {
+            timeStamp: event.data.originalEvent.timeStamp,
+            position: this.getPosition(event),
+            radius: new Point(event.data.width, event.data.height),
+            tilt: this.getTilt(event),
+            pressure: this.getPressure(event),
+            speed: 1,
+            isPressed: true
+        };
+
+        this._lastPointerData = this._lastPointerData || data;
+        let delta = Point.distance(<Point>this._lastPointerData.position, <Point><unknown>data.position);
+        if (delta < 1){
             return;
         }
         
-        this._lastPointerData = this._lastPointerData || data;
         let timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
         const speed = delta / timeDelta;
         data.speed = Utils.lerp(this._lastPointerData.speed, speed, 0.2);
@@ -525,20 +390,26 @@ export class PaintView extends View {
         this._currentTool.move(data);
     }
 
-    private down(data: IPointerData) {
-        Palette.collapseAll();
-
+    private up(event: PIXI.InteractionEvent) {
         if (!this._currentTool) {
             return;
         }
 
-        this._lastPointerData = data;
-        this._currentTool.down(data);
-    }
-
-    private up(data: IPointerData) {
-        if (!this._currentTool) {
+        if (!event.data.isPrimary){
             return;
+        }
+
+        // let target = <HTMLElement>event.target;
+        // target.releasePointerCapture(event.pointerId);
+
+        const data: IPointerData = {
+            timeStamp: event.data.originalEvent.timeStamp,
+            position: this.getPosition(event),
+            radius: new Point(event.data.width, event.data.height),
+            tilt: this.getTilt(event),
+            pressure: 1,
+            speed: 1,
+            isPressed: false
         }
 
         this._lastPointerData = data;
@@ -546,15 +417,15 @@ export class PaintView extends View {
     }
 
     clear(recordHistoryState: boolean = false) {
-        this.baseLayer.clear();
+        this.baseLayer.clear(this._pixi.renderer);
         if (recordHistoryState){
             this.recordHistoryState();
         }
     }
 
     fill() {
-        this.baseLayer.ctx.fillStyle = this.color;
-        this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
+        // this.baseLayer.ctx.fillStyle = this.color;
+        // this.baseLayer.ctx.fillRect(0, 0, this.width, this.height);
         this.recordHistoryState();
     }
 
@@ -565,7 +436,7 @@ export class PaintView extends View {
     }
 
     recordHistoryState(){
-        this._history.recordState(this.baseLayer.getData());
+        // this._history.recordState(this.baseLayer.getData());
         this.updateUndoButtons();
         this.setDirty();
     }
@@ -576,25 +447,25 @@ export class PaintView extends View {
     }
 
     undo() {
-        if (!this._history.canUndo){
-            return;
-        }
-        this.baseLayer.putData(this._history.undo());
-        this.updateUndoButtons();
-        this.setDirty();
+        // if (!this._history.canUndo){
+        //     return;
+        // }
+        // this.baseLayer.putData(this._history.undo());
+        // this.updateUndoButtons();
+        // this.setDirty();
     }
     
     redo() {
-        if (!this._history.canRedo){
-            return;
-        }
-        this.baseLayer.putData(this._history.redo());
-        this.updateUndoButtons()
-        this.setDirty();
+        // if (!this._history.canRedo){
+        //     return;
+        // }
+        // this.baseLayer.putData(this._history.redo());
+        // this.updateUndoButtons()
+        // this.setDirty();
     }
 
     restoreCurrentHistoryState(){
-        this.baseLayer.putData(this._history.getCurrentState());
+        // this.baseLayer.putData(this._history.getCurrentState());
     }
 
     loadImage(id: string) {
@@ -603,7 +474,7 @@ export class PaintView extends View {
                 this._imageId = id;
                 this.clear();
                 if (image){
-                    this.baseLayer.drawImage(image);
+                    this.baseLayer.drawImage(image, this._pixi.renderer);
                 }
                 
                 this.setOverlay(Utils.getImageOverlayUrl(id));
@@ -614,7 +485,8 @@ export class PaintView extends View {
 
     private saveImage() {
         Utils.log("Saving image");
-        this.baseLayer.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
+        this._pixi.renderer.extract.canvas(this.baseLayer.sprite)
+            .toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
         this._isDirty = false;
         this._lastSaveTimestamp = Date.now();
     }
@@ -627,8 +499,8 @@ export class PaintView extends View {
         super.show();
         this._currentTouchId = 0;
         this._autoMaskCaptured = false;
-        window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
         this._currentTool.enable();
+        this.pixi.ticker.start();
     }
     
     hide(){
@@ -644,23 +516,19 @@ export class PaintView extends View {
         if (this._history){
             this._history.clear();
         }
+        if (this.pixi){
+            this.pixi.ticker.stop();
+        }
         super.hide();
     }
 
-    private tick(timeStamp: number) {
+    private tick(delta: number) {
         if (!this.isVisible()){
             return;
         }
 
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
         
-        if (config.debug){
-            Utils.updateFPSCounter();
-        }
-
-        let delta = timeStamp - this._tickTimeStamp;
-        this._tickTimeStamp = timeStamp;
-
         if (this._currentTool) {
             this._currentTool.tick(delta);
             
@@ -701,10 +569,10 @@ export class PaintView extends View {
         //     return;
         // }
 
-        Utils.log("capturing auto mask");
-        Utils.floodFill(this.baseLayer.ctx, imageData.data, position, this.color);
-        Utils.dilateMask(imageData.data, this.width, this.height);
-        this._autoMaskCtx.putImageData(imageData, 0, 0);
+        // Utils.log("capturing auto mask");
+        // Utils.floodFill(this.baseLayer.ctx, imageData.data, position, this.color);
+        // Utils.dilateMask(imageData.data, this.width, this.height);
+        // this._autoMaskCtx.putImageData(imageData, 0, 0);
     }
 
     private processOverlay(ctx: CanvasRenderingContext2D) {

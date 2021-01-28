@@ -1,12 +1,10 @@
 import Tool from "./Tool";
 import Point from "../utils/Point";
-import {PaintView, IPointerData} from "../views/PaintView";
+import {IPointerData, PaintView} from "../views/PaintView";
 import Utils from "../utils/Utils";
-
-// @ts-ignore
-import brushPath from "url:../../img/brush.png";
-import Layer from "../Layer";
 import {config} from "../config";
+import * as PIXI from 'pixi.js';
+import {SCALE_MODES} from 'pixi.js';
 
 interface IPointData {
     position: Point,
@@ -15,32 +13,57 @@ interface IPointData {
     speed: number
 }
 
+const maxParticles = 500;
+
 // Paints lines with varying stroke width
 export default class PenTool extends Tool {
 
     private _startIndex: number;
-    private _points: IPointData[];
+    private _points: IPointData[] = [];
     private _drawPathRequested: boolean;
     private _brushCtx: CanvasRenderingContext2D;
     private _mode: string;
-    
+    private _particles: PIXI.Sprite[] = [];
+    private _brush: PIXI.ParticleContainer;
+
     private readonly _operation: string;
 
     constructor(painter: PaintView, buttonId: string, operation: string = "darken") {
         super(painter, buttonId);
         this._operation = operation;
-        this._mode = "crayon";
-        this.createBrushCtx();
+        this._mode = "line";
+        this.createBrush();
     }
 
-    private createBrushCtx() {
-        let brushCanvas = document.createElement("canvas");
-        brushCanvas.id = "brush";
-        brushCanvas.width = 64;
-        brushCanvas.height = 64;
-        this._brushCtx = <CanvasRenderingContext2D>brushCanvas.getContext("2d", {alpha: true});
-        this._brushCtx.imageSmoothingQuality = "high";
-        this._brushCtx.imageSmoothingEnabled = true;
+    private createBrush() {
+        this._particles = [];
+
+        this._brush = new PIXI.ParticleContainer(maxParticles, {
+            vertices: true,
+            rotation: true,
+            position: true,
+            uvs: true,
+            tint: false
+        });
+
+        for (let i = 0; i < maxParticles; i++) {
+            
+            const circle = new PIXI.Graphics(); 
+            circle.beginFill(0x000000);
+            circle.drawCircle(32, 32, 32);
+            circle.endFill();
+            const rt = this._painter.pixi.renderer.generateTexture(circle, SCALE_MODES.LINEAR, 1);
+            circle.destroy();
+            
+            const particle = new PIXI.Sprite(rt);
+            particle.tint = 0x000000;
+            particle.anchor.set(0.5);
+            particle.scale.set(0);
+
+            this._particles.push(particle);
+            this._brush.addChild(particle);
+        }
+        // this._painter.baseLayer.sprite.addChild(this._brush);
     }
 
     down(data: IPointerData): void {
@@ -56,25 +79,12 @@ export default class PenTool extends Tool {
         }];
         this._startIndex = 0;
 
-        let ctx = this._painter.baseLayer.ctx;
-        ctx.fillStyle = this.color;
-        ctx.strokeStyle = this.color;
-
-
-        // let ctx = this._brushCtx;
-        // let brushWidth = ctx.canvas.width;
-        // ctx.clearRect(0, 0, brushWidth, brushWidth);
-        // ctx.fillStyle = this.color;
-        // let radius = brushWidth * 0.5;
-        // ctx.beginPath();
-        // ctx.arc(radius, radius, radius - 1, 0, 2 * Math.PI);
-        // ctx.fill();  
-        this._painter.baseLayer.ctx.globalCompositeOperation = this._operation;
-
         this.requestDrawPath();
     }
     
     up(): void{
+        this._points = [];
+        this._startIndex = 0;
         this._painter.recordHistoryState();
     }
     
@@ -94,66 +104,66 @@ export default class PenTool extends Tool {
             return;
         }
 
-        let ctx = this._painter.baseLayer.ctx;
         if (this._mode == "line"){
-            this.drawConnectedLines(ctx, this._points.slice(this._startIndex));
+            this.drawConnectedLines(this._points.slice(this._startIndex));
+//             this.drawConnectedLines(this._points);
         }
-        else if (this._mode == "crayon"){
-            this.drawRandomPixelLines(ctx, this._points.slice(this._startIndex));
-        }
+        // else if (this._mode == "crayon"){
+        //     this.drawRandomPixelLines(ctx, this._points.slice(this._startIndex));
+        // }
         
-        // if (this._points.length - this._startIndex == 1){
-        //     const p = this._points[this._startIndex];
-        //     this.drawBrush(ctx, p.x, p.y, this._widths[this._startIndex]);
-        //     return;
-        // }
-        //
-        // for (let i = this._startIndex; i < this._points.length - 1; i++) {
-        //     const p1 = this._points[i];
-        //     const p2 = this._points[i+1];
-        //    
-        //     const w1 = this._widths[i];
-        //     const w2 = this._widths[i+1];
-        //
-        //     const dist = Point.distance(p1, p2);
-        //     const step = Math.max(1, 0.125 * Math.min(w1, w2, 64));
-        //     for (let d = 0; d <= dist; d += step){
-        //         const a = d / dist;
-        //         const p = Point.lerp(p1, p2, a);
-        //         const w = Utils.lerp(w1, w2, a);
-        //         this.drawBrush(ctx, p.x, p.y, w);
-        //     }
-        // }
         this._startIndex = Math.max(0, this._points.length - 1);
     }
     
-    drawConnectedLines(ctx: CanvasRenderingContext2D, points: IPointData[]){
+    drawConnectedLines(points: IPointData[]){
         const pointCount = points.length;
         if (pointCount == 0){
             return;
         }
         
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        let start = points[0].position;
-        let startWidth = points[0].width * this.lineWidth;
 
-        if (pointCount == 1){
-            // single dot
-            ctx.beginPath();
-            ctx.arc(start.x, start.y, 0.5 * startWidth, 0, 2 * Math.PI);
-            ctx.fill();
-        }
+        for (let i = 0; i < maxParticles; i++)
+        {
+            const particle = this._particles[i];
 
-        for (let i = 1; i < pointCount; i++) {
-            ctx.beginPath();
-            ctx.lineWidth = points[i].width * this.lineWidth;
-            const lastPosition = points[i-1].position;
-            const position = points[i].position;
-            ctx.lineTo(lastPosition.x, lastPosition.y);
-            ctx.lineTo(position.x, position.y);
-            ctx.stroke();
+            if (i > points.length - 1) {
+                particle.scale.set(0);
+                continue;    
+            }
+
+            const point = points[i];
+            
+            particle.scale.set(1);
+            particle.width = point.width;
+            particle.height = point.width;
+            particle.x = point.position.x;
+            particle.y = point.position.y;
         }
+        
+        const rt = <PIXI.RenderTexture>this._painter.baseLayer.sprite.texture;
+        this._painter.pixi.renderer.render(this._brush, rt, false, null, true);
+
+            // ctx.lineCap = "round";
+        // ctx.lineJoin = "round";
+        // let start = points[0].position;
+        // let startWidth = points[0].width * this.lineWidth;
+        //
+        // if (pointCount == 1){
+        //     // single dot
+        //     ctx.beginPath();
+        //     ctx.arc(start.x, start.y, 0.5 * startWidth, 0, 2 * Math.PI);
+        //     ctx.fill();
+        // }
+        //
+        // for (let i = 1; i < pointCount; i++) {
+        //     ctx.beginPath();
+        //     ctx.lineWidth = points[i].width * this.lineWidth;
+        //     const lastPosition = points[i-1].position;
+        //     const position = points[i].position;
+        //     ctx.lineTo(lastPosition.x, lastPosition.y);
+        //     ctx.lineTo(position.x, position.y);
+        //     ctx.stroke();
+        // }
     }
     
     drawRandomPixelLines(ctx: CanvasRenderingContext2D, points: IPointData[]){
@@ -244,13 +254,15 @@ export default class PenTool extends Tool {
     move(data: IPointerData): void {
         let width = this.getWidth(data.pressure, data.speed, data.tilt);
         const position = this.getPosition(data.position, data.tilt, width);
-
-        let newPoints = this.interpolatePoints({
+        
+        const newPoint = {
             position: position,
             width: width,
             tilt: data.tilt,
             speed: data.speed
-        });
+        }
+        
+        let newPoints = this.interpolatePoints(newPoint);
 
         this._points = this._points.concat(newPoints);
         // const numSegments = newPoints.length;
@@ -268,7 +280,7 @@ export default class PenTool extends Tool {
         const points: IPointData[] = [];
         
         if (this._points.length == 0){
-            return;
+            return points;
         }
         
         const start = this._points[this._points.length - 1];
@@ -322,6 +334,8 @@ export default class PenTool extends Tool {
     }
 
     getPosition(position: Point, tilt: Point, width: number): Point {
+        return position;
+        
         const tiltInfluence = 0.75;
         return Point.add(position, Point.scale(tilt, tiltInfluence * 0.5 * width / 90));
     }

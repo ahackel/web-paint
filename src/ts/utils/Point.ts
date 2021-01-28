@@ -100,4 +100,8 @@ export default class Point {
             p1.x * (1 - a) + p2.x * a,
             p1.y * (1 - a2) + p2.y * a2);
     }
+
+    static fromPixiPoint(point: PIXI.Point): Point {
+        return new Point(point.x, point.y);
+    }
 }

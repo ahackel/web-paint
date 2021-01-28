@@ -1,7 +1,8 @@
 import {config} from "./config";
 import Utils from "./utils/Utils";
 import Point from "./utils/Point";
-import ILayer from "./ILayer";
+import * as PIXI from 'pixi.js';
+import {Sprite} from "pixi.js";
 
 interface IPointer {
     clientX: number,
@@ -13,11 +14,11 @@ interface IPointerList {
     [index: number]: IPointer;
 }
 
-export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasElement> implements ILayer {
+export default class Layer {
 
     public onDoubleTap: Function | undefined;
     
-    protected _element: T;
+    protected _sprite: PIXI.Sprite;
     private _index: number;
     private _pinchCenter: Point;
     private _localDragPosition: Point;
@@ -25,112 +26,79 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     private _pinchStartRotation: number;
     private _startScale: number = 1;
     private _startRotation: number = 0;
-    private _position: Point = new Point(0, 0);
-    private _scale: number = 1;
-    private _rotation: number = 0;
     private _lastTouchStartTime: number = 0;
     private _pointers: PointerEvent[] = [];
-    private _width: number;
-    private _height: number;
+    private _floating: boolean;
     
-    get id(): string { return this._element.id; }
-    get index(): number { return this._index; }
-    set index(v: number) {
-        this._index = v;
-        this.transform(this.position, this.scale, this.rotation);
-    }
-    get width(): number { return this._width; };
-    get height(): number { return this._height; };
-    get position() { return this._position; }
-    get rotation() { return this._rotation; }
-    get scale() { return this._scale; }
-    get floating(): boolean { return this._element.classList.contains("floating"); }
+    get id(): string { return this._sprite.name; }
+    get sprite(): PIXI.Sprite { return this._sprite; }
+    get renderTexture(): PIXI.RenderTexture { return <PIXI.RenderTexture>this._sprite.texture; }
+
+    get width(): number { return this._sprite.width; };
+    get height(): number { return this._sprite.height; };
+    get position() { return this._sprite.position; }
+    get rotation() { return this._sprite.rotation; }
+    get scale() { return this._sprite.scale; }
+    
+    get floating(): boolean { return this._floating; }
     
     set floating(value: boolean) { 
-        this._element.classList.toggle("floating", value);
-        this._element.style.pointerEvents = value ? "auto" : "none";
-        if (value){
-            this.addEventListeners();
-        }
-        else {
-            this.removeEventListeners();
-        }
+        this._floating = value;
+        // this._sprite.style.pointerEvents = value ? "auto" : "none";
+        // if (value){
+        //     this.addEventListeners();
+        // }
+        // else {
+        //     this.removeEventListeners();
+        // }
     }
 
-    constructor(parent: HTMLElement, tag: string, id: string, x: number, y: number, width: number, height: number) {
-        this._element = <T>document.createElement(tag);
-        this._element.id = id;
-        this._element.classList.add("layer");
-        this._index = 0;
-        this._width = width;
-        this._height = height;
-        this._element.width = width;
-        this._element.height = height;
-        this._element.style.width = `${width}em`;
-        this._element.style.height = `${height}em`;
-        this._element.style.pointerEvents = "none";
-            
-        parent.appendChild(this._element);
-        this.transform(new Point(x, y), 1, 0);
+    constructor(container: PIXI.Container, id: string) {
+        this._sprite = new PIXI.Sprite();
+        this._sprite.name = id;
+        container.addChild(this._sprite);
         this.bindEventListeners();
     }
     
     remove() {
-        this._element.remove();
+        this._sprite.destroy();
     }
-
-    resize(width: number, height: number) {
-        const x = this.position.x + 0.5 * (this.width - width);
-        const y = this.position.y + 0.5 * (this.height - height);
-
-        this.setPositionAndSize(x, y, width, height);
-    }
-
-    setPositionAndSize(x: number, y: number, width: number, height: number) {
-        this._width = width;
-        this._height = height;
-        this._element.width = width;
-        this._element.height = height;
-        this._element.style.width = `${width}em`;
-        this._element.style.height = `${height}em`;
-        this.transform(new Point(x, y), this.scale, this.rotation);
-    }
-
+    
     drawToCanvas(ctx: CanvasRenderingContext2D) {
-        ctx.save();
-        let x = this._position.x + 0.5 * this.width;
-        let y = this._position.y + 0.5 * this.height;
-        ctx.setTransform(this._scale, 0, 0, this._scale, x, y);
-        ctx.rotate(this._rotation);
-        ctx.translate(-0.5 * this.width, -0.5 * this.height);
-        ctx.drawImage(this._element, 0, 0);
-        ctx.restore();
+        // ctx.save();
+        // let x = this._position.x + 0.5 * this.width;
+        // let y = this._position.y + 0.5 * this.height;
+        // ctx.setTransform(this._scale, 0, 0, this._scale, x, y);
+        // ctx.rotate(this._rotation);
+        // ctx.translate(-0.5 * this.width, -0.5 * this.height);
+        // ctx.drawImage(this._sprite, 0, 0);
+        // ctx.restore();
     }
 
     private addEventListeners() {
-        // pinch gesture handling inspired by https://codepen.io/hanseklund/pen/izloq
-        
-        this._element.addEventListener('click', this.preventDefault);
-
-        if (Utils.pointerEventsSupported()){
-            this._element.addEventListener('touchstart', this.preventDefault);
-            this._element.addEventListener('pointerdown', this.pointerDown);
-        }
-        else{
-            this._element.addEventListener('touchstart', this.touchStart);
-        }
+        // // pinch gesture handling inspired by https://codepen.io/hanseklund/pen/izloq
+        //
+        // this._sprite.addEventListener('click', this.preventDefault);
+        //
+        // if (Utils.pointerEventsSupported()){
+        //     this._sprite.addEventListener('touchstart', this.preventDefault);
+        //     this._sprite.addEventListener('pointerdown', this.pointerDown);
+        // }
+        // else{
+        //     this._sprite.addEventListener('touchstart', this.touchStart);
+        // }
     }
     
     private removeEventListeners() {
-        this._element.removeEventListener('click', this.preventDefault);
-
-        if (Utils.pointerEventsSupported()){
-            this._element.removeEventListener('touchstart', this.preventDefault);
-            this._element.removeEventListener('pointerdown', this.pointerDown);
-        }
-        else{
-            this._element.removeEventListener('touchstart', this.touchStart);
-        }
+        // this._sprite.removeEventListener('click', this.preventDefault);
+        //
+        // if (Utils.pointerEventsSupported()){
+        //     this._sprite.removeEventListener('touchstart', this.preventDefault);
+        //     this._sprite.removeEventListener('pointerdown', this.pointerDown);
+        // }
+        // else{
+        //     this._sprite.removeEventListener('touchstart', this.touchStart);
+        // }
     }
     
     private preventDefault(event: Event) {
@@ -144,36 +112,36 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     }
     
     private pointerDown(event: PointerEvent){
-        event.preventDefault();
-        this._element.setPointerCapture(event.pointerId);
-        this.addPointerEvent(event);
-
-        if (this._pointers.length === 1){
-            if (event.timeStamp < this._lastTouchStartTime + config.doubleTapDelay){
-                this.doubleTap(event);
-            }
-            this._lastTouchStartTime = event.timeStamp;
-
-            this._element.addEventListener("pointermove", this.pointerMove);
-            this._element.addEventListener("pointerup", this.pointerUp);
-
-            this._pinchCenter = new Point(
-                this._position.x + 0.5 * this.width,
-                this._position.y + 0.5 * this.height);
-
-            if (event.altKey){
-                let p1 = this.clientToPixel(this._pointers[0]);
-                let p2 = Point.mirror(p1, this._pinchCenter);
-                this.pinchStart(p1, p2);
-            }
-            else{
-                this.dragStart(this.clientToPixel(this._pointers[0]));
-            }
-        }
-        
-        if (this._pointers.length === 2 ){
-            this.pinchStart(this.clientToPixel(this._pointers[0]), this.clientToPixel(this._pointers[1]));
-        }  
+        // event.preventDefault();
+        // this._sprite.setPointerCapture(event.pointerId);
+        // this.addPointerEvent(event);
+        //
+        // if (this._pointers.length === 1){
+        //     if (event.timeStamp < this._lastTouchStartTime + config.doubleTapDelay){
+        //         this.doubleTap(event);
+        //     }
+        //     this._lastTouchStartTime = event.timeStamp;
+        //
+        //     this._sprite.addEventListener("pointermove", this.pointerMove);
+        //     this._sprite.addEventListener("pointerup", this.pointerUp);
+        //
+        //     this._pinchCenter = new Point(
+        //         this._position.x + 0.5 * this.width,
+        //         this._position.y + 0.5 * this.height);
+        //
+        //     if (event.altKey){
+        //         let p1 = this.clientToPixel(this._pointers[0]);
+        //         let p2 = Point.mirror(p1, this._pinchCenter);
+        //         this.pinchStart(p1, p2);
+        //     }
+        //     else{
+        //         this.dragStart(this.clientToPixel(this._pointers[0]));
+        //     }
+        // }
+        //
+        // if (this._pointers.length === 2 ){
+        //     this.pinchStart(this.clientToPixel(this._pointers[0]), this.clientToPixel(this._pointers[1]));
+        // }  
     }
 
     private addPointerEvent(event: PointerEvent) {
@@ -199,49 +167,49 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     }
 
     private pointerUp(event: PointerEvent) {
-        event.preventDefault();
-        this._element.releasePointerCapture(event.pointerId);
-        this.removePointerEvent(event);
-
-        if (this._pointers.length == 1) {
-            this.dragStart(this.clientToPixel(this._pointers[0]));
-        }
-
-        if (this._pointers.length == 0){
-            this._element.removeEventListener("pointermove", this.pointerMove);
-            this._element.removeEventListener("pointerup", this.pointerUp);
-        }
+        // event.preventDefault();
+        // this._sprite.releasePointerCapture(event.pointerId);
+        // this.removePointerEvent(event);
+        //
+        // if (this._pointers.length == 1) {
+        //     this.dragStart(this.clientToPixel(this._pointers[0]));
+        // }
+        //
+        // if (this._pointers.length == 0){
+        //     this._sprite.removeEventListener("pointermove", this.pointerMove);
+        //     this._sprite.removeEventListener("pointerup", this.pointerUp);
+        // }
     }
 
     private touchStart(event: TouchEvent) {
-        event.preventDefault();
-
-        if (event.touches.length === 1){
-            if (event.timeStamp < this._lastTouchStartTime + config.doubleTapDelay){
-                this.doubleTap(event);
-            }
-            this._lastTouchStartTime = event.timeStamp;
-            
-            this._element.addEventListener('touchmove', this.touchMove);
-            this._element.addEventListener('touchend', this.touchEnd);
-
-            this._pinchCenter = new Point(
-                this._position.x + 0.5 * this.width,
-                this._position.y + 0.5 * this.height);
-
-            if (event.altKey){
-                let p1 = this.clientToPixel(event.touches[0]);
-                let p2 = Point.mirror(p1, this._pinchCenter);
-                this.pinchStart(p1, p2);
-            }
-            else{
-                this.dragStart(this.clientToPixel(event.touches[0]));
-            }
-        }
-        
-        if (event.touches.length === 2){
-            this.pinchStart(this.clientToPixel(event.touches[0]), this.clientToPixel(event.touches[1]));
-        }
+        // event.preventDefault();
+        //
+        // if (event.touches.length === 1){
+        //     if (event.timeStamp < this._lastTouchStartTime + config.doubleTapDelay){
+        //         this.doubleTap(event);
+        //     }
+        //     this._lastTouchStartTime = event.timeStamp;
+        //    
+        //     this._sprite.addEventListener('touchmove', this.touchMove);
+        //     this._sprite.addEventListener('touchend', this.touchEnd);
+        //
+        //     this._pinchCenter = new Point(
+        //         this._position.x + 0.5 * this.width,
+        //         this._position.y + 0.5 * this.height);
+        //
+        //     if (event.altKey){
+        //         let p1 = this.clientToPixel(event.touches[0]);
+        //         let p2 = Point.mirror(p1, this._pinchCenter);
+        //         this.pinchStart(p1, p2);
+        //     }
+        //     else{
+        //         this.dragStart(this.clientToPixel(event.touches[0]));
+        //     }
+        // }
+        //
+        // if (event.touches.length === 2){
+        //     this.pinchStart(this.clientToPixel(event.touches[0]), this.clientToPixel(event.touches[1]));
+        // }
     }
 
     private touchMove(event: TouchEvent) {
@@ -250,33 +218,33 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     }
 
     private move(pointers: IPointerList, altKey: boolean) {
-        if (pointers.length === 1) {
-            if (altKey) {
-                let p1 = this.clientToPixel(pointers[0]);
-                let p2 = Point.mirror(p1, this._pinchCenter);
-                this.pinchMove(p1, p2);
-            } else {
-                this.dragMove(this.clientToPixel(pointers[0]));
-            }
-        }
-        if (pointers.length === 2) {
-            this.pinchMove(this.clientToPixel(pointers[0]), this.clientToPixel(pointers[1]));
-        }
+        // if (pointers.length === 1) {
+        //     if (altKey) {
+        //         let p1 = this.clientToPixel(pointers[0]);
+        //         let p2 = Point.mirror(p1, this._pinchCenter);
+        //         this.pinchMove(p1, p2);
+        //     } else {
+        //         this.dragMove(this.clientToPixel(pointers[0]));
+        //     }
+        // }
+        // if (pointers.length === 2) {
+        //     this.pinchMove(this.clientToPixel(pointers[0]), this.clientToPixel(pointers[1]));
+        // }
     }
 
     private touchEnd (event: TouchEvent) {
-        event.preventDefault();
-        this._element.removeEventListener('touchmove', this.touchMove);
-        this._element.addEventListener('touchend', this.touchEnd);
+        // event.preventDefault();
+        // this._sprite.removeEventListener('touchmove', this.touchMove);
+        // this._sprite.addEventListener('touchend', this.touchEnd);
     }
 
     transform(position: Point, scale: number, rotation: number) {
-        this._position = position;
-        this._rotation = rotation;
-        this._scale = scale;
-        const index = this._index;
-        this._element.style.transform = `translate(${position.x}em, ${position.y}em) rotate(${rotation}rad) scale(${scale}) translateZ(${index}px)`;
-        this._element.style.outlineWidth = `${2 / scale}em`;
+        // this._position = position;
+        // this._rotation = rotation;
+        // this._scale = scale;
+        // const index = this._index;
+        // this._sprite.style.transform = `translate(${position.x}em, ${position.y}em) rotate(${rotation}rad) scale(${scale}) translateZ(${index}px)`;
+        // this._sprite.style.outlineWidth = `${2 / scale}em`;
     }
 
     private bindEventListeners() {
@@ -292,20 +260,20 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     }
 
     private dragStart(position: Point) {
-        this._localDragPosition = Point.subtract(position, this.position);
+        // this._localDragPosition = Point.subtract(position, this.position);
     }
 
     private dragMove(position: Point) {
-        position.subtract(this._localDragPosition);
-        this.transform(position, this._scale, this._rotation);
+        // position.subtract(this._localDragPosition);
+        // this.transform(position, this._scale, this._rotation);
     }
 
     private pinchStart(p1: Point, p2: Point) {
-        let center = Point.center(p1, p2);
-        this._pinchStartDist = Point.distance(p1, p2);
-        this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
-        this._startRotation = this._rotation;
-        this._startScale = this._scale;       
+        // let center = Point.center(p1, p2);
+        // this._pinchStartDist = Point.distance(p1, p2);
+        // this._pinchStartRotation = Math.atan2(p1.y - center.y, p1.x - center.x);
+        // this._startRotation = this._rotation;
+        // this._startScale = this._scale;       
     }
 
     private pinchMove(p1: Point, p2: Point) {
@@ -325,17 +293,30 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
     }
 
     private clientToPixel(position1: IPointer){
-        let parent = this._element.parentElement;
-        let rect = parent.getBoundingClientRect();
+        // let parent = this._sprite.parentElement;
+        // let rect = parent.getBoundingClientRect();
+        //
+        // const isPortraitOrientation = rect.height > rect.width;
+        //
+        // let nx = (position1.clientX - rect.left) / rect.width;
+        // let ny = (position1.clientY - rect.top) / rect.height;
+        //
+        // let x = (isPortraitOrientation ? 1 - ny : nx) * config.width;
+        // let y = (isPortraitOrientation ? nx : ny) * config.height;
+        //
+        // return new Point(x, y);
+    }
 
-        const isPortraitOrientation = rect.height > rect.width;
+    clear(renderer: PIXI.Renderer) {
+        const oldRt = renderer.renderTexture.current;
+        renderer.renderTexture.bind(this.renderTexture);
+        renderer.renderTexture.clear();
+        renderer.renderTexture.bind(oldRt);
+    }
 
-        let nx = (position1.clientX - rect.left) / rect.width;
-        let ny = (position1.clientY - rect.top) / rect.height;
-
-        let x = (isPortraitOrientation ? 1 - ny : nx) * config.width;
-        let y = (isPortraitOrientation ? nx : ny) * config.height;
-
-        return new Point(x, y);
+    drawImage(image: HTMLImageElement, renderer: PIXI.Renderer) {
+        const imageSprite = new PIXI.Sprite(PIXI.Texture.from(image));
+        renderer.render(imageSprite, this.renderTexture);
+        imageSprite.destroy({texture: true});
     }
 }

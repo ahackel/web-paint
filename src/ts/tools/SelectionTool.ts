@@ -72,8 +72,8 @@ export default class SelectionTool extends Tool {
         this.destroySelectionLayer();
         this.hasFloatingSelection = false;
     }
-    
-    down(data: IPointerData) {
+
+    down(data: IPointerData): void {
         this._position = this.getClampedPosition(data);
         this.startNewSelection();
     }

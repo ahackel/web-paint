@@ -162,16 +162,16 @@ body, input, textarea {
     right: 0;
 }
 
-.layer {
+#sheet canvas {
     position: absolute;
     left: 0;
     top: 0;
-    background: none;
-}
-
-#base-layer {
     background: white;
 }
+
+/*#base-layer {*/
+/*    background: white;*/
+/*}*/
 
 .layer.floating{
     outline: 2px dashed black;
