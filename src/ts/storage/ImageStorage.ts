@@ -150,7 +150,7 @@ export default class ImageStorage {
 		Utils.log("Start migrating");
 
 		for (let id of keys) {
-			if (!id.startsWith("image") && !id.startsWith("Stamp")){
+			if (!id.startsWith("image") && !id.startsWith("Shape")){
 				continue;
 			}
 
@@ -158,7 +158,7 @@ export default class ImageStorage {
 				continue;
 			}
 
-			const newId = id.replace("Stamp", "stamp") + ".png";
+			const newId = id.replace("Shape", "shape") + ".png";
 			const data = <Blob>await this.adapter.getItem(id);
 			await this.adapter.setItem(newId, data);
 			await this.adapter.removeItem(id);

@@ -8422,7 +8422,7 @@ _parcelHelpers.export(exports, "config", function () {
 });
 var defaultShapes = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
 var config = {
-  debug: true,
+  debug: false,
   doubleTapDelay: 400,
   longClickDelay: 1000,
   minScrollDistance: 30,
@@ -10090,7 +10090,7 @@ var ImageStorage = /*#__PURE__*/(function () {
                   break;
                 }
                 _id2 = _step3.value;
-                if (!(!_id2.startsWith("image") && !_id2.startsWith("Stamp"))) {
+                if (!(!_id2.startsWith("image") && !_id2.startsWith("Shape"))) {
                   _context7.next = 12;
                   break;
                 }
@@ -10102,7 +10102,7 @@ var ImageStorage = /*#__PURE__*/(function () {
                 }
                 return _context7.abrupt("continue", 24);
               case 14:
-                newId = _id2.replace("Stamp", "stamp") + ".png";
+                newId = _id2.replace("Shape", "shape") + ".png";
                 _context7.next = 17;
                 return this.adapter.getItem(_id2);
               case 17:
@@ -33423,4 +33423,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.ca1f65dd.js.map
+//# sourceMappingURL=index.c30fedfb.js.map

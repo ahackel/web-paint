@@ -32,7 +32,7 @@ interface  IAppConfig{
 }
 
 export const config: IAppConfig = {
-    debug: true,
+    debug: false,
     doubleTapDelay: 400,
     longClickDelay: 1000,
     minScrollDistance: 30,
