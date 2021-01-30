@@ -10080,64 +10080,65 @@ var ImageStorage = /*#__PURE__*/(function () {
                 return this.keys();
               case 3:
                 keys = _context7.sent;
+                _utilsUtilsDefault.default.log("Start migrating");
                 _iterator3 = _createForOfIteratorHelper(keys);
-                _context7.prev = 5;
+                _context7.prev = 6;
                 _iterator3.s();
-              case 7:
+              case 8:
                 if ((_step3 = _iterator3.n()).done) {
-                  _context7.next = 25;
+                  _context7.next = 26;
                   break;
                 }
                 _id2 = _step3.value;
                 if (!(!_id2.startsWith("image") && !_id2.startsWith("Stamp"))) {
-                  _context7.next = 11;
+                  _context7.next = 12;
                   break;
                 }
-                return _context7.abrupt("continue", 23);
-              case 11:
+                return _context7.abrupt("continue", 24);
+              case 12:
                 if (!_id2.endsWith(".png")) {
-                  _context7.next = 13;
+                  _context7.next = 14;
                   break;
                 }
-                return _context7.abrupt("continue", 23);
-              case 13:
+                return _context7.abrupt("continue", 24);
+              case 14:
                 newId = _id2.replace("Stamp", "stamp") + ".png";
-                _context7.next = 16;
+                _context7.next = 17;
                 return this.adapter.getItem(_id2);
-              case 16:
+              case 17:
                 data = _context7.sent;
-                _context7.next = 19;
+                _context7.next = 20;
                 return this.adapter.setItem(newId, data);
-              case 19:
-                _context7.next = 21;
+              case 20:
+                _context7.next = 22;
                 return this.adapter.removeItem(_id2);
-              case 21:
+              case 22:
                 console.log(("Migrated ").concat(_id2, " to ").concat(newId, "."));
                 needsRefresh = true;
-              case 23:
-                _context7.next = 7;
+              case 24:
+                _context7.next = 8;
                 break;
-              case 25:
-                _context7.next = 30;
+              case 26:
+                _context7.next = 31;
                 break;
-              case 27:
-                _context7.prev = 27;
-                _context7.t0 = _context7["catch"](5);
+              case 28:
+                _context7.prev = 28;
+                _context7.t0 = _context7["catch"](6);
                 _iterator3.e(_context7.t0);
-              case 30:
-                _context7.prev = 30;
+              case 31:
+                _context7.prev = 31;
                 _iterator3.f();
-                return _context7.finish(30);
-              case 33:
+                return _context7.finish(31);
+              case 34:
                 if (needsRefresh) {
                   location.reload();
                 }
-              case 34:
+              case 35:
               case "end":
                 return _context7.stop();
             }
           }
-        }, _callee7, this, [[5, 27, 30, 33]]);
+        }, _callee7, this, [[6, 28, 31, 34]]);
       }));
       function migrate() {
         return _migrate.apply(this, arguments);
@@ -10158,56 +10159,57 @@ var ImageStorage = /*#__PURE__*/(function () {
                 return this.keys();
               case 3:
                 keys = _context8.sent;
+                _utilsUtilsDefault.default.log(keys.length + " keys");
                 _iterator4 = _createForOfIteratorHelper(keys);
-                _context8.prev = 5;
+                _context8.prev = 6;
                 _iterator4.s();
-              case 7:
+              case 8:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context8.next = 22;
+                  _context8.next = 23;
                   break;
                 }
                 _id3 = _step4.value;
                 _utilsUtilsDefault.default.log(_id3);
-                _context8.next = 12;
+                _context8.next = 13;
                 return this.loadImageUrl(_id3);
-              case 12:
+              case 13:
                 url = _context8.sent;
-                _context8.next = 15;
+                _context8.next = 16;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
-              case 15:
+              case 16:
                 blob = _context8.sent;
                 _utilsUtilsDefault.default.log(blob);
                 if (blob) {
-                  _context8.next = 19;
+                  _context8.next = 20;
                   break;
                 }
-                return _context8.abrupt("continue", 20);
-              case 19:
-                amount += blob.size;
+                return _context8.abrupt("continue", 21);
               case 20:
-                _context8.next = 7;
+                amount += blob.size;
+              case 21:
+                _context8.next = 8;
                 break;
-              case 22:
-                _context8.next = 27;
+              case 23:
+                _context8.next = 28;
                 break;
-              case 24:
-                _context8.prev = 24;
-                _context8.t0 = _context8["catch"](5);
+              case 25:
+                _context8.prev = 25;
+                _context8.t0 = _context8["catch"](6);
                 _iterator4.e(_context8.t0);
-              case 27:
-                _context8.prev = 27;
+              case 28:
+                _context8.prev = 28;
                 _iterator4.f();
-                return _context8.finish(27);
-              case 30:
-                return _context8.abrupt("return", amount);
+                return _context8.finish(28);
               case 31:
+                return _context8.abrupt("return", amount);
+              case 32:
               case "end":
                 return _context8.stop();
             }
           }
-        }, _callee8, this, [[5, 24, 27, 30]]);
+        }, _callee8, this, [[6, 25, 28, 31]]);
       }));
       function getStorageUsed() {
         return _getStorageUsed.apply(this, arguments);
@@ -33401,7 +33403,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
       _get(_getPrototypeOf(SettingsView.prototype), "show", this).call(this);
       this.updateInfo();
       var log = document.getElementById("log");
-      log.innerText = _utilsUtilsDefault.default.getLog().join("\n");
+      log.innerText = _utilsUtilsDefault.default.getLog().join("\r");
     }
   }, {
     key: "updateInfo",
@@ -33409,7 +33411,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
       var info = document.getElementById("info");
       info.innerText = ("Version: ").concat(version);
       _storageImageStorageDefault.default.getStorageUsed().then(function (amount) {
-        info.innerText += ("\nStorage used: ").concat(_utilsUtilsDefault.default.formatBytes(amount, 1));
+        info.innerText += ("\rStorage used: ").concat(_utilsUtilsDefault.default.formatBytes(amount, 1));
       });
     }
   }]);
@@ -33421,4 +33423,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.f8d84522.js.map
+//# sourceMappingURL=index.ca1f65dd.js.map

@@ -32,14 +32,14 @@ export default class SettingsView extends View {
         super.show();
         this.updateInfo();
         const log = <HTMLParagraphElement>document.getElementById("log");
-        log.innerText = Utils.getLog().join("\n");
+        log.innerText = Utils.getLog().join("\r");
     }
 
     private updateInfo() {
         const info = <HTMLParagraphElement>document.getElementById("info");
         info.innerText = `Version: ${version}`;
         ImageStorage.getStorageUsed().then(amount => {
-            info.innerText += `\nStorage used: ${Utils.formatBytes(amount, 1)}`;
+            info.innerText += `\rStorage used: ${Utils.formatBytes(amount, 1)}`;
         });
     }
 }
