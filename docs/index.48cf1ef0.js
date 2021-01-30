@@ -10061,68 +10061,74 @@ var ImageStorage = /*#__PURE__*/(function () {
     key: "migrate",
     value: (function () {
       var _migrate = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
-        var keys, _iterator3, _step3, _id2, newId, data;
+        var needsRefresh, keys, _iterator3, _step3, _id2, newId, data;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                _context7.next = 2;
+                needsRefresh = false;
+                _context7.next = 3;
                 return this.keys();
-              case 2:
+              case 3:
                 keys = _context7.sent;
                 _iterator3 = _createForOfIteratorHelper(keys);
-                _context7.prev = 4;
+                _context7.prev = 5;
                 _iterator3.s();
-              case 6:
+              case 7:
                 if ((_step3 = _iterator3.n()).done) {
-                  _context7.next = 23;
+                  _context7.next = 25;
                   break;
                 }
                 _id2 = _step3.value;
                 if (!(!_id2.startsWith("image") && !_id2.startsWith("Stamp"))) {
-                  _context7.next = 10;
+                  _context7.next = 11;
                   break;
                 }
-                return _context7.abrupt("continue", 21);
-              case 10:
+                return _context7.abrupt("continue", 23);
+              case 11:
                 if (!_id2.endsWith(".png")) {
-                  _context7.next = 12;
+                  _context7.next = 13;
                   break;
                 }
-                return _context7.abrupt("continue", 21);
-              case 12:
+                return _context7.abrupt("continue", 23);
+              case 13:
                 newId = _id2.replace("Stamp", "stamp") + ".png";
-                _context7.next = 15;
+                _context7.next = 16;
                 return this.adapter.getItem(_id2);
-              case 15:
+              case 16:
                 data = _context7.sent;
-                _context7.next = 18;
+                _context7.next = 19;
                 return this.adapter.setItem(newId, data);
-              case 18:
-                _context7.next = 20;
+              case 19:
+                _context7.next = 21;
                 return this.adapter.removeItem(_id2);
-              case 20:
-                console.log(("Migrated ").concat(_id2, " to ").concat(newId, "."));
               case 21:
-                _context7.next = 6;
-                break;
+                console.log(("Migrated ").concat(_id2, " to ").concat(newId, "."));
+                needsRefresh = true;
               case 23:
-                _context7.next = 28;
+                _context7.next = 7;
                 break;
               case 25:
-                _context7.prev = 25;
-                _context7.t0 = _context7["catch"](4);
+                _context7.next = 30;
+                break;
+              case 27:
+                _context7.prev = 27;
+                _context7.t0 = _context7["catch"](5);
                 _iterator3.e(_context7.t0);
-              case 28:
-                _context7.prev = 28;
+              case 30:
+                _context7.prev = 30;
                 _iterator3.f();
-                return _context7.finish(28);
-              case 31:
+                return _context7.finish(30);
+              case 33:
+                if (needsRefresh) {
+                  location.reload();
+                }
+              case 34:
               case "end":
                 return _context7.stop();
             }
           }
-        }, _callee7, this, [[4, 25, 28, 31]]);
+        }, _callee7, this, [[5, 27, 30, 33]]);
       }));
       function migrate() {
         return _migrate.apply(this, arguments);
@@ -33353,4 +33359,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.e3fb2204.js.map
+//# sourceMappingURL=index.48cf1ef0.js.map

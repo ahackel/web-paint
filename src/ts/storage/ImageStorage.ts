@@ -145,6 +145,7 @@ export default class ImageStorage {
 	}
 	
 	private static async migrate(){
+		let needsRefresh = false;
 		var keys = <string[]> await this.keys();
 
 		for (let id of keys) {
@@ -161,6 +162,10 @@ export default class ImageStorage {
 			await this.adapter.setItem(newId, data);
 			await this.adapter.removeItem(id);
 			console.log(`Migrated ${id} to ${newId}.`);
+			needsRefresh = true;
+		}
+		if (needsRefresh){
+			location.reload();
 		}
 	}
 	
