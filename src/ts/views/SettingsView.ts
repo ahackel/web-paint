@@ -31,6 +31,8 @@ export default class SettingsView extends View {
     show(){
         super.show();
         this.updateInfo();
+        const log = <HTMLParagraphElement>document.getElementById("log");
+        log.innerText = Utils.getLog().join("\n");
     }
 
     private updateInfo() {

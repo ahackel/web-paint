@@ -7,6 +7,7 @@ let _times: number[] = [];
 let _fps: number = 60;
 let _fpsDisplay: HTMLElement;
 let _fpsCounterEnabled = true;
+let _consoleOutput: string[] = [];
 
 export default class Utils {
 
@@ -75,6 +76,11 @@ export default class Utils {
             return;
         }
         console.log(message, optionalParams);
+        _consoleOutput.push(message.toString());
+    }
+    
+    public static getLog(): string[]{
+        return _consoleOutput;
     }
 
     public static updateFPSCounter(){

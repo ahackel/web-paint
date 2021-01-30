@@ -8422,7 +8422,7 @@ _parcelHelpers.export(exports, "config", function () {
 });
 var defaultShapes = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
 var config = {
-  debug: false,
+  debug: true,
   doubleTapDelay: 400,
   longClickDelay: 1000,
   minScrollDistance: 30,
@@ -8636,6 +8636,7 @@ var _times = [];
 var _fps = 60;
 var _fpsDisplay;
 var _fpsCounterEnabled = true;
+var _consoleOutput = [];
 var Utils = /*#__PURE__*/(function () {
   function Utils() {
     _classCallCheck(this, Utils);
@@ -8735,6 +8736,12 @@ var Utils = /*#__PURE__*/(function () {
         optionalParams[_key - 1] = arguments[_key];
       }
       console.log(message, optionalParams);
+      _consoleOutput.push(message.toString());
+    }
+  }, {
+    key: "getLog",
+    value: function getLog() {
+      return _consoleOutput;
     }
   }, {
     key: "updateFPSCounter",
@@ -9638,6 +9645,8 @@ _parcelHelpers.export(exports, "default", function () {
 });
 var _LocalForageAdapter = require("./LocalForageAdapter");
 var _LocalForageAdapterDefault = _parcelHelpers.interopDefault(_LocalForageAdapter);
+var _utilsUtils = require("../utils/Utils");
+var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _jszip = require("jszip");
 var _jszipDefault = _parcelHelpers.interopDefault(_jszip);
 function _createForOfIteratorHelper(o, allowArrayLike) {
@@ -10145,14 +10154,14 @@ var ImageStorage = /*#__PURE__*/(function () {
             switch (_context8.prev = _context8.next) {
               case 0:
                 amount = 0;
-                console.log("getStorageUsed");
+                _utilsUtilsDefault.default.log("getStorageUsed");
                 _context8.next = 4;
                 return this.keys();
               case 4:
                 keys = _context8.sent;
-                console.log("got keys");
-                console.log(keys.length);
-                console.log(keys);
+                _utilsUtilsDefault.default.log("got keys");
+                _utilsUtilsDefault.default.log(keys.length);
+                _utilsUtilsDefault.default.log(keys);
                 return _context8.abrupt("return");
               case 12:
                 if ((_step4 = _iterator4.n()).done) {
@@ -10227,7 +10236,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   return ImageStorage;
 })();
 
-},{"./LocalForageAdapter":"6C5Ef","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6C5Ef":[function(require,module,exports) {
+},{"./LocalForageAdapter":"6C5Ef","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","../utils/Utils":"1H53o"}],"6C5Ef":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -33392,6 +33401,8 @@ var SettingsView = /*#__PURE__*/(function (_View) {
     value: function show() {
       _get(_getPrototypeOf(SettingsView.prototype), "show", this).call(this);
       this.updateInfo();
+      var log = document.getElementById("log");
+      log.innerText = _utilsUtilsDefault.default.getLog().join("\n");
     }
   }, {
     key: "updateInfo",
@@ -33411,4 +33422,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.bc35d2d6.js.map
+//# sourceMappingURL=index.14052ecd.js.map

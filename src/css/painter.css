@@ -130,6 +130,22 @@ body, input, textarea {
     color: grey;
 }
 
+.view.settings #log {
+    width: 100%;
+    float: left;
+    background: #272727;
+    color: #c7c7c7;
+    overflow-y: scroll;
+    height: 20em;
+    padding: 0.5em;
+    font-family: monospace;
+    font-size: 16px;
+}
+
+#log br{
+    border-bottom: white solid 1px;
+}
+
 #peer-list {
     font-size: 1.2em;
     line-height: 1.4em;

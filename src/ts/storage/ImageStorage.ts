@@ -171,11 +171,11 @@ export default class ImageStorage {
 	
 	public static async getStorageUsed(): Promise<number> {
 		let amount = 0;
-		console.log("getStorageUsed");
+		Utils.log("getStorageUsed");
 		var keys = <string[]> await this.keys();
-		console.log("got keys");
-		console.log(keys.length);
-		console.log(keys);
+		Utils.log("got keys");
+		Utils.log(keys.length);
+		Utils.log(keys);
 		
 		return;
 		for (let id of keys) {
