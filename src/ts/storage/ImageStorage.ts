@@ -171,7 +171,10 @@ export default class ImageStorage {
 	
 	public static async getStorageUsed(): Promise<number> {
 		let amount = 0;
+		console.log("getStorageUsed");
 		var keys = <string[]> await this.keys();
+		console.log("got keys");
+		console.log(keys.length);
 		console.log(keys);
 		
 		return;

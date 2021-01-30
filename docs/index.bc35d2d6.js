@@ -10145,58 +10145,61 @@ var ImageStorage = /*#__PURE__*/(function () {
             switch (_context8.prev = _context8.next) {
               case 0:
                 amount = 0;
-                _context8.next = 3;
+                console.log("getStorageUsed");
+                _context8.next = 4;
                 return this.keys();
-              case 3:
+              case 4:
                 keys = _context8.sent;
+                console.log("got keys");
+                console.log(keys.length);
                 console.log(keys);
                 return _context8.abrupt("return");
-              case 9:
+              case 12:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context8.next = 23;
+                  _context8.next = 26;
                   break;
                 }
                 _id3 = _step4.value;
-                _context8.next = 13;
-                return this.loadImageUrl(_id3);
-              case 13:
-                url = _context8.sent;
                 _context8.next = 16;
+                return this.loadImageUrl(_id3);
+              case 16:
+                url = _context8.sent;
+                _context8.next = 19;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
-              case 16:
+              case 19:
                 blob = _context8.sent;
                 console.log(blob);
                 if (blob) {
-                  _context8.next = 20;
+                  _context8.next = 23;
                   break;
                 }
-                return _context8.abrupt("continue", 21);
-              case 20:
-                amount += blob.size;
-              case 21:
-                _context8.next = 9;
-                break;
+                return _context8.abrupt("continue", 24);
               case 23:
-                _context8.next = 28;
+                amount += blob.size;
+              case 24:
+                _context8.next = 12;
                 break;
-              case 25:
-                _context8.prev = 25;
-                _context8.t0 = _context8["catch"](7);
-                _iterator4.e(_context8.t0);
+              case 26:
+                _context8.next = 31;
+                break;
               case 28:
                 _context8.prev = 28;
-                _iterator4.f();
-                return _context8.finish(28);
+                _context8.t0 = _context8["catch"](10);
+                _iterator4.e(_context8.t0);
               case 31:
+                _context8.prev = 31;
+                _iterator4.f();
+                return _context8.finish(31);
+              case 34:
                 return _context8.abrupt("return", amount);
-              case 32:
+              case 35:
               case "end":
                 return _context8.stop();
             }
           }
-        }, _callee8, this, [[7, 25, 28, 31]]);
+        }, _callee8, this, [[10, 28, 31, 34]]);
       }));
       function getStorageUsed() {
         return _getStorageUsed.apply(this, arguments);
@@ -33408,4 +33411,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.207579b7.js.map
+//# sourceMappingURL=index.bc35d2d6.js.map
