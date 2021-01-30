@@ -173,6 +173,8 @@ export default class ImageStorage {
 		let amount = 0;
 		var keys = <string[]> await this.keys();
 		console.log(keys);
+		
+		return;
 		for (let id of keys) {
 			const url = await this.loadImageUrl(id);
 			const blob = await fetch(url).then(r => r.blob());

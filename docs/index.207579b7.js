@@ -10150,55 +10150,53 @@ var ImageStorage = /*#__PURE__*/(function () {
               case 3:
                 keys = _context8.sent;
                 console.log(keys);
-                _iterator4 = _createForOfIteratorHelper(keys);
-                _context8.prev = 6;
-                _iterator4.s();
-              case 8:
+                return _context8.abrupt("return");
+              case 9:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context8.next = 22;
+                  _context8.next = 23;
                   break;
                 }
                 _id3 = _step4.value;
-                _context8.next = 12;
+                _context8.next = 13;
                 return this.loadImageUrl(_id3);
-              case 12:
+              case 13:
                 url = _context8.sent;
-                _context8.next = 15;
+                _context8.next = 16;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
-              case 15:
+              case 16:
                 blob = _context8.sent;
                 console.log(blob);
                 if (blob) {
-                  _context8.next = 19;
+                  _context8.next = 20;
                   break;
                 }
-                return _context8.abrupt("continue", 20);
-              case 19:
-                amount += blob.size;
+                return _context8.abrupt("continue", 21);
               case 20:
-                _context8.next = 8;
+                amount += blob.size;
+              case 21:
+                _context8.next = 9;
                 break;
-              case 22:
-                _context8.next = 27;
+              case 23:
+                _context8.next = 28;
                 break;
-              case 24:
-                _context8.prev = 24;
-                _context8.t0 = _context8["catch"](6);
+              case 25:
+                _context8.prev = 25;
+                _context8.t0 = _context8["catch"](7);
                 _iterator4.e(_context8.t0);
-              case 27:
-                _context8.prev = 27;
+              case 28:
+                _context8.prev = 28;
                 _iterator4.f();
-                return _context8.finish(27);
-              case 30:
-                return _context8.abrupt("return", amount);
+                return _context8.finish(28);
               case 31:
+                return _context8.abrupt("return", amount);
+              case 32:
               case "end":
                 return _context8.stop();
             }
           }
-        }, _callee8, this, [[6, 24, 27, 30]]);
+        }, _callee8, this, [[7, 25, 28, 31]]);
       }));
       function getStorageUsed() {
         return _getStorageUsed.apply(this, arguments);
@@ -33410,4 +33408,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.0da5d4c5.js.map
+//# sourceMappingURL=index.207579b7.js.map
