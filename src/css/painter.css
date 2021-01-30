@@ -115,9 +115,9 @@ body, input, textarea {
     width: auto;
     border-radius: 0.5em;
     padding: 0 0.5em;
-    margin-block-end: 0.5em;
+    margin-right: 0.5em;
     float: left;
-    margin-inline-end: 0.5em;
+    margin-bottom: 0.5em;
 }
 
 .view.settings .wrapper{

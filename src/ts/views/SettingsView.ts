@@ -14,7 +14,10 @@ export default class SettingsView extends View {
         Utils.addClick(exportButton, async () => Utils.download(await ImageStorage.generateBackupArchive()));
 
         let importButton = <HTMLDivElement>this._element.getElementsByClassName("button import")[0];
-        Utils.addClick(importButton, async () => ImageStorage.importBackupArchive(await Utils.upload(".zip")));
+        Utils.addClick(importButton, async () => {
+            ImageStorage.importBackupArchive(await Utils.upload(".zip"));
+            this.updateInfo();
+        });
 
         let clearButton = <HTMLDivElement>this._element.getElementsByClassName("button clear")[0];
         Utils.addClick(clearButton, () => {
@@ -23,7 +26,14 @@ export default class SettingsView extends View {
                 location.reload();
             }
         });
+    }
+    
+    show(){
+        super.show();
+        this.updateInfo();
+    }
 
+    private updateInfo() {
         const info = <HTMLParagraphElement>document.getElementById("info");
         info.innerText = `Version: ${version}`;
         ImageStorage.getStorageUsed().then(amount => {

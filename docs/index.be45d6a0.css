@@ -115,9 +115,9 @@ body, input, textarea {
     width: auto;
     border-radius: 0.5em;
     padding: 0 0.5em;
-    margin-block-end: 0.5em;
+    margin-right: 0.5em;
     float: left;
-    margin-inline-end: 0.5em;
+    margin-bottom: 0.5em;
 }
 
 .view.settings .wrapper{
@@ -441,4 +441,4 @@ body, input, textarea {
     color: white;
 }
 
-/*# sourceMappingURL=index.ab48400a.css.map */
+/*# sourceMappingURL=index.be45d6a0.css.map */

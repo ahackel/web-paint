@@ -10149,54 +10149,56 @@ var ImageStorage = /*#__PURE__*/(function () {
                 return this.keys();
               case 3:
                 keys = _context8.sent;
+                console.log(keys);
                 _iterator4 = _createForOfIteratorHelper(keys);
-                _context8.prev = 5;
+                _context8.prev = 6;
                 _iterator4.s();
-              case 7:
+              case 8:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context8.next = 20;
+                  _context8.next = 22;
                   break;
                 }
                 _id3 = _step4.value;
-                _context8.next = 11;
+                _context8.next = 12;
                 return this.loadImageUrl(_id3);
-              case 11:
+              case 12:
                 url = _context8.sent;
-                _context8.next = 14;
+                _context8.next = 15;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
-              case 14:
+              case 15:
                 blob = _context8.sent;
+                console.log(blob);
                 if (blob) {
-                  _context8.next = 17;
+                  _context8.next = 19;
                   break;
                 }
-                return _context8.abrupt("continue", 18);
-              case 17:
+                return _context8.abrupt("continue", 20);
+              case 19:
                 amount += blob.size;
-              case 18:
-                _context8.next = 7;
-                break;
               case 20:
-                _context8.next = 25;
+                _context8.next = 8;
                 break;
               case 22:
-                _context8.prev = 22;
-                _context8.t0 = _context8["catch"](5);
+                _context8.next = 27;
+                break;
+              case 24:
+                _context8.prev = 24;
+                _context8.t0 = _context8["catch"](6);
                 _iterator4.e(_context8.t0);
-              case 25:
-                _context8.prev = 25;
+              case 27:
+                _context8.prev = 27;
                 _iterator4.f();
-                return _context8.finish(25);
-              case 28:
+                return _context8.finish(27);
+              case 30:
                 return _context8.abrupt("return", amount);
-              case 29:
+              case 31:
               case "end":
                 return _context8.stop();
             }
           }
-        }, _callee8, this, [[5, 22, 25, 28]]);
+        }, _callee8, this, [[6, 24, 27, 30]]);
       }));
       function getStorageUsed() {
         return _getStorageUsed.apply(this, arguments);
@@ -33225,6 +33227,43 @@ function _classCallCheck(instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if (("value" in descriptor)) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+      return desc.value;
+    };
+  }
+  return _get(target, property, receiver || target);
+}
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+  return object;
+}
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function");
@@ -33329,8 +33368,9 @@ var SettingsView = /*#__PURE__*/(function (_View) {
               return _utilsUtilsDefault.default.upload(".zip");
             case 3:
               _context2.t1 = _context2.sent;
-              return _context2.abrupt("return", _context2.t0.importBackupArchive.call(_context2.t0, _context2.t1));
-            case 5:
+              _context2.t0.importBackupArchive.call(_context2.t0, _context2.t1);
+              _this.updateInfo();
+            case 6:
             case "end":
               return _context2.stop();
           }
@@ -33344,13 +33384,24 @@ var SettingsView = /*#__PURE__*/(function (_View) {
         location.reload();
       }
     });
-    var info = document.getElementById("info");
-    info.innerText = ("Version: ").concat(version);
-    _storageImageStorageDefault.default.getStorageUsed().then(function (amount) {
-      info.innerText += ("\nStorage used: ").concat(_utilsUtilsDefault.default.formatBytes(amount, 1));
-    });
     return _this;
   }
+  _createClass(SettingsView, [{
+    key: "show",
+    value: function show() {
+      _get(_getPrototypeOf(SettingsView.prototype), "show", this).call(this);
+      this.updateInfo();
+    }
+  }, {
+    key: "updateInfo",
+    value: function updateInfo() {
+      var info = document.getElementById("info");
+      info.innerText = ("Version: ").concat(version);
+      _storageImageStorageDefault.default.getStorageUsed().then(function (amount) {
+        info.innerText += ("\nStorage used: ").concat(_utilsUtilsDefault.default.formatBytes(amount, 1));
+      });
+    }
+  }]);
   return SettingsView;
 })(_View2.View);
 
@@ -33359,4 +33410,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.48cf1ef0.js.map
+//# sourceMappingURL=index.0da5d4c5.js.map
