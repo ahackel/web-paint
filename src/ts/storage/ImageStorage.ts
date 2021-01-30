@@ -171,17 +171,13 @@ export default class ImageStorage {
 	
 	public static async getStorageUsed(): Promise<number> {
 		let amount = 0;
-		Utils.log("getStorageUsed");
 		var keys = <string[]> await this.keys();
-		Utils.log("got keys");
-		Utils.log(keys.length);
-		Utils.log(keys);
-		
-		return;
 		for (let id of keys) {
+			Utils.log(id);
+			
 			const url = await this.loadImageUrl(id);
 			const blob = await fetch(url).then(r => r.blob());
-			console.log(blob);
+			Utils.log(blob);
 			if (!blob){
 				continue;
 			}

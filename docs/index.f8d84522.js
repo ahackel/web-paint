@@ -10154,61 +10154,60 @@ var ImageStorage = /*#__PURE__*/(function () {
             switch (_context8.prev = _context8.next) {
               case 0:
                 amount = 0;
-                _utilsUtilsDefault.default.log("getStorageUsed");
-                _context8.next = 4;
+                _context8.next = 3;
                 return this.keys();
-              case 4:
+              case 3:
                 keys = _context8.sent;
-                _utilsUtilsDefault.default.log("got keys");
-                _utilsUtilsDefault.default.log(keys.length);
-                _utilsUtilsDefault.default.log(keys);
-                return _context8.abrupt("return");
-              case 12:
+                _iterator4 = _createForOfIteratorHelper(keys);
+                _context8.prev = 5;
+                _iterator4.s();
+              case 7:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context8.next = 26;
+                  _context8.next = 22;
                   break;
                 }
                 _id3 = _step4.value;
-                _context8.next = 16;
+                _utilsUtilsDefault.default.log(_id3);
+                _context8.next = 12;
                 return this.loadImageUrl(_id3);
-              case 16:
+              case 12:
                 url = _context8.sent;
-                _context8.next = 19;
+                _context8.next = 15;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
-              case 19:
+              case 15:
                 blob = _context8.sent;
-                console.log(blob);
+                _utilsUtilsDefault.default.log(blob);
                 if (blob) {
-                  _context8.next = 23;
+                  _context8.next = 19;
                   break;
                 }
-                return _context8.abrupt("continue", 24);
-              case 23:
+                return _context8.abrupt("continue", 20);
+              case 19:
                 amount += blob.size;
+              case 20:
+                _context8.next = 7;
+                break;
+              case 22:
+                _context8.next = 27;
+                break;
               case 24:
-                _context8.next = 12;
-                break;
-              case 26:
-                _context8.next = 31;
-                break;
-              case 28:
-                _context8.prev = 28;
-                _context8.t0 = _context8["catch"](10);
+                _context8.prev = 24;
+                _context8.t0 = _context8["catch"](5);
                 _iterator4.e(_context8.t0);
-              case 31:
-                _context8.prev = 31;
+              case 27:
+                _context8.prev = 27;
                 _iterator4.f();
-                return _context8.finish(31);
-              case 34:
+                return _context8.finish(27);
+              case 30:
                 return _context8.abrupt("return", amount);
-              case 35:
+              case 31:
               case "end":
                 return _context8.stop();
             }
           }
-        }, _callee8, this, [[10, 28, 31, 34]]);
+        }, _callee8, this, [[5, 24, 27, 30]]);
       }));
       function getStorageUsed() {
         return _getStorageUsed.apply(this, arguments);
@@ -33422,4 +33421,4 @@ module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal 
 
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.14052ecd.js.map
+//# sourceMappingURL=index.f8d84522.js.map
