@@ -15,14 +15,14 @@ export default class ShapePalette extends Palette {
 
         ImageStorage.keys()
             .then((keys: string[]) => {
-                const shapesIds = keys.filter(x => x.startsWith("Shape"));
+                const shapesIds = keys.filter(x => x.startsWith("shape"));
                 for (let shapeId of shapesIds) {
                     this.addShapeFromImageId(shapeId);
                 }
             });
 
         ImageStorage.addChangeListener((change: string, id: string) => {
-            if (change == "save" && id.startsWith("Shape")) {
+            if (change == "save" && id.startsWith("shape")) {
                 this.addShapeFromImageId(id);
             }
         });

@@ -33,7 +33,7 @@ export default class BookView extends View {
         this._thumbnails = [];
         
         for (let i=0; i<config.imageCount; i++) {
-            const imageId = `image${("" + (i + 1)).padStart(2, "0")}`;
+            const imageId = `image${("" + (i + 1)).padStart(2, "0")}.png`;
             let thumbnail = new Thumbnail(this._element, imageId, (id: string) => this.onImageSelected(id))
             this._thumbnails.push(thumbnail);
         }

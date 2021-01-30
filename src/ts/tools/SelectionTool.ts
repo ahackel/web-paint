@@ -229,7 +229,7 @@ export default class SelectionTool extends Tool {
                     return;
                 }
                 
-                const id = "Shape" + Date.now();
+                const id = `shape${Date.now()}.png`;
                 console.log(`Saving selection as: ${id}`);
                 this.selectionLayer.canvas.toBlob(blob => ImageStorage.saveImage(id, blob as Blob));
                 this.isInShapesPalette = true;

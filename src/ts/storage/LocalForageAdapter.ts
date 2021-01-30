@@ -24,4 +24,8 @@ export default class LocalForageAdapter extends StorageAdapter{
     iterate(param: (blob: Blob, id: string, iteration: number) => void): Promise<unknown> {
         return this._imageStore.iterate(param)
     }
+    
+    clear() {
+        return this._imageStore.clear();
+    }
 }

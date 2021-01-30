@@ -6,6 +6,8 @@ import DropboxAuthView from "./views/DropboxAuthView";
 import {config} from "./config";
 import PeerToPeer from "./PeerToPeer";
 import SettingsView from "./views/SettingsView";
+import ImageStorage from "./storage/ImageStorage";
+import Utils from "./utils/Utils";
 
 class App {
     private _activeView: View;
@@ -26,7 +28,7 @@ class App {
         });
         this.OnResize();
         
-        this._bookView = new BookView("book", () => {
+        this._bookView = new BookView("book", async () => {
             this.openView(this._settingsView);
         });
         this._bookView.onImageSelected = (id: string) => {

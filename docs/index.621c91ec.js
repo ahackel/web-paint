@@ -6,7 +6,7 @@
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
 
-(function(modules, cache, entry, mainEntry, parcelRequireName, globalName) {
+(function(modules, entry, mainEntry, parcelRequireName, globalName) {
   /* eslint-disable no-undef */
   var globalObject =
     typeof globalThis !== 'undefined'
@@ -24,6 +24,8 @@
   var previousRequire =
     typeof globalObject[parcelRequireName] === 'function' &&
     globalObject[parcelRequireName];
+
+  var cache = previousRequire.cache || {};
   // Do not use `require` to prevent Webpack from trying to bundle this call
   var nodeRequire =
     typeof module !== 'undefined' &&
@@ -184,6 +186,6 @@ var define;
   }) : "object" == typeof module && module.exports ? module.exports = r : t.dataURLtoBlob = r);
 })(window);
 
-},{}]},{},["1eDLU"], "1eDLU", "parcelRequireb491")
+},{}]},["1eDLU"], "1eDLU", "parcelRequireb491")
 
-//# sourceMappingURL=index.d749440a.js.map
+//# sourceMappingURL=index.621c91ec.js.map

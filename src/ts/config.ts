@@ -50,9 +50,9 @@ export const config: IAppConfig = {
     defaultShapes: defaultShapes,
     imageCount: 32,
     images: {
-        "image01": {overlay: "./img/overlays/spirit.png"},
-        "image02": {overlay: "./img/overlays/spirit2.png"},
-        "image03": {overlay: "./img/overlays/spirit3.png"},
-        "image04": {overlay: "./img/overlays/santa.png"}
+        "image01.png": {overlay: "./img/overlays/spirit.png"},
+        "image02.png": {overlay: "./img/overlays/spirit2.png"},
+        "image03.png": {overlay: "./img/overlays/spirit3.png"},
+        "image04.png": {overlay: "./img/overlays/santa.png"}
     }
 };

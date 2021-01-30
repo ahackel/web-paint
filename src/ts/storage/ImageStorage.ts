@@ -2,6 +2,8 @@ import LocalForageAdapter from "./LocalForageAdapter";
 import Utils from "../utils/Utils";
 import DropboxAdapter from "./DropboxAdapter";
 import StorageAdapter from "./StorageAdapter";
+import JSZip from "jszip";
+import {secondary_emails} from "dropbox";
 
 export default class ImageStorage {
 
@@ -11,7 +13,8 @@ export default class ImageStorage {
 	
 	public static get adapter() {
 		if (!this._adapter) {
-			this._adapter = new LocalForageAdapter()
+			this._adapter = new LocalForageAdapter();
+			this.migrate();
 		}
 		return this._adapter 
 	}
@@ -103,5 +106,75 @@ export default class ImageStorage {
 		for (let changeListener of this._changeListeners) {
 			changeListener(change, id);
 		}
+	}
+	
+	public static clear(){
+		this.adapter.clear();
+	}
+	
+	public static async generateBackupArchive(): Promise<Blob> {
+		let count = 0;
+		var keys = <string[]> await this.keys();
+		var zip = new JSZip();
+		
+		for (let id of keys) {
+			const url = await this.loadImageUrl(id);
+			const blob = await fetch(url).then(r => r.blob());
+			if (!blob){
+				continue;
+			}
+			zip.file(id, blob);
+			count += 1;
+		}
+		
+		if (count == 0){
+			return;
+		}
+		
+		return zip.generateAsync({type:"blob"});
+	}
+	
+	public static async importBackupArchive(zipFile: Blob) {
+		const zip = await JSZip.loadAsync(zipFile);
+		
+		zip.forEach(async (path, file) => {
+			const buffer = await file.async("arraybuffer");
+			const blob = new Blob([buffer], {"type": "image/png"});
+			this.saveImage(file.name, blob);
+		})
+	}
+	
+	private static async migrate(){
+		var keys = <string[]> await this.keys();
+
+		for (let id of keys) {
+			if (!id.startsWith("image") && !id.startsWith("Stamp")){
+				continue;
+			}
+
+			if (id.endsWith(".png")){
+				continue;
+			}
+
+			const newId = id.replace("Stamp", "stamp") + ".png";
+			const data = <Blob>await this.adapter.getItem(id);
+			await this.adapter.setItem(newId, data);
+			await this.adapter.removeItem(id);
+			console.log(`Migrated ${id} to ${newId}.`);
+		}
+	}
+	
+	public static async getStorageUsed(): Promise<number> {
+		let amount = 0;
+		var keys = <string[]> await this.keys();
+		for (let id of keys) {
+			const url = await this.loadImageUrl(id);
+			const blob = await fetch(url).then(r => r.blob());
+			if (!blob){
+				continue;
+			}
+			amount += blob.size;
+		}
+		return amount;
 	}
 }

@@ -9,6 +9,46 @@ let _fpsDisplay: HTMLElement;
 let _fpsCounterEnabled = true;
 
 export default class Utils {
+
+    // source:
+    // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+    static formatBytes(bytes: number, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+    
+    static download(data: any){
+        const a = document.createElement('a');
+        document.body.append(a);
+        a.download = 'web-paint-backup';
+        a.href = URL.createObjectURL(data);
+        a.click();
+        a.remove();
+    }
+    
+    static async upload(accept: string): Promise<Blob> {
+        return new Promise(resolve => {
+            const input = document.createElement('input');
+            input.type = "file";
+            input.accept = accept; 
+            input.onchange = () => {
+                if (input.files.length == 0){
+                    return;
+                }
+                let file = input.files[0];
+                resolve(file);
+                input.remove();
+            }
+            input.click();
+        });
+    }
     
     static imageToBlob(image: HTMLImageElement){
         const canvas = document.createElement("canvas");
