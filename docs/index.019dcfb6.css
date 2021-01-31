@@ -109,7 +109,8 @@ body, input, textarea {
     padding: 2rem;
     display: block;
     box-sizing: border-box;
-    padding-right: 55%;
+    padding-right: 52%;
+    line-height: 1.4em;
 }
 
 .view.settings .button.text {
@@ -147,15 +148,6 @@ body, input, textarea {
 #log li {
     border-bottom: #444444 solid 1px;
     padding: 0 1em;
-}
-
-#peer-list {
-    font-size: 1.2em;
-    line-height: 1.4em;
-    border: none;
-    outline: none;
-    resize: none;
-    width: 100%;
 }
 
 .thumbnail {
@@ -460,4 +452,4 @@ body, input, textarea {
     color: white;
 }
 
-/*# sourceMappingURL=index.da785dbc.css.map */
+/*# sourceMappingURL=index.019dcfb6.css.map */

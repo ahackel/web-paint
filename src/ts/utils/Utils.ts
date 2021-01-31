@@ -26,7 +26,7 @@ export default class Utils {
     
     static download(data: any){
         const a = document.createElement('a');
-        document.body.append(a);
+        document.body.appendChild(a);
         a.download = 'web-paint-backup';
         a.href = URL.createObjectURL(data);
         a.click();

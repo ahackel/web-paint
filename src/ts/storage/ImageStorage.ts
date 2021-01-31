@@ -146,7 +146,6 @@ export default class ImageStorage {
 	private static async migrate(){
 		let needsRefresh = false;
 		var keys = <string[]> await this.keys();
-		Utils.log("Start migrating");
 
 		for (let id of keys) {
 			if (!id.startsWith("image") && !id.startsWith("Shape")){
@@ -172,13 +171,9 @@ export default class ImageStorage {
 	public static async getStorageUsed(): Promise<number> {
 		let amount = 0;
 		var keys = <string[]> await this.keys();
-		Utils.log(keys.length + " keys");
 		for (let id of keys) {
-			Utils.log(id);
-			
 			const url = await this.loadImageUrl(id);
 			const blob = await fetch(url).then(r => r.blob());
-			Utils.log(blob);
 			if (!blob){
 				continue;
 			}

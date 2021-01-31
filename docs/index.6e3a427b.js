@@ -8657,7 +8657,7 @@ var Utils = /*#__PURE__*/(function () {
     key: "download",
     value: function download(data) {
       var a = document.createElement('a');
-      document.body.append(a);
+      document.body.appendChild(a);
       a.download = 'web-paint-backup';
       a.href = URL.createObjectURL(data);
       a.click();
@@ -9639,8 +9639,6 @@ _parcelHelpers.export(exports, "default", function () {
 require('whatwg-fetch');
 var _LocalForageAdapter = require("./LocalForageAdapter");
 var _LocalForageAdapterDefault = _parcelHelpers.interopDefault(_LocalForageAdapter);
-var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _jszip = require("jszip");
 var _jszipDefault = _parcelHelpers.interopDefault(_jszip);
 function _createForOfIteratorHelper(o, allowArrayLike) {
@@ -10074,65 +10072,64 @@ var ImageStorage = /*#__PURE__*/(function () {
                 return this.keys();
               case 3:
                 keys = _context7.sent;
-                _utilsUtilsDefault.default.log("Start migrating");
                 _iterator3 = _createForOfIteratorHelper(keys);
-                _context7.prev = 6;
+                _context7.prev = 5;
                 _iterator3.s();
-              case 8:
+              case 7:
                 if ((_step3 = _iterator3.n()).done) {
-                  _context7.next = 26;
+                  _context7.next = 25;
                   break;
                 }
                 _id2 = _step3.value;
                 if (!(!_id2.startsWith("image") && !_id2.startsWith("Shape"))) {
-                  _context7.next = 12;
+                  _context7.next = 11;
                   break;
                 }
-                return _context7.abrupt("continue", 24);
-              case 12:
+                return _context7.abrupt("continue", 23);
+              case 11:
                 if (!_id2.endsWith(".png")) {
-                  _context7.next = 14;
+                  _context7.next = 13;
                   break;
                 }
-                return _context7.abrupt("continue", 24);
-              case 14:
+                return _context7.abrupt("continue", 23);
+              case 13:
                 newId = _id2.replace("Shape", "shape") + ".png";
-                _context7.next = 17;
+                _context7.next = 16;
                 return this.adapter.getItem(_id2);
-              case 17:
+              case 16:
                 data = _context7.sent;
-                _context7.next = 20;
+                _context7.next = 19;
                 return this.adapter.setItem(newId, data);
-              case 20:
-                _context7.next = 22;
+              case 19:
+                _context7.next = 21;
                 return this.adapter.removeItem(_id2);
-              case 22:
+              case 21:
                 console.log(("Migrated ").concat(_id2, " to ").concat(newId, "."));
                 needsRefresh = true;
-              case 24:
-                _context7.next = 8;
+              case 23:
+                _context7.next = 7;
                 break;
-              case 26:
-                _context7.next = 31;
+              case 25:
+                _context7.next = 30;
                 break;
-              case 28:
-                _context7.prev = 28;
-                _context7.t0 = _context7["catch"](6);
+              case 27:
+                _context7.prev = 27;
+                _context7.t0 = _context7["catch"](5);
                 _iterator3.e(_context7.t0);
-              case 31:
-                _context7.prev = 31;
+              case 30:
+                _context7.prev = 30;
                 _iterator3.f();
-                return _context7.finish(31);
-              case 34:
+                return _context7.finish(30);
+              case 33:
                 if (needsRefresh) {
                   location.reload();
                 }
-              case 35:
+              case 34:
               case "end":
                 return _context7.stop();
             }
           }
-        }, _callee7, this, [[6, 28, 31, 34]]);
+        }, _callee7, this, [[5, 27, 30, 33]]);
       }));
       function migrate() {
         return _migrate.apply(this, arguments);
@@ -10153,57 +10150,54 @@ var ImageStorage = /*#__PURE__*/(function () {
                 return this.keys();
               case 3:
                 keys = _context8.sent;
-                _utilsUtilsDefault.default.log(keys.length + " keys");
                 _iterator4 = _createForOfIteratorHelper(keys);
-                _context8.prev = 6;
+                _context8.prev = 5;
                 _iterator4.s();
-              case 8:
+              case 7:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context8.next = 23;
-                  break;
-                }
-                _id3 = _step4.value;
-                _utilsUtilsDefault.default.log(_id3);
-                _context8.next = 13;
-                return this.loadImageUrl(_id3);
-              case 13:
-                url = _context8.sent;
-                _context8.next = 16;
-                return fetch(url).then(function (r) {
-                  return r.blob();
-                });
-              case 16:
-                blob = _context8.sent;
-                _utilsUtilsDefault.default.log(blob);
-                if (blob) {
                   _context8.next = 20;
                   break;
                 }
-                return _context8.abrupt("continue", 21);
-              case 20:
+                _id3 = _step4.value;
+                _context8.next = 11;
+                return this.loadImageUrl(_id3);
+              case 11:
+                url = _context8.sent;
+                _context8.next = 14;
+                return fetch(url).then(function (r) {
+                  return r.blob();
+                });
+              case 14:
+                blob = _context8.sent;
+                if (blob) {
+                  _context8.next = 17;
+                  break;
+                }
+                return _context8.abrupt("continue", 18);
+              case 17:
                 amount += blob.size;
-              case 21:
-                _context8.next = 8;
+              case 18:
+                _context8.next = 7;
                 break;
-              case 23:
-                _context8.next = 28;
+              case 20:
+                _context8.next = 25;
                 break;
+              case 22:
+                _context8.prev = 22;
+                _context8.t0 = _context8["catch"](5);
+                _iterator4.e(_context8.t0);
               case 25:
                 _context8.prev = 25;
-                _context8.t0 = _context8["catch"](6);
-                _iterator4.e(_context8.t0);
-              case 28:
-                _context8.prev = 28;
                 _iterator4.f();
-                return _context8.finish(28);
-              case 31:
+                return _context8.finish(25);
+              case 28:
                 return _context8.abrupt("return", amount);
-              case 32:
+              case 29:
               case "end":
                 return _context8.stop();
             }
           }
-        }, _callee8, this, [[6, 25, 28, 31]]);
+        }, _callee8, this, [[5, 22, 25, 28]]);
       }));
       function getStorageUsed() {
         return _getStorageUsed.apply(this, arguments);
@@ -10231,7 +10225,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   return ImageStorage;
 })();
 
-},{"whatwg-fetch":"1ve7H","./LocalForageAdapter":"6C5Ef","../utils/Utils":"1H53o","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1ve7H":[function(require,module,exports) {
+},{"whatwg-fetch":"1ve7H","./LocalForageAdapter":"6C5Ef","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1ve7H":[function(require,module,exports) {
 var define;
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : factory(global.WHATWGFetch = {});
@@ -33934,7 +33928,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"5xv2G","console-log-html":"66kok","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5xv2G":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"2O4yD","console-log-html":"66kok","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2O4yD":[function(require,module,exports) {
 module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.554\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"console-log-html\":\"^2.0.2\",\"dropbox\":\"^8.3.0\",\"jszip\":\"^3.5.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\",\"whatwg-fetch\":\"^3.5.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}],"66kok":[function(require,module,exports) {
@@ -34091,4 +34085,4 @@ if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 }
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.12c1d27c.js.map
+//# sourceMappingURL=index.6e3a427b.js.map
