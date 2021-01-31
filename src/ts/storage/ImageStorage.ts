@@ -1,4 +1,4 @@
-import 'babel-polyfill';
+import 'whatwg-fetch';
 import LocalForageAdapter from "./LocalForageAdapter";
 import Utils from "../utils/Utils";
 import StorageAdapter from "./StorageAdapter";
