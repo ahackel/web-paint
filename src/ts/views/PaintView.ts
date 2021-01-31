@@ -109,27 +109,15 @@ export class PaintView extends View {
 
         this._redoButton = <HTMLDivElement>document.getElementById("redo-button");
         Utils.addClick(this._redoButton, () => this.redo());
-
-        let importImageField = <HTMLInputElement>document.getElementById("import-image-field");
-        importImageField.addEventListener("change", files => {
-            if (importImageField.files.length == 0){
-                return;
-            }
-            let file = importImageField.files[0];
-            let image = new Image();
-            const url = URL.createObjectURL(file);
-            image.src = url;
-            image.onload = () => {
-                this.setTool(this.selectionTool);
-                this.selectionTool.setImage(image);
-                URL.revokeObjectURL(url);
-            }
-            
-            // Reset input field so the change event will be triggered again if the user selects the same asset again
-            importImageField.value = null;
-        })
+        
         this._importImageButton = <HTMLDivElement>document.getElementById("import-image-button");
-        Utils.addClick(this._importImageButton, () => importImageField.click());
+        Utils.addClick(this._importImageButton, async () => {
+            const blob = await Utils.upload("image/*");
+            this.setTool(this.selectionTool);
+            const url = URL.createObjectURL(blob);
+            await this.selectionTool.setImageUrl(url);
+            URL.revokeObjectURL(url);
+        });
     }
 
     private addLayer(layer: ILayer): ILayer {

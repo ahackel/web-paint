@@ -36,6 +36,8 @@ export default class Utils {
     static async upload(accept: string): Promise<Blob> {
         return new Promise(resolve => {
             const input = document.createElement('input');
+            // needed?
+            document.body.appendChild(input);
             input.type = "file";
             input.accept = accept; 
             input.onchange = () => {

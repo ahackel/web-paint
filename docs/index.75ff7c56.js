@@ -8673,6 +8673,8 @@ var Utils = /*#__PURE__*/(function () {
               case 0:
                 return _context.abrupt("return", new Promise(function (resolve) {
                   var input = document.createElement('input');
+                  // needed?
+                  document.body.appendChild(input);
                   input.type = "file";
                   input.accept = accept;
                   input.onchange = function () {
@@ -30340,6 +30342,35 @@ var _toolsSelectionTool = require("../tools/SelectionTool");
 var _toolsSelectionToolDefault = _parcelHelpers.interopDefault(_toolsSelectionTool);
 var _Toolbar = require("../Toolbar");
 var _History = require("../History");
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this, args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+      _next(undefined);
+    });
+  };
+}
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -30539,27 +30570,30 @@ var PaintView = /*#__PURE__*/(function (_View) {
       _utilsUtilsDefault.default.addClick(this._redoButton, function () {
         return _this2.redo();
       });
-      var importImageField = document.getElementById("import-image-field");
-      importImageField.addEventListener("change", function (files) {
-        if (importImageField.files.length == 0) {
-          return;
-        }
-        var file = importImageField.files[0];
-        var image = new Image();
-        var url = URL.createObjectURL(file);
-        image.src = url;
-        image.onload = function () {
-          _this2.setTool(_this2.selectionTool);
-          _this2.selectionTool.setImage(image);
-          URL.revokeObjectURL(url);
-        };
-        // Reset input field so the change event will be triggered again if the user selects the same asset again
-        importImageField.value = null;
-      });
       this._importImageButton = document.getElementById("import-image-button");
-      _utilsUtilsDefault.default.addClick(this._importImageButton, function () {
-        return importImageField.click();
-      });
+      _utilsUtilsDefault.default.addClick(this._importImageButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var blob, url;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return _utilsUtilsDefault.default.upload("image/*");
+              case 2:
+                blob = _context.sent;
+                _this2.setTool(_this2.selectionTool);
+                url = URL.createObjectURL(blob);
+                _context.next = 7;
+                return _this2.selectionTool.setImageUrl(url);
+              case 7:
+                URL.revokeObjectURL(url);
+              case 8:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      })));
     }
   }, {
     key: "addLayer",
@@ -32872,6 +32906,7 @@ var Layer = /*#__PURE__*/(function () {
       var index = this._index;
       this._element.style.transform = ("translate(").concat(position.x, "em, ").concat(position.y, "em) rotate(").concat(rotation, "rad) scale(").concat(scale, ") translateZ(").concat(index, "px)");
       this._element.style.outlineWidth = ("").concat(2 / scale, "em");
+      this._element.style.outlineOffset = ("-").concat(2 / scale, "em");
     }
   }, {
     key: "bindEventListeners",
@@ -33063,6 +33098,35 @@ var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageSto
 var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _config = require("../config");
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this, args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+      _next(undefined);
+    });
+  };
+}
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -33342,14 +33406,34 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     }
   }, {
     key: "setImageUrl",
-    value: function setImageUrl(url) {
-      var _this2 = this;
-      var img = new Image();
-      img.src = url;
-      img.onload = function () {
-        _this2.setImage(img);
-      };
-    }
+    value: (function () {
+      var _setImageUrl = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(url) {
+        var _this2 = this;
+        var img;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                img = new Image();
+                img.src = url;
+                return _context.abrupt("return", new Promise(function (resolve) {
+                  img.onload = function () {
+                    _this2.setImage(img);
+                    resolve(img);
+                  };
+                }));
+              case 3:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+      function setImageUrl(_x) {
+        return _setImageUrl.apply(this, arguments);
+      }
+      return setImageUrl;
+    })()
   }, {
     key: "requestDrawSelectionOutline",
     value: function requestDrawSelectionOutline() {
@@ -34085,4 +34169,4 @@ if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 }
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.6e3a427b.js.map
+//# sourceMappingURL=index.75ff7c56.js.map

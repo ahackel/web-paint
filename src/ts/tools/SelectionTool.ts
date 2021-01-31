@@ -145,12 +145,15 @@ export default class SelectionTool extends Tool {
         this.updateDownloadAnchor();
     }
 
-    setImageUrl(url: string){
+    async setImageUrl(url: string): Promise<HTMLImageElement>{
         const img = new Image();
         img.src = url;
-        img.onload = () => {
-            this.setImage(img);
-        }
+        return new Promise(resolve => {
+            img.onload = () => {
+                this.setImage(img);
+                resolve(img);
+            }
+        });
     }
 
     private requestDrawSelectionOutline() {

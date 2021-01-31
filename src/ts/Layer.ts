@@ -277,6 +277,7 @@ export default abstract class Layer<T extends HTMLImageElement | HTMLCanvasEleme
         const index = this._index;
         this._element.style.transform = `translate(${position.x}em, ${position.y}em) rotate(${rotation}rad) scale(${scale}) translateZ(${index}px)`;
         this._element.style.outlineWidth = `${2 / scale}em`;
+        this._element.style.outlineOffset = `-${2 / scale}em`;
     }
 
     private bindEventListeners() {
