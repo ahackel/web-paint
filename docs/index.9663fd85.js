@@ -9636,6 +9636,7 @@ _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
   return ImageStorage;
 });
+require('babel-polyfill');
 var _LocalForageAdapter = require("./LocalForageAdapter");
 var _LocalForageAdapterDefault = _parcelHelpers.interopDefault(_LocalForageAdapter);
 var _utilsUtils = require("../utils/Utils");
@@ -10230,7 +10231,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   return ImageStorage;
 })();
 
-},{"./LocalForageAdapter":"6C5Ef","../utils/Utils":"1H53o","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6C5Ef":[function(require,module,exports) {
+},{"./LocalForageAdapter":"6C5Ef","../utils/Utils":"1H53o","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","babel-polyfill":"57WP1"}],"6C5Ef":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -33411,7 +33412,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"5xv2G","console-log-html":"66kok","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5xv2G":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"2O4yD","console-log-html":"66kok","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2O4yD":[function(require,module,exports) {
 module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.554\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"console-log-html\":\"^2.0.2\",\"dropbox\":\"^8.3.0\",\"jszip\":\"^3.5.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}],"66kok":[function(require,module,exports) {
@@ -33568,4 +33569,4 @@ if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 }
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.6513b127.js.map
+//# sourceMappingURL=index.9663fd85.js.map

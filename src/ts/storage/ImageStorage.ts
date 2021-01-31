@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import LocalForageAdapter from "./LocalForageAdapter";
 import Utils from "../utils/Utils";
 import StorageAdapter from "./StorageAdapter";
