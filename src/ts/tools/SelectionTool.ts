@@ -6,6 +6,7 @@ import ImageStorage from "../storage/ImageStorage";
 import Utils from "../utils/Utils";
 import {PaintView, IPointerData} from "../views/PaintView";
 import {config} from "../config";
+import {saveAs} from "file-saver";
 
 // Provides a floating selection the user can manipulate 
 export default class SelectionTool extends Tool {
@@ -34,7 +35,6 @@ export default class SelectionTool extends Tool {
     private _stampButton: HTMLDivElement;
     private _saveButton: HTMLDivElement;
     private _downloadButton: HTMLDivElement;
-    private _downloadAnchor: HTMLAnchorElement;
 
     constructor(painter: PaintView, buttonId: string) {
         super(painter, buttonId);
@@ -44,9 +44,10 @@ export default class SelectionTool extends Tool {
         Utils.addClick(this._stampButton, () => this.paintSelectionToCanvas());
         this._saveButton = <HTMLDivElement>document.getElementById("selection-save-button");
         Utils.addClick(this._saveButton, () => this.saveSelectionAsNewStamp());
-        
         this._downloadButton = <HTMLDivElement>document.getElementById("selection-download-button");
-        this._downloadAnchor = <HTMLAnchorElement>this._downloadButton.firstElementChild;
+        Utils.addClick(this._downloadButton, () => {
+            this.selectionLayer.canvas.toBlob(blob => saveAs(blob, "image.png"));
+        });
         
         this.hasFloatingSelection = false;
         this._position = new Vector(0, 0);
@@ -142,7 +143,6 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.floating = true;
         this.selectionLayer.drawImage(image);
         this.isInShapesPalette = true;
-        this.updateDownloadAnchor();
     }
 
     async setImageUrl(url: string): Promise<HTMLImageElement>{
@@ -211,7 +211,6 @@ export default class SelectionTool extends Tool {
         this.selectionLayer.ctx.drawImage(this._painter.baseLayer.canvas, x, y, width, height, 0, 0, width, height);
         this._painter.baseLayer.clear(this.selection);
         this._painter.recordHistoryState();
-        this.updateDownloadAnchor();
     }
 
     private paintSelectionToCanvas() {
@@ -270,11 +269,5 @@ export default class SelectionTool extends Tool {
         this.startNewSelection();
         this._selection = new Rect(0, 0, this._painter.width, this._painter.height);
         this.cutSelection();
-    }
-
-    private updateDownloadAnchor() {
-        this.selectionLayer.canvas.toBlob(blob => {
-            this._downloadAnchor.href = URL.createObjectURL(blob);
-        })
     }
 }

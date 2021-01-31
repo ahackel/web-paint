@@ -19,15 +19,6 @@ export default class Utils {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
     
-    static download(data: any){
-        const a = document.createElement('a');
-        document.body.appendChild(a);
-        a.download = 'web-paint-backup';
-        a.href = URL.createObjectURL(data);
-        a.click();
-        a.remove();
-    }
-    
     static async upload(accept: string): Promise<Blob> {
         return new Promise(resolve => {
             const input = document.createElement('input');

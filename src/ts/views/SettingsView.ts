@@ -15,7 +15,7 @@ export default class SettingsView extends View {
         let exportButton = <HTMLDivElement>this._element.getElementsByClassName("button export")[0];
         Utils.addClick(exportButton, async () => {
             const zipBlob = await ImageStorage.generateBackupArchive();
-            saveAs(zipBlob, "web-paint-backup");
+            saveAs(zipBlob, "web-paint-backup.zip");
         });
 
         let importButton = <HTMLDivElement>this._element.getElementsByClassName("button import")[0];
