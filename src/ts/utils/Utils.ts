@@ -3,11 +3,6 @@ import Rect from "./Rect";
 import Vector from "../math/Vector";
 const Pressure = require('pressure');
 
-let _times: number[] = [];
-let _fps: number = 60;
-let _fpsDisplay: HTMLElement;
-let _fpsCounterEnabled = true;
-
 export default class Utils {
 
     // source:
@@ -36,8 +31,6 @@ export default class Utils {
     static async upload(accept: string): Promise<Blob> {
         return new Promise(resolve => {
             const input = document.createElement('input');
-            // needed?
-            document.body.appendChild(input);
             input.type = "file";
             input.accept = accept; 
             input.onchange = () => {
@@ -78,28 +71,7 @@ export default class Utils {
         }
         console.log(message, optionalParams);
     }
-    
-    public static updateFPSCounter(){
-        if (!_fpsCounterEnabled){
-            return false;    
-        }
 
-        const now = performance.now();
-        while (_times.length > 0 && _times[0] <= now - 1000) {
-            _times.shift();
-        }
-        _times.push(now);
-        _fps = Math.min(60, this.lerp(_fps, _times.length, 0.1));
-        if (_fpsDisplay == null){
-            _fpsDisplay = <HTMLElement>document.getElementById("fps-counter");
-            if (_fpsDisplay == null){
-                this.log("Could not find fps counter element. Disabling fps counter.");
-                _fpsCounterEnabled = false;
-                return;
-            }
-        }
-        _fpsDisplay.innerText = _fps.toFixed(0);
-    }
 
     public static addClick(element: HTMLElement, callback: (this: HTMLElement, event: any) => any,
                            supportScrolling: boolean = false){

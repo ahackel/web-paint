@@ -3,6 +3,7 @@ import Utils from "../utils/Utils";
 import ImageStorage from "../storage/ImageStorage";
 const version = require('/package').version;
 var ConsoleLogHTML = require('console-log-html');
+import { saveAs } from 'file-saver';
 
 export default class SettingsView extends View {
     
@@ -12,7 +13,10 @@ export default class SettingsView extends View {
         Utils.addClick(backButton, () => onBackClicked());
 
         let exportButton = <HTMLDivElement>this._element.getElementsByClassName("button export")[0];
-        Utils.addClick(exportButton, async () => Utils.download(await ImageStorage.generateBackupArchive()));
+        Utils.addClick(exportButton, async () => {
+            const zipBlob = await ImageStorage.generateBackupArchive();
+            saveAs(zipBlob, "web-paint-backup");
+        });
 
         let importButton = <HTMLDivElement>this._element.getElementsByClassName("button import")[0];
         Utils.addClick(importButton, async () => {

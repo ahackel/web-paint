@@ -615,10 +615,6 @@ export class PaintView extends View {
         }
 
         window.requestAnimationFrame(timeStamp => this.tick(timeStamp))
-        
-        if (config.debug){
-            Utils.updateFPSCounter();
-        }
 
         let delta = timeStamp - this._tickTimeStamp;
         this._tickTimeStamp = timeStamp;

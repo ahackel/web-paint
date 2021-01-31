@@ -8632,10 +8632,6 @@ function _createClass(Constructor, protoProps, staticProps) {
   return Constructor;
 }
 var Pressure = require('pressure');
-var _times = [];
-var _fps = 60;
-var _fpsDisplay;
-var _fpsCounterEnabled = true;
 var Utils = /*#__PURE__*/(function () {
   function Utils() {
     _classCallCheck(this, Utils);
@@ -8673,8 +8669,6 @@ var Utils = /*#__PURE__*/(function () {
               case 0:
                 return _context.abrupt("return", new Promise(function (resolve) {
                   var input = document.createElement('input');
-                  // needed?
-                  document.body.appendChild(input);
                   input.type = "file";
                   input.accept = accept;
                   input.onchange = function () {
@@ -8737,28 +8731,6 @@ var Utils = /*#__PURE__*/(function () {
         optionalParams[_key - 1] = arguments[_key];
       }
       console.log(message, optionalParams);
-    }
-  }, {
-    key: "updateFPSCounter",
-    value: function updateFPSCounter() {
-      if (!_fpsCounterEnabled) {
-        return false;
-      }
-      var now = performance.now();
-      while (_times.length > 0 && _times[0] <= now - 1000) {
-        _times.shift();
-      }
-      _times.push(now);
-      _fps = Math.min(60, this.lerp(_fps, _times.length, 0.1));
-      if (_fpsDisplay == null) {
-        _fpsDisplay = document.getElementById("fps-counter");
-        if (_fpsDisplay == null) {
-          this.log("Could not find fps counter element. Disabling fps counter.");
-          _fpsCounterEnabled = false;
-          return;
-        }
-      }
-      _fpsDisplay.innerText = _fps.toFixed(0);
     }
   }, {
     key: "addClick",
@@ -31121,9 +31093,6 @@ var PaintView = /*#__PURE__*/(function (_View) {
       window.requestAnimationFrame(function (timeStamp) {
         return _this9.tick(timeStamp);
       });
-      if (_config.config.debug) {
-        _utilsUtilsDefault.default.updateFPSCounter();
-      }
       var delta = timeStamp - this._tickTimeStamp;
       this._tickTimeStamp = timeStamp;
       if (this._currentTool) {
@@ -33798,6 +33767,7 @@ var _utilsUtils = require("../utils/Utils");
 var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _storageImageStorage = require("../storage/ImageStorage");
 var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _fileSaver = require('file-saver');
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -33946,17 +33916,17 @@ var SettingsView = /*#__PURE__*/(function (_View) {
     });
     var exportButton = _this._element.getElementsByClassName("button export")[0];
     _utilsUtilsDefault.default.addClick(exportButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      var zipBlob;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.t0 = _utilsUtilsDefault.default;
-              _context.next = 3;
+              _context.next = 2;
               return _storageImageStorageDefault.default.generateBackupArchive();
-            case 3:
-              _context.t1 = _context.sent;
-              return _context.abrupt("return", _context.t0.download.call(_context.t0, _context.t1));
-            case 5:
+            case 2:
+              zipBlob = _context.sent;
+              _fileSaver.saveAs(zipBlob, "web-paint-backup");
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -34012,8 +33982,8 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"2O4yD","console-log-html":"66kok","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2O4yD":[function(require,module,exports) {
-module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.554\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"console-log-html\":\"^2.0.2\",\"dropbox\":\"^8.3.0\",\"jszip\":\"^3.5.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\",\"whatwg-fetch\":\"^3.5.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
+},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"2O4yD","console-log-html":"66kok","file-saver":"2Ln2F","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2O4yD":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"@types/file-saver\":\"^2.0.1\",\"parcel\":\"^2.0.0-nightly.554\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"console-log-html\":\"^2.0.2\",\"dropbox\":\"^8.3.0\",\"file-saver\":\"^2.0.5\",\"jszip\":\"^3.5.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\",\"whatwg-fetch\":\"^3.5.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}],"66kok":[function(require,module,exports) {
 /**
@@ -34167,6 +34137,83 @@ var ConsoleLogHTML = (function (original, methods, console, Object, TYPE_UNDEFIN
 if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
     module.exports = ConsoleLogHTML;
 }
+},{}],"2Ln2F":[function(require,module,exports) {
+var define;
+var global = arguments[3];
+(function (a, b) {
+  if ("function" == typeof define && define.amd) define([], b); else if ("undefined" != typeof exports) b(); else {
+    (b(), a.FileSaver = ({
+      exports: {}
+    }).exports);
+  }
+})(this, function () {
+  "use strict";
+  function b(a, b) {
+    return ("undefined" == typeof b ? b = {
+      autoBom: !1
+    } : "object" != typeof b && (console.warn("Deprecated: Expected third argument to be a object"), b = {
+      autoBom: !b
+    }), b.autoBom && (/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i).test(a.type) ? new Blob(["\uFEFF", a], {
+      type: a.type
+    }) : a);
+  }
+  function c(a, b, c) {
+    var d = new XMLHttpRequest();
+    (d.open("GET", a), d.responseType = "blob", d.onload = function () {
+      g(d.response, b, c);
+    }, d.onerror = function () {
+      console.error("could not download file");
+    }, d.send());
+  }
+  function d(a) {
+    var b = new XMLHttpRequest();
+    b.open("HEAD", a, !1);
+    try {
+      b.send();
+    } catch (a) {}
+    return 200 <= b.status && 299 >= b.status;
+  }
+  function e(a) {
+    try {
+      a.dispatchEvent(new MouseEvent("click"));
+    } catch (c) {
+      var b = document.createEvent("MouseEvents");
+      (b.initMouseEvent("click", !0, !0, window, 0, 0, 0, 80, 20, !1, !1, !1, !1, 0, null), a.dispatchEvent(b));
+    }
+  }
+  var f = "object" == typeof window && window.window === window ? window : "object" == typeof self && self.self === self ? self : "object" == typeof global && global.global === global ? global : void 0, a = f.navigator && (/Macintosh/).test(navigator.userAgent) && (/AppleWebKit/).test(navigator.userAgent) && !(/Safari/).test(navigator.userAgent), g = f.saveAs || ("object" != typeof window || window !== f ? function () {} : ("download" in HTMLAnchorElement.prototype) && !a ? function (b, g, h) {
+    var i = f.URL || f.webkitURL, j = document.createElement("a");
+    (g = g || b.name || "download", j.download = g, j.rel = "noopener", "string" == typeof b ? (j.href = b, j.origin === location.origin ? e(j) : d(j.href) ? c(b, g, h) : e(j, j.target = "_blank")) : (j.href = i.createObjectURL(b), setTimeout(function () {
+      i.revokeObjectURL(j.href);
+    }, 4E4), setTimeout(function () {
+      e(j);
+    }, 0)));
+  } : ("msSaveOrOpenBlob" in navigator) ? function (f, g, h) {
+    if ((g = g || f.name || "download", "string" != typeof f)) navigator.msSaveOrOpenBlob(b(f, h), g); else if (d(f)) c(f, g, h); else {
+      var i = document.createElement("a");
+      (i.href = f, i.target = "_blank", setTimeout(function () {
+        e(i);
+      }));
+    }
+  } : function (b, d, e, g) {
+    if ((g = g || open("", "_blank"), g && (g.document.title = g.document.body.innerText = "downloading..."), "string" == typeof b)) return c(b, d, e);
+    var h = "application/octet-stream" === b.type, i = (/constructor/i).test(f.HTMLElement) || f.safari, j = (/CriOS\/[\d]+/).test(navigator.userAgent);
+    if ((j || h && i || a) && "undefined" != typeof FileReader) {
+      var k = new FileReader();
+      (k.onloadend = function () {
+        var a = k.result;
+        (a = j ? a : a.replace(/^data:[^;]*;/, "data:attachment/file;"), g ? g.location.href = a : location = a, g = null);
+      }, k.readAsDataURL(b));
+    } else {
+      var l = f.URL || f.webkitURL, m = l.createObjectURL(b);
+      (g ? g.location = m : location.href = m, g = null, setTimeout(function () {
+        l.revokeObjectURL(m);
+      }, 4E4));
+    }
+  });
+  (f.saveAs = g.saveAs = g, "undefined" != typeof module && (module.exports = g));
+});
+
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.75ff7c56.js.map
+//# sourceMappingURL=index.f8da6575.js.map
