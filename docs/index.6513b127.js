@@ -203,6 +203,9 @@ var App = /*#__PURE__*/(function () {
     _classCallCheck(this, App);
     // App.preventOverScroll();
     // PeerToPeer.createInstance();
+    this._settingsView = new _viewsSettingsViewDefault.default("settings", function () {
+      _this.openView(_this._bookView);
+    });
     this._sheet = document.getElementById("sheet");
     window.addEventListener('resize', function (event) {
       _this.OnResize();
@@ -227,9 +230,6 @@ var App = /*#__PURE__*/(function () {
       });
     };
     this._paintView = new _viewsPaintView.PaintView("paint", function () {
-      _this.openView(_this._bookView);
-    });
-    this._settingsView = new _viewsSettingsViewDefault.default("settings", function () {
       _this.openView(_this._bookView);
     });
     // Dropbox integration is not working yet:
@@ -8422,7 +8422,7 @@ _parcelHelpers.export(exports, "config", function () {
 });
 var defaultShapes = ["img/stamps/star.png", "img/stamps/unicorn.png", "img/stamps/snowman.png", "img/stamps/dolphin.png", "img/stamps/snail.png"];
 var config = {
-  debug: false,
+  debug: true,
   doubleTapDelay: 400,
   longClickDelay: 1000,
   minScrollDistance: 30,
@@ -8636,7 +8636,6 @@ var _times = [];
 var _fps = 60;
 var _fpsDisplay;
 var _fpsCounterEnabled = true;
-var _consoleOutput = [];
 var Utils = /*#__PURE__*/(function () {
   function Utils() {
     _classCallCheck(this, Utils);
@@ -8736,12 +8735,6 @@ var Utils = /*#__PURE__*/(function () {
         optionalParams[_key - 1] = arguments[_key];
       }
       console.log(message, optionalParams);
-      _consoleOutput.push(message.toString());
-    }
-  }, {
-    key: "getLog",
-    value: function getLog() {
-      return _consoleOutput;
     }
   }, {
     key: "updateFPSCounter",
@@ -10237,7 +10230,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   return ImageStorage;
 })();
 
-},{"./LocalForageAdapter":"6C5Ef","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","../utils/Utils":"1H53o"}],"6C5Ef":[function(require,module,exports) {
+},{"./LocalForageAdapter":"6C5Ef","../utils/Utils":"1H53o","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6C5Ef":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -33338,6 +33331,7 @@ function _getPrototypeOf(o) {
   return _getPrototypeOf(o);
 }
 var version = require('/package').version;
+var ConsoleLogHTML = require('console-log-html');
 var SettingsView = /*#__PURE__*/(function (_View) {
   _inherits(SettingsView, _View);
   var _super = _createSuper(SettingsView);
@@ -33395,6 +33389,7 @@ var SettingsView = /*#__PURE__*/(function (_View) {
         location.reload();
       }
     });
+    ConsoleLogHTML.connect(document.getElementById("log"), {}, true, true, true);
     return _this;
   }
   _createClass(SettingsView, [{
@@ -33402,8 +33397,6 @@ var SettingsView = /*#__PURE__*/(function (_View) {
     value: function show() {
       _get(_getPrototypeOf(SettingsView.prototype), "show", this).call(this);
       this.updateInfo();
-      var log = document.getElementById("log");
-      log.innerText = _utilsUtilsDefault.default.getLog().join("\r");
     }
   }, {
     key: "updateInfo",
@@ -33418,9 +33411,161 @@ var SettingsView = /*#__PURE__*/(function (_View) {
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"5xv2G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5xv2G":[function(require,module,exports) {
-module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.554\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"dropbox\":\"^8.3.0\",\"jszip\":\"^3.5.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
+},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"5xv2G","console-log-html":"66kok","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"5xv2G":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"parcel\":\"^2.0.0-nightly.554\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"console-log-html\":\"^2.0.2\",\"dropbox\":\"^8.3.0\",\"jszip\":\"^3.5.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
+},{}],"66kok":[function(require,module,exports) {
+/**
+ * Redirects console output to an &lt;ul&gt; element
+ * @namespace
+ */
+var ConsoleLogHTML = (function (original, methods, console, Object, TYPE_UNDEFINED, TYPE_BOOLEAN, INSTANCE_OBJECT_OBJECT) {
+    'use strict';
+    for (var i = 0; i < methods.length; i++) {
+        if (TYPE_UNDEFINED !== typeof console[methods[i]]) {
+            original[methods[i]] = console[methods[i]];
+        }
+    }
+
+    var originalSkipHtml = console.skipHtml,
+        originalKeys = Object.keys(original),
+        originalClear = TYPE_UNDEFINED !== typeof console.clear ? console.clear : false,
+        jQueryIsUp = typeof jQuery !== TYPE_UNDEFINED ? jQuery : false,
+        extend = function () {
+            var out = {},
+                i = 0,
+                j, keys;
+
+            for (; i < arguments.length; i++) {
+                keys = Object.keys(arguments[i]);
+                for (j = 0; j < keys.length; j++) {
+                    out[keys[j]] = arguments[i][keys[j]];
+                }
+            }
+
+            return out;
+        },
+        register = function (method, target, options, includeTimestamp, logToConsole, appendAtBottom) {
+
+            console.skipHtml[method] = function () {
+                original[method].apply(console, arguments);
+            };
+
+            console[method] = function () {
+                var finalMsg, msgPart, i, li;
+
+                finalMsg = "";
+                for (i = 0; i < arguments.length; i++) {
+                    msgPart = arguments[i] + ""; // "safe toString()" (works with null & undefined)
+                    if (msgPart === INSTANCE_OBJECT_OBJECT) {
+                        try {
+                            // Prefix with "Object" like in Firefox-, Chrome-, and node.js-output
+                            msgPart = "Object " + JSON.stringify(arguments[i]);
+                        } catch (e) {
+
+                        }
+                    }
+
+                    finalMsg += (i > 0 ? " " : "") + msgPart;
+                }
+
+                finalMsg = (includeTimestamp ? "[" + (new Date()).toLocaleTimeString() + "] " : "") + finalMsg;
+                li = document.createElement("li");
+                li.setAttribute("data-level", method);
+                li.innerText = finalMsg;
+                if (options[method]) {
+                    li.setAttribute("class", options[method]);
+                }
+
+                if (appendAtBottom){
+                    target.appendChild(li);
+                } else {
+                    target.insertBefore(li, target.firstChild);
+                }
+
+                if (logToConsole) {
+                    console.skipHtml[method].apply(console, arguments);
+                }
+            };
+        };
+
+    return {
+        /**
+         * Default CSS classes
+         * @type Object
+         * @memberof ConsoleLogHTML
+         * @prop {?string} error=text-danger The default CSS class for error messages
+         * @prop {?string} warn=text-warning The default CSS class for warning messages
+         * @prop {?string} info=text-success The default CSS class for info messages
+         * @prop {?string} debug=text-info The default CSS class for debug messages
+         * @prop {?string} log=null The default CSS class for log messages
+         */
+        DEFAULTS: {
+            error: "text-danger",
+            warn: "text-warning",
+            info: "text-success",
+            debug: "text-info",
+            log: ""
+        },
+        /**
+         * Disconnect our console overrides, reverting to the original state
+         * @memberof ConsoleLogHTML
+         */
+        disconnect: function () {
+            console.skipHtml = originalSkipHtml;
+            for (var i = 0; i < originalKeys.length; i++) {
+                console[originalKeys[i]] = original[originalKeys[i]];
+            }
+            if (false !== originalClear) {
+                console.clear = originalClear;
+            }
+        },
+        /**
+         * Overwrite the original console.* methods and start outputting to screen
+         * @memberof ConsoleLogHTML
+         * @param {$|jQuery|HTMLUListElement} target The target &lt;ul&gt; element to output to. Can can either be a
+         * jQuery or vanilla JS HTMLUListElement.
+         * @param {Object} [options=ConsoleLogHTML.DEFAULTS] CSS class options. See {@link ConsoleLogHTML.DEFAULTS} for
+         * default values.
+         * @param {boolean} [includeTimestamp=true] Whether to include the log message timestamp in HTML
+         * @param {boolean} [logToConsole=true] Whether to continue logging to the console as well as HTML.
+         * @param {boolean} [appendAtBottom=false] Whether to append the log messages at the end of the ul-list
+         * @throws {Error} If target is not an &lt;ul&gt; element
+         */
+        connect: function (target, options, includeTimestamp, logToConsole, appendAtBottom) {
+            if (jQueryIsUp && target instanceof jQueryIsUp) {
+                target = target[0];
+            }
+            if (typeof logToConsole !== TYPE_BOOLEAN) {
+                logToConsole = true;
+            }
+            if (typeof includeTimestamp !== TYPE_BOOLEAN) {
+                includeTimestamp = true;
+            }
+            if (!(target instanceof HTMLUListElement)) {
+                throw new Error("The target must be a HTML <ul> element");
+            } else {
+                options = extend(ConsoleLogHTML.DEFAULTS, options || {});
+
+                console.skipHtml = {};
+                for (var i = 0; i < originalKeys.length; i++) {
+                    register(originalKeys[i], target, options, includeTimestamp, logToConsole, appendAtBottom);
+                }
+
+                if (false !== originalClear) {
+                    console.clear = function () {
+                        target.innerText = "";
+                        originalClear.apply(console);
+                    };
+                }
+            }
+        }
+    };
+})({}, ["log", "debug", "info", "warn", "error"], console, Object, "undefined", "boolean", '[object Object]');
+
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+    module.exports = ConsoleLogHTML;
+}
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.c30fedfb.js.map
+//# sourceMappingURL=index.6513b127.js.map

@@ -1,9 +1,7 @@
 import LocalForageAdapter from "./LocalForageAdapter";
 import Utils from "../utils/Utils";
-import DropboxAdapter from "./DropboxAdapter";
 import StorageAdapter from "./StorageAdapter";
 import JSZip from "jszip";
-import {secondary_emails} from "dropbox";
 
 export default class ImageStorage {
 

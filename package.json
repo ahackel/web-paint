@@ -23,6 +23,7 @@
     "@fortawesome/fontawesome-free": "^5.15.2",
     "babel-polyfill": "^6.26.0",
     "blueimp-canvas-to-blob": "^3.28.0",
+    "console-log-html": "^2.0.2",
     "dropbox": "^8.3.0",
     "jszip": "^3.5.0",
     "localforage": "^1.9.0",

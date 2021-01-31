@@ -21,6 +21,10 @@ class App {
         // App.preventOverScroll();
         
         //PeerToPeer.createInstance();
+
+        this._settingsView = new SettingsView("settings",() => {
+            this.openView(this._bookView);
+        });
         
         this._sheet = document.getElementById("sheet")
         window.addEventListener('resize', event => {
@@ -42,9 +46,6 @@ class App {
             this.openView(this._bookView);
         });
 
-        this._settingsView = new SettingsView("settings",() => {
-            this.openView(this._bookView);
-        });
 
         // Dropbox integration is not working yet:
         // this.dropboxAuthView = new DropboxAuthView("dropbox-auth");

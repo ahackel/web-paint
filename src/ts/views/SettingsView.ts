@@ -2,6 +2,7 @@ import {View} from "./View";
 import Utils from "../utils/Utils";
 import ImageStorage from "../storage/ImageStorage";
 const version = require('/package').version;
+var ConsoleLogHTML = require('console-log-html');
 
 export default class SettingsView extends View {
     
@@ -26,13 +27,13 @@ export default class SettingsView extends View {
                 location.reload();
             }
         });
+
+        ConsoleLogHTML.connect(document.getElementById("log"), {}, true, true, true);
     }
     
     show(){
         super.show();
         this.updateInfo();
-        const log = <HTMLParagraphElement>document.getElementById("log");
-        log.innerText = Utils.getLog().join("\r");
     }
 
     private updateInfo() {
