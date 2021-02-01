@@ -1,7 +1,7 @@
 import Tool from "./Tool";
 import Vector from "../math/Vector";
 import {PaintView, IPointerData} from "../views/PaintView";
-import Utils from "../utils/Utils";
+import * as Utils from "../utils/Utils";
 
 // @ts-ignore
 import brushPath from "url:../../img/brush.png";

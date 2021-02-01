@@ -1,13 +1,12 @@
 import Tool from "./Tool";
-import Point from "../utils/Point";
-import Utils from "../utils/Utils";
-import {PaintView, IPointerData} from "../views/PaintView";
+import Vector from "../math/Vector";
+import {IPointerData} from "../views/PaintView";
 
 // Fills an area with the selected color 
 export default abstract class ShapeToolBase extends Tool {
 
-    protected _startPosition: Point;
-    protected _position: Point;
+    protected _startPosition: Vector;
+    protected _position: Vector;
     private _drawShapeRequested: boolean;
 
     down(data: IPointerData) {

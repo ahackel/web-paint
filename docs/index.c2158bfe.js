@@ -8163,7 +8163,6 @@ var _config = require("../config");
 var _Thumbnail = require("./Thumbnail");
 var _ThumbnailDefault = _parcelHelpers.interopDefault(_Thumbnail);
 var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8276,7 +8275,7 @@ var BookView = /*#__PURE__*/(function (_View) {
     _classCallCheck(this, BookView);
     _this = _super.call(this, id);
     var settingsButton = _this._element.getElementsByClassName("button settings")[0];
-    _utilsUtilsDefault.default.addClick(settingsButton, function () {
+    _utilsUtils.addClick(settingsButton, function () {
       return onSettingsClicked();
     });
     return _this;
@@ -8465,9 +8464,7 @@ _parcelHelpers.export(exports, "default", function () {
   return Thumbnail;
 });
 var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _storageImageStorage = require("../storage/imageStorage");
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -8524,17 +8521,17 @@ var Thumbnail = /*#__PURE__*/(function () {
     // PeerToPeer.instance.sendData(peerName, blob);
     // });
     // });
-    _utilsUtilsDefault.default.addClick(element, function () {
+    _utilsUtils.addClick(element, function () {
       if (onImageSelected) {
         onImageSelected(id);
       }
     }, true);
-    _storageImageStorageDefault.default.addChangeListener(function (change, id) {
+    _storageImageStorage.imageStorage.addChangeListener(function (change, id) {
       if (change == "save" && id == _this.id) {
         _this.loadImage();
       }
     });
-    this.overlayUrl = _utilsUtilsDefault.default.getImageOverlayUrl(id);
+    this.overlayUrl = _utilsUtils.getImageOverlayUrl(id);
     parent.appendChild(element);
     this.loadImage();
   }
@@ -8552,7 +8549,7 @@ var Thumbnail = /*#__PURE__*/(function () {
     key: "loadImage",
     value: function loadImage() {
       var _this2 = this;
-      _storageImageStorageDefault.default.loadImageUrl(this.id).then(function (url) {
+      _storageImageStorage.imageStorage.loadImageUrl(this.id).then(function (url) {
         _this2.imageUrl = url;
       });
     }
@@ -8572,11 +8569,59 @@ var Thumbnail = /*#__PURE__*/(function () {
   return Thumbnail;
 })();
 
-},{"../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1H53o":[function(require,module,exports) {
+},{"../utils/Utils":"1H53o","../storage/imageStorage":"3kpel","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1H53o":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return Utils;
+_parcelHelpers.export(exports, "formatBytes", function () {
+  return formatBytes;
+});
+_parcelHelpers.export(exports, "upload", function () {
+  return upload;
+});
+_parcelHelpers.export(exports, "imageToBlob", function () {
+  return imageToBlob;
+});
+_parcelHelpers.export(exports, "pointerEventsSupported", function () {
+  return pointerEventsSupported;
+});
+_parcelHelpers.export(exports, "getImageOverlayUrl", function () {
+  return getImageOverlayUrl;
+});
+_parcelHelpers.export(exports, "log", function () {
+  return log;
+});
+_parcelHelpers.export(exports, "addClick", function () {
+  return addClick;
+});
+_parcelHelpers.export(exports, "addLongClick", function () {
+  return addLongClick;
+});
+_parcelHelpers.export(exports, "createNewImageId", function () {
+  return createNewImageId;
+});
+_parcelHelpers.export(exports, "lerp", function () {
+  return lerp;
+});
+_parcelHelpers.export(exports, "clamp", function () {
+  return clamp;
+});
+_parcelHelpers.export(exports, "lerpColor", function () {
+  return lerpColor;
+});
+_parcelHelpers.export(exports, "lerpCanvas", function () {
+  return lerpCanvas;
+});
+_parcelHelpers.export(exports, "stringToColor", function () {
+  return stringToColor;
+});
+_parcelHelpers.export(exports, "floodFill", function () {
+  return floodFill;
+});
+_parcelHelpers.export(exports, "getVisiblePixelFrame", function () {
+  return getVisiblePixelFrame;
+});
+_parcelHelpers.export(exports, "dilateMask", function () {
+  return dilateMask;
 });
 var _config = require("../config");
 var _Rect = require("./Rect");
@@ -8612,472 +8657,410 @@ function _asyncToGenerator(fn) {
     });
   };
 }
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if (("value" in descriptor)) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
 var Pressure = require('pressure');
-var Utils = /*#__PURE__*/(function () {
-  function Utils() {
-    _classCallCheck(this, Utils);
+function formatBytes(bytes) {
+  var decimals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+  if (bytes === 0) return '0 Bytes';
+  var k = 1024;
+  var dm = decimals < 0 ? 0 : decimals;
+  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  var i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+function upload(_x) {
+  return _upload.apply(this, arguments);
+}
+function _upload() {
+  _upload = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(accept) {
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            return _context.abrupt("return", new Promise(function (resolve) {
+              var input = document.createElement('input');
+              input.type = "file";
+              input.accept = accept;
+              input.onchange = function () {
+                if (input.files.length == 0) {
+                  return;
+                }
+                var file = input.files[0];
+                resolve(file);
+                input.remove();
+              };
+              input.click();
+            }));
+          case 1:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _upload.apply(this, arguments);
+}
+function imageToBlob(image) {
+  var canvas = document.createElement("canvas");
+  canvas.id = "imageToCanvas";
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  var ctx = canvas.getContext("2d", {
+    alpha: true
+  });
+  ctx.drawImage(image, 0, 0);
+  return new Promise(function (resolve) {
+    canvas.toBlob(function (blob) {
+      return resolve(blob);
+    });
+  });
+}
+function pointerEventsSupported() {
+  return window.PointerEvent != null;
+}
+function getImageOverlayUrl(id) {
+  var _config$images$id;
+  return (_config$images$id = _config.config.images[id]) === null || _config$images$id === void 0 ? void 0 : _config$images$id.overlay;
+}
+function log(message) {
+  if (!_config.config.debug) {
+    return;
   }
-  _createClass(Utils, null, [{
-    key: "formatBytes",
-    // source:
-    // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
-    value: function formatBytes(bytes) {
-      var decimals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-      if (bytes === 0) return '0 Bytes';
-      var k = 1024;
-      var dm = decimals < 0 ? 0 : decimals;
-      var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-      var i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  for (var _len = arguments.length, optionalParams = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    optionalParams[_key - 1] = arguments[_key];
+  }
+  console.log(message, optionalParams);
+}
+function addClick(element, callback) {
+  var supportScrolling = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var scrollStartX;
+  var scrollStartY;
+  var touchId;
+  var isTracking;
+  var startTimeStamp;
+  var scrolled;
+  element.addEventListener("touchstart", touchStart);
+  element.addEventListener("mouseup", mouseUp);
+  function mouseUp(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    callback.call(event.target, event);
+  }
+  function touchStart(event) {
+    if (!supportScrolling) {
+      event.preventDefault();
     }
-  }, {
-    key: "upload",
-    value: (function () {
-      var _upload = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(accept) {
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                return _context.abrupt("return", new Promise(function (resolve) {
-                  var input = document.createElement('input');
-                  input.type = "file";
-                  input.accept = accept;
-                  input.onchange = function () {
-                    if (input.files.length == 0) {
-                      return;
-                    }
-                    var file = input.files[0];
-                    resolve(file);
-                    input.remove();
-                  };
-                  input.click();
-                }));
-              case 1:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }));
-      function upload(_x) {
-        return _upload.apply(this, arguments);
-      }
-      return upload;
-    })()
-  }, {
-    key: "imageToBlob",
-    value: function imageToBlob(image) {
-      var canvas = document.createElement("canvas");
-      canvas.id = "imageToCanvas";
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
-      var ctx = canvas.getContext("2d", {
-        alpha: true
-      });
-      ctx.drawImage(image, 0, 0);
-      return new Promise(function (resolve) {
-        canvas.toBlob(function (blob) {
-          return resolve(blob);
-        });
-      });
+    if (isTracking || event.touches.length > 1) {
+      return;
     }
-  }, {
-    key: "pointerEventsSupported",
-    value: function pointerEventsSupported() {
-      return window.PointerEvent != null;
+    var touch = event.changedTouches[0];
+    isTracking = true;
+    touchId = touch.identifier;
+    scrolled = false;
+    scrollStartX = touch.pageX;
+    scrollStartY = touch.pageY;
+    startTimeStamp = event.timeStamp;
+    element.classList.add("down");
+    element.addEventListener("touchmove", touchMove);
+    element.addEventListener("touchend", touchEnd);
+  }
+  function touchMove(event) {
+    if (!supportScrolling) {
+      event.preventDefault();
     }
-  }, {
-    key: "getImageOverlayUrl",
-    value: function getImageOverlayUrl(id) {
-      var _config$images$id;
-      return (_config$images$id = _config.config.images[id]) === null || _config$images$id === void 0 ? void 0 : _config$images$id.overlay;
+    if (!isTracking) {
+      return;
     }
-  }, {
-    key: "log",
-    value: function log(message) {
-      if (!_config.config.debug) {
-        return;
-      }
-      for (var _len = arguments.length, optionalParams = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        optionalParams[_key - 1] = arguments[_key];
-      }
-      console.log(message, optionalParams);
+    var touch = event.changedTouches[0];
+    // user dragged out of the element:
+    if (document.elementFromPoint(touch.pageX, touch.pageY) != event.target) {
+      isTracking = false;
+      element.classList.remove("down");
     }
-  }, {
-    key: "addClick",
-    value: function addClick(element, callback) {
-      var supportScrolling = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var scrollStartX;
-      var scrollStartY;
-      var touchId;
-      var isTracking;
-      var startTimeStamp;
-      var scrolled;
-      element.addEventListener("touchstart", touchStart);
-      element.addEventListener("mouseup", mouseUp);
-      function mouseUp(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        callback.call(event.target, event);
-      }
-      function touchStart(event) {
-        if (!supportScrolling) {
-          event.preventDefault();
-        }
-        if (isTracking || event.touches.length > 1) {
-          return;
-        }
-        var touch = event.changedTouches[0];
-        isTracking = true;
-        touchId = touch.identifier;
-        scrolled = false;
-        scrollStartX = touch.pageX;
-        scrollStartY = touch.pageY;
-        startTimeStamp = event.timeStamp;
-        element.classList.add("down");
-        element.addEventListener("touchmove", touchMove);
-        element.addEventListener("touchend", touchEnd);
-      }
-      function touchMove(event) {
-        if (!supportScrolling) {
-          event.preventDefault();
-        }
-        if (!isTracking) {
-          return;
-        }
-        var touch = event.changedTouches[0];
-        // user dragged out of the element:
-        if (document.elementFromPoint(touch.pageX, touch.pageY) != event.target) {
-          isTracking = false;
-          element.classList.remove("down");
-        }
-        if (scrolled || event.timeStamp < startTimeStamp + _config.config.maxScrollDelay) {
-          if (supportScrolling && (Math.abs(touch.pageX - scrollStartX) > _config.config.minScrollDistance || Math.abs(touch.pageY - scrollStartY) > _config.config.minScrollDistance)) {
-            isTracking = false;
-            element.classList.remove("down");
-          }
-        }
-        // After tapping and holding for a while the element does not start scrolling any more.
-        // In that case we don't want perform the scroll check above any more:
-        if (event.timeStamp < startTimeStamp + _config.config.maxScrollDelay) {
-          if (Math.abs(touch.pageX - scrollStartX) > 2 || Math.abs(touch.pageY - scrollStartY) > 2) {
-            scrolled = true;
-          }
-        }
-      }
-      function touchEnd(event) {
-        event.preventDefault();
-        element.removeEventListener("touchmove", touchMove);
-        element.removeEventListener("touchend", touchEnd);
-        element.classList.remove("down");
-        if (!isTracking) {
-          return;
-        }
+    if (scrolled || event.timeStamp < startTimeStamp + _config.config.maxScrollDelay) {
+      if (supportScrolling && (Math.abs(touch.pageX - scrollStartX) > _config.config.minScrollDistance || Math.abs(touch.pageY - scrollStartY) > _config.config.minScrollDistance)) {
         isTracking = false;
-        touchId = null;
-        callback.call(event.target, event);
+        element.classList.remove("down");
       }
     }
-  }, {
-    key: "addLongClick",
-    value: function addLongClick(element, callback) {
-      var timer;
-      var caller = this;
-      var called = false;
-      element.addEventListener("touchstart", down);
-      element.addEventListener("touchend", up);
-      element.addEventListener("mousedown", down);
-      element.addEventListener("mouseup", up);
-      function down(event) {
-        called = false;
-        timer = setTimeout(function () {
-          callback.call(caller, event);
-          called = true;
-        }, _config.config.longClickDelay);
-      }
-      function up(event) {
-        if (called) {
-          event.stopImmediatePropagation();
-          element.classList.remove("down");
-          called = false;
-        } else {
-          clearTimeout(timer);
-        }
+    // After tapping and holding for a while the element does not start scrolling any more.
+    // In that case we don't want perform the scroll check above any more:
+    if (event.timeStamp < startTimeStamp + _config.config.maxScrollDelay) {
+      if (Math.abs(touch.pageX - scrollStartX) > 2 || Math.abs(touch.pageY - scrollStartY) > 2) {
+        scrolled = true;
       }
     }
-  }, {
-    key: "createNewImageId",
-    value: function createNewImageId() {
-      return Date.now().toString();
+  }
+  function touchEnd(event) {
+    event.preventDefault();
+    element.removeEventListener("touchmove", touchMove);
+    element.removeEventListener("touchend", touchEnd);
+    element.classList.remove("down");
+    if (!isTracking) {
+      return;
     }
-  }, {
-    key: "lerp",
-    value: function lerp(a, b, alpha) {
-      return a * (1 - alpha) + b * alpha;
+    isTracking = false;
+    touchId = null;
+    callback.call(event.target, event);
+  }
+}
+function addLongClick(element, callback) {
+  var timer;
+  var caller = this;
+  var called = false;
+  element.addEventListener("touchstart", down);
+  element.addEventListener("touchend", up);
+  element.addEventListener("mousedown", down);
+  element.addEventListener("mouseup", up);
+  function down(event) {
+    called = false;
+    timer = setTimeout(function () {
+      callback.call(caller, event);
+      called = true;
+    }, _config.config.longClickDelay);
+  }
+  function up(event) {
+    if (called) {
+      event.stopImmediatePropagation();
+      element.classList.remove("down");
+      called = false;
+    } else {
+      clearTimeout(timer);
     }
-  }, {
-    key: "clamp",
-    value: function clamp(lower, upper, n) {
-      return Math.min(upper, Math.max(lower, n));
+  }
+}
+function createNewImageId() {
+  return Date.now().toString();
+}
+function lerp(a, b, alpha) {
+  return a * (1 - alpha) + b * alpha;
+}
+function clamp(lower, upper, n) {
+  return Math.min(upper, Math.max(lower, n));
+}
+function lerpColor(color1, color2, alpha) {
+  if (alpha == 0) {
+    return color1;
+  }
+  if (alpha == 1) {
+    return color2;
+  }
+  var aa = (color1 & 0xff000000) >> 24;
+  var ba = (color1 & 0x00ff0000) >> 16;
+  var ga = (color1 & 0x0000ff00) >> 8;
+  var ra = color1 & 0x000000ff;
+  var ab = (color2 & 0xff000000) >> 24;
+  var bb = (color2 & 0x00ff0000) >> 16;
+  var gb = (color2 & 0x0000ff00) >> 8;
+  var rb = color2 & 0x000000ff;
+  var r = Math.floor(lerp(ra, rb, alpha));
+  var g = Math.floor(lerp(ga, gb, alpha));
+  var b = Math.floor(lerp(ba, bb, alpha));
+  var a = 255;
+  // Math.floor(Utils.lerp(aa, ab, alpha));
+  return r + (g << 8) + (b << 16) + 0xFF000000;
+}
+function lerpCanvas(ctxA, ctxB, ctxMask) {
+  var width = ctxA.canvas.width;
+  var height = ctxA.canvas.height;
+  var dataA = ctxA.getImageData(0, 0, width, height);
+  var dataB = ctxB.getImageData(0, 0, width, height);
+  var dataMask = ctxMask.getImageData(0, 0, width, height);
+  var a32 = new Uint8ClampedArray(dataA.data.buffer);
+  var b32 = new Uint8ClampedArray(dataB.data.buffer);
+  var m32 = new Uint8ClampedArray(dataMask.data.buffer);
+  for (var i = 0; i < width * height; i++) {
+    var a = m32[i * 4 + 3] / 255;
+    a32[i * 4 + 0] = (1 - a) * a32[i * 4 + 0] + a * b32[i * 4 + 0];
+    a32[i * 4 + 1] = (1 - a) * a32[i * 4 + 1] + a * b32[i * 4 + 1];
+    a32[i * 4 + 2] = (1 - a) * a32[i * 4 + 2] + a * b32[i * 4 + 2];
+    a32[i * 4 + 3] = (1 - a) * a32[i * 4 + 3] + a * b32[i * 4 + 3];
+  }
+  ctxA.putImageData(dataA, 0, 0);
+}
+function stringToColor(h) {
+  var r = 0, g = 0, b = 0;
+  if (h.length == 4) {
+    r = parseInt(h[1] + h[1], 16);
+    g = parseInt(h[2] + h[2], 16);
+    b = parseInt(h[3] + h[3], 16);
+  } else {
+    r = parseInt(h[1] + h[2], 16);
+    g = parseInt(h[3] + h[4], 16);
+    b = parseInt(h[5] + h[6], 16);
+  }
+  return 0xFF000000 + r + (g << 8) + (b << 16);
+}
+function floodFill(sourceCtx, mask, startPosition, color) {
+  var threshold = 0.5;
+  var width = sourceCtx.canvas.width;
+  var height = sourceCtx.canvas.height;
+  var sourceData = sourceCtx.getImageData(0, 0, width, height);
+  var sourcePixels = sourceData.data;
+  startPosition = startPosition.clone().round();
+  var startIndex = startPosition.x + startPosition.y * width;
+  // const startR = sourcePixels[startIndex * 4];
+  // const startG = sourcePixels[startIndex * 4 + 1];
+  // const startB = sourcePixels[startIndex * 4 + 2];
+  // const startA = sourcePixels[startIndex * 4 + 3];
+  var startR = parseInt(color[1] + color[2], 16);
+  var startG = parseInt(color[3] + color[4], 16);
+  var startB = parseInt(color[5] + color[6], 16);
+  // take into account that transparent pixels appear white (due to white bg) but their rgb value is 0:
+  // const startBrightness = startA < 5 ? 255 : 0.333 * (startR + startG + startB);
+  var startBrightness = 0.333 * (startR + startG + startB);
+  // clear alpha channel:
+  for (var i = 0; i < width * height; i++) {
+    mask[i * 4 + 3] = 0;
+  }
+  // start at multiple positions around start position:
+  var stack = [];
+  stack.push(startPosition);
+  if (startPosition.x > 1) {
+    stack.push(new _mathVectorDefault.default(startPosition.x - 2, startPosition.y));
+  }
+  if (startPosition.x < width - 2) {
+    stack.push(new _mathVectorDefault.default(startPosition.x + 2, startPosition.y));
+  }
+  if (startPosition.y > 1) {
+    stack.push(new _mathVectorDefault.default(startPosition.x, startPosition.y - 2));
+  }
+  if (startPosition.y < height - 2) {
+    stack.push(new _mathVectorDefault.default(startPosition.x, startPosition.y + 2));
+  }
+  while (stack.length > 0) {
+    var pos = stack.pop();
+    if (isBorderPixel(pos.x, pos.y, false)) {
+      continue;
     }
-  }, {
-    key: "lerpColor",
-    value: function lerpColor(color1, color2, alpha) {
-      if (alpha == 0) {
-        return color1;
+    var minX = scanLeft(pos.x, pos.y);
+    var maxX = scanRight(pos.x, pos.y);
+    addToStack(minX, maxX, pos.y - 1);
+    addToStack(minX, maxX, pos.y + 1);
+  }
+  function scanLeft(x, y) {
+    var minX = x;
+    while (minX >= 0) {
+      if (isBorderPixel(minX, y, true)) {
+        break;
       }
-      if (alpha == 1) {
-        return color2;
-      }
-      var aa = (color1 & 0xff000000) >> 24;
-      var ba = (color1 & 0x00ff0000) >> 16;
-      var ga = (color1 & 0x0000ff00) >> 8;
-      var ra = color1 & 0x000000ff;
-      var ab = (color2 & 0xff000000) >> 24;
-      var bb = (color2 & 0x00ff0000) >> 16;
-      var gb = (color2 & 0x0000ff00) >> 8;
-      var rb = color2 & 0x000000ff;
-      var r = Math.floor(Utils.lerp(ra, rb, alpha));
-      var g = Math.floor(Utils.lerp(ga, gb, alpha));
-      var b = Math.floor(Utils.lerp(ba, bb, alpha));
-      var a = 255;
-      // Math.floor(Utils.lerp(aa, ab, alpha));
-      return r + (g << 8) + (b << 16) + 0xFF000000;
+      minX -= 1;
     }
-  }, {
-    key: "lerpCanvas",
-    value: function lerpCanvas(ctxA, ctxB, ctxMask) {
-      var width = ctxA.canvas.width;
-      var height = ctxA.canvas.height;
-      var dataA = ctxA.getImageData(0, 0, width, height);
-      var dataB = ctxB.getImageData(0, 0, width, height);
-      var dataMask = ctxMask.getImageData(0, 0, width, height);
-      var a32 = new Uint8ClampedArray(dataA.data.buffer);
-      var b32 = new Uint8ClampedArray(dataB.data.buffer);
-      var m32 = new Uint8ClampedArray(dataMask.data.buffer);
-      for (var i = 0; i < width * height; i++) {
-        var a = m32[i * 4 + 3] / 255;
-        a32[i * 4 + 0] = (1 - a) * a32[i * 4 + 0] + a * b32[i * 4 + 0];
-        a32[i * 4 + 1] = (1 - a) * a32[i * 4 + 1] + a * b32[i * 4 + 1];
-        a32[i * 4 + 2] = (1 - a) * a32[i * 4 + 2] + a * b32[i * 4 + 2];
-        a32[i * 4 + 3] = (1 - a) * a32[i * 4 + 3] + a * b32[i * 4 + 3];
+    return minX + 1;
+  }
+  function scanRight(x, y) {
+    var maxX = x + 1;
+    while (maxX < width) {
+      if (isBorderPixel(maxX, y, true)) {
+        break;
       }
-      ctxA.putImageData(dataA, 0, 0);
+      maxX += 1;
     }
-  }, {
-    key: "stringToColor",
-    value: function stringToColor(h) {
-      var r = 0, g = 0, b = 0;
-      if (h.length == 4) {
-        r = parseInt(h[1] + h[1], 16);
-        g = parseInt(h[2] + h[2], 16);
-        b = parseInt(h[3] + h[3], 16);
-      } else {
-        r = parseInt(h[1] + h[2], 16);
-        g = parseInt(h[3] + h[4], 16);
-        b = parseInt(h[5] + h[6], 16);
-      }
-      return 0xFF000000 + r + (g << 8) + (b << 16);
+    return maxX - 1;
+  }
+  function addToStack(minX, maxX, y) {
+    if (y < 0 || y >= height) {
+      return;
     }
-  }, {
-    key: "floodFill",
-    value: function floodFill(sourceCtx, mask, startPosition, color) {
-      var threshold = 0.5;
-      var width = sourceCtx.canvas.width;
-      var height = sourceCtx.canvas.height;
-      var sourceData = sourceCtx.getImageData(0, 0, width, height);
-      var sourcePixels = sourceData.data;
-      startPosition = startPosition.clone().round();
-      var startIndex = startPosition.x + startPosition.y * width;
-      // const startR = sourcePixels[startIndex * 4];
-      // const startG = sourcePixels[startIndex * 4 + 1];
-      // const startB = sourcePixels[startIndex * 4 + 2];
-      // const startA = sourcePixels[startIndex * 4 + 3];
-      var startR = parseInt(color[1] + color[2], 16);
-      var startG = parseInt(color[3] + color[4], 16);
-      var startB = parseInt(color[5] + color[6], 16);
-      // take into account that transparent pixels appear white (due to white bg) but their rgb value is 0:
-      // const startBrightness = startA < 5 ? 255 : 0.333 * (startR + startG + startB);
-      var startBrightness = 0.333 * (startR + startG + startB);
-      // clear alpha channel:
-      for (var i = 0; i < width * height; i++) {
-        mask[i * 4 + 3] = 0;
+    for (var x = minX; x <= maxX; x++) {
+      if (isBorderPixel(x, y, false)) {
+        continue;
       }
-      // start at multiple positions around start position:
-      var stack = [];
-      stack.push(startPosition);
-      if (startPosition.x > 1) {
-        stack.push(new _mathVectorDefault.default(startPosition.x - 2, startPosition.y));
-      }
-      if (startPosition.x < width - 2) {
-        stack.push(new _mathVectorDefault.default(startPosition.x + 2, startPosition.y));
-      }
-      if (startPosition.y > 1) {
-        stack.push(new _mathVectorDefault.default(startPosition.x, startPosition.y - 2));
-      }
-      if (startPosition.y < height - 2) {
-        stack.push(new _mathVectorDefault.default(startPosition.x, startPosition.y + 2));
-      }
-      while (stack.length > 0) {
-        var pos = stack.pop();
-        if (isBorderPixel(pos.x, pos.y, false)) {
-          continue;
-        }
-        var minX = scanLeft(pos.x, pos.y);
-        var maxX = scanRight(pos.x, pos.y);
-        addToStack(minX, maxX, pos.y - 1);
-        addToStack(minX, maxX, pos.y + 1);
-      }
-      function scanLeft(x, y) {
-        var minX = x;
-        while (minX >= 0) {
-          if (isBorderPixel(minX, y, true)) {
-            break;
-          }
-          minX -= 1;
-        }
-        return minX + 1;
-      }
-      function scanRight(x, y) {
-        var maxX = x + 1;
-        while (maxX < width) {
-          if (isBorderPixel(maxX, y, true)) {
-            break;
-          }
-          maxX += 1;
-        }
-        return maxX - 1;
-      }
-      function addToStack(minX, maxX, y) {
-        if (y < 0 || y >= height) {
-          return;
-        }
-        for (var x = minX; x <= maxX; x++) {
-          if (isBorderPixel(x, y, false)) {
-            continue;
-          }
-          stack.push(new _mathVectorDefault.default(x, y));
-        }
-      }
-      function isBorderPixel(x, y, setValue) {
-        var index = (x + y * width) * 4;
-        var indexA = index + 3;
-        if (mask[indexA]) {
-          return true;
-        }
-        var r = sourcePixels[index];
-        var g = sourcePixels[index + 1];
-        var b = sourcePixels[index + 2];
-        var a = sourcePixels[index + 3];
-        // 
-        // let difference = Math.max(
-        // Math.abs(r - startR),
-        // Math.abs(g - startG),
-        // Math.abs(b - startB),
-        // Math.abs(a - startA)
-        // ) / 255;
-        var brightness = 0.333 * (r + g + b);
-        if (a < 250 || brightness >= startBrightness) {
-          if (setValue) {
-            mask[indexA] = 255;
-          }
-          return false;
-        }
-        // if (difference < threshold){
-        // if (setValue){
-        // mask[indexA] = 255;
-        // }
-        // return false;
-        // }
-        // if (setValue) {
-        // mask[indexA] = (1 - difference) * 255;
-        // }
-        return true;
-      }
+      stack.push(new _mathVectorDefault.default(x, y));
     }
-  }, {
-    key: "getVisiblePixelFrame",
-    value: function getVisiblePixelFrame(ctx, rect) {
-      var x = rect.x, y = rect.y, width = rect.width, height = rect.height;
-      if (width <= 0 || height <= 0) {
-        return _RectDefault.default.Empty();
-      }
-      var data = ctx.getImageData(x, y, width, height);
-      var pixels = data.data;
-      var minX = width;
-      var maxX = 0;
-      var minY = height;
-      var maxY = 0;
-      for (var cy = 0; cy < height; cy++) {
-        for (var cx = 0; cx < width; cx++) {
-          if (pixels[(cx + cy * width) * 4 + 3]) {
-            minX = cx < minX ? cx : minX;
-            maxX = cx > maxX ? cx : maxX;
-            minY = cy < minY ? cy : minY;
-            maxY = cy > maxY ? cy : maxY;
-          }
-        }
-      }
-      x += minX;
-      y += minY;
-      width = Math.max(0, maxX - minX + 1);
-      height = Math.max(0, maxY - minY + 1);
-      return new _RectDefault.default(x, y, width, height);
+  }
+  function isBorderPixel(x, y, setValue) {
+    var index = (x + y * width) * 4;
+    var indexA = index + 3;
+    if (mask[indexA]) {
+      return true;
     }
-  }, {
-    key: "dilateMask",
-    value: function dilateMask(pixels, width, height) {
-      for (var y = 0; y < height; y++) {
-        for (var x = 0; x < width - 1; x++) {
-          var i = (x + y * width) * 4 + 3;
-          if (pixels[i + 4]) {
-            pixels[i] = 255;
-          }
-        }
-        for (var _x2 = width - 1; _x2 > 0; _x2--) {
-          var _i = (_x2 + y * width) * 4 + 3;
-          if (pixels[_i - 4]) {
-            pixels[_i] = 255;
-          }
-        }
+    var r = sourcePixels[index];
+    var g = sourcePixels[index + 1];
+    var b = sourcePixels[index + 2];
+    var a = sourcePixels[index + 3];
+    // 
+    // let difference = Math.max(
+    // Math.abs(r - startR),
+    // Math.abs(g - startG),
+    // Math.abs(b - startB),
+    // Math.abs(a - startA)
+    // ) / 255;
+    var brightness = 0.333 * (r + g + b);
+    if (a < 250 || brightness >= startBrightness) {
+      if (setValue) {
+        mask[indexA] = 255;
       }
-      for (var _x3 = 0; _x3 < width; _x3++) {
-        for (var _y = 0; _y < height - 1; _y++) {
-          var _i2 = (_x3 + _y * width) * 4 + 3;
-          if (pixels[_i2 + 4 * width]) {
-            pixels[_i2] = 255;
-          }
-        }
-        for (var _y2 = height - 1; _y2 > 0; _y2--) {
-          var _i3 = (_x3 + _y2 * width) * 4 + 3;
-          if (pixels[_i3 - 4 * width]) {
-            pixels[_i3] = 255;
-          }
-        }
+      return false;
+    }
+    // if (difference < threshold){
+    // if (setValue){
+    // mask[indexA] = 255;
+    // }
+    // return false;
+    // }
+    // if (setValue) {
+    // mask[indexA] = (1 - difference) * 255;
+    // }
+    return true;
+  }
+}
+function getVisiblePixelFrame(ctx, rect) {
+  var x = rect.x, y = rect.y, width = rect.width, height = rect.height;
+  if (width <= 0 || height <= 0) {
+    return _RectDefault.default.Empty();
+  }
+  var data = ctx.getImageData(x, y, width, height);
+  var pixels = data.data;
+  var minX = width;
+  var maxX = 0;
+  var minY = height;
+  var maxY = 0;
+  for (var cy = 0; cy < height; cy++) {
+    for (var cx = 0; cx < width; cx++) {
+      if (pixels[(cx + cy * width) * 4 + 3]) {
+        minX = cx < minX ? cx : minX;
+        maxX = cx > maxX ? cx : maxX;
+        minY = cy < minY ? cy : minY;
+        maxY = cy > maxY ? cy : maxY;
       }
     }
-  }]);
-  return Utils;
-})();
+  }
+  x += minX;
+  y += minY;
+  width = Math.max(0, maxX - minX + 1);
+  height = Math.max(0, maxY - minY + 1);
+  return new _RectDefault.default(x, y, width, height);
+}
+function dilateMask(pixels, width, height) {
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width - 1; x++) {
+      var i = (x + y * width) * 4 + 3;
+      if (pixels[i + 4]) {
+        pixels[i] = 255;
+      }
+    }
+    for (var _x2 = width - 1; _x2 > 0; _x2--) {
+      var _i = (_x2 + y * width) * 4 + 3;
+      if (pixels[_i - 4]) {
+        pixels[_i] = 255;
+      }
+    }
+  }
+  for (var _x3 = 0; _x3 < width; _x3++) {
+    for (var _y = 0; _y < height - 1; _y++) {
+      var _i2 = (_x3 + _y * width) * 4 + 3;
+      if (pixels[_i2 + 4 * width]) {
+        pixels[_i2] = 255;
+      }
+    }
+    for (var _y2 = height - 1; _y2 > 0; _y2--) {
+      var _i3 = (_x3 + _y2 * width) * 4 + 3;
+      if (pixels[_i3 - 4 * width]) {
+        pixels[_i3] = 255;
+      }
+    }
+  }
+}
 
 },{"../config":"1tzQg","./Rect":"3WeR4","../math/Vector":"1B3oQ","pressure":"7hv3G","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"3WeR4":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
@@ -9597,8 +9580,8 @@ var define;
 },{}],"3kpel":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
-_parcelHelpers.export(exports, "default", function () {
-  return ImageStorage;
+_parcelHelpers.export(exports, "imageStorage", function () {
+  return imageStorage;
 });
 require('whatwg-fetch');
 var _LocalForageAdapter = require("./LocalForageAdapter");
@@ -9721,7 +9704,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   function ImageStorage() {
     _classCallCheck(this, ImageStorage);
   }
-  _createClass(ImageStorage, null, [{
+  _createClass(ImageStorage, [{
     key: "loadImage",
     value: (function () {
       var _loadImage = _asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee(id) {
@@ -10188,6 +10171,7 @@ var ImageStorage = /*#__PURE__*/(function () {
   }]);
   return ImageStorage;
 })();
+var imageStorage = new ImageStorage();
 
 },{"whatwg-fetch":"1ve7H","./LocalForageAdapter":"6C5Ef","jszip":"3tYp5","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"1ve7H":[function(require,module,exports) {
 var define;
@@ -30285,14 +30269,12 @@ var _palettesColorPaletteDefault = _parcelHelpers.interopDefault(_palettesColorP
 var _palettesSizePalette = require("../palettes/SizePalette");
 var _palettesSizePaletteDefault = _parcelHelpers.interopDefault(_palettesSizePalette);
 var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _toolsPenTool = require("../tools/PenTool");
 var _toolsPenToolDefault = _parcelHelpers.interopDefault(_toolsPenTool);
 var _mathVector = require("../math/Vector");
 var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 var _palettesPalette = require("../palettes/Palette");
 var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
 var _config = require("../config");
 var _palettesShapePalette = require("../palettes/ShapePalette");
 var _palettesShapePaletteDefault = _parcelHelpers.interopDefault(_palettesShapePalette);
@@ -30502,7 +30484,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
     _this._sheet = document.getElementById("sheet");
     _this.width = _config.config.width;
     _this.height = _config.config.height;
-    _utilsUtilsDefault.default.log(("Setting PaintView size to ").concat(_this.width, " x ").concat(_this.height));
+    _utilsUtils.log(("Setting PaintView size to ").concat(_this.width, " x ").concat(_this.height));
     _this.addCanvasLayer("base-layer", 0, 0, _this.width, _this.height, false);
     _this.addEventListeners();
     _this.createButtons(onBackClicked);
@@ -30521,26 +30503,26 @@ var PaintView = /*#__PURE__*/(function (_View) {
     value: function createButtons(onBackClicked) {
       var _this2 = this;
       var backButton = this._element.getElementsByClassName("button back")[0];
-      _utilsUtilsDefault.default.addClick(backButton, function () {
+      _utilsUtils.addClick(backButton, function () {
         return onBackClicked();
       });
       this._undoButton = document.getElementById("undo-button");
-      _utilsUtilsDefault.default.addClick(this._undoButton, function () {
+      _utilsUtils.addClick(this._undoButton, function () {
         return _this2.undo();
       });
       this._redoButton = document.getElementById("redo-button");
-      _utilsUtilsDefault.default.addClick(this._redoButton, function () {
+      _utilsUtils.addClick(this._redoButton, function () {
         return _this2.redo();
       });
       this._importImageButton = document.getElementById("import-image-button");
-      _utilsUtilsDefault.default.addClick(this._importImageButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      _utilsUtils.addClick(this._importImageButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee() {
         var blob, url;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _utilsUtilsDefault.default.upload("image/*");
+                return _utilsUtils.upload("image/*");
               case 2:
                 blob = _context.sent;
                 _this2.setTool(_this2.selectionTool);
@@ -30617,24 +30599,24 @@ var PaintView = /*#__PURE__*/(function (_View) {
     value: function createTools() {
       var _this3 = this;
       var penButton = document.getElementById("tool-pen");
-      _utilsUtilsDefault.default.addLongClick(penButton, function () {
+      _utilsUtils.addLongClick(penButton, function () {
         return _this3.fill();
       });
-      _utilsUtilsDefault.default.addClick(penButton, function () {
+      _utilsUtils.addClick(penButton, function () {
         return _this3.setTool(_this3.markerTool);
       });
       var eraserButton = document.getElementById("tool-eraser");
-      _utilsUtilsDefault.default.addLongClick(eraserButton, function () {
+      _utilsUtils.addLongClick(eraserButton, function () {
         return _this3.clear(true);
       });
-      _utilsUtilsDefault.default.addClick(eraserButton, function () {
+      _utilsUtils.addClick(eraserButton, function () {
         return _this3.setTool(_this3.eraserTool);
       });
       var selectionButton = document.getElementById("tool-selection");
-      _utilsUtilsDefault.default.addClick(selectionButton, function () {
+      _utilsUtils.addClick(selectionButton, function () {
         return _this3.setTool(_this3.selectionTool);
       });
-      _utilsUtilsDefault.default.addLongClick(selectionButton, function () {
+      _utilsUtils.addLongClick(selectionButton, function () {
         _this3.setTool(_this3.selectionTool);
         _this3.selectionTool.selectAll();
       });
@@ -30833,12 +30815,12 @@ var PaintView = /*#__PURE__*/(function (_View) {
   }, {
     key: "getNormalizedPointerPressure",
     value: function getNormalizedPointerPressure(event) {
-      return event.pointerType == "pen" ? _utilsUtilsDefault.default.clamp(0.5, 2, event.pressure * 4) : 1;
+      return event.pointerType == "pen" ? _utilsUtils.clamp(0.5, 2, event.pressure * 4) : 1;
     }
   }, {
     key: "getNormalizedTouchPressure",
     value: function getNormalizedTouchPressure(touch) {
-      return touch.touchType == "stylus" ? _utilsUtilsDefault.default.clamp(0.5, 2, touch.force * 4) : 1;
+      return touch.touchType == "stylus" ? _utilsUtils.clamp(0.5, 2, touch.force * 4) : 1;
     }
   }, {
     key: "pointerUp",
@@ -30930,7 +30912,7 @@ var PaintView = /*#__PURE__*/(function (_View) {
       this._lastPointerData = this._lastPointerData || data;
       var timeDelta = data.timeStamp - this._lastPointerData.timeStamp;
       var speed = delta / timeDelta;
-      data.speed = _utilsUtilsDefault.default.lerp(this._lastPointerData.speed, speed, 0.2);
+      data.speed = _utilsUtils.lerp(this._lastPointerData.speed, speed, 0.2);
       this._lastPointerData = data;
       this._currentTool.move(data);
     }
@@ -31018,13 +31000,13 @@ var PaintView = /*#__PURE__*/(function (_View) {
     key: "loadImage",
     value: function loadImage(id) {
       var _this6 = this;
-      return _storageImageStorageDefault.default.loadImage(id).then(function (image) {
+      return _storageImageStorage.imageStorage.loadImage(id).then(function (image) {
         _this6._imageId = id;
         _this6.clear();
         if (image) {
           _this6.baseLayer.drawImage(image);
         }
-        _this6.setOverlay(_utilsUtilsDefault.default.getImageOverlayUrl(id));
+        _this6.setOverlay(_utilsUtils.getImageOverlayUrl(id));
         _this6.ResetHistory();
         _this6._isDirty = false;
       });
@@ -31033,9 +31015,9 @@ var PaintView = /*#__PURE__*/(function (_View) {
     key: "saveImage",
     value: function saveImage() {
       var _this7 = this;
-      _utilsUtilsDefault.default.log("Saving image");
+      _utilsUtils.log("Saving image");
       this.baseLayer.canvas.toBlob(function (blob) {
-        return _storageImageStorageDefault.default.saveImage(_this7._imageId, blob);
+        return _storageImageStorage.imageStorage.saveImage(_this7._imageId, blob);
       });
       this._isDirty = false;
       this._lastSaveTimestamp = Date.now();
@@ -31121,9 +31103,9 @@ var PaintView = /*#__PURE__*/(function (_View) {
       // if (this._autoMaskCaptured && imageData.data[index] > 0){
       // return;
       // }
-      _utilsUtilsDefault.default.log("capturing auto mask");
-      _utilsUtilsDefault.default.floodFill(this.baseLayer.ctx, imageData.data, position, this.color);
-      _utilsUtilsDefault.default.dilateMask(imageData.data, this.width, this.height);
+      _utilsUtils.log("capturing auto mask");
+      _utilsUtils.floodFill(this.baseLayer.ctx, imageData.data, position, this.color);
+      _utilsUtils.dilateMask(imageData.data, this.width, this.height);
       this._autoMaskCtx.putImageData(imageData, 0, 0);
     }
   }, {
@@ -31290,7 +31272,6 @@ _parcelHelpers.export(exports, "Palette", function () {
 });
 var _viewsView = require("../views/View");
 var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 function _createForOfIteratorHelper(o, allowArrayLike) {
   var it;
   if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
@@ -31538,7 +31519,7 @@ var Palette = /*#__PURE__*/(function (_View) {
       var element = document.createElement("div");
       element.classList.add("option");
       this._selectedElement = element;
-      _utilsUtilsDefault.default.addClick(element, function () {
+      _utilsUtils.addClick(element, function () {
         return _this2.toggle();
       });
       this.updateSelectedOptionElement(element, this.selectedOption);
@@ -31586,10 +31567,10 @@ var Palette = /*#__PURE__*/(function (_View) {
       var element = document.createElement("div");
       element.classList.add("option");
       element.dataset.index = ("").concat(index);
-      _utilsUtilsDefault.default.addLongClick(element, function (event) {
+      _utilsUtils.addLongClick(element, function (event) {
         return _this3.optionLongClicked(event, option, index);
       });
-      _utilsUtilsDefault.default.addClick(element, function (event) {
+      _utilsUtils.addClick(element, function (event) {
         return _this3.optionClicked(event, option, index);
       });
       this.updateOptionElement(element, option);
@@ -31756,7 +31737,6 @@ var _Tool2Default = _parcelHelpers.interopDefault(_Tool2);
 var _mathVector = require("../math/Vector");
 var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -31982,9 +31962,9 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
       var lastWidth = this._widths[this._widths.length - 1];
       var maxWidthDifferencePerSegment = 2;
       var maxWidthDifference = maxWidthDifferencePerSegment * numSegments;
-      width = _utilsUtilsDefault.default.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
+      width = _utilsUtils.clamp(lastWidth - maxWidthDifference, lastWidth + maxWidthDifference, width);
       for (var i = 0; i < numSegments; i++) {
-        this._widths.push(_utilsUtilsDefault.default.lerp(lastWidth, width, i / numSegments));
+        this._widths.push(_utilsUtils.lerp(lastWidth, width, i / numSegments));
       }
       this.requestDrawPath();
     }
@@ -32031,7 +32011,7 @@ var PenTool = /*#__PURE__*/(function (_Tool) {
   }, {
     key: "getWidth",
     value: function getWidth(pressure, speed) {
-      speed = _utilsUtilsDefault.default.clamp(1, 2, speed);
+      speed = _utilsUtils.clamp(1, 2, speed);
       return pressure / speed;
     }
   }, {
@@ -32159,8 +32139,7 @@ _parcelHelpers.export(exports, "default", function () {
   return ShapePalette;
 });
 var _Palette2 = require("./Palette");
-var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _storageImageStorage = require("../storage/imageStorage");
 var _config = require("../config");
 function _createForOfIteratorHelper(o, allowArrayLike) {
   var it;
@@ -32322,7 +32301,7 @@ var ShapePalette = /*#__PURE__*/(function (_Palette) {
     _this = _super.call(this, id, _config.config.defaultShapes, true);
     _this._shapeIds = {};
     _this.selectedIndex = 0;
-    _storageImageStorageDefault.default.keys().then(function (keys) {
+    _storageImageStorage.imageStorage.keys().then(function (keys) {
       var shapesIds = keys.filter(function (x) {
         return x.startsWith("shape");
       });
@@ -32338,7 +32317,7 @@ var ShapePalette = /*#__PURE__*/(function (_Palette) {
         _iterator.f();
       }
     });
-    _storageImageStorageDefault.default.addChangeListener(function (change, id) {
+    _storageImageStorage.imageStorage.addChangeListener(function (change, id) {
       if (change == "save" && id.startsWith("shape")) {
         _this.addShapeFromImageId(id);
       }
@@ -32349,7 +32328,7 @@ var ShapePalette = /*#__PURE__*/(function (_Palette) {
     key: "addShapeFromImageId",
     value: function addShapeFromImageId(stampId) {
       var _this2 = this;
-      _storageImageStorageDefault.default.loadImageUrl(stampId).then(function (url) {
+      _storageImageStorage.imageStorage.loadImageUrl(stampId).then(function (url) {
         _this2._shapeIds[url] = stampId;
         _this2.addOption(url);
       });
@@ -32378,7 +32357,7 @@ var ShapePalette = /*#__PURE__*/(function (_Palette) {
       if (!stampId) {
         return;
       }
-      _storageImageStorageDefault.default.deleteImage(stampId).then(function () {
+      _storageImageStorage.imageStorage.deleteImage(stampId).then(function () {
         delete _this3._shapeIds[option];
         _this3.removeOption(index);
         if (_this3.selectedIndex == index) {
@@ -32391,7 +32370,7 @@ var ShapePalette = /*#__PURE__*/(function (_Palette) {
   return ShapePalette;
 })(_Palette2.Palette);
 
-},{"./Palette":"1J0Eg","../storage/ImageStorage":"3kpel","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6xo2a":[function(require,module,exports) {
+},{"./Palette":"1J0Eg","../storage/imageStorage":"3kpel","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"6xo2a":[function(require,module,exports) {
 var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
 _parcelHelpers.defineInteropFlag(exports);
 _parcelHelpers.export(exports, "default", function () {
@@ -32550,7 +32529,6 @@ _parcelHelpers.export(exports, "default", function () {
 });
 var _config = require("./config");
 var _utilsUtils = require("./utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _mathVector = require("./math/Vector");
 var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 function _classCallCheck(instance, Constructor) {
@@ -32704,7 +32682,7 @@ var Layer = /*#__PURE__*/(function () {
     value: function addEventListeners() {
       // pinch gesture handling inspired by https://codepen.io/hanseklund/pen/izloq
       this._element.addEventListener('click', this.preventDefault);
-      if (_utilsUtilsDefault.default.pointerEventsSupported()) {
+      if (_utilsUtils.pointerEventsSupported()) {
         this._element.addEventListener('touchstart', this.preventDefault);
         this._element.addEventListener('pointerdown', this.pointerDown);
       } else {
@@ -32715,7 +32693,7 @@ var Layer = /*#__PURE__*/(function () {
     key: "removeEventListeners",
     value: function removeEventListeners() {
       this._element.removeEventListener('click', this.preventDefault);
-      if (_utilsUtilsDefault.default.pointerEventsSupported()) {
+      if (_utilsUtils.pointerEventsSupported()) {
         this._element.removeEventListener('touchstart', this.preventDefault);
         this._element.removeEventListener('pointerdown', this.pointerDown);
       } else {
@@ -32906,7 +32884,7 @@ var Layer = /*#__PURE__*/(function () {
       var angle = Math.atan2(p1.y - center.y, p1.x - center.x);
       var angleChange = angle - this._pinchStartRotation;
       var scale = this._startScale * (distance / this._pinchStartDist);
-      scale = _utilsUtilsDefault.default.clamp(0.1, 10, scale);
+      scale = _utilsUtils.clamp(0.1, 10, scale);
       var position = p1.clone().add(p2).multiplyScalar(0.5);
       position.x -= 0.5 * this.width;
       position.y -= 0.5 * this.height;
@@ -33052,10 +33030,8 @@ var _mathVector = require("../math/Vector");
 var _mathVectorDefault = _parcelHelpers.interopDefault(_mathVector);
 var _utilsRect = require("../utils/Rect");
 var _utilsRectDefault = _parcelHelpers.interopDefault(_utilsRect);
-var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _storageImageStorage = require("../storage/imageStorage");
 var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
 var _config = require("../config");
 var _fileSaver = require("file-saver");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
@@ -33244,19 +33220,19 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     _defineProperty(_assertThisInitialized(_this), "selectionLayerId", "selection-layer");
     _defineProperty(_assertThisInitialized(_this), "_selection", _utilsRectDefault.default.Empty());
     _this._deleteButton = document.getElementById("selection-delete-button");
-    _utilsUtilsDefault.default.addClick(_this._deleteButton, function () {
+    _utilsUtils.addClick(_this._deleteButton, function () {
       return _this.clearSelection();
     });
     _this._stampButton = document.getElementById("selection-stamp-button");
-    _utilsUtilsDefault.default.addClick(_this._stampButton, function () {
+    _utilsUtils.addClick(_this._stampButton, function () {
       return _this.paintSelectionToCanvas();
     });
     _this._saveButton = document.getElementById("selection-save-button");
-    _utilsUtilsDefault.default.addClick(_this._saveButton, function () {
+    _utilsUtils.addClick(_this._saveButton, function () {
       return _this.saveSelectionAsNewStamp();
     });
     _this._downloadButton = document.getElementById("selection-download-button");
-    _utilsUtilsDefault.default.addClick(_this._downloadButton, function () {
+    _utilsUtils.addClick(_this._downloadButton, function () {
       _this.selectionLayer.canvas.toBlob(function (blob) {
         return _fileSaver.saveAs(blob, "image.png");
       });
@@ -33442,7 +33418,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     key: "cutSelection",
     value: function cutSelection() {
       this.selectionLayer.clear();
-      this._selection = _utilsUtilsDefault.default.getVisiblePixelFrame(this._painter.baseLayer.ctx, this.selection);
+      this._selection = _utilsUtils.getVisiblePixelFrame(this._painter.baseLayer.ctx, this.selection);
       if (this.selection.isEmpty()) {
         return;
       }
@@ -33468,7 +33444,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
     key: "saveSelectionAsNewStamp",
     value: function saveSelectionAsNewStamp() {
       var _this4 = this;
-      _storageImageStorageDefault.default.keys().then(function (keys) {
+      _storageImageStorage.imageStorage.keys().then(function (keys) {
         var shapesIds = keys.filter(function (x) {
           return x.startsWith("Shape");
         });
@@ -33479,7 +33455,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
         var id = ("shape").concat(Date.now(), ".png");
         console.log(("Saving selection as: ").concat(id));
         _this4.selectionLayer.canvas.toBlob(function (blob) {
-          return _storageImageStorageDefault.default.saveImage(id, blob);
+          return _storageImageStorage.imageStorage.saveImage(id, blob);
         });
         _this4.isInShapesPalette = true;
       });
@@ -33527,7 +33503,7 @@ var SelectionTool = /*#__PURE__*/(function (_Tool) {
   return SelectionTool;
 })(_Tool2Default.default);
 
-},{"./Tool":"7utpK","../math/Vector":"1B3oQ","../utils/Rect":"3WeR4","../storage/ImageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3","file-saver":"2Ln2F"}],"2Ln2F":[function(require,module,exports) {
+},{"./Tool":"7utpK","../math/Vector":"1B3oQ","../utils/Rect":"3WeR4","../storage/imageStorage":"3kpel","../utils/Utils":"1H53o","../config":"1tzQg","file-saver":"2Ln2F","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2Ln2F":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 (function (a, b) {
@@ -33826,9 +33802,7 @@ _parcelHelpers.export(exports, "default", function () {
 });
 var _View2 = require("./View");
 var _utilsUtils = require("../utils/Utils");
-var _utilsUtilsDefault = _parcelHelpers.interopDefault(_utilsUtils);
-var _storageImageStorage = require("../storage/ImageStorage");
-var _storageImageStorageDefault = _parcelHelpers.interopDefault(_storageImageStorage);
+var _storageImageStorage = require("../storage/imageStorage");
 var _fileSaver = require('file-saver');
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -33973,18 +33947,18 @@ var SettingsView = /*#__PURE__*/(function (_View) {
     _classCallCheck(this, SettingsView);
     _this = _super.call(this, id);
     var backButton = _this._element.getElementsByClassName("button back")[0];
-    _utilsUtilsDefault.default.addClick(backButton, function () {
+    _utilsUtils.addClick(backButton, function () {
       return onBackClicked();
     });
     var exportButton = _this._element.getElementsByClassName("button export")[0];
-    _utilsUtilsDefault.default.addClick(exportButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+    _utilsUtils.addClick(exportButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       var zipBlob;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return _storageImageStorageDefault.default.generateBackupArchive();
+              return _storageImageStorage.imageStorage.generateBackupArchive();
             case 2:
               zipBlob = _context.sent;
               _fileSaver.saveAs(zipBlob, "web-paint-backup.zip");
@@ -33996,14 +33970,14 @@ var SettingsView = /*#__PURE__*/(function (_View) {
       }, _callee);
     })));
     var importButton = _this._element.getElementsByClassName("button import")[0];
-    _utilsUtilsDefault.default.addClick(importButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+    _utilsUtils.addClick(importButton, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              _context2.t0 = _storageImageStorageDefault.default;
+              _context2.t0 = _storageImageStorage.imageStorage;
               _context2.next = 3;
-              return _utilsUtilsDefault.default.upload(".zip");
+              return _utilsUtils.upload(".zip");
             case 3:
               _context2.t1 = _context2.sent;
               _context2.t0.importBackupArchive.call(_context2.t0, _context2.t1);
@@ -34016,9 +33990,9 @@ var SettingsView = /*#__PURE__*/(function (_View) {
       }, _callee2);
     })));
     var clearButton = _this._element.getElementsByClassName("button clear")[0];
-    _utilsUtilsDefault.default.addClick(clearButton, function () {
+    _utilsUtils.addClick(clearButton, function () {
       if (confirm("Really clear all iamges?")) {
-        _storageImageStorageDefault.default.clear();
+        _storageImageStorage.imageStorage.clear();
         location.reload();
       }
     });
@@ -34036,15 +34010,15 @@ var SettingsView = /*#__PURE__*/(function (_View) {
     value: function updateInfo() {
       var info = document.getElementById("info");
       info.innerText = ("Version: ").concat(version);
-      _storageImageStorageDefault.default.getStorageUsed().then(function (amount) {
-        info.innerText += ("\rStorage used: ").concat(_utilsUtilsDefault.default.formatBytes(amount, 1));
+      _storageImageStorage.imageStorage.getStorageUsed().then(function (amount) {
+        info.innerText += ("\rStorage used: ").concat(_utilsUtils.formatBytes(amount, 1));
       });
     }
   }]);
   return SettingsView;
 })(_View2.View);
 
-},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/ImageStorage":"3kpel","/package":"2O4yD","console-log-html":"66kok","file-saver":"2Ln2F","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2O4yD":[function(require,module,exports) {
+},{"./View":"30r6k","../utils/Utils":"1H53o","../storage/imageStorage":"3kpel","/package":"2O4yD","console-log-html":"66kok","file-saver":"2Ln2F","@parcel/transformer-js/lib/esmodule-helpers.js":"7jvX3"}],"2O4yD":[function(require,module,exports) {
 module.exports = JSON.parse("{\"name\":\"web-paint\",\"description\":\"personal painting app\",\"version\":\"1.0.0\",\"license\":\"Apache-2.0\",\"homepage\":\"https://github.com/ahackel/web-paint\",\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/ahackel/web-paint.git\"},\"scripts\":{\"clean\":\"rm -rf docs\",\"start\":\"cp -r static/* dist/; parcel serve ./src/index.html\",\"build\":\"parcel build ./src/index.html --no-scope-hoist\",\"postbuild\":\"cp -r static/* docs/\",\"publish\":\"git push\"},\"devDependencies\":{\"@types/file-saver\":\"^2.0.1\",\"parcel\":\"^2.0.0-nightly.554\",\"typescript\":\"^4.1.3\"},\"dependencies\":{\"@fortawesome/fontawesome-free\":\"^5.15.2\",\"babel-polyfill\":\"^6.26.0\",\"blueimp-canvas-to-blob\":\"^3.28.0\",\"console-log-html\":\"^2.0.2\",\"dropbox\":\"^8.3.0\",\"file-saver\":\"^2.0.5\",\"jszip\":\"^3.5.0\",\"localforage\":\"^1.9.0\",\"peerjs\":\"^1.3.1\",\"pressure\":\"^2.2.0\",\"whatwg-fetch\":\"^3.5.0\"},\"main\":\"docs/index.html\",\"targets\":{\"main\":{\"minify\":false,\"publicUrl\":\"./\"}},\"browserslist\":[\"iOS 9\"]}");
 
 },{}],"66kok":[function(require,module,exports) {
@@ -34201,4 +34175,4 @@ if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 }
 },{}]},["JzIzc"], "JzIzc", "parcelRequireb491")
 
-//# sourceMappingURL=index.dbf05f67.js.map
+//# sourceMappingURL=index.c2158bfe.js.map

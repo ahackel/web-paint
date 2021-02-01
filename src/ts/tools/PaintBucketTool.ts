@@ -1,5 +1,5 @@
 import Tool from "./Tool";
-import Utils from "../utils/Utils";
+import * as Utils from "../utils/Utils";
 
 // Fills an area with the selected color 
 export default class PaintBucketTool extends Tool{

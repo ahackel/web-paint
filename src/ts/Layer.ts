@@ -1,5 +1,5 @@
 import {config} from "./config";
-import Utils from "./utils/Utils";
+import * as Utils from "./utils/Utils";
 import Vector from "./math/Vector";
 import ILayer from "./ILayer";
 

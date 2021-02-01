@@ -1,5 +1,5 @@
 import {Palette} from "./Palette";
-import ImageStorage from "../storage/ImageStorage";
+import {imageStorage} from "../storage/imageStorage";
 import {config} from "../config";
 
 export default class ShapePalette extends Palette {
@@ -13,7 +13,7 @@ export default class ShapePalette extends Palette {
         this._shapeIds = {};
         this.selectedIndex = 0;
 
-        ImageStorage.keys()
+        imageStorage.keys()
             .then((keys: string[]) => {
                 const shapesIds = keys.filter(x => x.startsWith("shape"));
                 for (let shapeId of shapesIds) {
@@ -21,7 +21,7 @@ export default class ShapePalette extends Palette {
                 }
             });
 
-        ImageStorage.addChangeListener((change: string, id: string) => {
+        imageStorage.addChangeListener((change: string, id: string) => {
             if (change == "save" && id.startsWith("shape")) {
                 this.addShapeFromImageId(id);
             }
@@ -29,7 +29,7 @@ export default class ShapePalette extends Palette {
     }
 
     private addShapeFromImageId(stampId: string) {
-        ImageStorage.loadImageUrl(stampId)
+        imageStorage.loadImageUrl(stampId)
             .then(url => {
                 this._shapeIds[url] = stampId;
                 this.addOption(url);
@@ -54,7 +54,7 @@ export default class ShapePalette extends Palette {
         if (!stampId){
             return;
         }
-        ImageStorage.deleteImage(stampId)
+        imageStorage.deleteImage(stampId)
             .then(() => {
                 delete this._shapeIds[option];
                 this.removeOption(index);

@@ -1,5 +1,5 @@
 import {View} from "../views/View";
-import Utils from "../utils/Utils";
+import * as Utils from "../utils/Utils";
 
 // base class for palettes
 export class Palette extends View {

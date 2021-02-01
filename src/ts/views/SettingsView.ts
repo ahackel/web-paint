@@ -1,6 +1,6 @@
 import {View} from "./View";
-import Utils from "../utils/Utils";
-import ImageStorage from "../storage/ImageStorage";
+import * as Utils from "../utils/Utils";
+import {imageStorage} from "../storage/imageStorage";
 const version = require('/package').version;
 var ConsoleLogHTML = require('console-log-html');
 import { saveAs } from 'file-saver';
@@ -14,20 +14,20 @@ export default class SettingsView extends View {
 
         let exportButton = <HTMLDivElement>this._element.getElementsByClassName("button export")[0];
         Utils.addClick(exportButton, async () => {
-            const zipBlob = await ImageStorage.generateBackupArchive();
+            const zipBlob = await imageStorage.generateBackupArchive();
             saveAs(zipBlob, "web-paint-backup.zip");
         });
 
         let importButton = <HTMLDivElement>this._element.getElementsByClassName("button import")[0];
         Utils.addClick(importButton, async () => {
-            ImageStorage.importBackupArchive(await Utils.upload(".zip"));
+            imageStorage.importBackupArchive(await Utils.upload(".zip"));
             this.updateInfo();
         });
 
         let clearButton = <HTMLDivElement>this._element.getElementsByClassName("button clear")[0];
         Utils.addClick(clearButton, () => {
             if (confirm("Really clear all iamges?")){
-                ImageStorage.clear();
+                imageStorage.clear();
                 location.reload();
             }
         });
@@ -43,7 +43,7 @@ export default class SettingsView extends View {
     private updateInfo() {
         const info = <HTMLParagraphElement>document.getElementById("info");
         info.innerText = `Version: ${version}`;
-        ImageStorage.getStorageUsed().then(amount => {
+        imageStorage.getStorageUsed().then(amount => {
             info.innerText += `\rStorage used: ${Utils.formatBytes(amount, 1)}`;
         });
     }

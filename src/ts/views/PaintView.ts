@@ -3,12 +3,12 @@ import Tool from "../tools/Tool";
 import ColorPalette from "../palettes/ColorPalette";
 import ToolPalette from "../palettes/ToolPalette";
 import SizePalette from "../palettes/SizePalette";
-import Utils from "../utils/Utils";
+import * as Utils from "../utils/Utils";
 import PenTool from "../tools/PenTool";
 import PaintBucketTool from "../tools/PaintBucketTool";
 import Vector from "../math/Vector";
 import {Palette} from "../palettes/Palette";
-import ImageStorage from "../storage/ImageStorage";
+import {imageStorage} from "../storage/ImageStorage";
 import {config} from "../config";
 import RectangleTool from "../tools/RectangleTool";
 import LineTool from "../tools/LineTool";
@@ -560,7 +560,7 @@ export class PaintView extends View {
     }
 
     loadImage(id: string) {
-        return ImageStorage.loadImage(id)
+        return imageStorage.loadImage(id)
             .then(image => {
                 this._imageId = id;
                 this.clear();
@@ -576,7 +576,7 @@ export class PaintView extends View {
 
     private saveImage() {
         Utils.log("Saving image");
-        this.baseLayer.canvas.toBlob(blob => ImageStorage.saveImage(this._imageId, blob as Blob));
+        this.baseLayer.canvas.toBlob(blob => imageStorage.saveImage(this._imageId, blob as Blob));
         this._isDirty = false;
         this._lastSaveTimestamp = Date.now();
     }

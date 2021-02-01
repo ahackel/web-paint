@@ -2,7 +2,7 @@ import {View} from "./View";
 import {config} from "../config";
 import Thumbnail from "./Thumbnail";
 import PeerToPeer from "../PeerToPeer";
-import Utils from "../utils/Utils";
+import * as Utils from "../utils/Utils";
 
 
 export default class BookView extends View {

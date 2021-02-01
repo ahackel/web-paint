@@ -2,8 +2,8 @@ import Tool from "./Tool";
 import Vector from "../math/Vector";
 import CanvasLayer from "../CanvasLayer";
 import Rect from "../utils/Rect";
-import ImageStorage from "../storage/ImageStorage";
-import Utils from "../utils/Utils";
+import {imageStorage} from "../storage/imageStorage";
+import * as Utils from "../utils/Utils";
 import {PaintView, IPointerData} from "../views/PaintView";
 import {config} from "../config";
 import {saveAs} from "file-saver";
@@ -223,7 +223,7 @@ export default class SelectionTool extends Tool {
     }
 
     private saveSelectionAsNewStamp() {
-        ImageStorage.keys()
+        imageStorage.keys()
             .then((keys: string[]) => {
                 const shapesIds = keys.filter(x => x.startsWith("Shape"));
                 if (shapesIds.length >= config.maxShapeCount){
@@ -233,7 +233,7 @@ export default class SelectionTool extends Tool {
                 
                 const id = `shape${Date.now()}.png`;
                 console.log(`Saving selection as: ${id}`);
-                this.selectionLayer.canvas.toBlob(blob => ImageStorage.saveImage(id, blob as Blob));
+                this.selectionLayer.canvas.toBlob(blob => imageStorage.saveImage(id, blob as Blob));
                 this.isInShapesPalette = true;
             });
     }

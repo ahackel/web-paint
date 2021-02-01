@@ -1,16 +1,15 @@
 import 'whatwg-fetch';
 import LocalForageAdapter from "./LocalForageAdapter";
-import Utils from "../utils/Utils";
 import StorageAdapter from "./StorageAdapter";
 import JSZip from "jszip";
 
-export default class ImageStorage {
+class ImageStorage {
 
-	private static _adapter: StorageAdapter;
-	private static _changeListeners: Function[];
-	private static _urls: { [id: string]: string }
+	private _adapter: StorageAdapter;
+	private _changeListeners: Function[];
+	private _urls: { [id: string]: string }
 	
-	public static get adapter() {
+	public get adapter() {
 		if (!this._adapter) {
 			this._adapter = new LocalForageAdapter();
 			this.migrate();
@@ -18,14 +17,14 @@ export default class ImageStorage {
 		return this._adapter 
 	}
 	
-	public static get urls(){
+	public get urls(){
 		if (!this._urls){
 			this._urls = {};
 		}
 		return this._urls;
 	}
 
-	public static async loadImage(id: string): Promise<HTMLImageElement> {
+	public async loadImage(id: string): Promise<HTMLImageElement> {
 		const url: string = await this.loadImageUrl(id);
 		
 		if (!url){
@@ -47,7 +46,7 @@ export default class ImageStorage {
 	}
 	
 
-	public static async loadImageUrl(id: string): Promise<string> {
+	public async loadImageUrl(id: string): Promise<string> {
 		if (id in this.urls){
 			return this.urls[id];
 		}
@@ -62,11 +61,11 @@ export default class ImageStorage {
 		return url;
 	}
 
-	private static loadBlob(id: string): Promise<Blob> {
+	private loadBlob(id: string): Promise<Blob> {
 		return <Promise<Blob>>this.adapter.getItem(id)
 	}
 
-	public static async saveImage(id: string, blob: Blob){
+	public async saveImage(id: string, blob: Blob){
 		try{
 			await this.adapter.setItem(id, blob);
 		}
@@ -81,7 +80,7 @@ export default class ImageStorage {
 		this.dispatchChangeEvent("save", id);
 	}
 	
-	public static deleteImage(id: string){
+	public deleteImage(id: string){
 		return this.adapter.removeItem(id)
 			.then(() => {
 				if (id in this.urls){
@@ -92,26 +91,26 @@ export default class ImageStorage {
 			})		
 	}
 
-	public static keys() {
+	public keys() {
 		return this.adapter.keys();
 	}
 
-	public static addChangeListener(callback: Function){
+	public addChangeListener(callback: Function){
 		this._changeListeners = this._changeListeners || [];
 		this._changeListeners.push(callback);
 	}
 
-	private static dispatchChangeEvent(change: string, id: string) {
+	private dispatchChangeEvent(change: string, id: string) {
 		for (let changeListener of this._changeListeners) {
 			changeListener(change, id);
 		}
 	}
 	
-	public static clear(){
+	public clear(){
 		this.adapter.clear();
 	}
 	
-	public static async generateBackupArchive(): Promise<Blob> {
+	public async generateBackupArchive(): Promise<Blob> {
 		let count = 0;
 		var keys = <string[]> await this.keys();
 		var zip = new JSZip();
@@ -133,7 +132,7 @@ export default class ImageStorage {
 		return zip.generateAsync({type:"blob"});
 	}
 	
-	public static async importBackupArchive(zipFile: Blob) {
+	public async importBackupArchive(zipFile: Blob) {
 		const zip = await JSZip.loadAsync(zipFile);
 		
 		zip.forEach(async (path, file) => {
@@ -143,7 +142,7 @@ export default class ImageStorage {
 		})
 	}
 	
-	private static async migrate(){
+	private async migrate(){
 		let needsRefresh = false;
 		var keys = <string[]> await this.keys();
 
@@ -168,7 +167,7 @@ export default class ImageStorage {
 		}
 	}
 	
-	public static async getStorageUsed(): Promise<number> {
+	public async getStorageUsed(): Promise<number> {
 		let amount = 0;
 		var keys = <string[]> await this.keys();
 		for (let id of keys) {
@@ -182,3 +181,5 @@ export default class ImageStorage {
 		return amount;
 	}
 }
+
+export const imageStorage = new ImageStorage();

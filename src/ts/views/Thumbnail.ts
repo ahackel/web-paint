@@ -1,5 +1,5 @@
-import Utils from "../utils/Utils";
-import ImageStorage from "../storage/ImageStorage";
+import * as Utils from "../utils/Utils";
+import {imageStorage} from "../storage/imageStorage";
 
 export default class Thumbnail {
     
@@ -41,7 +41,7 @@ export default class Thumbnail {
             }
         }, true);
 
-        ImageStorage.addChangeListener((change: string, id: string) => {
+        imageStorage.addChangeListener((change: string, id: string) => {
             if (change == "save" && id == this.id) {
                 this.loadImage();
             }
@@ -62,7 +62,7 @@ export default class Thumbnail {
     }
 
     private loadImage() {
-        ImageStorage.loadImageUrl(this.id)
+        imageStorage.loadImageUrl(this.id)
             .then(url => {
                 this.imageUrl = url;
             });
