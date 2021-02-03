@@ -6,6 +6,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 module.exports = {
     mode: 'production',
     entry: './src/ts/app.ts',
+    target: ['web', 'es5'],
     devtool: 'source-map',
     devServer: {
         contentBase: './docs',
@@ -36,7 +37,7 @@ module.exports = {
         extensions: [ '.ts', '.js' ],
     },
     output: {
-        filename: '[name].js',
+        filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'docs'),
     },
     optimization: {
