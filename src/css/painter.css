@@ -145,12 +145,12 @@ body, input, textarea {
     color: #CCC;
     background: white;
     border-radius: 0.1rem;
-    transition: transform 0.25s;
     font-size: 5.6rem;
     width: 1em;
     height: 0.75em;
     background-size: contain;
     cursor: pointer;
+    transition: opacity 1s;
 }
 
 .thumbnail.down {

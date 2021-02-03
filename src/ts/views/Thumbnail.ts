@@ -10,6 +10,7 @@ export default class Thumbnail {
     get id() { return this._element.id; }
     set imageUrl(src: string){
         this._imageUrl = src;
+        this._element.style.opacity = "1";
         this.updateBackgroundImages();
     }
     set overlayUrl(src: string){
@@ -22,6 +23,7 @@ export default class Thumbnail {
         this._element = element;
         element.id = id;
         element.classList.add("thumbnail");
+        this._element.style.opacity = "0";
         
         // Utils.addLongClick(element, () => {
         //     if (!this._image || !PeerToPeer.instance || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
