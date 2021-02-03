@@ -1,4 +1,4 @@
-import Utils from "../utils/Utils";
+import * as Utils from "../utils/Utils";
 
 export default class Vector {
     public x: number;

@@ -1,5 +1,5 @@
 import {Palette} from "./Palette";
-import {imageStorage} from "../storage/imageStorage";
+import {imageStorage} from "../storage/ImageStorage";
 import {config} from "../config";
 
 export default class ShapePalette extends Palette {

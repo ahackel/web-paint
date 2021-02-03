@@ -1,3 +1,10 @@
+require('../css/painter.css');
+import {library, dom} from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+
+library.add(fas)
+dom.watch();
+
 import 'babel-polyfill';
 import {View} from "./views/View";
 import BookView from "./views/BookView";
@@ -6,8 +13,8 @@ import DropboxAuthView from "./views/DropboxAuthView";
 import {config} from "./config";
 import PeerToPeer from "./PeerToPeer";
 import SettingsView from "./views/SettingsView";
-import ImageStorage from "./storage/ImageStorage";
-import Utils from "./utils/Utils";
+import {imageStorage} from "./storage/ImageStorage";
+import * as Utils from "./utils/Utils";
 
 class App {
     private _activeView: View;
@@ -96,5 +103,8 @@ class App {
     }
 }
 
-// @ts-ignore
-window.app = new App();
+document.addEventListener("DOMContentLoaded", () => {
+    // @ts-ignore
+    window.app = new App();
+});
+

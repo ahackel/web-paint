@@ -1,5 +1,5 @@
 import * as Utils from "../utils/Utils";
-import {imageStorage} from "../storage/imageStorage";
+import {imageStorage} from "../storage/ImageStorage";
 
 export default class Thumbnail {
     

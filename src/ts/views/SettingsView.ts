@@ -1,7 +1,7 @@
 import {View} from "./View";
 import * as Utils from "../utils/Utils";
-import {imageStorage} from "../storage/imageStorage";
-const version = require('/package').version;
+import {imageStorage} from "../storage/ImageStorage";
+const version = "1.0.0" //require('/package').version;
 var ConsoleLogHTML = require('console-log-html');
 import { saveAs } from 'file-saver';
 

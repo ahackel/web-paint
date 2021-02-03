@@ -2,7 +2,7 @@ import Tool from "./Tool";
 import Vector from "../math/Vector";
 import CanvasLayer from "../CanvasLayer";
 import Rect from "../utils/Rect";
-import {imageStorage} from "../storage/imageStorage";
+import {imageStorage} from "../storage/ImageStorage";
 import * as Utils from "../utils/Utils";
 import {PaintView, IPointerData} from "../views/PaintView";
 import {config} from "../config";
@@ -124,11 +124,11 @@ export default class SelectionTool extends Tool {
             case 'Backspace':
                 this.clearSelection();
                 break;
-            case 'KeyC':
-                if (event.metaKey){
-                    this.copyToClipboard();
-                }
-                break;
+            // case 'KeyC':
+            //     if (event.metaKey){
+            //         this.copyToClipboard();
+            //     }
+            //     break;
         }
     }
 
@@ -239,31 +239,31 @@ export default class SelectionTool extends Tool {
     }
 
 
-    copyToClipboard(){
-        this.selectionLayer.canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({'image/png': blob})]));
-        console.log("copied selection to clipboard");
-    }
-
-    pasteFromClipboard() {
-        navigator.permissions.query({name: "clipboard-read"})
-            .then(result => {
-                if (!(result.state == "granted" || result.state == "prompt")) {
-                    return;
-                }
-                navigator.clipboard.read()
-                    .then(data => {
-                        for (let i = 0; i < data.length; i++) {
-                            if (!data[i].types.includes("image/png")){
-                                continue;
-                            }
-                            data[i].getType("image/png")
-                                .then(blob => {
-                                    this.setImageUrl(URL.createObjectURL(blob));
-                                })
-                        }
-                    });
-            });
-    }
+    // copyToClipboard(){
+    //     this.selectionLayer.canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({'image/png': blob})]));
+    //     console.log("copied selection to clipboard");
+    // }
+    //
+    // pasteFromClipboard() {
+    //     navigator.permissions.query({name: "clipboard-read"})
+    //         .then(result => {
+    //             if (!(result.state == "granted" || result.state == "prompt")) {
+    //                 return;
+    //             }
+    //             navigator.clipboard.read()
+    //                 .then(data => {
+    //                     for (let i = 0; i < data.length; i++) {
+    //                         if (!data[i].types.includes("image/png")){
+    //                             continue;
+    //                         }
+    //                         data[i].getType("image/png")
+    //                             .then(blob => {
+    //                                 this.setImageUrl(URL.createObjectURL(blob));
+    //                             })
+    //                     }
+    //                 });
+    //         });
+    // }
 
     selectAll() {
         this.startNewSelection();

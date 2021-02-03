@@ -12,7 +12,6 @@ import {imageStorage} from "../storage/ImageStorage";
 import {config} from "../config";
 import RectangleTool from "../tools/RectangleTool";
 import LineTool from "../tools/LineTool";
-import StampTool from "../tools/StampTool";
 import ShapePalette from "../palettes/ShapePalette";
 import Layer from "../Layer";
 import ILayer from "../ILayer";
@@ -323,12 +322,12 @@ export class PaintView extends View {
         }
         
         switch (event.code){
-            case 'KeyV':
-                if (event.metaKey){
-                    this.setTool(this.selectionTool);
-                    this.selectionTool.pasteFromClipboard();
-                }
-                break;
+            // case 'KeyV':
+            //     if (event.metaKey){
+            //         this.setTool(this.selectionTool);
+            //         this.selectionTool.pasteFromClipboard();
+            //     }
+            //     break;
         }
         
         if (!this._currentTool) {

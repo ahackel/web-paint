@@ -5,13 +5,10 @@
     "noImplicitAny": true,
     "module": "CommonJS",
     "target": "es6",
-    "declaration": true,
+    "declaration": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "lib": ["dom", "es2015"]
-  },
-  "include": [
-    "src/**/*"
-  ]
+  }
 }
