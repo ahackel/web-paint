@@ -4,9 +4,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-    mode: 'production',
+    mode: 'development',
     entry: './src/ts/app.ts',
-    target: ['web', 'es5'],
     devtool: 'source-map',
     devServer: {
         contentBase: './docs',
@@ -30,6 +29,16 @@ module.exports = {
             {
                 test: /\.(svg|eot|woff|woff2|ttf)$/,
                 use: ['file-loader']
+            },
+            {
+                test: /\.m?js$/,
+                // exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    }
+                }
             }
         ],
     },
