@@ -766,10 +766,14 @@ var Toolbar = /*#__PURE__*/function (_View) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @fortawesome/fontawesome-svg-core */ "./node_modules/@fortawesome/fontawesome-svg-core/index.es.js");
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
-/* harmony import */ var _views_BookView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./views/BookView */ "./src/ts/views/BookView.ts");
-/* harmony import */ var _views_PaintView__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./views/PaintView */ "./src/ts/views/PaintView.ts");
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./config */ "./src/ts/config.ts");
-/* harmony import */ var _views_SettingsView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./views/SettingsView */ "./src/ts/views/SettingsView.ts");
+/* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/stable */ "./node_modules/core-js/stable/index.js");
+/* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_stable__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! regenerator-runtime/runtime */ "./node_modules/regenerator-runtime/runtime.js");
+/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _views_BookView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./views/BookView */ "./src/ts/views/BookView.ts");
+/* harmony import */ var _views_PaintView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./views/PaintView */ "./src/ts/views/PaintView.ts");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./config */ "./src/ts/config.ts");
+/* harmony import */ var _views_SettingsView__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./views/SettingsView */ "./src/ts/views/SettingsView.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -785,7 +789,10 @@ __webpack_require__(/*! ../css/painter.css */ "./src/css/painter.css");
 
 
 _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__.library.add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__.fas);
-_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__.dom.watch();
+_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__.dom.watch(); // required to make 'async' work on old devices: 
+
+
+
 
 
 
@@ -799,7 +806,7 @@ var App = /*#__PURE__*/function () {
 
     // App.preventOverScroll();
     //PeerToPeer.createInstance();
-    this._settingsView = new _views_SettingsView__WEBPACK_IMPORTED_MODULE_5__.default("settings", function () {
+    this._settingsView = new _views_SettingsView__WEBPACK_IMPORTED_MODULE_7__.default("settings", function () {
       _this.openView(_this._bookView);
     });
     this._sheet = document.getElementById("sheet");
@@ -807,7 +814,7 @@ var App = /*#__PURE__*/function () {
       _this.OnResize();
     });
     this.OnResize();
-    this._bookView = new _views_BookView__WEBPACK_IMPORTED_MODULE_2__.default("book", /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+    this._bookView = new _views_BookView__WEBPACK_IMPORTED_MODULE_4__.default("book", /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -828,7 +835,7 @@ var App = /*#__PURE__*/function () {
       });
     };
 
-    this._paintView = new _views_PaintView__WEBPACK_IMPORTED_MODULE_3__.PaintView("paint", function () {
+    this._paintView = new _views_PaintView__WEBPACK_IMPORTED_MODULE_5__.PaintView("paint", function () {
       _this.openView(_this._bookView);
     }); // Dropbox integration is not working yet:
     // this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
@@ -855,11 +862,11 @@ var App = /*#__PURE__*/function () {
       var isLargeScreen = docWidth > 1024;
       var viewWidth = Math.max(docWidth, docHeight);
       var viewHeight = Math.min(docWidth, docHeight);
-      var horizontalPixelSize = viewWidth / _config__WEBPACK_IMPORTED_MODULE_4__.config.width;
-      var verticalPixelSize = viewHeight / _config__WEBPACK_IMPORTED_MODULE_4__.config.height;
-      var virtualPixelSize = _config__WEBPACK_IMPORTED_MODULE_4__.config.fullScreenCanvas && !isLargeScreen ? Math.max(horizontalPixelSize, verticalPixelSize) : Math.min(horizontalPixelSize, verticalPixelSize);
+      var horizontalPixelSize = viewWidth / _config__WEBPACK_IMPORTED_MODULE_6__.config.width;
+      var verticalPixelSize = viewHeight / _config__WEBPACK_IMPORTED_MODULE_6__.config.height;
+      var virtualPixelSize = _config__WEBPACK_IMPORTED_MODULE_6__.config.fullScreenCanvas && !isLargeScreen ? Math.max(horizontalPixelSize, verticalPixelSize) : Math.min(horizontalPixelSize, verticalPixelSize);
       this._sheet.style.fontSize = "".concat(virtualPixelSize, "px");
-      this._sheet.style.left = "".concat(portrait ? 0.5 * (docWidth - virtualPixelSize * _config__WEBPACK_IMPORTED_MODULE_4__.config.width) : 0, "px");
+      this._sheet.style.left = "".concat(portrait ? 0.5 * (docWidth - virtualPixelSize * _config__WEBPACK_IMPORTED_MODULE_6__.config.width) : 0, "px");
     }
   }, {
     key: "openView",
@@ -5226,7 +5233,7 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 		};
 /******/ 		
 /******/ 		var deferredModules = [
-/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-2e6149"]
+/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-9c6dc5"]
 /******/ 		];
 /******/ 		// no chunk on demand loading
 /******/ 		
@@ -5308,4 +5315,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.f451c25c47926f20537a.js.map
+//# sourceMappingURL=main.04f1db483e13b3ae40d2.js.map

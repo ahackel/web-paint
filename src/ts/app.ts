@@ -5,6 +5,10 @@ import { fas } from '@fortawesome/free-solid-svg-icons'
 library.add(fas)
 dom.watch();
 
+// required to make 'async' work on old devices: 
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 import {View} from "./views/View";
 import BookView from "./views/BookView";
 import {PaintView} from "./views/PaintView";
