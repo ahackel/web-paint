@@ -13,9 +13,18 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
+                test: /\.(js|ts)$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            "@babel/preset-env",
+                            '@babel/preset-typescript'
+                        ],
+                        "plugins": ["transform-class-properties"]
+                    }
+                }
             },
             {
                 test: /\.(sass|scss|css)$/i,
@@ -30,16 +39,6 @@ module.exports = {
                 test: /\.(svg|eot|woff|woff2|ttf)$/,
                 use: ['file-loader']
             },
-            {
-                test: /\.m?js$/,
-                // exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env']
-                    }
-                }
-            }
         ],
     },
     resolve: {
