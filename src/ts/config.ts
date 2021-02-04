@@ -53,6 +53,8 @@ export const config: IAppConfig = {
         "image01.png": {overlay: "./img/overlays/spirit.png"},
         "image02.png": {overlay: "./img/overlays/spirit2.png"},
         "image03.png": {overlay: "./img/overlays/spirit3.png"},
-        "image04.png": {overlay: "./img/overlays/santa.png"}
+        "image04.png": {overlay: "./img/overlays/santa.png"},
+        "image05.png": {overlay: "./img/overlays/tropfen.png"},
+        "image06.png": {overlay: "./img/overlays/kneipp.png"}
     }
 };

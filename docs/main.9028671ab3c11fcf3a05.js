@@ -942,6 +942,12 @@ var config = {
     },
     "image04.png": {
       overlay: "./img/overlays/santa.png"
+    },
+    "image05.png": {
+      overlay: "./img/overlays/tropfen.png"
+    },
+    "image06.png": {
+      overlay: "./img/overlays/kneipp.png"
     }
   }
 };
@@ -5315,4 +5321,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.04f1db483e13b3ae40d2.js.map
+//# sourceMappingURL=main.9028671ab3c11fcf3a05.js.map
