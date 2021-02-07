@@ -50,10 +50,6 @@ export function pointerEventsSupported(): boolean {
     return window.PointerEvent != null;
 }
 
-export function getImageOverlayUrl(id: string) {
-    return config.images[id]?.overlay;
-}
-
 export function log(message?: any, ...optionalParams: any[]){
     if (!config.debug){
         return;
@@ -72,7 +68,7 @@ export function addClick(element: HTMLElement, callback: (this: HTMLElement, eve
     let startTimeStamp: number;
     let scrolled: boolean;
     
-    element.addEventListener("touchstart", touchStart);
+    element.addEventListener("touchstart", touchStart, {passive: supportScrolling});
     element.addEventListener("mouseup", mouseUp);
     
     function mouseUp(event: Event){
@@ -99,7 +95,7 @@ export function addClick(element: HTMLElement, callback: (this: HTMLElement, eve
         startTimeStamp = event.timeStamp;
         element.classList.add("down");
 
-        element.addEventListener("touchmove", touchMove);
+        element.addEventListener("touchmove", touchMove, {passive: supportScrolling});
         element.addEventListener("touchend", touchEnd);
     }
 
@@ -159,7 +155,7 @@ export function addLongClick(element: HTMLElement, callback: (this: HTMLElement,
     let caller = this;
     let called: boolean = false;
 
-    element.addEventListener("touchstart", down);
+    element.addEventListener("touchstart", down,{passive: true});
     element.addEventListener("touchend", up);
     element.addEventListener("mousedown", down);
     element.addEventListener("mouseup", up);

@@ -49,8 +49,6 @@ export default class Thumbnail {
             }
         });
         
-        this.overlayUrl = Utils.getImageOverlayUrl(id);
-
         parent.appendChild(element);
         this.loadImage();
     }
@@ -67,6 +65,10 @@ export default class Thumbnail {
         imageStorage.loadImageUrl(this.id)
             .then(url => {
                 this.imageUrl = url;
+            });
+        imageStorage.loadImageUrl("overlay-" + this.id)
+            .then(url => {
+                this.overlayUrl = url;
             });
     }
 

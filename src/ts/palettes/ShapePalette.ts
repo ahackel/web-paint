@@ -1,6 +1,5 @@
 import {Palette} from "./Palette";
 import {imageStorage} from "../storage/ImageStorage";
-import {config} from "../config";
 
 export default class ShapePalette extends Palette {
 
@@ -9,7 +8,7 @@ export default class ShapePalette extends Palette {
     get stamp() { return this.selectedOption }
     
     constructor(id: string) {
-        super(id, config.defaultShapes, true);
+        super(id, [], true);
         this._shapeIds = {};
         this.selectedIndex = 0;
 

@@ -1,11 +1,3 @@
-const defaultShapes = [
-    "img/stamps/star.png",
-    "img/stamps/unicorn.png",
-    "img/stamps/snowman.png",
-    "img/stamps/dolphin.png",
-    "img/stamps/snail.png"
-]
-
 interface IImageConfig{
     overlay: string;
 }
@@ -26,9 +18,7 @@ interface  IAppConfig{
     saveInterval: number;
     width: number;
     height: number;
-    defaultShapes: string[];
     imageCount: number;
-    images: { [id: string]: IImageConfig };
 }
 
 export const config: IAppConfig = {
@@ -37,7 +27,7 @@ export const config: IAppConfig = {
     longClickDelay: 1000,
     minScrollDistance: 30,
     maxScrollDelay: 500,
-    maxShapeCount: 64 - defaultShapes.length,
+    maxShapeCount: 64,
     usePointerEvents: true,
     fullScreenCanvas: true, // If true fills the whole screen with the canvas, if false makes sure the whole canvas fits on the screen
     pixelPerfect: false,   // Make sure to perform painting operations on rounded pixel positions
@@ -47,14 +37,5 @@ export const config: IAppConfig = {
     saveInterval: 5000,
     width: 1024,
     height: 768,
-    defaultShapes: defaultShapes,
-    imageCount: 32,
-    images: {
-        "image01.png": {overlay: "./img/overlays/spirit.png"},
-        "image02.png": {overlay: "./img/overlays/spirit2.png"},
-        "image03.png": {overlay: "./img/overlays/spirit3.png"},
-        "image04.png": {overlay: "./img/overlays/santa.png"},
-        "image05.png": {overlay: "./img/overlays/tropfen.png"},
-        "image06.png": {overlay: "./img/overlays/kneipp.png"}
-    }
+    imageCount: 32
 };

@@ -158,7 +158,9 @@ export class PaintView extends View {
         this.removeLayer(this.overlayLayer);
     }
     
-    public setOverlay(url: string){
+    public async setOverlay(id: string){
+        const url = await imageStorage.loadImageUrl(id);
+        
         if (!url){
             this.removeOverlay();
             return;
@@ -567,7 +569,7 @@ export class PaintView extends View {
                     this.baseLayer.drawImage(image);
                 }
                 
-                this.setOverlay(Utils.getImageOverlayUrl(id));
+                this.setOverlay("overlay-" + id);
                 this.ResetHistory();
                 this._isDirty = false;
             })

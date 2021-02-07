@@ -103,11 +103,21 @@ body, input, textarea {
     line-height: 1.4em;
 }
 
+.view.settings input{
+    font-size: 0.5rem;
+    line-height: 1em;
+    border: none;
+    width: 100%;
+    border-radius: 0.5em;
+    box-sizing: border-box;
+    padding: 0.5em;
+    -webkit-user-select: initial;
+}
+
 .view.settings .button.text {
     width: auto;
     border-radius: 0.5em;
     padding: 0 0.5em;
-    margin-right: 0.5em;
     margin-bottom: 0.5em;
 }
 

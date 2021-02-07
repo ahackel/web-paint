@@ -8,6 +8,8 @@ module.exports = {
     entry: './src/ts/app.ts',
     devtool: 'source-map',
     devServer: {
+        port: 1234,
+        host: '0.0.0.0',
         contentBase: './docs',
     },
     module: {
@@ -55,14 +57,6 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new CopyPlugin({
-            patterns: [
-                { 
-                    from: "**/*",
-                    context: path.resolve(__dirname, "static")
-                },
-            ],
-        }),
         new HtmlWebpackPlugin({
             template: './src/index.html',
             inject: 'head'
