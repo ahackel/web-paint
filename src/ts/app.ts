@@ -1,6 +1,7 @@
 require('../css/painter.css');
 import {library, dom} from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
+require('blueimp-canvas-to-blob/js/canvas-to-blob');
 
 library.add(fas)
 dom.watch();

@@ -96,6 +96,8 @@ class Server {
             if (!path.name.endsWith(".png")){
                 continue;
             }
+            
+            console.log("getting default asset: " + path.name);
             this.downloadImage("default/" + path.name, path.name);
         }
     }

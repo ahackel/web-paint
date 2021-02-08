@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webpaint</title>
+<!--    <link rel="manifest" href="./manifest.webmanifest">-->
+    <meta name="theme-color" content="#317EFB"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" sizes="128x128" href="./img/icons/icon-128x128.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="./img/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="./img/icons/icon-512x512.png">
+
+<script src="vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-17eecd.76de2c5e1104b52655c1.js"></script><script src="main.a4df35fb9229db76860a.js"></script></head>
+<body>
+
+<div class="view paint hidden" id="paint">
+    <div class="button back"><i class="fas fa-times"></i></div>
+    <div class="toolbar left" id="context-toolbar">
+        <div class="palette" id="color-palette"></div>
+        <div class="palette" id="size-palette"></div>
+
+        <div class="button" id="selection-stamp-button"><i class="fas fa-stamp"></i></div>
+        <div class="button" id="selection-save-button"><i class="fas fa-plus-square"></i></div>
+        <div class="button" id="selection-download-button"><i class="fas fa-file-download"></i></div>
+        <div class="button" id="selection-delete-button"><i class="fas fa-trash-alt"></i></div>
+
+    </div>
+    <div class="toolbar top" id="main-toolbar">
+        <div class="button selected" id="tool-pen"><i class="fas fa-highlighter"></i></div>
+        <div class="button" id="tool-eraser"><i class="fas fa-eraser"></i></div>
+        <div class="button" id="tool-selection"><i class="fas fa-cut"></i></div>
+        
+        <div class="spacer"></div>
+
+        <div class="palette" id="stamp-palette"></div>
+        <div class="button" id="import-image-button"><i class="fas fa-camera"></i></div>
+        <div class="button" id="undo-button"><i class="fas fa-undo"></i></div>
+        <div class="button" id="redo-button"><i class="fas fa-redo"></i></div>
+    </div>
+    <div id="sheet"></div>
+</div>
+
+<div class="view settings hidden" id="settings">
+    <div class="button back"><i class="fas fa-times"></i></div>
+    <p id="info"></p>
+    <p>
+        <label for="server-url">Server</label>
+        <input type="url" id="server-url"/>
+    </p>
+    <p>
+        <label for="user-id">User ID</label>
+        <input type="text" id="user-id"/>
+    </p>
+    <div class="button text sync"><i class="fas fa-sync"></i> Sync with server</div>
+    <div class="button text export"><i class="fas fa-file-export"></i> Export all images</div>
+    <div class="button text import"><i class="fas fa-file-import"></i> Import all images</div>
+    <div class="button text clear"><i class="fas fa-trash-alt"></i> Reset</div>
+    <ul id="log"></ul>
+</div>
+
+<div class="view book hidden" id="book">
+    <div class="button settings"><i class="fas fa-cog"></i></div>
+</div>
+
+<div class="view dropbox-auth hidden" id="dropbox-auth">
+    <a href="#" id="dropbox-button">Authenticate Dropbox</a>
+</div>
+
+</body>
+</html>

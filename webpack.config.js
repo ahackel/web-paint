@@ -9,7 +9,6 @@ module.exports = {
     devtool: 'source-map',
     devServer: {
         port: 1234,
-        host: '0.0.0.0',
         contentBase: './docs',
     },
     module: {
