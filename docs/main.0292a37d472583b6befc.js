@@ -1636,6 +1636,457 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
 
 /***/ }),
 
+/***/ "./src/ts/storage/DropboxStorage.ts":
+/*!******************************************!*\
+  !*** ./src/ts/storage/DropboxStorage.ts ***!
+  \******************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "dropboxStorage": function() { return /* binding */ dropboxStorage; }
+/* harmony export */ });
+/* harmony import */ var dropbox__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! dropbox */ "./node_modules/dropbox/dist/Dropbox-sdk.min.js");
+/* harmony import */ var dropbox__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(dropbox__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _ImageStorage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ImageStorage */ "./src/ts/storage/ImageStorage.ts");
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var CLIENT_ID = 'dyfw7wk3nb2utzo';
+
+var DropboxStorage = /*#__PURE__*/function () {
+  function DropboxStorage() {
+    var _localStorage$getItem,
+        _this = this;
+
+    _classCallCheck(this, DropboxStorage);
+
+    this._isAuthorized = false;
+    this._userId = (_localStorage$getItem = localStorage.getItem("user-id")) !== null && _localStorage$getItem !== void 0 ? _localStorage$getItem : "";
+    var token = this.getAccessTokenFromUrl();
+
+    if (token) {
+      this.authorize(token);
+    } else {
+      localforage__WEBPACK_IMPORTED_MODULE_1___default().getItem('dropbox-token').then(function (token) {
+        if (token) {
+          _this.authorize(token);
+        }
+      });
+    }
+  }
+
+  _createClass(DropboxStorage, [{
+    key: "isAuthorized",
+    get: function get() {
+      return this._isAuthorized;
+    }
+  }, {
+    key: "dbx",
+    get: function get() {
+      return this._dbx;
+    }
+  }, {
+    key: "userId",
+    get: function get() {
+      return this._userId;
+    },
+    set: function set(value) {
+      this._userId = value;
+      localStorage.setItem("user-id", value);
+    }
+  }, {
+    key: "getAuthenticationUrl",
+    value: function getAuthenticationUrl() {
+      var auth = new dropbox__WEBPACK_IMPORTED_MODULE_0__.DropboxAuth({
+        clientId: CLIENT_ID
+      });
+      return auth.getAuthenticationUrl(location.href);
+    }
+  }, {
+    key: "sync",
+    value: function () {
+      var _sync = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (!(!this.isAuthorized || !this.userId)) {
+                  _context.next = 2;
+                  break;
+                }
+
+                return _context.abrupt("return");
+
+              case 2:
+                _context.next = 4;
+                return this.downloadDefaultAssets();
+
+              case 4:
+                _context.next = 6;
+                return this.uploadUserContent();
+
+              case 6:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function sync() {
+        return _sync.apply(this, arguments);
+      }
+
+      return sync;
+    }()
+  }, {
+    key: "downloadDefaultAssets",
+    value: function () {
+      var _downloadDefaultAssets = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+        var res, _iterator, _step, path;
+
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.dbx.filesListFolder({
+                  path: "/default"
+                });
+
+              case 2:
+                res = _context2.sent;
+
+                if (!(res.status != 200)) {
+                  _context2.next = 6;
+                  break;
+                }
+
+                console.log('Could not download default assets.');
+                return _context2.abrupt("return");
+
+              case 6:
+                _iterator = _createForOfIteratorHelper(res.result.entries);
+                _context2.prev = 7;
+
+                _iterator.s();
+
+              case 9:
+                if ((_step = _iterator.n()).done) {
+                  _context2.next = 19;
+                  break;
+                }
+
+                path = _step.value;
+
+                if (!(path[".tag"] != "file")) {
+                  _context2.next = 13;
+                  break;
+                }
+
+                return _context2.abrupt("continue", 17);
+
+              case 13:
+                if (path.name.endsWith(".png")) {
+                  _context2.next = 15;
+                  break;
+                }
+
+                return _context2.abrupt("continue", 17);
+
+              case 15:
+                console.log("getting default asset: " + path.name);
+                this.downloadImage(path.path_lower, path.name);
+
+              case 17:
+                _context2.next = 9;
+                break;
+
+              case 19:
+                _context2.next = 24;
+                break;
+
+              case 21:
+                _context2.prev = 21;
+                _context2.t0 = _context2["catch"](7);
+
+                _iterator.e(_context2.t0);
+
+              case 24:
+                _context2.prev = 24;
+
+                _iterator.f();
+
+                return _context2.finish(24);
+
+              case 27:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[7, 21, 24, 27]]);
+      }));
+
+      function downloadDefaultAssets() {
+        return _downloadDefaultAssets.apply(this, arguments);
+      }
+
+      return downloadDefaultAssets;
+    }()
+  }, {
+    key: "downloadImage",
+    value: function () {
+      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(path, imageId) {
+        var res, blob;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return this.dbx.filesDownload({
+                  path: path
+                });
+
+              case 2:
+                res = _context3.sent;
+
+                if (res.status == 200) {
+                  console.log(res.result);
+                  blob = res.result.fileBlob;
+
+                  if (blob) {
+                    _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.saveImage(imageId, blob);
+                  }
+                }
+
+              case 4:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function downloadImage(_x, _x2) {
+        return _downloadImage.apply(this, arguments);
+      }
+
+      return downloadImage;
+    }()
+  }, {
+    key: "uploadUserContent",
+    value: function () {
+      var _uploadUserContent = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+        var keys, _iterator2, _step2, id, url, blob, fileName;
+
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                this.createDirectory(this.userId);
+                _context4.next = 3;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.keys();
+
+              case 3:
+                keys = _context4.sent;
+                _iterator2 = _createForOfIteratorHelper(keys);
+                _context4.prev = 5;
+
+                _iterator2.s();
+
+              case 7:
+                if ((_step2 = _iterator2.n()).done) {
+                  _context4.next = 22;
+                  break;
+                }
+
+                id = _step2.value;
+                _context4.next = 11;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.loadImageUrl(id);
+
+              case 11:
+                url = _context4.sent;
+                _context4.next = 14;
+                return fetch(url).then(function (r) {
+                  return r.blob();
+                });
+
+              case 14:
+                blob = _context4.sent;
+
+                if (blob) {
+                  _context4.next = 17;
+                  break;
+                }
+
+                return _context4.abrupt("continue", 20);
+
+              case 17:
+                fileName = "/" + this.userId + "/" + id;
+                console.log("posting: " + fileName);
+                this.postImage(blob, fileName);
+
+              case 20:
+                _context4.next = 7;
+                break;
+
+              case 22:
+                _context4.next = 27;
+                break;
+
+              case 24:
+                _context4.prev = 24;
+                _context4.t0 = _context4["catch"](5);
+
+                _iterator2.e(_context4.t0);
+
+              case 27:
+                _context4.prev = 27;
+
+                _iterator2.f();
+
+                return _context4.finish(27);
+
+              case 30:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this, [[5, 24, 27, 30]]);
+      }));
+
+      function uploadUserContent() {
+        return _uploadUserContent.apply(this, arguments);
+      }
+
+      return uploadUserContent;
+    }()
+  }, {
+    key: "postImage",
+    value: function () {
+      var _postImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(blob, path) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                return _context5.abrupt("return", this.dbx.filesUpload({
+                  path: path,
+                  contents: blob
+                }));
+
+              case 1:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function postImage(_x3, _x4) {
+        return _postImage.apply(this, arguments);
+      }
+
+      return postImage;
+    }()
+  }, {
+    key: "createDirectory",
+    value: function createDirectory(path) {// this.dbx.file
+    }
+  }, {
+    key: "getAccessTokenFromUrl",
+    value: function getAccessTokenFromUrl() {
+      return this.parseQueryString(window.location.hash).access_token;
+    }
+  }, {
+    key: "parseQueryString",
+    value: function parseQueryString(str) {
+      var ret = Object.create(null);
+
+      if (typeof str !== 'string') {
+        return ret;
+      }
+
+      str = str.trim().replace(/^(\?|#|&)/, '');
+
+      if (!str) {
+        return ret;
+      }
+
+      str.split('&').forEach(function (param) {
+        var parts = param.replace(/\+/g, ' ').split('='); // Firefox (pre 40) decodes `%3D` to `=`
+        // https://github.com/sindresorhus/query-string/pull/37
+
+        var key = parts.shift();
+        var val = parts.length > 0 ? parts.join('=') : undefined;
+        key = decodeURIComponent(key); // missing `=` should be `null`:
+        // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+
+        val = val === undefined ? null : decodeURIComponent(val);
+
+        if (ret[key] === undefined) {
+          ret[key] = val;
+        } else if (Array.isArray(ret[key])) {
+          ret[key].push(val);
+        } else {
+          ret[key] = [ret[key], val];
+        }
+      });
+      return ret;
+    }
+  }, {
+    key: "authorize",
+    value: function authorize(token) {
+      this._isAuthorized = !!token;
+
+      if (this.isAuthorized) {
+        this._dbx = new dropbox__WEBPACK_IMPORTED_MODULE_0__.Dropbox({
+          accessToken: token
+        });
+        localforage__WEBPACK_IMPORTED_MODULE_1___default().setItem('dropbox-token', token);
+      }
+    }
+  }, {
+    key: "unauthorize",
+    value: function unauthorize() {
+      var _this2 = this;
+
+      if (!this.isAuthorized) {
+        return;
+      }
+
+      this.dbx.authTokenRevoke().then(function () {
+        _this2._isAuthorized = false;
+        localforage__WEBPACK_IMPORTED_MODULE_1___default().removeItem('dropbox-token');
+      });
+    }
+  }]);
+
+  return DropboxStorage;
+}();
+
+var dropboxStorage = new DropboxStorage();
+
+/***/ }),
+
 /***/ "./src/ts/storage/ImageStorage.ts":
 /*!****************************************!*\
   !*** ./src/ts/storage/ImageStorage.ts ***!
@@ -5202,6 +5653,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var file_saver__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! file-saver */ "./node_modules/file-saver/dist/FileSaver.min.js");
 /* harmony import */ var file_saver__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(file_saver__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _storage_Server__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../storage/Server */ "./src/ts/storage/Server.ts");
+/* harmony import */ var _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../storage/DropboxStorage */ "./src/ts/storage/DropboxStorage.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -5240,6 +5692,7 @@ var ConsoleLogHTML = __webpack_require__(/*! console-log-html */ "./node_modules
 
 
 
+
 var SettingsView = /*#__PURE__*/function (_View) {
   _inherits(SettingsView, _View);
 
@@ -5266,17 +5719,26 @@ var SettingsView = /*#__PURE__*/function (_View) {
     _this._userIdElement = _this._element.querySelector("#user-id");
 
     _this._userIdElement.onblur = function () {
-      return _storage_Server__WEBPACK_IMPORTED_MODULE_4__.server.userId = _this._userIdElement.value;
+      return _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.userId = _this._userIdElement.value;
     };
 
-    var syncButton = _this._element.querySelector(".button.sync");
+    _this._connectButton = _this._element.querySelector(".button.connect");
+    _utils_Utils__WEBPACK_IMPORTED_MODULE_1__.addClick(_this._connectButton, function () {
+      location.href = _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.getAuthenticationUrl();
+    });
+    _this._disconnectButton = _this._element.querySelector(".button.disconnect");
+    _utils_Utils__WEBPACK_IMPORTED_MODULE_1__.addClick(_this._disconnectButton, function () {
+      _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.unauthorize();
 
-    _utils_Utils__WEBPACK_IMPORTED_MODULE_1__.addClick(syncButton, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      _this.updateButtons();
+    });
+    _this._syncButton = _this._element.querySelector(".button.sync");
+    _utils_Utils__WEBPACK_IMPORTED_MODULE_1__.addClick(_this._syncButton, /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              return _context.abrupt("return", _storage_Server__WEBPACK_IMPORTED_MODULE_4__.server.sync());
+              return _context.abrupt("return", _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.sync());
 
             case 1:
             case "end":
@@ -5348,11 +5810,23 @@ var SettingsView = /*#__PURE__*/function (_View) {
   }
 
   _createClass(SettingsView, [{
+    key: "updateButtons",
+    value: function updateButtons() {
+      console.log(_storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.isAuthorized);
+
+      this._connectButton.classList.toggle('hidden', _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.isAuthorized);
+
+      this._disconnectButton.classList.toggle('hidden', !_storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.isAuthorized);
+
+      this._syncButton.classList.toggle("disabled", !_storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.isAuthorized);
+    }
+  }, {
     key: "show",
     value: function show() {
       _get(_getPrototypeOf(SettingsView.prototype), "show", this).call(this);
 
       this.updateInfo();
+      this.updateButtons();
     }
   }, {
     key: "updateInfo",
@@ -5363,7 +5837,7 @@ var SettingsView = /*#__PURE__*/function (_View) {
         info.innerText += "\rStorage used: ".concat(_utils_Utils__WEBPACK_IMPORTED_MODULE_1__.formatBytes(amount, 1));
       });
       this._hostElement.value = _storage_Server__WEBPACK_IMPORTED_MODULE_4__.server.host;
-      this._userIdElement.value = _storage_Server__WEBPACK_IMPORTED_MODULE_4__.server.userId;
+      this._userIdElement.value = _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.userId;
     }
   }]);
 
@@ -5574,7 +6048,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "* {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  user-select: none;\n  touch-action: none;\n  /* prevent pinch zoom in whole app */\n}\n\ntextarea {\n  -webkit-user-select: initial;\n}\n\nhtml,\nbody {\n  margin: 0;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  font-size: 40px;\n}\n\n@media (max-width: 400px), (max-height: 400px) {\n  html,\nbody {\n    font-size: 28px;\n  }\n}\nbody {\n  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n  line-height: 1.5rem;\n}\n\nbody, input, textarea {\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n  line-height: 1.5rem;\n}\n\n.button {\n  width: 1.5rem;\n  height: 1.5rem;\n  line-height: 1.5rem;\n  text-align: center;\n  font-size: 0.75rem;\n  border-radius: 30%;\n  cursor: pointer;\n  background: rgba(255, 255, 255, 0.5);\n  color: black;\n  transition: transform 0.25s;\n}\n\n.button.down {\n  transform: scale(0.9);\n}\n\n.button i {\n  line-height: 1.5rem;\n}\n\n#dropbox-button {\n  border-radius: 3px;\n  background-color: #007ee5;\n  border: none;\n  color: #fff;\n  font-size: 16px;\n  padding: 10px 15px;\n  text-decoration: none;\n  height: 24px;\n}\n\n.view {\n  display: flex;\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  background: #BBB;\n  overflow: hidden;\n}\n\n.dropbox-auth {\n  align-items: center;\n  justify-content: center;\n}\n\n.view.book {\n  flex-wrap: wrap;\n  align-content: flex-start;\n  justify-content: center;\n  overflow-y: auto;\n  -webkit-overflow-scrolling: touch;\n}\n\n.view.book, .view.book * {\n  touch-action: pan-y;\n}\n\n.view.settings {\n  font-size: 0.5rem;\n  padding: 2rem;\n  display: block;\n  box-sizing: border-box;\n  padding-right: 52%;\n  line-height: 1.4em;\n}\n\n.view.settings input {\n  font-size: 0.5rem;\n  line-height: 1em;\n  border: none;\n  width: 100%;\n  border-radius: 0.5em;\n  box-sizing: border-box;\n  padding: 0.5em;\n  -webkit-user-select: initial;\n}\n\n.view.settings .button.text {\n  width: auto;\n  border-radius: 0.5em;\n  padding: 0 0.5em;\n  margin-bottom: 0.5em;\n}\n\n.view.settings label {\n  display: block;\n  text-transform: uppercase;\n  color: grey;\n}\n\n.view.settings #log {\n  width: 50vw;\n  background: #272727;\n  color: #c7c7c7;\n  overflow: scroll;\n  -webkit-overflow-scrolling: touch;\n  touch-action: pan-y;\n  height: 100vh;\n  padding: 0;\n  font-family: monospace;\n  font-size: 12px;\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 0;\n  line-height: 20px;\n}\n\n#log li {\n  border-bottom: #444444 solid 1px;\n  padding: 0 1em;\n}\n\n.thumbnail {\n  margin: 0.3rem;\n  color: #CCC;\n  background: white;\n  border-radius: 0.1rem;\n  font-size: 5.6rem;\n  width: 1em;\n  height: 0.75em;\n  background-size: contain;\n  cursor: pointer;\n  transition: opacity 1s;\n}\n\n.thumbnail.down {\n  transform: scale(0.9);\n}\n\n.paint {\n  align-items: center;\n}\n\n.paint #sheet {\n  font-size: 1px;\n  width: 1024em;\n  height: 768em;\n  margin: auto;\n  overflow: auto;\n  position: fixed;\n  object-fit: contain;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n}\n\n.layer {\n  position: absolute;\n  left: 0;\n  top: 0;\n  background: none;\n}\n\n#base-layer {\n  background: white;\n}\n\n.layer.floating {\n  outline: 2px dashed black;\n}\n\n#stamp-layer {\n  opacity: 0.2;\n}\n\n@media (orientation: portrait) {\n  .paint #sheet {\n    transform: rotate(-90deg);\n    overflow-x: hidden;\n  }\n}\n.button.back {\n  position: absolute;\n  top: 0.25rem;\n  left: 0.25rem;\n  z-index: 100;\n}\n\n.button.settings {\n  position: absolute;\n  right: 0.25rem;\n  top: 0.25rem;\n  z-index: 100;\n}\n\n.button a {\n  width: 100%;\n  height: 100%;\n  display: block;\n  color: black;\n}\n\n.button#stamp-button {\n  font-size: 1.25rem;\n  position: absolute;\n  top: 0.25rem;\n  right: 0.25rem;\n  width: 2rem;\n  height: 2rem;\n  z-index: 100;\n  line-height: 1.85rem;\n}\n\n.toolbar {\n  display: flex;\n  background: lightgray;\n  border-radius: 0.5rem;\n  z-index: 100;\n  position: absolute;\n}\n\n.toolbar.left {\n  flex-direction: column;\n  left: 0.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.right {\n  flex-direction: column;\n  right: 0.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.top {\n  flex-direction: row;\n  left: 50%;\n  top: 0.25em;\n  transform: translateX(-50%);\n}\n\n.toolbar.bottom {\n  flex-direction: row;\n  left: 50%;\n  bottom: 0.25em;\n  transform: translateX(-50%);\n}\n\n.toolbar .button {\n  /*display: inline-block;*/\n  background: transparent;\n}\n\n.toolbar .spacer {\n  width: 1.5em;\n  height: 1.5em;\n}\n\n.palette {\n  position: relative;\n  transition: transform 0.25s;\n  display: inline-block;\n  float: left;\n  text-align: center;\n  z-index: 100;\n}\n\n.palette .option i {\n  font-size: 0.75em;\n}\n\n/* down direction is default: */\n.palette .options {\n  position: absolute;\n  display: flex;\n  flex-wrap: wrap;\n  background: lightgray;\n  border-radius: 0.5rem;\n  padding: 0.25rem;\n  transition: transform 0.15s;\n  top: 2.25rem;\n  left: 50%;\n  transform: translateX(-50%);\n}\n\n.palette .option {\n  width: 1em;\n  height: 1em;\n  line-height: 0.75em;\n  display: inline-block;\n  margin: 0.25em;\n  float: left;\n  transition: transform 0.25s;\n  background-size: contain;\n  background-repeat: no-repeat;\n  background-position: center;\n}\n\n.palette .options .option {\n  margin: 0.125em;\n}\n\n.palette .option:active {\n  transform: scale(0.9);\n}\n\n.palette .options .arrow {\n  position: absolute;\n  width: 0;\n  height: 0;\n  font-size: 0.25rem;\n  top: -2em;\n  left: 50%;\n  margin-left: -1em;\n  border-left: 1em solid transparent;\n  border-right: 1em solid transparent;\n  border-bottom: 2em solid lightgray;\n  border-top: none;\n}\n\n.toolbar.left .palette .options {\n  left: 2.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.left .palette .options .arrow {\n  top: initial;\n  left: -2em;\n  top: 50%;\n  margin-top: -1em;\n  border-top: 1em solid transparent;\n  border-bottom: 1em solid transparent;\n  border-right: 2em solid lightgray;\n}\n\n.toolbar.right .palette .options {\n  left: initial;\n  right: 2.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.right .palette .options .arrow {\n  left: initial;\n  top: initial;\n  right: -2em;\n  top: 50%;\n  margin-top: -1em;\n  border-top: 1em solid transparent;\n  border-bottom: 1em solid transparent;\n  border-left: 2em solid lightgray;\n  border-right: 0;\n}\n\n.toolbar.bottom .palette .options {\n  left: 50%;\n  top: initial;\n  bottom: 2.25rem;\n  transform: translateX(-50%);\n}\n\n.toolbar.bottom .palette .options .arrow {\n  top: initial;\n  bottom: -2em;\n  left: 50%;\n  margin-left: -1em;\n  border-left: 1em solid transparent;\n  border-right: 1em solid transparent;\n  border-top: 2em solid lightgray;\n  border-bottom: none;\n}\n\n.palette.collapsed:active {\n  transform: scale(0.9);\n}\n\n.toolbar.top .palette.collapsed .options, .toolbar.bottom .palette.collapsed .options {\n  transform: translateX(-50%) scale(0);\n}\n\n.toolbar.left .palette.collapsed .options, .toolbar.right .palette.collapsed .options {\n  transform: translateY(-50%) scale(0);\n}\n\n#stamp-palette.palette .options {\n  font-size: 1.5rem;\n}\n\n@media (max-width: 400px), (max-height: 400px) {\n  #stamp-palette.palette .options {\n    font-size: 1rem;\n  }\n}\n.line-width {\n  background: black;\n  height: 100%;\n  margin: auto;\n  border-radius: 0.15em;\n}\n\n#color-palette .option {\n  border-radius: 40%;\n}\n\n.hidden {\n  display: none !important;\n}\n\n.disabled {\n  opacity: 0.25;\n}\n\n.selected {\n  background: #58b0ff !important;\n  color: white;\n}", "",{"version":3,"sources":["webpack://./painter.css"],"names":[],"mappings":"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","sourcesContent":["* {\n    -webkit-touch-callout: none;\n    -webkit-user-select: none;\n    user-select: none;\n    touch-action: none; /* prevent pinch zoom in whole app */\n}\n\ntextarea {\n    -webkit-user-select: initial;\n}\n\nhtml,\nbody{\n    margin: 0;\n    width: 100%;\n    height: 100%;\n    position: fixed;\n    font-size: 40px;\n}\n\n@media (max-width: 400px), (max-height: 400px){\n    html,\n    body{\n        font-size: 28px;\n    }   \n}\n\nbody {\n    -webkit-tap-highlight-color: rgba(0,0,0,0);\n    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n    line-height: 1.5rem;\n}\n\nbody, input, textarea {\n    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n    line-height: 1.5rem;\n}\n\n.button {\n    width: 1.5rem;\n    height: 1.5rem;\n    line-height: 1.5rem;\n    text-align: center;\n    font-size: 0.75rem;\n    border-radius: 30%;\n    cursor: pointer;\n    background: rgba(255, 255, 255, 0.5);\n    color: black;\n    transition: transform 0.25s;\n}\n\n.button.down {\n    transform: scale(0.9);\n}\n\n.button i{\n    line-height: 1.5rem;\n}\n\n#dropbox-button{\n    border-radius: 3px;\n    background-color: #007ee5;\n    border: none;\n    color: #fff;\n    font-size: 16px;\n    padding: 10px 15px;\n    text-decoration: none;\n    height: 24px;\n}\n\n.view {\n    display: flex;\n    position: fixed;\n    width: 100%;\n    height: 100%;\n    background: #BBB;\n    overflow: hidden;\n}\n\n.dropbox-auth{\n    align-items: center;\n    justify-content: center;\n}\n\n.view.book {\n    flex-wrap: wrap;\n    align-content: flex-start;\n    justify-content: center;\n    overflow-y: auto;\n    -webkit-overflow-scrolling: touch;\n}\n\n.view.book, .view.book * {\n    touch-action: pan-y;\n}\n\n.view.settings {\n    font-size: 0.5rem;\n    padding: 2rem;\n    display: block;\n    box-sizing: border-box;\n    padding-right: 52%;\n    line-height: 1.4em;\n}\n\n.view.settings input{\n    font-size: 0.5rem;\n    line-height: 1em;\n    border: none;\n    width: 100%;\n    border-radius: 0.5em;\n    box-sizing: border-box;\n    padding: 0.5em;\n    -webkit-user-select: initial;\n}\n\n.view.settings .button.text {\n    width: auto;\n    border-radius: 0.5em;\n    padding: 0 0.5em;\n    margin-bottom: 0.5em;\n}\n\n.view.settings label{\n    display: block;\n    text-transform: uppercase;\n    color: grey;\n}\n\n.view.settings #log {\n    width: 50vw;\n    background: #272727;\n    color: #c7c7c7;\n    overflow: scroll;\n    -webkit-overflow-scrolling: touch;\n    touch-action: pan-y;\n    height: 100vh;\n    padding: 0;\n    font-family: monospace;\n    font-size: 12px;\n    position: fixed;\n    top: 0;\n    right: 0;\n    margin: 0;\n    line-height: 20px;\n}\n\n#log li {\n    border-bottom: #444444 solid 1px;\n    padding: 0 1em;\n}\n\n.thumbnail {\n    margin: 0.3rem;\n    color: #CCC;\n    background: white;\n    border-radius: 0.1rem;\n    font-size: 5.6rem;\n    width: 1em;\n    height: 0.75em;\n    background-size: contain;\n    cursor: pointer;\n    transition: opacity 1s;\n}\n\n.thumbnail.down {\n    transform: scale(0.9);\n}\n\n.paint{\n    align-items: center;\n}\n\n.paint #sheet {\n    font-size: 1px;\n    width: 1024em;\n    height: 768em;\n    margin: auto;\n    overflow: auto;\n    position: fixed;\n    object-fit: contain;\n    left: 0;\n    top: 0;\n    bottom: 0;\n    right: 0;\n}\n\n.layer {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background: none;\n}\n\n#base-layer {\n    background: white;\n}\n\n.layer.floating{\n    outline: 2px dashed black;\n}\n\n#stamp-layer{\n    opacity: 0.2;\n}\n\n@media (orientation: portrait) {\n    .paint #sheet {\n        transform: rotate(-90deg);\n        overflow-x: hidden;\n    }\n}\n\n\n.button.back {\n    position: absolute;\n    top: 0.25rem;\n    left: 0.25rem;\n    z-index: 100;\n}\n\n.button.settings {\n    position: absolute;\n    right: 0.25rem;\n    top: 0.25rem;\n    z-index: 100;\n}\n\n.button a{\n    width: 100%;\n    height: 100%;\n    display: block;\n    color: black;    \n}\n\n.button#stamp-button{\n    font-size: 1.25rem;\n    position: absolute;\n    top: 0.25rem;\n    right: 0.25rem;\n    width: 2rem;\n    height: 2rem;\n    z-index: 100;\n    line-height: 1.85rem;\n}\n\n.toolbar {\n    display: flex;\n    background: lightgray;\n    border-radius: 0.5rem;\n    z-index: 100;\n    position: absolute;\n}\n\n.toolbar.left {\n    flex-direction: column;\n    left: 0.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.right {\n    flex-direction: column;\n    right: 0.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.top {\n    flex-direction: row;\n    left: 50%;\n    top: 0.25em;\n    transform: translateX(-50%);\n}\n\n.toolbar.bottom {\n    flex-direction: row;\n    left: 50%;\n    bottom: 0.25em;\n    transform: translateX(-50%);\n}\n\n\n.toolbar .button {\n    /*display: inline-block;*/\n    background: transparent;\n}\n\n.toolbar .spacer {\n    width: 1.5em;\n    height: 1.5em;\n}\n\n.palette {\n    position: relative;\n    transition: transform 0.25s;\n    display: inline-block;\n    float: left;\n    text-align: center;\n    z-index: 100;\n}\n\n.palette .option i {\n    font-size: 0.75em;\n}\n\n/* down direction is default: */\n.palette .options{\n    position: absolute;\n    display: flex;\n    flex-wrap: wrap;\n    background: lightgray;\n    border-radius: 0.5rem;\n    padding: 0.25rem;\n    transition: transform 0.15s;\n    top: 2.25rem;\n    left: 50%;\n    transform: translateX(-50%);\n}\n\n.palette .option {\n    width: 1em;\n    height: 1em;\n    line-height: 0.75em;\n    display: inline-block;\n    margin: 0.25em;\n    float: left;\n    transition: transform 0.25s;\n    background-size: contain;\n    background-repeat: no-repeat;\n    background-position: center;\n}\n\n.palette .options .option {\n    margin: 0.125em;\n}\n\n.palette .option:active {\n    transform: scale(0.9);\n}\n\n.palette .options .arrow {\n    position: absolute;\n    width: 0;\n    height: 0;\n    font-size: 0.25rem;\n    top: -2em;\n    left: 50%;\n    margin-left: -1em;\n    border-left: 1em solid transparent;\n    border-right: 1em solid transparent;\n    border-bottom: 2em solid lightgray;\n    border-top: none;\n}\n\n.toolbar.left .palette .options{\n    left: 2.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.left .palette .options .arrow {\n    top: initial;\n    left: -2em;\n    top: 50%;\n    margin-top: -1em;\n    border-top: 1em solid transparent;\n    border-bottom: 1em solid transparent;\n    border-right: 2em solid lightgray;\n}\n\n.toolbar.right .palette .options{\n    left: initial;\n    right: 2.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.right .palette .options .arrow {\n    left: initial;\n    top: initial;\n    right: -2em;\n    top: 50%;\n    margin-top: -1em;\n    border-top: 1em solid transparent;\n    border-bottom: 1em solid transparent;\n    border-left: 2em solid lightgray;\n    border-right: 0;\n}\n\n.toolbar.bottom .palette .options{\n    left: 50%;\n    top: initial;\n    bottom: 2.25rem;\n    transform: translateX(-50%);\n}\n\n.toolbar.bottom .palette .options .arrow {\n    top: initial;\n    bottom: -2em;\n    left: 50%;\n    margin-left: -1em;\n    border-left: 1em solid transparent;\n    border-right: 1em solid transparent;\n    border-top: 2em solid lightgray;\n    border-bottom: none;\n}\n\n.palette.collapsed:active {\n    transform: scale(0.9);\n}\n\n.toolbar.top .palette.collapsed .options, .toolbar.bottom .palette.collapsed .options {\n    transform: translateX(-50%) scale(0.0);\n}\n\n.toolbar.left .palette.collapsed .options, .toolbar.right .palette.collapsed .options {\n    transform: translateY(-50%) scale(0.0);\n}\n\n#stamp-palette.palette .options{\n    font-size: 1.5rem;\n}\n\n@media (max-width: 400px), (max-height: 400px){\n    #stamp-palette.palette .options{\n        font-size: 1rem;\n    }\n}\n\n.line-width{\n    background: black;\n    height: 100%;\n    margin: auto;\n    border-radius: 0.15em;\n}\n\n#color-palette .option {\n    border-radius: 40%;\n}\n\n.hidden {\n    display: none!important;\n}\n\n.disabled {\n    opacity: 0.25;\n}\n\n.selected {\n    background: #58b0ff!important;\n    color: white;\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "* {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  user-select: none;\n  touch-action: none;\n  /* prevent pinch zoom in whole app */\n}\n\ntextarea {\n  -webkit-user-select: initial;\n}\n\nhtml,\nbody {\n  margin: 0;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  font-size: 40px;\n}\n\n@media (max-width: 400px), (max-height: 400px) {\n  html,\nbody {\n    font-size: 28px;\n  }\n}\nbody {\n  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n  line-height: 1.5rem;\n}\n\nbody, input, textarea {\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n  line-height: 1.5rem;\n}\n\n.button {\n  width: 1.5rem;\n  height: 1.5rem;\n  line-height: 1.5rem;\n  text-align: center;\n  font-size: 0.75rem;\n  border-radius: 30%;\n  cursor: pointer;\n  background: rgba(255, 255, 255, 0.5);\n  color: black;\n  transition: transform 0.25s;\n}\n\n.button.down {\n  transform: scale(0.9);\n}\n\n.button i {\n  line-height: 1.5rem;\n}\n\n.button .fa-stack {\n  height: 1em;\n  width: 1em;\n}\n\n.button .fa-stack.fa-fw {\n  width: 1.25em;\n}\n\n#dropbox-button {\n  border-radius: 3px;\n  background-color: #007ee5;\n  border: none;\n  color: #fff;\n  font-size: 16px;\n  padding: 10px 15px;\n  text-decoration: none;\n  height: 24px;\n}\n\n.view {\n  display: flex;\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  background: #BBB;\n  overflow: hidden;\n}\n\n.dropbox-auth {\n  align-items: center;\n  justify-content: center;\n}\n\n.view.book {\n  flex-wrap: wrap;\n  align-content: flex-start;\n  justify-content: center;\n  overflow-y: auto;\n  -webkit-overflow-scrolling: touch;\n}\n\n.view.book, .view.book * {\n  touch-action: pan-y;\n}\n\n.view.settings {\n  font-size: 0.5rem;\n  padding: 0.5rem 2.5rem;\n  display: block;\n  box-sizing: border-box;\n  padding-right: 52%;\n  line-height: 1.4em;\n}\n\n.view.settings input {\n  font-size: 0.5rem;\n  line-height: 1em;\n  border: none;\n  width: 100%;\n  border-radius: 0.5em;\n  box-sizing: border-box;\n  padding: 0.5em;\n  -webkit-user-select: initial;\n}\n\n.view.settings .button.text {\n  width: auto;\n  border-radius: 0.5em;\n  padding: 0 0.5em;\n  margin-bottom: 0.5em;\n  text-align: left;\n}\n\n.view.settings label {\n  display: block;\n  text-transform: uppercase;\n  color: grey;\n}\n\n.view.settings #log {\n  width: 50vw;\n  background: #272727;\n  color: #c7c7c7;\n  overflow: scroll;\n  -webkit-overflow-scrolling: touch;\n  touch-action: pan-y;\n  height: 100vh;\n  padding: 0;\n  font-family: monospace;\n  font-size: 12px;\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 0;\n  line-height: 20px;\n}\n\n#log li {\n  border-bottom: #444444 solid 1px;\n  padding: 0 1em;\n}\n\n.thumbnail {\n  margin: 0.3rem;\n  color: #CCC;\n  background: white;\n  border-radius: 0.1rem;\n  font-size: 5.6rem;\n  width: 1em;\n  height: 0.75em;\n  background-size: contain;\n  cursor: pointer;\n  transition: opacity 1s;\n}\n\n.thumbnail.down {\n  transform: scale(0.9);\n}\n\n.paint {\n  align-items: center;\n}\n\n.paint #sheet {\n  font-size: 1px;\n  width: 1024em;\n  height: 768em;\n  margin: auto;\n  overflow: auto;\n  position: fixed;\n  object-fit: contain;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n}\n\n.layer {\n  position: absolute;\n  left: 0;\n  top: 0;\n  background: none;\n}\n\n#base-layer {\n  background: white;\n}\n\n.layer.floating {\n  outline: 2px dashed black;\n}\n\n#stamp-layer {\n  opacity: 0.2;\n}\n\n@media (orientation: portrait) {\n  .paint #sheet {\n    transform: rotate(-90deg);\n    overflow-x: hidden;\n  }\n}\n.button.back {\n  position: absolute;\n  top: 0.25rem;\n  left: 0.25rem;\n  z-index: 100;\n}\n\n.button.settings {\n  position: absolute;\n  right: 0.25rem;\n  top: 0.25rem;\n  z-index: 100;\n}\n\n.button a {\n  width: 100%;\n  height: 100%;\n  display: block;\n  color: black;\n}\n\n.button#stamp-button {\n  font-size: 1.25rem;\n  position: absolute;\n  top: 0.25rem;\n  right: 0.25rem;\n  width: 2rem;\n  height: 2rem;\n  z-index: 100;\n  line-height: 1.85rem;\n}\n\n.toolbar {\n  display: flex;\n  background: lightgray;\n  border-radius: 0.5rem;\n  z-index: 100;\n  position: absolute;\n}\n\n.toolbar.left {\n  flex-direction: column;\n  left: 0.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.right {\n  flex-direction: column;\n  right: 0.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.top {\n  flex-direction: row;\n  left: 50%;\n  top: 0.25em;\n  transform: translateX(-50%);\n}\n\n.toolbar.bottom {\n  flex-direction: row;\n  left: 50%;\n  bottom: 0.25em;\n  transform: translateX(-50%);\n}\n\n.toolbar .button {\n  /*display: inline-block;*/\n  background: transparent;\n}\n\n.toolbar .spacer {\n  width: 1.5em;\n  height: 1.5em;\n}\n\n.palette {\n  position: relative;\n  transition: transform 0.25s;\n  display: inline-block;\n  float: left;\n  text-align: center;\n  z-index: 100;\n}\n\n.palette .option i {\n  font-size: 0.75em;\n}\n\n/* down direction is default: */\n.palette .options {\n  position: absolute;\n  display: flex;\n  flex-wrap: wrap;\n  background: lightgray;\n  border-radius: 0.5rem;\n  padding: 0.25rem;\n  transition: transform 0.15s;\n  top: 2.25rem;\n  left: 50%;\n  transform: translateX(-50%);\n}\n\n.palette .option {\n  width: 1em;\n  height: 1em;\n  line-height: 0.75em;\n  display: inline-block;\n  margin: 0.25em;\n  float: left;\n  transition: transform 0.25s;\n  background-size: contain;\n  background-repeat: no-repeat;\n  background-position: center;\n}\n\n.palette .options .option {\n  margin: 0.125em;\n}\n\n.palette .option:active {\n  transform: scale(0.9);\n}\n\n.palette .options .arrow {\n  position: absolute;\n  width: 0;\n  height: 0;\n  font-size: 0.25rem;\n  top: -2em;\n  left: 50%;\n  margin-left: -1em;\n  border-left: 1em solid transparent;\n  border-right: 1em solid transparent;\n  border-bottom: 2em solid lightgray;\n  border-top: none;\n}\n\n.toolbar.left .palette .options {\n  left: 2.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.left .palette .options .arrow {\n  top: initial;\n  left: -2em;\n  top: 50%;\n  margin-top: -1em;\n  border-top: 1em solid transparent;\n  border-bottom: 1em solid transparent;\n  border-right: 2em solid lightgray;\n}\n\n.toolbar.right .palette .options {\n  left: initial;\n  right: 2.25rem;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.toolbar.right .palette .options .arrow {\n  left: initial;\n  top: initial;\n  right: -2em;\n  top: 50%;\n  margin-top: -1em;\n  border-top: 1em solid transparent;\n  border-bottom: 1em solid transparent;\n  border-left: 2em solid lightgray;\n  border-right: 0;\n}\n\n.toolbar.bottom .palette .options {\n  left: 50%;\n  top: initial;\n  bottom: 2.25rem;\n  transform: translateX(-50%);\n}\n\n.toolbar.bottom .palette .options .arrow {\n  top: initial;\n  bottom: -2em;\n  left: 50%;\n  margin-left: -1em;\n  border-left: 1em solid transparent;\n  border-right: 1em solid transparent;\n  border-top: 2em solid lightgray;\n  border-bottom: none;\n}\n\n.palette.collapsed:active {\n  transform: scale(0.9);\n}\n\n.toolbar.top .palette.collapsed .options, .toolbar.bottom .palette.collapsed .options {\n  transform: translateX(-50%) scale(0);\n}\n\n.toolbar.left .palette.collapsed .options, .toolbar.right .palette.collapsed .options {\n  transform: translateY(-50%) scale(0);\n}\n\n#stamp-palette.palette .options {\n  font-size: 1.5rem;\n}\n\n@media (max-width: 400px), (max-height: 400px) {\n  #stamp-palette.palette .options {\n    font-size: 1rem;\n  }\n}\n.line-width {\n  background: black;\n  height: 100%;\n  margin: auto;\n  border-radius: 0.15em;\n}\n\n#color-palette .option {\n  border-radius: 40%;\n}\n\n.hidden {\n  display: none !important;\n}\n\n.disabled {\n  opacity: 0.25;\n}\n\n.selected {\n  background: #58b0ff !important;\n  color: white;\n}", "",{"version":3,"sources":["webpack://./painter.css"],"names":[],"mappings":"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","sourcesContent":["* {\n    -webkit-touch-callout: none;\n    -webkit-user-select: none;\n    user-select: none;\n    touch-action: none; /* prevent pinch zoom in whole app */\n}\n\ntextarea {\n    -webkit-user-select: initial;\n}\n\nhtml,\nbody{\n    margin: 0;\n    width: 100%;\n    height: 100%;\n    position: fixed;\n    font-size: 40px;\n}\n\n@media (max-width: 400px), (max-height: 400px){\n    html,\n    body{\n        font-size: 28px;\n    }   \n}\n\nbody {\n    -webkit-tap-highlight-color: rgba(0,0,0,0);\n    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n    line-height: 1.5rem;\n}\n\nbody, input, textarea {\n    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n    line-height: 1.5rem;\n}\n\n.button {\n    width: 1.5rem;\n    height: 1.5rem;\n    line-height: 1.5rem;\n    text-align: center;\n    font-size: 0.75rem;\n    border-radius: 30%;\n    cursor: pointer;\n    background: rgba(255, 255, 255, 0.5);\n    color: black;\n    transition: transform 0.25s;\n}\n\n.button.down {\n    transform: scale(0.9);\n}\n\n.button i{\n    line-height: 1.5rem;\n}\n\n.button .fa-stack{\n    height: 1em;\n    width: 1em;    \n}\n\n.button .fa-stack.fa-fw{\n    width: 1.25em;    \n}\n\n#dropbox-button{\n    border-radius: 3px;\n    background-color: #007ee5;\n    border: none;\n    color: #fff;\n    font-size: 16px;\n    padding: 10px 15px;\n    text-decoration: none;\n    height: 24px;\n}\n\n.view {\n    display: flex;\n    position: fixed;\n    width: 100%;\n    height: 100%;\n    background: #BBB;\n    overflow: hidden;\n}\n\n.dropbox-auth{\n    align-items: center;\n    justify-content: center;\n}\n\n.view.book {\n    flex-wrap: wrap;\n    align-content: flex-start;\n    justify-content: center;\n    overflow-y: auto;\n    -webkit-overflow-scrolling: touch;\n}\n\n.view.book, .view.book * {\n    touch-action: pan-y;\n}\n\n.view.settings {\n    font-size: 0.5rem;\n    padding: 0.5rem 2.5rem;\n    display: block;\n    box-sizing: border-box;\n    padding-right: 52%;\n    line-height: 1.4em;\n}\n\n.view.settings input{\n    font-size: 0.5rem;\n    line-height: 1em;\n    border: none;\n    width: 100%;\n    border-radius: 0.5em;\n    box-sizing: border-box;\n    padding: 0.5em;\n    -webkit-user-select: initial;\n}\n\n.view.settings .button.text {\n    width: auto;\n    border-radius: 0.5em;\n    padding: 0 0.5em;\n    margin-bottom: 0.5em;\n    text-align: left;\n}\n\n.view.settings label{\n    display: block;\n    text-transform: uppercase;\n    color: grey;\n}\n\n.view.settings #log {\n    width: 50vw;\n    background: #272727;\n    color: #c7c7c7;\n    overflow: scroll;\n    -webkit-overflow-scrolling: touch;\n    touch-action: pan-y;\n    height: 100vh;\n    padding: 0;\n    font-family: monospace;\n    font-size: 12px;\n    position: fixed;\n    top: 0;\n    right: 0;\n    margin: 0;\n    line-height: 20px;\n}\n\n#log li {\n    border-bottom: #444444 solid 1px;\n    padding: 0 1em;\n}\n\n.thumbnail {\n    margin: 0.3rem;\n    color: #CCC;\n    background: white;\n    border-radius: 0.1rem;\n    font-size: 5.6rem;\n    width: 1em;\n    height: 0.75em;\n    background-size: contain;\n    cursor: pointer;\n    transition: opacity 1s;\n}\n\n.thumbnail.down {\n    transform: scale(0.9);\n}\n\n.paint{\n    align-items: center;\n}\n\n.paint #sheet {\n    font-size: 1px;\n    width: 1024em;\n    height: 768em;\n    margin: auto;\n    overflow: auto;\n    position: fixed;\n    object-fit: contain;\n    left: 0;\n    top: 0;\n    bottom: 0;\n    right: 0;\n}\n\n.layer {\n    position: absolute;\n    left: 0;\n    top: 0;\n    background: none;\n}\n\n#base-layer {\n    background: white;\n}\n\n.layer.floating{\n    outline: 2px dashed black;\n}\n\n#stamp-layer{\n    opacity: 0.2;\n}\n\n@media (orientation: portrait) {\n    .paint #sheet {\n        transform: rotate(-90deg);\n        overflow-x: hidden;\n    }\n}\n\n\n.button.back {\n    position: absolute;\n    top: 0.25rem;\n    left: 0.25rem;\n    z-index: 100;\n}\n\n.button.settings {\n    position: absolute;\n    right: 0.25rem;\n    top: 0.25rem;\n    z-index: 100;\n}\n\n.button a{\n    width: 100%;\n    height: 100%;\n    display: block;\n    color: black;    \n}\n\n.button#stamp-button{\n    font-size: 1.25rem;\n    position: absolute;\n    top: 0.25rem;\n    right: 0.25rem;\n    width: 2rem;\n    height: 2rem;\n    z-index: 100;\n    line-height: 1.85rem;\n}\n\n.toolbar {\n    display: flex;\n    background: lightgray;\n    border-radius: 0.5rem;\n    z-index: 100;\n    position: absolute;\n}\n\n.toolbar.left {\n    flex-direction: column;\n    left: 0.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.right {\n    flex-direction: column;\n    right: 0.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.top {\n    flex-direction: row;\n    left: 50%;\n    top: 0.25em;\n    transform: translateX(-50%);\n}\n\n.toolbar.bottom {\n    flex-direction: row;\n    left: 50%;\n    bottom: 0.25em;\n    transform: translateX(-50%);\n}\n\n\n.toolbar .button {\n    /*display: inline-block;*/\n    background: transparent;\n}\n\n.toolbar .spacer {\n    width: 1.5em;\n    height: 1.5em;\n}\n\n.palette {\n    position: relative;\n    transition: transform 0.25s;\n    display: inline-block;\n    float: left;\n    text-align: center;\n    z-index: 100;\n}\n\n.palette .option i {\n    font-size: 0.75em;\n}\n\n/* down direction is default: */\n.palette .options{\n    position: absolute;\n    display: flex;\n    flex-wrap: wrap;\n    background: lightgray;\n    border-radius: 0.5rem;\n    padding: 0.25rem;\n    transition: transform 0.15s;\n    top: 2.25rem;\n    left: 50%;\n    transform: translateX(-50%);\n}\n\n.palette .option {\n    width: 1em;\n    height: 1em;\n    line-height: 0.75em;\n    display: inline-block;\n    margin: 0.25em;\n    float: left;\n    transition: transform 0.25s;\n    background-size: contain;\n    background-repeat: no-repeat;\n    background-position: center;\n}\n\n.palette .options .option {\n    margin: 0.125em;\n}\n\n.palette .option:active {\n    transform: scale(0.9);\n}\n\n.palette .options .arrow {\n    position: absolute;\n    width: 0;\n    height: 0;\n    font-size: 0.25rem;\n    top: -2em;\n    left: 50%;\n    margin-left: -1em;\n    border-left: 1em solid transparent;\n    border-right: 1em solid transparent;\n    border-bottom: 2em solid lightgray;\n    border-top: none;\n}\n\n.toolbar.left .palette .options{\n    left: 2.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.left .palette .options .arrow {\n    top: initial;\n    left: -2em;\n    top: 50%;\n    margin-top: -1em;\n    border-top: 1em solid transparent;\n    border-bottom: 1em solid transparent;\n    border-right: 2em solid lightgray;\n}\n\n.toolbar.right .palette .options{\n    left: initial;\n    right: 2.25rem;\n    top: 50%;\n    transform: translateY(-50%);\n}\n\n.toolbar.right .palette .options .arrow {\n    left: initial;\n    top: initial;\n    right: -2em;\n    top: 50%;\n    margin-top: -1em;\n    border-top: 1em solid transparent;\n    border-bottom: 1em solid transparent;\n    border-left: 2em solid lightgray;\n    border-right: 0;\n}\n\n.toolbar.bottom .palette .options{\n    left: 50%;\n    top: initial;\n    bottom: 2.25rem;\n    transform: translateX(-50%);\n}\n\n.toolbar.bottom .palette .options .arrow {\n    top: initial;\n    bottom: -2em;\n    left: 50%;\n    margin-left: -1em;\n    border-left: 1em solid transparent;\n    border-right: 1em solid transparent;\n    border-top: 2em solid lightgray;\n    border-bottom: none;\n}\n\n.palette.collapsed:active {\n    transform: scale(0.9);\n}\n\n.toolbar.top .palette.collapsed .options, .toolbar.bottom .palette.collapsed .options {\n    transform: translateX(-50%) scale(0.0);\n}\n\n.toolbar.left .palette.collapsed .options, .toolbar.right .palette.collapsed .options {\n    transform: translateY(-50%) scale(0.0);\n}\n\n#stamp-palette.palette .options{\n    font-size: 1.5rem;\n}\n\n@media (max-width: 400px), (max-height: 400px){\n    #stamp-palette.palette .options{\n        font-size: 1rem;\n    }\n}\n\n.line-width{\n    background: black;\n    height: 100%;\n    margin: auto;\n    border-radius: 0.15em;\n}\n\n#color-palette .option {\n    border-radius: 40%;\n}\n\n.hidden {\n    display: none!important;\n}\n\n.disabled {\n    opacity: 0.25;\n}\n\n.selected {\n    background: #58b0ff!important;\n    color: white;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -5703,7 +6177,7 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 		};
 /******/ 		
 /******/ 		var deferredModules = [
-/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-17eecd"]
+/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-353298"]
 /******/ 		];
 /******/ 		// no chunk on demand loading
 /******/ 		
@@ -5785,4 +6259,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.a4df35fb9229db76860a.js.map
+//# sourceMappingURL=main.0292a37d472583b6befc.js.map

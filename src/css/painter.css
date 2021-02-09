@@ -57,6 +57,15 @@ body, input, textarea {
     line-height: 1.5rem;
 }
 
+.button .fa-stack{
+    height: 1em;
+    width: 1em;    
+}
+
+.button .fa-stack.fa-fw{
+    width: 1.25em;    
+}
+
 #dropbox-button{
     border-radius: 3px;
     background-color: #007ee5;
@@ -96,7 +105,7 @@ body, input, textarea {
 
 .view.settings {
     font-size: 0.5rem;
-    padding: 2rem;
+    padding: 0.5rem 2.5rem;
     display: block;
     box-sizing: border-box;
     padding-right: 52%;
@@ -119,6 +128,7 @@ body, input, textarea {
     border-radius: 0.5em;
     padding: 0 0.5em;
     margin-bottom: 0.5em;
+    text-align: left;
 }
 
 .view.settings label{

@@ -6,11 +6,16 @@ var ConsoleLogHTML = require('console-log-html');
 import { saveAs } from 'file-saver';
 import localforage from "localforage";
 import {server} from "../storage/Server";
+import {Dropbox, DropboxAuth} from 'dropbox';
+import {dropboxStorage} from "../storage/DropboxStorage";
 
 export default class SettingsView extends View {
     
     private _hostElement: HTMLInputElement;
     private _userIdElement: HTMLInputElement;
+    private _connectButton: HTMLDivElement;
+    private _disconnectButton: HTMLDivElement;
+    private _syncButton: HTMLDivElement;
     
     constructor(id: string, onBackClicked: Function) {
         super(id);
@@ -21,10 +26,21 @@ export default class SettingsView extends View {
         this._hostElement.onblur = () => server.host = this._hostElement.value;
         
         this._userIdElement = this._element.querySelector<HTMLInputElement>("#user-id");
-        this._userIdElement.onblur = () => server.userId = this._userIdElement.value;
-        
-        let syncButton = this._element.querySelector<HTMLDivElement>(".button.sync");
-        Utils.addClick(syncButton, async () => server.sync());
+        this._userIdElement.onblur = () => dropboxStorage.userId = this._userIdElement.value;
+
+        this._connectButton = this._element.querySelector<HTMLDivElement>(".button.connect");
+        Utils.addClick(this._connectButton, () => {
+            location.href = dropboxStorage.getAuthenticationUrl();
+        });
+
+        this._disconnectButton = this._element.querySelector<HTMLDivElement>(".button.disconnect");
+        Utils.addClick(this._disconnectButton, () => {
+            dropboxStorage.unauthorize();
+            this.updateButtons();
+        });
+
+        this._syncButton = this._element.querySelector<HTMLDivElement>(".button.sync");
+        Utils.addClick(this._syncButton, async () => dropboxStorage.sync());
 
         let exportButton = this._element.querySelector<HTMLDivElement>(".button.export");
         Utils.addClick(exportButton, async () => {
@@ -49,9 +65,17 @@ export default class SettingsView extends View {
         ConsoleLogHTML.connect(document.getElementById("log"), {}, true, true, true);
     }
 
+    private updateButtons() {
+        console.log(dropboxStorage.isAuthorized)
+        this._connectButton.classList.toggle('hidden', dropboxStorage.isAuthorized);
+        this._disconnectButton.classList.toggle('hidden', !dropboxStorage.isAuthorized);
+        this._syncButton.classList.toggle("disabled", !dropboxStorage.isAuthorized);
+    }
+
     show(){
         super.show();
         this.updateInfo();
+        this.updateButtons();
     }
 
     private updateInfo() {
@@ -62,6 +86,6 @@ export default class SettingsView extends View {
         });
 
         this._hostElement.value = server.host;
-        this._userIdElement.value = server.userId;
+        this._userIdElement.value = dropboxStorage.userId;
     }
 }
