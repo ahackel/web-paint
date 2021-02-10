@@ -45,8 +45,10 @@ module.exports = {
     resolve: {
         extensions: [ '.ts', '.js' ],
         fallback: {
-            "util": false,
-            "crypto": false
+            "util": require.resolve("util/"),
+            "crypto": require.resolve("crypto-browserify"),
+            "buffer": require.resolve("buffer/"),
+            "stream": require.resolve("stream-browserify")
         }
     },
     output: {
