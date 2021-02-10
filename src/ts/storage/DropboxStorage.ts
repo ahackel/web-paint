@@ -64,11 +64,10 @@ class DropboxStorage {
     
     async syncFolder(path: string, mode: number = this.SYNC_BOTH){
         try{
-            const res = await this.dbx.filesListFolder({path: "/" + path});
-
-            if (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH) {
+            const serverFiles = await this.listFolder(path);
+            if (serverFiles && (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH)) {
                 // download from server:
-                for (let path of res.result.entries) {
+                for (let path of serverFiles) {
                     console.log(path.name)
                     if (path[".tag"] != "file") {
                         continue;
@@ -90,12 +89,15 @@ class DropboxStorage {
 
             if (mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH) {
                 // upload:
-                this.createDirectory(path);
-                const folderEntries = res.result.entries;
-                var keys = <string[]>await imageStorage.keys();
+                
+                if (!serverFiles){
+                    await this.createDirectory(path);
+                }
+                
+                const keys = <string[]>await imageStorage.keys();
 
                 for (let id of keys) {
-                    const existingEntry = <files.FileMetadataReference>folderEntries.find(x => x.name == id);
+                    const existingEntry = <files.FileMetadataReference>serverFiles?.find(x => x.name == id);
                     if (existingEntry){
                         const existingChangeDate = new Date(existingEntry.server_modified).getTime();
                         if (existingChangeDate >= await imageStorage.GetFileChangeDate(id)){
@@ -119,6 +121,16 @@ class DropboxStorage {
         }
     }
 
+    private async listFolder(path: string) {
+        try{
+            var res = await this.dbx.filesListFolder({path: "/" + path});
+            return res.result.entries;
+        }
+        catch(error){
+            return null;
+        }
+    }
+
     private async downloadImage(path: string, imageId: string, changeDate: number) {
         const res = await this.dbx.filesDownload({path: path});
         if (res.status == 200){
@@ -134,9 +146,9 @@ class DropboxStorage {
     async postImage(blob: Blob, path: string){
         return this.dbx.filesUpload({path: path, contents: blob, mode: { ".tag": "overwrite" }})
     }
-    
-    private createDirectory(path: string) {
-        // this.dbx.file
+
+    private async createDirectory(path: string) {
+        return this.dbx.filesCreateFolderV2({path: "/" + path});
     }
     
     private getAccessTokenFromUrl() {

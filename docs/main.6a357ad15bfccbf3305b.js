@@ -1789,13 +1789,12 @@ var DropboxStorage = /*#__PURE__*/function () {
         var _this2 = this;
 
         var mode,
-            res,
+            serverFiles,
             _iterator,
             _step,
             _path,
             imageId,
             changeDate,
-            folderEntries,
             keys,
             _iterator2,
             _step2,
@@ -1810,20 +1809,18 @@ var DropboxStorage = /*#__PURE__*/function () {
                 mode = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : this.SYNC_BOTH;
                 _context3.prev = 1;
                 _context3.next = 4;
-                return this.dbx.filesListFolder({
-                  path: "/" + path
-                });
+                return this.listFolder(path);
 
               case 4:
-                res = _context3.sent;
+                serverFiles = _context3.sent;
 
-                if (!(mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH)) {
+                if (!(serverFiles && (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH))) {
                   _context3.next = 36;
                   break;
                 }
 
                 // download from server:
-                _iterator = _createForOfIteratorHelper(res.result.entries);
+                _iterator = _createForOfIteratorHelper(serverFiles);
                 _context3.prev = 7;
 
                 _iterator.s();
@@ -1896,20 +1893,26 @@ var DropboxStorage = /*#__PURE__*/function () {
 
               case 36:
                 if (!(mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH)) {
-                  _context3.next = 61;
+                  _context3.next = 62;
                   break;
                 }
 
-                // upload:
-                this.createDirectory(path);
-                folderEntries = res.result.entries;
-                _context3.next = 41;
+                if (serverFiles) {
+                  _context3.next = 40;
+                  break;
+                }
+
+                _context3.next = 40;
+                return this.createDirectory(path);
+
+              case 40:
+                _context3.next = 42;
                 return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.keys();
 
-              case 41:
+              case 42:
                 keys = _context3.sent;
                 _iterator2 = _createForOfIteratorHelper(keys);
-                _context3.prev = 43;
+                _context3.prev = 44;
                 _loop = /*#__PURE__*/regeneratorRuntime.mark(function _loop() {
                   var id, existingEntry, existingChangeDate, url, blob, fileName;
                   return regeneratorRuntime.wrap(function _loop$(_context2) {
@@ -1917,7 +1920,7 @@ var DropboxStorage = /*#__PURE__*/function () {
                       switch (_context2.prev = _context2.next) {
                         case 0:
                           id = _step2.value;
-                          existingEntry = folderEntries.find(function (x) {
+                          existingEntry = serverFiles === null || serverFiles === void 0 ? void 0 : serverFiles.find(function (x) {
                             return x.name == id;
                           });
 
@@ -1978,60 +1981,60 @@ var DropboxStorage = /*#__PURE__*/function () {
 
                 _iterator2.s();
 
-              case 46:
+              case 47:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context3.next = 53;
+                  _context3.next = 54;
                   break;
                 }
 
-                return _context3.delegateYield(_loop(), "t3", 48);
+                return _context3.delegateYield(_loop(), "t3", 49);
 
-              case 48:
+              case 49:
                 _ret = _context3.t3;
 
                 if (!(_ret === "continue")) {
-                  _context3.next = 51;
+                  _context3.next = 52;
                   break;
                 }
 
-                return _context3.abrupt("continue", 51);
+                return _context3.abrupt("continue", 52);
 
-              case 51:
-                _context3.next = 46;
+              case 52:
+                _context3.next = 47;
                 break;
 
-              case 53:
-                _context3.next = 58;
+              case 54:
+                _context3.next = 59;
                 break;
 
-              case 55:
-                _context3.prev = 55;
-                _context3.t4 = _context3["catch"](43);
+              case 56:
+                _context3.prev = 56;
+                _context3.t4 = _context3["catch"](44);
 
                 _iterator2.e(_context3.t4);
 
-              case 58:
-                _context3.prev = 58;
+              case 59:
+                _context3.prev = 59;
 
                 _iterator2.f();
 
-                return _context3.finish(58);
+                return _context3.finish(59);
 
-              case 61:
-                _context3.next = 66;
+              case 62:
+                _context3.next = 67;
                 break;
 
-              case 63:
-                _context3.prev = 63;
+              case 64:
+                _context3.prev = 64;
                 _context3.t5 = _context3["catch"](1);
                 console.log(_context3.t5);
 
-              case 66:
+              case 67:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee2, this, [[1, 63], [7, 30, 33, 36], [43, 55, 58, 61]]);
+        }, _callee2, this, [[1, 64], [7, 30, 33, 36], [44, 56, 59, 62]]);
       }));
 
       function syncFolder(_x) {
@@ -2041,21 +2044,59 @@ var DropboxStorage = /*#__PURE__*/function () {
       return syncFolder;
     }()
   }, {
-    key: "downloadImage",
+    key: "listFolder",
     value: function () {
-      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(path, imageId, changeDate) {
-        var res, blob;
+      var _listFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(path) {
+        var res;
         return regeneratorRuntime.wrap(function _callee3$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _context4.next = 2;
+                _context4.prev = 0;
+                _context4.next = 3;
+                return this.dbx.filesListFolder({
+                  path: "/" + path
+                });
+
+              case 3:
+                res = _context4.sent;
+                return _context4.abrupt("return", res.result.entries);
+
+              case 7:
+                _context4.prev = 7;
+                _context4.t0 = _context4["catch"](0);
+                return _context4.abrupt("return", null);
+
+              case 10:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee3, this, [[0, 7]]);
+      }));
+
+      function listFolder(_x2) {
+        return _listFolder.apply(this, arguments);
+      }
+
+      return listFolder;
+    }()
+  }, {
+    key: "downloadImage",
+    value: function () {
+      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(path, imageId, changeDate) {
+        var res, blob;
+        return regeneratorRuntime.wrap(function _callee4$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
                 return this.dbx.filesDownload({
                   path: path
                 });
 
               case 2:
-                res = _context4.sent;
+                res = _context5.sent;
 
                 if (res.status == 200) {
                   // fileBlob exists:
@@ -2069,13 +2110,13 @@ var DropboxStorage = /*#__PURE__*/function () {
 
               case 4:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
-      function downloadImage(_x2, _x3, _x4) {
+      function downloadImage(_x3, _x4, _x5) {
         return _downloadImage.apply(this, arguments);
       }
 
@@ -2084,12 +2125,12 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "postImage",
     value: function () {
-      var _postImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(blob, path) {
-        return regeneratorRuntime.wrap(function _callee4$(_context5) {
+      var _postImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(blob, path) {
+        return regeneratorRuntime.wrap(function _callee5$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                return _context5.abrupt("return", this.dbx.filesUpload({
+                return _context6.abrupt("return", this.dbx.filesUpload({
                   path: path,
                   contents: blob,
                   mode: {
@@ -2099,13 +2140,13 @@ var DropboxStorage = /*#__PURE__*/function () {
 
               case 1:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
-      function postImage(_x5, _x6) {
+      function postImage(_x6, _x7) {
         return _postImage.apply(this, arguments);
       }
 
@@ -2113,8 +2154,30 @@ var DropboxStorage = /*#__PURE__*/function () {
     }()
   }, {
     key: "createDirectory",
-    value: function createDirectory(path) {// this.dbx.file
-    }
+    value: function () {
+      var _createDirectory = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(path) {
+        return regeneratorRuntime.wrap(function _callee6$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                return _context7.abrupt("return", this.dbx.filesCreateFolderV2({
+                  path: "/" + path
+                }));
+
+              case 1:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function createDirectory(_x8) {
+        return _createDirectory.apply(this, arguments);
+      }
+
+      return createDirectory;
+    }()
   }, {
     key: "getAccessTokenFromUrl",
     value: function getAccessTokenFromUrl() {
@@ -6623,4 +6686,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.f7aa4a5a4acb12dddba9.js.map
+//# sourceMappingURL=main.6a357ad15bfccbf3305b.js.map
