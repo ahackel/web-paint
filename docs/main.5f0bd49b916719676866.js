@@ -1,5 +1,4 @@
 /******/ (function() { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/ts/CanvasLayer.ts":
@@ -8,6 +7,7 @@
   \*******************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ CanvasLayer; }
@@ -123,6 +123,7 @@ var CanvasLayer = /*#__PURE__*/function (_Layer) {
   \***************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "History": function() { return /* binding */ History; }
@@ -212,6 +213,7 @@ var History = /*#__PURE__*/function () {
   \*******************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ ImageLayer; }
@@ -279,6 +281,7 @@ var ImageLayer = /*#__PURE__*/function (_Layer) {
   \*************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ Layer; }
@@ -692,6 +695,7 @@ var Layer = /*#__PURE__*/function () {
   \***************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Toolbar": function() { return /* binding */ Toolbar; }
@@ -763,6 +767,7 @@ var Toolbar = /*#__PURE__*/function (_View) {
   \***********************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @fortawesome/fontawesome-svg-core */ "./node_modules/@fortawesome/fontawesome-svg-core/index.es.js");
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
@@ -907,6 +912,7 @@ document.addEventListener("DOMContentLoaded", function () {
   \**************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "config": function() { return /* binding */ config; }
@@ -941,6 +947,7 @@ var config = {
   \*******************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ Vector; }
@@ -1079,6 +1086,7 @@ var Vector = /*#__PURE__*/function () {
   \*****************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ ColorPalette; }
@@ -1160,6 +1168,7 @@ var ColorPalette = /*#__PURE__*/function (_Palette) {
   \************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Palette": function() { return /* binding */ Palette; }
@@ -1425,6 +1434,7 @@ var Palette = /*#__PURE__*/function (_View) {
   \*****************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ ShapePalette; }
@@ -1570,6 +1580,7 @@ var ShapePalette = /*#__PURE__*/function (_Palette) {
   \****************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ SizePalette; }
@@ -1642,6 +1653,7 @@ var SizePalette = /*#__PURE__*/function (_Palette) {
   \******************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "dropboxStorage": function() { return /* binding */ dropboxStorage; }
@@ -2093,14 +2105,17 @@ var dropboxStorage = new DropboxStorage();
   \****************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "imageStorage": function() { return /* binding */ imageStorage; }
 /* harmony export */ });
 /* harmony import */ var whatwg_fetch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! whatwg-fetch */ "./node_modules/whatwg-fetch/fetch.js");
 /* harmony import */ var _LocalForageAdapter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LocalForageAdapter */ "./src/ts/storage/LocalForageAdapter.ts");
-/* harmony import */ var jszip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jszip */ "./node_modules/jszip/lib/index.js");
+/* harmony import */ var jszip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jszip */ "./node_modules/jszip/dist/jszip.min.js");
 /* harmony import */ var jszip__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jszip__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_3__);
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -2121,9 +2136,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 var ImageStorage = /*#__PURE__*/function () {
   function ImageStorage() {
     _classCallCheck(this, ImageStorage);
+
+    this.loadFileMeta();
   }
 
   _createClass(ImageStorage, [{
@@ -2146,51 +2164,29 @@ var ImageStorage = /*#__PURE__*/function () {
       return this._urls;
     }
   }, {
-    key: "loadImage",
+    key: "GetFileChangeDate",
+    value: function GetFileChangeDate(id) {
+      if (id in this._fileMeta) {
+        return this._fileMeta[id].changeDate;
+      }
+
+      return Date.now();
+    }
+  }, {
+    key: "SetFileChangeDate",
     value: function () {
-      var _loadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id) {
-        var url, img;
+      var _SetFileChangeDate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id, date) {
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
-                return this.loadImageUrl(id);
+                this._fileMeta[id] = {
+                  changeDate: date
+                };
+                _context.next = 3;
+                return localforage__WEBPACK_IMPORTED_MODULE_3___default().setItem("file-meta", this._fileMeta);
 
-              case 2:
-                url = _context.sent;
-
-                if (url) {
-                  _context.next = 5;
-                  break;
-                }
-
-                return _context.abrupt("return", null);
-
-              case 5:
-                img = new Image();
-                img.id = id;
-                img.src = url;
-
-                if (!(img.decode != null)) {
-                  _context.next = 12;
-                  break;
-                }
-
-                _context.next = 11;
-                return img.decode();
-
-              case 11:
-                return _context.abrupt("return", img);
-
-              case 12:
-                return _context.abrupt("return", new Promise(function (resolve) {
-                  img.onload = function () {
-                    return resolve(img);
-                  };
-                }));
-
-              case 13:
+              case 3:
               case "end":
                 return _context.stop();
             }
@@ -2198,7 +2194,66 @@ var ImageStorage = /*#__PURE__*/function () {
         }, _callee, this);
       }));
 
-      function loadImage(_x) {
+      function SetFileChangeDate(_x, _x2) {
+        return _SetFileChangeDate.apply(this, arguments);
+      }
+
+      return SetFileChangeDate;
+    }()
+  }, {
+    key: "loadImage",
+    value: function () {
+      var _loadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
+        var url, img;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.loadImageUrl(id);
+
+              case 2:
+                url = _context2.sent;
+
+                if (url) {
+                  _context2.next = 5;
+                  break;
+                }
+
+                return _context2.abrupt("return", null);
+
+              case 5:
+                img = new Image();
+                img.id = id;
+                img.src = url;
+
+                if (!(img.decode != null)) {
+                  _context2.next = 12;
+                  break;
+                }
+
+                _context2.next = 11;
+                return img.decode();
+
+              case 11:
+                return _context2.abrupt("return", img);
+
+              case 12:
+                return _context2.abrupt("return", new Promise(function (resolve) {
+                  img.onload = function () {
+                    return resolve(img);
+                  };
+                }));
+
+              case 13:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function loadImage(_x3) {
         return _loadImage.apply(this, arguments);
       }
 
@@ -2207,47 +2262,47 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "loadImageUrl",
     value: function () {
-      var _loadImageUrl = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
+      var _loadImageUrl = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id) {
         var blob, url;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 if (!(id in this.urls)) {
-                  _context2.next = 2;
+                  _context3.next = 2;
                   break;
                 }
 
-                return _context2.abrupt("return", this.urls[id]);
+                return _context3.abrupt("return", this.urls[id]);
 
               case 2:
-                _context2.next = 4;
+                _context3.next = 4;
                 return this.loadBlob(id);
 
               case 4:
-                blob = _context2.sent;
+                blob = _context3.sent;
 
                 if (blob) {
-                  _context2.next = 7;
+                  _context3.next = 7;
                   break;
                 }
 
-                return _context2.abrupt("return", null);
+                return _context3.abrupt("return", null);
 
               case 7:
                 url = URL.createObjectURL(blob);
                 this.urls[id] = url;
-                return _context2.abrupt("return", url);
+                return _context3.abrupt("return", url);
 
               case 10:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
-      function loadImageUrl(_x2) {
+      function loadImageUrl(_x4) {
         return _loadImageUrl.apply(this, arguments);
       }
 
@@ -2261,24 +2316,28 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "saveImage",
     value: function () {
-      var _saveImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id, blob) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      var _saveImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id, blob) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context3.prev = 0;
-                _context3.next = 3;
+                _context4.prev = 0;
+                _context4.next = 3;
                 return this.adapter.setItem(id, blob);
 
               case 3:
-                _context3.next = 7;
-                break;
+                _context4.next = 5;
+                return this.SetFileChangeDate(id, Date.now());
 
               case 5:
-                _context3.prev = 5;
-                _context3.t0 = _context3["catch"](0);
+                _context4.next = 9;
+                break;
 
               case 7:
+                _context4.prev = 7;
+                _context4.t0 = _context4["catch"](0);
+
+              case 9:
                 if (id in this.urls) {
                   URL.revokeObjectURL(this.urls[id]);
                 }
@@ -2286,15 +2345,15 @@ var ImageStorage = /*#__PURE__*/function () {
                 this.urls[id] = URL.createObjectURL(blob);
                 this.dispatchChangeEvent("save", id);
 
-              case 10:
+              case 12:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this, [[0, 5]]);
+        }, _callee4, this, [[0, 7]]);
       }));
 
-      function saveImage(_x3, _x4) {
+      function saveImage(_x5, _x6) {
         return _saveImage.apply(this, arguments);
       }
 
@@ -2351,96 +2410,96 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "generateBackupArchive",
     value: function () {
-      var _generateBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+      var _generateBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
         var count, keys, zip, _iterator2, _step2, _id, url, blob;
 
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 count = 0;
-                _context4.next = 3;
+                _context5.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context4.sent;
+                keys = _context5.sent;
                 zip = new (jszip__WEBPACK_IMPORTED_MODULE_2___default())();
                 _iterator2 = _createForOfIteratorHelper(keys);
-                _context4.prev = 6;
+                _context5.prev = 6;
 
                 _iterator2.s();
 
               case 8:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context4.next = 22;
+                  _context5.next = 22;
                   break;
                 }
 
                 _id = _step2.value;
-                _context4.next = 12;
+                _context5.next = 12;
                 return this.loadImageUrl(_id);
 
               case 12:
-                url = _context4.sent;
-                _context4.next = 15;
+                url = _context5.sent;
+                _context5.next = 15;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
 
               case 15:
-                blob = _context4.sent;
+                blob = _context5.sent;
 
                 if (blob) {
-                  _context4.next = 18;
+                  _context5.next = 18;
                   break;
                 }
 
-                return _context4.abrupt("continue", 20);
+                return _context5.abrupt("continue", 20);
 
               case 18:
                 zip.file(_id, blob);
                 count += 1;
 
               case 20:
-                _context4.next = 8;
+                _context5.next = 8;
                 break;
 
               case 22:
-                _context4.next = 27;
+                _context5.next = 27;
                 break;
 
               case 24:
-                _context4.prev = 24;
-                _context4.t0 = _context4["catch"](6);
+                _context5.prev = 24;
+                _context5.t0 = _context5["catch"](6);
 
-                _iterator2.e(_context4.t0);
+                _iterator2.e(_context5.t0);
 
               case 27:
-                _context4.prev = 27;
+                _context5.prev = 27;
 
                 _iterator2.f();
 
-                return _context4.finish(27);
+                return _context5.finish(27);
 
               case 30:
                 if (!(count == 0)) {
-                  _context4.next = 32;
+                  _context5.next = 32;
                   break;
                 }
 
-                return _context4.abrupt("return");
+                return _context5.abrupt("return");
 
               case 32:
-                return _context4.abrupt("return", zip.generateAsync({
+                return _context5.abrupt("return", zip.generateAsync({
                   type: "blob"
                 }));
 
               case 33:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this, [[6, 24, 27, 30]]);
+        }, _callee5, this, [[6, 24, 27, 30]]);
       }));
 
       function generateBackupArchive() {
@@ -2452,31 +2511,31 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "importBackupArchive",
     value: function () {
-      var _importBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(zipFile) {
+      var _importBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(zipFile) {
         var _this2 = this;
 
         var zip;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _context6.next = 2;
+                _context7.next = 2;
                 return jszip__WEBPACK_IMPORTED_MODULE_2___default().loadAsync(zipFile);
 
               case 2:
-                zip = _context6.sent;
+                zip = _context7.sent;
                 zip.forEach( /*#__PURE__*/function () {
-                  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(path, file) {
+                  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(path, file) {
                     var buffer, blob;
-                    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                    return regeneratorRuntime.wrap(function _callee6$(_context6) {
                       while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context6.prev = _context6.next) {
                           case 0:
-                            _context5.next = 2;
+                            _context6.next = 2;
                             return file.async("arraybuffer");
 
                           case 2:
-                            buffer = _context5.sent;
+                            buffer = _context6.sent;
                             blob = new Blob([buffer], {
                               "type": "image/png"
                             });
@@ -2485,26 +2544,26 @@ var ImageStorage = /*#__PURE__*/function () {
 
                           case 5:
                           case "end":
-                            return _context5.stop();
+                            return _context6.stop();
                         }
                       }
-                    }, _callee5);
+                    }, _callee6);
                   }));
 
-                  return function (_x6, _x7) {
+                  return function (_x8, _x9) {
                     return _ref.apply(this, arguments);
                   };
                 }());
 
               case 4:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }));
 
-      function importBackupArchive(_x5) {
+      function importBackupArchive(_x7) {
         return _importBackupArchive.apply(this, arguments);
       }
 
@@ -2513,59 +2572,59 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "migrate",
     value: function () {
-      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
         var needsRefresh, keys, _iterator3, _step3, _id2, newId, data;
 
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 needsRefresh = false;
-                _context7.next = 3;
+                _context8.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context7.sent;
+                keys = _context8.sent;
                 _iterator3 = _createForOfIteratorHelper(keys);
-                _context7.prev = 5;
+                _context8.prev = 5;
 
                 _iterator3.s();
 
               case 7:
                 if ((_step3 = _iterator3.n()).done) {
-                  _context7.next = 25;
+                  _context8.next = 25;
                   break;
                 }
 
                 _id2 = _step3.value;
 
                 if (!(!_id2.startsWith("image") && !_id2.startsWith("Shape"))) {
-                  _context7.next = 11;
+                  _context8.next = 11;
                   break;
                 }
 
-                return _context7.abrupt("continue", 23);
+                return _context8.abrupt("continue", 23);
 
               case 11:
                 if (!_id2.endsWith(".png")) {
-                  _context7.next = 13;
+                  _context8.next = 13;
                   break;
                 }
 
-                return _context7.abrupt("continue", 23);
+                return _context8.abrupt("continue", 23);
 
               case 13:
                 newId = _id2.replace("Shape", "shape") + ".png";
-                _context7.next = 16;
+                _context8.next = 16;
                 return this.adapter.getItem(_id2);
 
               case 16:
-                data = _context7.sent;
-                _context7.next = 19;
+                data = _context8.sent;
+                _context8.next = 19;
                 return this.adapter.setItem(newId, data);
 
               case 19:
-                _context7.next = 21;
+                _context8.next = 21;
                 return this.adapter.removeItem(_id2);
 
               case 21:
@@ -2573,25 +2632,25 @@ var ImageStorage = /*#__PURE__*/function () {
                 needsRefresh = true;
 
               case 23:
-                _context7.next = 7;
+                _context8.next = 7;
                 break;
 
               case 25:
-                _context7.next = 30;
+                _context8.next = 30;
                 break;
 
               case 27:
-                _context7.prev = 27;
-                _context7.t0 = _context7["catch"](5);
+                _context8.prev = 27;
+                _context8.t0 = _context8["catch"](5);
 
-                _iterator3.e(_context7.t0);
+                _iterator3.e(_context8.t0);
 
               case 30:
-                _context7.prev = 30;
+                _context8.prev = 30;
 
                 _iterator3.f();
 
-                return _context7.finish(30);
+                return _context8.finish(30);
 
               case 33:
                 if (needsRefresh) {
@@ -2600,10 +2659,10 @@ var ImageStorage = /*#__PURE__*/function () {
 
               case 34:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7, this, [[5, 27, 30, 33]]);
+        }, _callee8, this, [[5, 27, 30, 33]]);
       }));
 
       function migrate() {
@@ -2615,84 +2674,84 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "getStorageUsed",
     value: function () {
-      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
+      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9() {
         var amount, keys, _iterator4, _step4, _id3, url, blob;
 
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
                 amount = 0;
-                _context8.next = 3;
+                _context9.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context8.sent;
+                keys = _context9.sent;
                 _iterator4 = _createForOfIteratorHelper(keys);
-                _context8.prev = 5;
+                _context9.prev = 5;
 
                 _iterator4.s();
 
               case 7:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context8.next = 20;
+                  _context9.next = 20;
                   break;
                 }
 
                 _id3 = _step4.value;
-                _context8.next = 11;
+                _context9.next = 11;
                 return this.loadImageUrl(_id3);
 
               case 11:
-                url = _context8.sent;
-                _context8.next = 14;
+                url = _context9.sent;
+                _context9.next = 14;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
 
               case 14:
-                blob = _context8.sent;
+                blob = _context9.sent;
 
                 if (blob) {
-                  _context8.next = 17;
+                  _context9.next = 17;
                   break;
                 }
 
-                return _context8.abrupt("continue", 18);
+                return _context9.abrupt("continue", 18);
 
               case 17:
                 amount += blob.size;
 
               case 18:
-                _context8.next = 7;
+                _context9.next = 7;
                 break;
 
               case 20:
-                _context8.next = 25;
+                _context9.next = 25;
                 break;
 
               case 22:
-                _context8.prev = 22;
-                _context8.t0 = _context8["catch"](5);
+                _context9.prev = 22;
+                _context9.t0 = _context9["catch"](5);
 
-                _iterator4.e(_context8.t0);
+                _iterator4.e(_context9.t0);
 
               case 25:
-                _context8.prev = 25;
+                _context9.prev = 25;
 
                 _iterator4.f();
 
-                return _context8.finish(25);
+                return _context9.finish(25);
 
               case 28:
-                return _context8.abrupt("return", amount);
+                return _context9.abrupt("return", amount);
 
               case 29:
               case "end":
-                return _context8.stop();
+                return _context9.stop();
             }
           }
-        }, _callee8, this, [[5, 22, 25, 28]]);
+        }, _callee9, this, [[5, 22, 25, 28]]);
       }));
 
       function getStorageUsed() {
@@ -2700,6 +2759,60 @@ var ImageStorage = /*#__PURE__*/function () {
       }
 
       return getStorageUsed;
+    }()
+  }, {
+    key: "loadFileMeta",
+    value: function () {
+      var _loadFileMeta = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10() {
+        var _yield$localforage$ge;
+
+        return regeneratorRuntime.wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                _context10.next = 2;
+                return localforage__WEBPACK_IMPORTED_MODULE_3___default().getItem("file-meta");
+
+              case 2:
+                _context10.t1 = _yield$localforage$ge = _context10.sent;
+                _context10.t0 = _context10.t1 !== null;
+
+                if (!_context10.t0) {
+                  _context10.next = 6;
+                  break;
+                }
+
+                _context10.t0 = _yield$localforage$ge !== void 0;
+
+              case 6:
+                if (!_context10.t0) {
+                  _context10.next = 10;
+                  break;
+                }
+
+                _context10.t2 = _yield$localforage$ge;
+                _context10.next = 11;
+                break;
+
+              case 10:
+                _context10.t2 = {};
+
+              case 11:
+                this._fileMeta = _context10.t2;
+
+              case 12:
+              case "end":
+                return _context10.stop();
+            }
+          }
+        }, _callee10, this);
+      }));
+
+      function loadFileMeta() {
+        return _loadFileMeta.apply(this, arguments);
+      }
+
+      return loadFileMeta;
     }()
   }]);
 
@@ -2716,6 +2829,7 @@ var imageStorage = new ImageStorage();
   \**********************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ LocalForageAdapter; }
@@ -2810,6 +2924,7 @@ var LocalForageAdapter = /*#__PURE__*/function (_StorageAdapter) {
   \**********************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "server": function() { return /* binding */ server; }
@@ -3231,6 +3346,7 @@ var server = new Server();
   \******************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ StorageAdapter; }
@@ -3251,6 +3367,7 @@ var StorageAdapter = function StorageAdapter() {
   \*********************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ PenTool; }
@@ -3530,6 +3647,7 @@ var PenTool = /*#__PURE__*/function (_Tool) {
   \***************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ SelectionTool; }
@@ -3940,6 +4058,7 @@ var SelectionTool = /*#__PURE__*/function (_Tool) {
   \******************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ Tool; }
@@ -4041,6 +4160,7 @@ var Tool = /*#__PURE__*/function () {
   \******************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ Rect; }
@@ -4106,6 +4226,7 @@ var Rect = /*#__PURE__*/function () {
   \*******************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "formatBytes": function() { return /* binding */ formatBytes; },
@@ -4623,6 +4744,7 @@ function dilateMask(pixels, width, height) {
   \**********************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ BookView; }
@@ -4724,6 +4846,7 @@ var BookView = /*#__PURE__*/function (_View) {
   \***********************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "PaintView": function() { return /* binding */ PaintView; }
@@ -5643,6 +5766,7 @@ var _initialiseProps = function _initialiseProps() {
   \**************************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ SettingsView; }
@@ -5854,6 +5978,7 @@ var SettingsView = /*#__PURE__*/function (_View) {
   \***********************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": function() { return /* binding */ Thumbnail; }
@@ -5975,6 +6100,7 @@ var Thumbnail = /*#__PURE__*/function () {
   \******************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "View": function() { return /* binding */ View; }
@@ -6038,6 +6164,7 @@ var View = /*#__PURE__*/function () {
   \*****************************************************************************************************************************************************/
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
@@ -6061,6 +6188,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, "* {\n  -webkit-touch-callout: none;\n 
   \*****************************/
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
@@ -6078,6 +6206,26 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ __webpack_exports__["default"] = (_node_modules_css_loader_dist_cjs_js_node_modules_resolve_url_loader_index_js_node_modules_sass_loader_dist_cjs_js_painter_css__WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
+/***/ "?8465":
+/*!************************!*\
+  !*** crypto (ignored) ***!
+  \************************/
+/***/ (function() {
+
+/* (ignored) */
+
+/***/ }),
+
+/***/ "?0bed":
+/*!**********************!*\
+  !*** util (ignored) ***!
+  \**********************/
+/***/ (function() {
+
+/* (ignored) */
 
 /***/ })
 
@@ -6177,7 +6325,7 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 		};
 /******/ 		
 /******/ 		var deferredModules = [
-/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-353298"]
+/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-235257"]
 /******/ 		];
 /******/ 		// no chunk on demand loading
 /******/ 		
@@ -6259,4 +6407,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.0292a37d472583b6befc.js.map
+//# sourceMappingURL=main.5f0bd49b916719676866.js.map

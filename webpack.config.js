@@ -44,6 +44,10 @@ module.exports = {
     },
     resolve: {
         extensions: [ '.ts', '.js' ],
+        fallback: {
+            "util": false,
+            "crypto": false
+        }
     },
     output: {
         filename: '[name].[contenthash].js',

@@ -2,12 +2,22 @@ import 'whatwg-fetch';
 import LocalForageAdapter from "./LocalForageAdapter";
 import StorageAdapter from "./StorageAdapter";
 import JSZip from "jszip";
+import localforage from "localforage";
+
+interface IFileMeta {
+	changeDate: number
+}
 
 class ImageStorage {
 
 	private _adapter: StorageAdapter;
 	private _changeListeners: Function[];
 	private _urls: { [id: string]: string }
+	private _fileMeta: { [id: string]: IFileMeta }
+	
+	constructor() {
+		this.loadFileMeta();
+	}
 	
 	public get adapter() {
 		if (!this._adapter) {
@@ -22,6 +32,18 @@ class ImageStorage {
 			this._urls = {};
 		}
 		return this._urls;
+	}
+	
+	GetFileChangeDate(id: string){
+		if (id in this._fileMeta){
+			return this._fileMeta[id].changeDate;
+		}
+		return Date.now();
+	}
+
+	async SetFileChangeDate(id: string, date: number){
+		this._fileMeta[id] = { changeDate: date };
+		await localforage.setItem("file-meta", this._fileMeta);
 	}
 
 	public async loadImage(id: string): Promise<HTMLImageElement> {
@@ -68,6 +90,7 @@ class ImageStorage {
 	public async saveImage(id: string, blob: Blob){
 		try{
 			await this.adapter.setItem(id, blob);
+			await this.SetFileChangeDate(id, Date.now());
 		}
 		catch (e) {
 		}
@@ -179,6 +202,10 @@ class ImageStorage {
 			amount += blob.size;
 		}
 		return amount;
+	}
+
+	private async loadFileMeta() {
+		this._fileMeta = await localforage.getItem("file-meta") ?? {};
 	}
 }
 
