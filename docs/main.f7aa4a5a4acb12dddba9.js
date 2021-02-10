@@ -769,16 +769,18 @@ var Toolbar = /*#__PURE__*/function (_View) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @fortawesome/fontawesome-svg-core */ "./node_modules/@fortawesome/fontawesome-svg-core/index.es.js");
-/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
-/* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/stable */ "./node_modules/core-js/stable/index.js");
-/* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_stable__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! regenerator-runtime/runtime */ "./node_modules/regenerator-runtime/runtime.js");
-/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _views_BookView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./views/BookView */ "./src/ts/views/BookView.ts");
-/* harmony import */ var _views_PaintView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./views/PaintView */ "./src/ts/views/PaintView.ts");
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./config */ "./src/ts/config.ts");
-/* harmony import */ var _views_SettingsView__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./views/SettingsView */ "./src/ts/views/SettingsView.ts");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
+/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @fortawesome/fontawesome-svg-core */ "./node_modules/@fortawesome/fontawesome-svg-core/index.es.js");
+/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
+/* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/stable */ "./node_modules/core-js/stable/index.js");
+/* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_stable__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! regenerator-runtime/runtime */ "./node_modules/regenerator-runtime/runtime.js");
+/* harmony import */ var regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(regenerator_runtime_runtime__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _views_BookView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./views/BookView */ "./src/ts/views/BookView.ts");
+/* harmony import */ var _views_PaintView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./views/PaintView */ "./src/ts/views/PaintView.ts");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./config */ "./src/ts/config.ts");
+/* harmony import */ var _views_SettingsView__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./views/SettingsView */ "./src/ts/views/SettingsView.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -789,6 +791,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+
+
 __webpack_require__(/*! ../css/painter.css */ "./src/css/painter.css");
 
 
@@ -796,8 +800,8 @@ __webpack_require__(/*! ../css/painter.css */ "./src/css/painter.css");
 
 __webpack_require__(/*! blueimp-canvas-to-blob/js/canvas-to-blob */ "./node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.js");
 
-_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__.library.add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__.fas);
-_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__.dom.watch(); // required to make 'async' work on old devices: 
+_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_1__.library.add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_2__.fas);
+_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_1__.dom.watch(); // required to make 'async' work on old devices: 
 
 
 
@@ -814,7 +818,7 @@ var App = /*#__PURE__*/function () {
 
     // App.preventOverScroll();
     //PeerToPeer.createInstance();
-    this._settingsView = new _views_SettingsView__WEBPACK_IMPORTED_MODULE_7__.default("settings", function () {
+    this._settingsView = new _views_SettingsView__WEBPACK_IMPORTED_MODULE_8__.default("settings", function () {
       _this.openView(_this._bookView);
     });
     this._sheet = document.getElementById("sheet");
@@ -822,7 +826,7 @@ var App = /*#__PURE__*/function () {
       _this.OnResize();
     });
     this.OnResize();
-    this._bookView = new _views_BookView__WEBPACK_IMPORTED_MODULE_4__.default("book", /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+    this._bookView = new _views_BookView__WEBPACK_IMPORTED_MODULE_5__.default("book", /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -843,7 +847,7 @@ var App = /*#__PURE__*/function () {
       });
     };
 
-    this._paintView = new _views_PaintView__WEBPACK_IMPORTED_MODULE_5__.PaintView("paint", function () {
+    this._paintView = new _views_PaintView__WEBPACK_IMPORTED_MODULE_6__.PaintView("paint", function () {
       _this.openView(_this._bookView);
     }); // Dropbox integration is not working yet:
     // this.dropboxAuthView = new DropboxAuthView("dropbox-auth");
@@ -870,11 +874,11 @@ var App = /*#__PURE__*/function () {
       var isLargeScreen = docWidth > 1024;
       var viewWidth = Math.max(docWidth, docHeight);
       var viewHeight = Math.min(docWidth, docHeight);
-      var horizontalPixelSize = viewWidth / _config__WEBPACK_IMPORTED_MODULE_6__.config.width;
-      var verticalPixelSize = viewHeight / _config__WEBPACK_IMPORTED_MODULE_6__.config.height;
-      var virtualPixelSize = _config__WEBPACK_IMPORTED_MODULE_6__.config.fullScreenCanvas && !isLargeScreen ? Math.max(horizontalPixelSize, verticalPixelSize) : Math.min(horizontalPixelSize, verticalPixelSize);
+      var horizontalPixelSize = viewWidth / _config__WEBPACK_IMPORTED_MODULE_7__.config.width;
+      var verticalPixelSize = viewHeight / _config__WEBPACK_IMPORTED_MODULE_7__.config.height;
+      var virtualPixelSize = _config__WEBPACK_IMPORTED_MODULE_7__.config.fullScreenCanvas && !isLargeScreen ? Math.max(horizontalPixelSize, verticalPixelSize) : Math.min(horizontalPixelSize, verticalPixelSize);
       this._sheet.style.fontSize = "".concat(virtualPixelSize, "px");
-      this._sheet.style.left = "".concat(portrait ? 0.5 * (docWidth - virtualPixelSize * _config__WEBPACK_IMPORTED_MODULE_6__.config.width) : 0, "px");
+      this._sheet.style.left = "".concat(portrait ? 0.5 * (docWidth - virtualPixelSize * _config__WEBPACK_IMPORTED_MODULE_7__.config.width) : 0, "px");
     }
   }, {
     key: "openView",
@@ -901,7 +905,9 @@ var App = /*#__PURE__*/function () {
 
 document.addEventListener("DOMContentLoaded", function () {
   // @ts-ignore
-  window.app = new App();
+  window.app = new App(); // @ts-ignore
+
+  window.localForage = (localforage__WEBPACK_IMPORTED_MODULE_0___default());
 });
 
 /***/ }),
@@ -1812,7 +1818,7 @@ var DropboxStorage = /*#__PURE__*/function () {
                 res = _context3.sent;
 
                 if (!(mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH)) {
-                  _context3.next = 35;
+                  _context3.next = 36;
                   break;
                 }
 
@@ -1824,85 +1830,86 @@ var DropboxStorage = /*#__PURE__*/function () {
 
               case 9:
                 if ((_step = _iterator.n()).done) {
-                  _context3.next = 27;
+                  _context3.next = 28;
                   break;
                 }
 
                 _path = _step.value;
+                console.log(_path.name);
 
                 if (!(_path[".tag"] != "file")) {
-                  _context3.next = 13;
+                  _context3.next = 14;
                   break;
                 }
 
-                return _context3.abrupt("continue", 25);
+                return _context3.abrupt("continue", 26);
 
-              case 13:
+              case 14:
                 if (_path.name.endsWith(".png")) {
-                  _context3.next = 15;
+                  _context3.next = 16;
                   break;
                 }
 
-                return _context3.abrupt("continue", 25);
+                return _context3.abrupt("continue", 26);
 
-              case 15:
+              case 16:
                 imageId = _path.name;
                 changeDate = new Date(_path.server_modified).getTime();
-                _context3.next = 19;
+                _context3.next = 20;
                 return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(imageId);
 
-              case 19:
+              case 20:
                 _context3.t0 = _context3.sent;
                 _context3.t1 = changeDate;
 
                 if (!(_context3.t0 >= _context3.t1)) {
-                  _context3.next = 23;
+                  _context3.next = 24;
                   break;
                 }
 
-                return _context3.abrupt("continue", 25);
+                return _context3.abrupt("continue", 26);
 
-              case 23:
+              case 24:
                 console.log("getting " + imageId);
                 this.downloadImage(_path.path_lower, imageId, changeDate);
 
-              case 25:
+              case 26:
                 _context3.next = 9;
                 break;
 
-              case 27:
-                _context3.next = 32;
+              case 28:
+                _context3.next = 33;
                 break;
 
-              case 29:
-                _context3.prev = 29;
+              case 30:
+                _context3.prev = 30;
                 _context3.t2 = _context3["catch"](7);
 
                 _iterator.e(_context3.t2);
 
-              case 32:
-                _context3.prev = 32;
+              case 33:
+                _context3.prev = 33;
 
                 _iterator.f();
 
-                return _context3.finish(32);
+                return _context3.finish(33);
 
-              case 35:
+              case 36:
                 if (!(mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH)) {
-                  _context3.next = 60;
+                  _context3.next = 61;
                   break;
                 }
 
                 // upload:
                 this.createDirectory(path);
                 folderEntries = res.result.entries;
-                _context3.next = 40;
+                _context3.next = 41;
                 return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.keys();
 
-              case 40:
+              case 41:
                 keys = _context3.sent;
                 _iterator2 = _createForOfIteratorHelper(keys);
-                _context3.prev = 42;
+                _context3.prev = 43;
                 _loop = /*#__PURE__*/regeneratorRuntime.mark(function _loop() {
                   var id, existingEntry, existingChangeDate, url, blob, fileName;
                   return regeneratorRuntime.wrap(function _loop$(_context2) {
@@ -1971,60 +1978,60 @@ var DropboxStorage = /*#__PURE__*/function () {
 
                 _iterator2.s();
 
-              case 45:
+              case 46:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context3.next = 52;
+                  _context3.next = 53;
                   break;
                 }
 
-                return _context3.delegateYield(_loop(), "t3", 47);
+                return _context3.delegateYield(_loop(), "t3", 48);
 
-              case 47:
+              case 48:
                 _ret = _context3.t3;
 
                 if (!(_ret === "continue")) {
-                  _context3.next = 50;
+                  _context3.next = 51;
                   break;
                 }
 
-                return _context3.abrupt("continue", 50);
+                return _context3.abrupt("continue", 51);
 
-              case 50:
-                _context3.next = 45;
+              case 51:
+                _context3.next = 46;
                 break;
 
-              case 52:
-                _context3.next = 57;
+              case 53:
+                _context3.next = 58;
                 break;
 
-              case 54:
-                _context3.prev = 54;
-                _context3.t4 = _context3["catch"](42);
+              case 55:
+                _context3.prev = 55;
+                _context3.t4 = _context3["catch"](43);
 
                 _iterator2.e(_context3.t4);
 
-              case 57:
-                _context3.prev = 57;
+              case 58:
+                _context3.prev = 58;
 
                 _iterator2.f();
 
-                return _context3.finish(57);
+                return _context3.finish(58);
 
-              case 60:
-                _context3.next = 65;
+              case 61:
+                _context3.next = 66;
                 break;
 
-              case 62:
-                _context3.prev = 62;
+              case 63:
+                _context3.prev = 63;
                 _context3.t5 = _context3["catch"](1);
                 console.log(_context3.t5);
 
-              case 65:
+              case 66:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee2, this, [[1, 62], [7, 29, 32, 35], [42, 54, 57, 60]]);
+        }, _callee2, this, [[1, 63], [7, 30, 33, 36], [43, 55, 58, 61]]);
       }));
 
       function syncFolder(_x) {
@@ -6616,4 +6623,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.b0bad37390a5b5419b63.js.map
+//# sourceMappingURL=main.f7aa4a5a4acb12dddba9.js.map

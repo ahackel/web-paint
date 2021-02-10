@@ -1,3 +1,5 @@
+import localforage from "localforage";
+
 require('../css/painter.css');
 import {library, dom} from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
@@ -108,5 +110,7 @@ class App {
 document.addEventListener("DOMContentLoaded", () => {
     // @ts-ignore
     window.app = new App();
+    // @ts-ignore
+    window.localForage = localforage;
 });
 

@@ -69,6 +69,7 @@ class DropboxStorage {
             if (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH) {
                 // download from server:
                 for (let path of res.result.entries) {
+                    console.log(path.name)
                     if (path[".tag"] != "file") {
                         continue;
                     }
