@@ -1,4 +1,4 @@
-import {Dropbox, DropboxAuth} from "dropbox";
+import {Dropbox, DropboxAuth, DropboxResponse, files} from "dropbox";
 import localforage from "localforage";
 import {imageStorage} from "./ImageStorage";
 
@@ -9,7 +9,10 @@ class DropboxStorage {
     private _isAuthorized: boolean = false;
     private _dbx: Dropbox;
     private _userId: string;
-
+    
+    SYNC_BOTH = 0;
+    SYNC_UPLOAD = 1;
+    SYNC_DOWNLOAD = 2;
 
     get isAuthorized(): boolean {
         return this._isAuthorized;
@@ -53,60 +56,82 @@ class DropboxStorage {
             return;
         }
 
-        await this.downloadDefaultAssets();
-        await this.uploadUserContent();
+        console.log("Sync default content:");
+        await this.syncFolder("default", this.SYNC_DOWNLOAD);
+        console.log("Sync user content:");
+        await this.syncFolder(this.userId, this.SYNC_BOTH);
+    }
+    
+    async syncFolder(path: string, mode: number = this.SYNC_BOTH){
+        try{
+            const res = await this.dbx.filesListFolder({path: "/" + path});
+
+            if (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH) {
+                // download from server:
+                for (let path of res.result.entries) {
+                    if (path[".tag"] != "file") {
+                        continue;
+                    }
+                    if (!path.name.endsWith(".png")) {
+                        continue;
+                    }
+
+                    const imageId = path.name;
+                    const changeDate = new Date(path.server_modified).getTime();
+                    if (await imageStorage.GetFileChangeDate(imageId) >= changeDate) {
+                        continue;
+                    }
+
+                    console.log("getting " + imageId);
+                    this.downloadImage(path.path_lower, imageId, changeDate);
+                }
+            }
+
+            if (mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH) {
+                // upload:
+                this.createDirectory(path);
+                const folderEntries = res.result.entries;
+                var keys = <string[]>await imageStorage.keys();
+
+                for (let id of keys) {
+                    const existingEntry = <files.FileMetadataReference>folderEntries.find(x => x.name == id);
+                    if (existingEntry){
+                        const existingChangeDate = new Date(existingEntry.server_modified).getTime();
+                        if (existingChangeDate >= await imageStorage.GetFileChangeDate(id)){
+                            continue;
+                        }
+                    }
+
+                    const url = await imageStorage.loadImageUrl(id);
+                    const blob = await fetch(url).then(r => r.blob());
+                    if (!blob) {
+                        continue;
+                    }
+                    let fileName = "/" + path + "/" + id;
+                    console.log("posting: " + fileName);
+                    await this.postImage(blob, fileName);
+                }
+            }
+        }
+        catch (error){
+            console.log(error);
+        }
     }
 
-    private async downloadDefaultAssets(){
-        const res = await this.dbx.filesListFolder({path: "/default"});
-        if (res.status != 200){
-            console.log('Could not download default assets.');
-            return;
-        }
-        
-        for (let path of res.result.entries) {
-            if (path[".tag"] != "file"){
-                continue;
-            }
-            if (!path.name.endsWith(".png")){
-                continue;
-            }
-
-            console.log("getting default asset: " + path.name);
-            this.downloadImage(path.path_lower, path.name);
-        }
-    }
-
-    private async downloadImage(path: string, imageId: string) {
+    private async downloadImage(path: string, imageId: string, changeDate: number) {
         const res = await this.dbx.filesDownload({path: path});
         if (res.status == 200){
-            console.log(res.result)
+            // fileBlob exists:
+            // @ts-ignore
             var blob = res.result.fileBlob;
             if (blob){
-                imageStorage.saveImage(imageId, blob);
+                imageStorage.saveImage(imageId, blob, changeDate);
             }
-        }
-    }
-
-    private async uploadUserContent() {
-        this.createDirectory(this.userId);
-
-        var keys = <string[]>await imageStorage.keys();
-
-        for (let id of keys) {
-            const url = await imageStorage.loadImageUrl(id);
-            const blob = await fetch(url).then(r => r.blob());
-            if (!blob) {
-                continue;
-            }
-            let fileName = "/" + this.userId + "/" + id;
-            console.log("posting: " + fileName);
-            this.postImage(blob, fileName);
         }
     }
 
     async postImage(blob: Blob, path: string){
-        return this.dbx.filesUpload({path: path, contents: blob})
+        return this.dbx.filesUpload({path: path, contents: blob, mode: { ".tag": "overwrite" }})
     }
     
     private createDirectory(path: string) {

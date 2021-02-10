@@ -2,18 +2,19 @@ import 'whatwg-fetch';
 import LocalForageAdapter from "./LocalForageAdapter";
 import StorageAdapter from "./StorageAdapter";
 import JSZip from "jszip";
-import localforage from "localforage";
 
 interface IFileMeta {
 	changeDate: number
 }
+
+type IFileMetaList = { [id: string]: IFileMeta };
 
 class ImageStorage {
 
 	private _adapter: StorageAdapter;
 	private _changeListeners: Function[];
 	private _urls: { [id: string]: string }
-	private _fileMeta: { [id: string]: IFileMeta }
+	private _fileMeta: IFileMetaList
 	
 	constructor() {
 		this.loadFileMeta();
@@ -34,16 +35,29 @@ class ImageStorage {
 		return this._urls;
 	}
 	
-	GetFileChangeDate(id: string){
+	async GetFileChangeDate(id: string){
 		if (id in this._fileMeta){
 			return this._fileMeta[id].changeDate;
 		}
-		return Date.now();
+		
+		if (await this.ContainsImage(id)){
+			// add missing entry
+			const newChangeDate = Date.now();
+			this.SetFileChangeDate(id, newChangeDate);
+			return newChangeDate;
+		}
+		
+		return 0;
+	}
+	
+	async ContainsImage(id: string){
+		var keys = <string[]> await this.keys();
+		return keys.includes(id);
 	}
 
 	async SetFileChangeDate(id: string, date: number){
 		this._fileMeta[id] = { changeDate: date };
-		await localforage.setItem("file-meta", this._fileMeta);
+		await this.adapter.setItem("file-meta", this._fileMeta);
 	}
 
 	public async loadImage(id: string): Promise<HTMLImageElement> {
@@ -87,10 +101,10 @@ class ImageStorage {
 		return <Promise<Blob>>this.adapter.getItem(id)
 	}
 
-	public async saveImage(id: string, blob: Blob){
+	public async saveImage(id: string, blob: Blob, changeDate: number = Date.now()){
 		try{
 			await this.adapter.setItem(id, blob);
-			await this.SetFileChangeDate(id, Date.now());
+			await this.SetFileChangeDate(id, changeDate);
 		}
 		catch (e) {
 		}
@@ -114,8 +128,9 @@ class ImageStorage {
 			})		
 	}
 
-	public keys() {
-		return this.adapter.keys();
+	async keys(): Promise<string[]> {
+		var keys = <string[]>await this.adapter.keys();
+		return keys.filter(x => x != "file-meta")
 	}
 
 	public addChangeListener(callback: Function){
@@ -205,7 +220,7 @@ class ImageStorage {
 	}
 
 	private async loadFileMeta() {
-		this._fileMeta = await localforage.getItem("file-meta") ?? {};
+		this._fileMeta = <IFileMetaList> await this.adapter.getItem("file-meta") ?? {};
 	}
 }
 

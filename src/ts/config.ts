@@ -2,7 +2,7 @@ interface IImageConfig{
     overlay: string;
 }
 
-interface  IAppConfig{
+interface IAppConfig{
     debug: boolean;
     doubleTapDelay: number;
     longClickDelay: number;
@@ -19,6 +19,7 @@ interface  IAppConfig{
     width: number;
     height: number;
     imageCount: number;
+    useHtmlLog: boolean;
 }
 
 export const config: IAppConfig = {
@@ -37,5 +38,6 @@ export const config: IAppConfig = {
     saveInterval: 5000,
     width: 1024,
     height: 768,
-    imageCount: 32
+    imageCount: 32,
+    useHtmlLog: true
 };

@@ -936,7 +936,8 @@ var config = {
   saveInterval: 5000,
   width: 1024,
   height: 768,
-  imageCount: 32
+  imageCount: 32,
+  useHtmlLog: true
 };
 
 /***/ }),
@@ -1692,6 +1693,9 @@ var DropboxStorage = /*#__PURE__*/function () {
     _classCallCheck(this, DropboxStorage);
 
     this._isAuthorized = false;
+    this.SYNC_BOTH = 0;
+    this.SYNC_UPLOAD = 1;
+    this.SYNC_DOWNLOAD = 2;
     this._userId = (_localStorage$getItem = localStorage.getItem("user-id")) !== null && _localStorage$getItem !== void 0 ? _localStorage$getItem : "";
     var token = this.getAccessTokenFromUrl();
 
@@ -1749,14 +1753,16 @@ var DropboxStorage = /*#__PURE__*/function () {
                 return _context.abrupt("return");
 
               case 2:
-                _context.next = 4;
-                return this.downloadDefaultAssets();
+                console.log("Sync default content:");
+                _context.next = 5;
+                return this.syncFolder("default", this.SYNC_DOWNLOAD);
 
-              case 4:
-                _context.next = 6;
-                return this.uploadUserContent();
+              case 5:
+                console.log("Sync user content:");
+                _context.next = 8;
+                return this.syncFolder(this.userId, this.SYNC_BOTH);
 
-              case 6:
+              case 8:
               case "end":
                 return _context.stop();
             }
@@ -1771,238 +1777,317 @@ var DropboxStorage = /*#__PURE__*/function () {
       return sync;
     }()
   }, {
-    key: "downloadDefaultAssets",
+    key: "syncFolder",
     value: function () {
-      var _downloadDefaultAssets = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var res, _iterator, _step, path;
+      var _syncFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(path) {
+        var _this2 = this;
 
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        var mode,
+            res,
+            _iterator,
+            _step,
+            _path,
+            imageId,
+            changeDate,
+            folderEntries,
+            keys,
+            _iterator2,
+            _step2,
+            _loop,
+            _ret,
+            _args3 = arguments;
+
+        return regeneratorRuntime.wrap(function _callee2$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _context2.next = 2;
+                mode = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : this.SYNC_BOTH;
+                _context3.prev = 1;
+                _context3.next = 4;
                 return this.dbx.filesListFolder({
-                  path: "/default"
+                  path: "/" + path
                 });
 
-              case 2:
-                res = _context2.sent;
+              case 4:
+                res = _context3.sent;
 
-                if (!(res.status != 200)) {
-                  _context2.next = 6;
+                if (!(mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH)) {
+                  _context3.next = 35;
                   break;
                 }
 
-                console.log('Could not download default assets.');
-                return _context2.abrupt("return");
-
-              case 6:
+                // download from server:
                 _iterator = _createForOfIteratorHelper(res.result.entries);
-                _context2.prev = 7;
+                _context3.prev = 7;
 
                 _iterator.s();
 
               case 9:
                 if ((_step = _iterator.n()).done) {
-                  _context2.next = 19;
+                  _context3.next = 27;
                   break;
                 }
 
-                path = _step.value;
+                _path = _step.value;
 
-                if (!(path[".tag"] != "file")) {
-                  _context2.next = 13;
+                if (!(_path[".tag"] != "file")) {
+                  _context3.next = 13;
                   break;
                 }
 
-                return _context2.abrupt("continue", 17);
+                return _context3.abrupt("continue", 25);
 
               case 13:
-                if (path.name.endsWith(".png")) {
-                  _context2.next = 15;
+                if (_path.name.endsWith(".png")) {
+                  _context3.next = 15;
                   break;
                 }
 
-                return _context2.abrupt("continue", 17);
+                return _context3.abrupt("continue", 25);
 
               case 15:
-                console.log("getting default asset: " + path.name);
-                this.downloadImage(path.path_lower, path.name);
-
-              case 17:
-                _context2.next = 9;
-                break;
+                imageId = _path.name;
+                changeDate = new Date(_path.server_modified).getTime();
+                _context3.next = 19;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(imageId);
 
               case 19:
-                _context2.next = 24;
+                _context3.t0 = _context3.sent;
+                _context3.t1 = changeDate;
+
+                if (!(_context3.t0 >= _context3.t1)) {
+                  _context3.next = 23;
+                  break;
+                }
+
+                return _context3.abrupt("continue", 25);
+
+              case 23:
+                console.log("getting " + imageId);
+                this.downloadImage(_path.path_lower, imageId, changeDate);
+
+              case 25:
+                _context3.next = 9;
                 break;
 
-              case 21:
-                _context2.prev = 21;
-                _context2.t0 = _context2["catch"](7);
+              case 27:
+                _context3.next = 32;
+                break;
 
-                _iterator.e(_context2.t0);
+              case 29:
+                _context3.prev = 29;
+                _context3.t2 = _context3["catch"](7);
 
-              case 24:
-                _context2.prev = 24;
+                _iterator.e(_context3.t2);
+
+              case 32:
+                _context3.prev = 32;
 
                 _iterator.f();
 
-                return _context2.finish(24);
+                return _context3.finish(32);
 
-              case 27:
+              case 35:
+                if (!(mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH)) {
+                  _context3.next = 60;
+                  break;
+                }
+
+                // upload:
+                this.createDirectory(path);
+                folderEntries = res.result.entries;
+                _context3.next = 40;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.keys();
+
+              case 40:
+                keys = _context3.sent;
+                _iterator2 = _createForOfIteratorHelper(keys);
+                _context3.prev = 42;
+                _loop = /*#__PURE__*/regeneratorRuntime.mark(function _loop() {
+                  var id, existingEntry, existingChangeDate, url, blob, fileName;
+                  return regeneratorRuntime.wrap(function _loop$(_context2) {
+                    while (1) {
+                      switch (_context2.prev = _context2.next) {
+                        case 0:
+                          id = _step2.value;
+                          existingEntry = folderEntries.find(function (x) {
+                            return x.name == id;
+                          });
+
+                          if (!existingEntry) {
+                            _context2.next = 10;
+                            break;
+                          }
+
+                          existingChangeDate = new Date(existingEntry.server_modified).getTime();
+                          _context2.t0 = existingChangeDate;
+                          _context2.next = 7;
+                          return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(id);
+
+                        case 7:
+                          _context2.t1 = _context2.sent;
+
+                          if (!(_context2.t0 >= _context2.t1)) {
+                            _context2.next = 10;
+                            break;
+                          }
+
+                          return _context2.abrupt("return", "continue");
+
+                        case 10:
+                          _context2.next = 12;
+                          return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.loadImageUrl(id);
+
+                        case 12:
+                          url = _context2.sent;
+                          _context2.next = 15;
+                          return fetch(url).then(function (r) {
+                            return r.blob();
+                          });
+
+                        case 15:
+                          blob = _context2.sent;
+
+                          if (blob) {
+                            _context2.next = 18;
+                            break;
+                          }
+
+                          return _context2.abrupt("return", "continue");
+
+                        case 18:
+                          fileName = "/" + path + "/" + id;
+                          console.log("posting: " + fileName);
+                          _context2.next = 22;
+                          return _this2.postImage(blob, fileName);
+
+                        case 22:
+                        case "end":
+                          return _context2.stop();
+                      }
+                    }
+                  }, _loop);
+                });
+
+                _iterator2.s();
+
+              case 45:
+                if ((_step2 = _iterator2.n()).done) {
+                  _context3.next = 52;
+                  break;
+                }
+
+                return _context3.delegateYield(_loop(), "t3", 47);
+
+              case 47:
+                _ret = _context3.t3;
+
+                if (!(_ret === "continue")) {
+                  _context3.next = 50;
+                  break;
+                }
+
+                return _context3.abrupt("continue", 50);
+
+              case 50:
+                _context3.next = 45;
+                break;
+
+              case 52:
+                _context3.next = 57;
+                break;
+
+              case 54:
+                _context3.prev = 54;
+                _context3.t4 = _context3["catch"](42);
+
+                _iterator2.e(_context3.t4);
+
+              case 57:
+                _context3.prev = 57;
+
+                _iterator2.f();
+
+                return _context3.finish(57);
+
+              case 60:
+                _context3.next = 65;
+                break;
+
+              case 62:
+                _context3.prev = 62;
+                _context3.t5 = _context3["catch"](1);
+                console.log(_context3.t5);
+
+              case 65:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this, [[7, 21, 24, 27]]);
+        }, _callee2, this, [[1, 62], [7, 29, 32, 35], [42, 54, 57, 60]]);
       }));
 
-      function downloadDefaultAssets() {
-        return _downloadDefaultAssets.apply(this, arguments);
+      function syncFolder(_x) {
+        return _syncFolder.apply(this, arguments);
       }
 
-      return downloadDefaultAssets;
+      return syncFolder;
     }()
   }, {
     key: "downloadImage",
     value: function () {
-      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(path, imageId) {
+      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(path, imageId, changeDate) {
         var res, blob;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee3$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context3.next = 2;
+                _context4.next = 2;
                 return this.dbx.filesDownload({
                   path: path
                 });
 
               case 2:
-                res = _context3.sent;
+                res = _context4.sent;
 
                 if (res.status == 200) {
-                  console.log(res.result);
+                  // fileBlob exists:
+                  // @ts-ignore
                   blob = res.result.fileBlob;
 
                   if (blob) {
-                    _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.saveImage(imageId, blob);
+                    _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.saveImage(imageId, blob, changeDate);
                   }
                 }
 
               case 4:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
         }, _callee3, this);
       }));
 
-      function downloadImage(_x, _x2) {
+      function downloadImage(_x2, _x3, _x4) {
         return _downloadImage.apply(this, arguments);
       }
 
       return downloadImage;
     }()
   }, {
-    key: "uploadUserContent",
-    value: function () {
-      var _uploadUserContent = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
-        var keys, _iterator2, _step2, id, url, blob, fileName;
-
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                this.createDirectory(this.userId);
-                _context4.next = 3;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.keys();
-
-              case 3:
-                keys = _context4.sent;
-                _iterator2 = _createForOfIteratorHelper(keys);
-                _context4.prev = 5;
-
-                _iterator2.s();
-
-              case 7:
-                if ((_step2 = _iterator2.n()).done) {
-                  _context4.next = 22;
-                  break;
-                }
-
-                id = _step2.value;
-                _context4.next = 11;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.loadImageUrl(id);
-
-              case 11:
-                url = _context4.sent;
-                _context4.next = 14;
-                return fetch(url).then(function (r) {
-                  return r.blob();
-                });
-
-              case 14:
-                blob = _context4.sent;
-
-                if (blob) {
-                  _context4.next = 17;
-                  break;
-                }
-
-                return _context4.abrupt("continue", 20);
-
-              case 17:
-                fileName = "/" + this.userId + "/" + id;
-                console.log("posting: " + fileName);
-                this.postImage(blob, fileName);
-
-              case 20:
-                _context4.next = 7;
-                break;
-
-              case 22:
-                _context4.next = 27;
-                break;
-
-              case 24:
-                _context4.prev = 24;
-                _context4.t0 = _context4["catch"](5);
-
-                _iterator2.e(_context4.t0);
-
-              case 27:
-                _context4.prev = 27;
-
-                _iterator2.f();
-
-                return _context4.finish(27);
-
-              case 30:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this, [[5, 24, 27, 30]]);
-      }));
-
-      function uploadUserContent() {
-        return _uploadUserContent.apply(this, arguments);
-      }
-
-      return uploadUserContent;
-    }()
-  }, {
     key: "postImage",
     value: function () {
-      var _postImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(blob, path) {
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      var _postImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(blob, path) {
+        return regeneratorRuntime.wrap(function _callee4$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 return _context5.abrupt("return", this.dbx.filesUpload({
                   path: path,
-                  contents: blob
+                  contents: blob,
+                  mode: {
+                    ".tag": "overwrite"
+                  }
                 }));
 
               case 1:
@@ -2010,10 +2095,10 @@ var DropboxStorage = /*#__PURE__*/function () {
                 return _context5.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee4, this);
       }));
 
-      function postImage(_x3, _x4) {
+      function postImage(_x5, _x6) {
         return _postImage.apply(this, arguments);
       }
 
@@ -2079,14 +2164,14 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "unauthorize",
     value: function unauthorize() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!this.isAuthorized) {
         return;
       }
 
       this.dbx.authTokenRevoke().then(function () {
-        _this2._isAuthorized = false;
+        _this3._isAuthorized = false;
         localforage__WEBPACK_IMPORTED_MODULE_1___default().removeItem('dropbox-token');
       });
     }
@@ -2114,8 +2199,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _LocalForageAdapter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LocalForageAdapter */ "./src/ts/storage/LocalForageAdapter.ts");
 /* harmony import */ var jszip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jszip */ "./node_modules/jszip/dist/jszip.min.js");
 /* harmony import */ var jszip__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jszip__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! localforage */ "./node_modules/localforage/dist/localforage.js");
-/* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_3__);
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -2131,7 +2214,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 
@@ -2165,28 +2247,39 @@ var ImageStorage = /*#__PURE__*/function () {
     }
   }, {
     key: "GetFileChangeDate",
-    value: function GetFileChangeDate(id) {
-      if (id in this._fileMeta) {
-        return this._fileMeta[id].changeDate;
-      }
-
-      return Date.now();
-    }
-  }, {
-    key: "SetFileChangeDate",
     value: function () {
-      var _SetFileChangeDate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id, date) {
+      var _GetFileChangeDate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id) {
+        var newChangeDate;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                this._fileMeta[id] = {
-                  changeDate: date
-                };
-                _context.next = 3;
-                return localforage__WEBPACK_IMPORTED_MODULE_3___default().setItem("file-meta", this._fileMeta);
+                if (!(id in this._fileMeta)) {
+                  _context.next = 2;
+                  break;
+                }
 
-              case 3:
+                return _context.abrupt("return", this._fileMeta[id].changeDate);
+
+              case 2:
+                _context.next = 4;
+                return this.ContainsImage(id);
+
+              case 4:
+                if (!_context.sent) {
+                  _context.next = 8;
+                  break;
+                }
+
+                // add missing entry
+                newChangeDate = Date.now();
+                this.SetFileChangeDate(id, newChangeDate);
+                return _context.abrupt("return", newChangeDate);
+
+              case 8:
+                return _context.abrupt("return", 0);
+
+              case 9:
               case "end":
                 return _context.stop();
             }
@@ -2194,7 +2287,65 @@ var ImageStorage = /*#__PURE__*/function () {
         }, _callee, this);
       }));
 
-      function SetFileChangeDate(_x, _x2) {
+      function GetFileChangeDate(_x) {
+        return _GetFileChangeDate.apply(this, arguments);
+      }
+
+      return GetFileChangeDate;
+    }()
+  }, {
+    key: "ContainsImage",
+    value: function () {
+      var _ContainsImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
+        var keys;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return this.keys();
+
+              case 2:
+                keys = _context2.sent;
+                return _context2.abrupt("return", keys.includes(id));
+
+              case 4:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function ContainsImage(_x2) {
+        return _ContainsImage.apply(this, arguments);
+      }
+
+      return ContainsImage;
+    }()
+  }, {
+    key: "SetFileChangeDate",
+    value: function () {
+      var _SetFileChangeDate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id, date) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this._fileMeta[id] = {
+                  changeDate: date
+                };
+                _context3.next = 3;
+                return this.adapter.setItem("file-meta", this._fileMeta);
+
+              case 3:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function SetFileChangeDate(_x3, _x4) {
         return _SetFileChangeDate.apply(this, arguments);
       }
 
@@ -2203,24 +2354,24 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "loadImage",
     value: function () {
-      var _loadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
+      var _loadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id) {
         var url, img;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context2.next = 2;
+                _context4.next = 2;
                 return this.loadImageUrl(id);
 
               case 2:
-                url = _context2.sent;
+                url = _context4.sent;
 
                 if (url) {
-                  _context2.next = 5;
+                  _context4.next = 5;
                   break;
                 }
 
-                return _context2.abrupt("return", null);
+                return _context4.abrupt("return", null);
 
               case 5:
                 img = new Image();
@@ -2228,18 +2379,18 @@ var ImageStorage = /*#__PURE__*/function () {
                 img.src = url;
 
                 if (!(img.decode != null)) {
-                  _context2.next = 12;
+                  _context4.next = 12;
                   break;
                 }
 
-                _context2.next = 11;
+                _context4.next = 11;
                 return img.decode();
 
               case 11:
-                return _context2.abrupt("return", img);
+                return _context4.abrupt("return", img);
 
               case 12:
-                return _context2.abrupt("return", new Promise(function (resolve) {
+                return _context4.abrupt("return", new Promise(function (resolve) {
                   img.onload = function () {
                     return resolve(img);
                   };
@@ -2247,13 +2398,13 @@ var ImageStorage = /*#__PURE__*/function () {
 
               case 13:
               case "end":
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee4, this);
       }));
 
-      function loadImage(_x3) {
+      function loadImage(_x5) {
         return _loadImage.apply(this, arguments);
       }
 
@@ -2262,47 +2413,47 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "loadImageUrl",
     value: function () {
-      var _loadImageUrl = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id) {
+      var _loadImageUrl = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(id) {
         var blob, url;
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 if (!(id in this.urls)) {
-                  _context3.next = 2;
+                  _context5.next = 2;
                   break;
                 }
 
-                return _context3.abrupt("return", this.urls[id]);
+                return _context5.abrupt("return", this.urls[id]);
 
               case 2:
-                _context3.next = 4;
+                _context5.next = 4;
                 return this.loadBlob(id);
 
               case 4:
-                blob = _context3.sent;
+                blob = _context5.sent;
 
                 if (blob) {
-                  _context3.next = 7;
+                  _context5.next = 7;
                   break;
                 }
 
-                return _context3.abrupt("return", null);
+                return _context5.abrupt("return", null);
 
               case 7:
                 url = URL.createObjectURL(blob);
                 this.urls[id] = url;
-                return _context3.abrupt("return", url);
+                return _context5.abrupt("return", url);
 
               case 10:
               case "end":
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee5, this);
       }));
 
-      function loadImageUrl(_x4) {
+      function loadImageUrl(_x6) {
         return _loadImageUrl.apply(this, arguments);
       }
 
@@ -2316,28 +2467,31 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "saveImage",
     value: function () {
-      var _saveImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id, blob) {
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      var _saveImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(id, blob) {
+        var changeDate,
+            _args6 = arguments;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _context4.prev = 0;
-                _context4.next = 3;
+                changeDate = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : Date.now();
+                _context6.prev = 1;
+                _context6.next = 4;
                 return this.adapter.setItem(id, blob);
 
-              case 3:
-                _context4.next = 5;
-                return this.SetFileChangeDate(id, Date.now());
+              case 4:
+                _context6.next = 6;
+                return this.SetFileChangeDate(id, changeDate);
 
-              case 5:
-                _context4.next = 9;
+              case 6:
+                _context6.next = 10;
                 break;
 
-              case 7:
-                _context4.prev = 7;
-                _context4.t0 = _context4["catch"](0);
+              case 8:
+                _context6.prev = 8;
+                _context6.t0 = _context6["catch"](1);
 
-              case 9:
+              case 10:
                 if (id in this.urls) {
                   URL.revokeObjectURL(this.urls[id]);
                 }
@@ -2345,15 +2499,15 @@ var ImageStorage = /*#__PURE__*/function () {
                 this.urls[id] = URL.createObjectURL(blob);
                 this.dispatchChangeEvent("save", id);
 
-              case 12:
+              case 13:
               case "end":
-                return _context4.stop();
+                return _context6.stop();
             }
           }
-        }, _callee4, this, [[0, 7]]);
+        }, _callee6, this, [[1, 8]]);
       }));
 
-      function saveImage(_x5, _x6) {
+      function saveImage(_x7, _x8) {
         return _saveImage.apply(this, arguments);
       }
 
@@ -2375,9 +2529,36 @@ var ImageStorage = /*#__PURE__*/function () {
     }
   }, {
     key: "keys",
-    value: function keys() {
-      return this.adapter.keys();
-    }
+    value: function () {
+      var _keys = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+        var keys;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _context7.next = 2;
+                return this.adapter.keys();
+
+              case 2:
+                keys = _context7.sent;
+                return _context7.abrupt("return", keys.filter(function (x) {
+                  return x != "file-meta";
+                }));
+
+              case 4:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function keys() {
+        return _keys.apply(this, arguments);
+      }
+
+      return keys;
+    }()
   }, {
     key: "addChangeListener",
     value: function addChangeListener(callback) {
@@ -2410,96 +2591,96 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "generateBackupArchive",
     value: function () {
-      var _generateBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+      var _generateBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
         var count, keys, zip, _iterator2, _step2, _id, url, blob;
 
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 count = 0;
-                _context5.next = 3;
+                _context8.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context5.sent;
+                keys = _context8.sent;
                 zip = new (jszip__WEBPACK_IMPORTED_MODULE_2___default())();
                 _iterator2 = _createForOfIteratorHelper(keys);
-                _context5.prev = 6;
+                _context8.prev = 6;
 
                 _iterator2.s();
 
               case 8:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context5.next = 22;
+                  _context8.next = 22;
                   break;
                 }
 
                 _id = _step2.value;
-                _context5.next = 12;
+                _context8.next = 12;
                 return this.loadImageUrl(_id);
 
               case 12:
-                url = _context5.sent;
-                _context5.next = 15;
+                url = _context8.sent;
+                _context8.next = 15;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
 
               case 15:
-                blob = _context5.sent;
+                blob = _context8.sent;
 
                 if (blob) {
-                  _context5.next = 18;
+                  _context8.next = 18;
                   break;
                 }
 
-                return _context5.abrupt("continue", 20);
+                return _context8.abrupt("continue", 20);
 
               case 18:
                 zip.file(_id, blob);
                 count += 1;
 
               case 20:
-                _context5.next = 8;
+                _context8.next = 8;
                 break;
 
               case 22:
-                _context5.next = 27;
+                _context8.next = 27;
                 break;
 
               case 24:
-                _context5.prev = 24;
-                _context5.t0 = _context5["catch"](6);
+                _context8.prev = 24;
+                _context8.t0 = _context8["catch"](6);
 
-                _iterator2.e(_context5.t0);
+                _iterator2.e(_context8.t0);
 
               case 27:
-                _context5.prev = 27;
+                _context8.prev = 27;
 
                 _iterator2.f();
 
-                return _context5.finish(27);
+                return _context8.finish(27);
 
               case 30:
                 if (!(count == 0)) {
-                  _context5.next = 32;
+                  _context8.next = 32;
                   break;
                 }
 
-                return _context5.abrupt("return");
+                return _context8.abrupt("return");
 
               case 32:
-                return _context5.abrupt("return", zip.generateAsync({
+                return _context8.abrupt("return", zip.generateAsync({
                   type: "blob"
                 }));
 
               case 33:
               case "end":
-                return _context5.stop();
+                return _context8.stop();
             }
           }
-        }, _callee5, this, [[6, 24, 27, 30]]);
+        }, _callee8, this, [[6, 24, 27, 30]]);
       }));
 
       function generateBackupArchive() {
@@ -2511,31 +2692,31 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "importBackupArchive",
     value: function () {
-      var _importBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(zipFile) {
+      var _importBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10(zipFile) {
         var _this2 = this;
 
         var zip;
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
-                _context7.next = 2;
+                _context10.next = 2;
                 return jszip__WEBPACK_IMPORTED_MODULE_2___default().loadAsync(zipFile);
 
               case 2:
-                zip = _context7.sent;
+                zip = _context10.sent;
                 zip.forEach( /*#__PURE__*/function () {
-                  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(path, file) {
+                  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(path, file) {
                     var buffer, blob;
-                    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    return regeneratorRuntime.wrap(function _callee9$(_context9) {
                       while (1) {
-                        switch (_context6.prev = _context6.next) {
+                        switch (_context9.prev = _context9.next) {
                           case 0:
-                            _context6.next = 2;
+                            _context9.next = 2;
                             return file.async("arraybuffer");
 
                           case 2:
-                            buffer = _context6.sent;
+                            buffer = _context9.sent;
                             blob = new Blob([buffer], {
                               "type": "image/png"
                             });
@@ -2544,26 +2725,26 @@ var ImageStorage = /*#__PURE__*/function () {
 
                           case 5:
                           case "end":
-                            return _context6.stop();
+                            return _context9.stop();
                         }
                       }
-                    }, _callee6);
+                    }, _callee9);
                   }));
 
-                  return function (_x8, _x9) {
+                  return function (_x10, _x11) {
                     return _ref.apply(this, arguments);
                   };
                 }());
 
               case 4:
               case "end":
-                return _context7.stop();
+                return _context10.stop();
             }
           }
-        }, _callee7);
+        }, _callee10);
       }));
 
-      function importBackupArchive(_x7) {
+      function importBackupArchive(_x9) {
         return _importBackupArchive.apply(this, arguments);
       }
 
@@ -2572,59 +2753,59 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "migrate",
     value: function () {
-      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
+      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11() {
         var needsRefresh, keys, _iterator3, _step3, _id2, newId, data;
 
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+        return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context11.prev = _context11.next) {
               case 0:
                 needsRefresh = false;
-                _context8.next = 3;
+                _context11.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context8.sent;
+                keys = _context11.sent;
                 _iterator3 = _createForOfIteratorHelper(keys);
-                _context8.prev = 5;
+                _context11.prev = 5;
 
                 _iterator3.s();
 
               case 7:
                 if ((_step3 = _iterator3.n()).done) {
-                  _context8.next = 25;
+                  _context11.next = 25;
                   break;
                 }
 
                 _id2 = _step3.value;
 
                 if (!(!_id2.startsWith("image") && !_id2.startsWith("Shape"))) {
-                  _context8.next = 11;
+                  _context11.next = 11;
                   break;
                 }
 
-                return _context8.abrupt("continue", 23);
+                return _context11.abrupt("continue", 23);
 
               case 11:
                 if (!_id2.endsWith(".png")) {
-                  _context8.next = 13;
+                  _context11.next = 13;
                   break;
                 }
 
-                return _context8.abrupt("continue", 23);
+                return _context11.abrupt("continue", 23);
 
               case 13:
                 newId = _id2.replace("Shape", "shape") + ".png";
-                _context8.next = 16;
+                _context11.next = 16;
                 return this.adapter.getItem(_id2);
 
               case 16:
-                data = _context8.sent;
-                _context8.next = 19;
+                data = _context11.sent;
+                _context11.next = 19;
                 return this.adapter.setItem(newId, data);
 
               case 19:
-                _context8.next = 21;
+                _context11.next = 21;
                 return this.adapter.removeItem(_id2);
 
               case 21:
@@ -2632,25 +2813,25 @@ var ImageStorage = /*#__PURE__*/function () {
                 needsRefresh = true;
 
               case 23:
-                _context8.next = 7;
+                _context11.next = 7;
                 break;
 
               case 25:
-                _context8.next = 30;
+                _context11.next = 30;
                 break;
 
               case 27:
-                _context8.prev = 27;
-                _context8.t0 = _context8["catch"](5);
+                _context11.prev = 27;
+                _context11.t0 = _context11["catch"](5);
 
-                _iterator3.e(_context8.t0);
+                _iterator3.e(_context11.t0);
 
               case 30:
-                _context8.prev = 30;
+                _context11.prev = 30;
 
                 _iterator3.f();
 
-                return _context8.finish(30);
+                return _context11.finish(30);
 
               case 33:
                 if (needsRefresh) {
@@ -2659,10 +2840,10 @@ var ImageStorage = /*#__PURE__*/function () {
 
               case 34:
               case "end":
-                return _context8.stop();
+                return _context11.stop();
             }
           }
-        }, _callee8, this, [[5, 27, 30, 33]]);
+        }, _callee11, this, [[5, 27, 30, 33]]);
       }));
 
       function migrate() {
@@ -2674,84 +2855,84 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "getStorageUsed",
     value: function () {
-      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9() {
+      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12() {
         var amount, keys, _iterator4, _step4, _id3, url, blob;
 
-        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+        return regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context12.prev = _context12.next) {
               case 0:
                 amount = 0;
-                _context9.next = 3;
+                _context12.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context9.sent;
+                keys = _context12.sent;
                 _iterator4 = _createForOfIteratorHelper(keys);
-                _context9.prev = 5;
+                _context12.prev = 5;
 
                 _iterator4.s();
 
               case 7:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context9.next = 20;
+                  _context12.next = 20;
                   break;
                 }
 
                 _id3 = _step4.value;
-                _context9.next = 11;
+                _context12.next = 11;
                 return this.loadImageUrl(_id3);
 
               case 11:
-                url = _context9.sent;
-                _context9.next = 14;
+                url = _context12.sent;
+                _context12.next = 14;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
 
               case 14:
-                blob = _context9.sent;
+                blob = _context12.sent;
 
                 if (blob) {
-                  _context9.next = 17;
+                  _context12.next = 17;
                   break;
                 }
 
-                return _context9.abrupt("continue", 18);
+                return _context12.abrupt("continue", 18);
 
               case 17:
                 amount += blob.size;
 
               case 18:
-                _context9.next = 7;
+                _context12.next = 7;
                 break;
 
               case 20:
-                _context9.next = 25;
+                _context12.next = 25;
                 break;
 
               case 22:
-                _context9.prev = 22;
-                _context9.t0 = _context9["catch"](5);
+                _context12.prev = 22;
+                _context12.t0 = _context12["catch"](5);
 
-                _iterator4.e(_context9.t0);
+                _iterator4.e(_context12.t0);
 
               case 25:
-                _context9.prev = 25;
+                _context12.prev = 25;
 
                 _iterator4.f();
 
-                return _context9.finish(25);
+                return _context12.finish(25);
 
               case 28:
-                return _context9.abrupt("return", amount);
+                return _context12.abrupt("return", amount);
 
               case 29:
               case "end":
-                return _context9.stop();
+                return _context12.stop();
             }
           }
-        }, _callee9, this, [[5, 22, 25, 28]]);
+        }, _callee12, this, [[5, 22, 25, 28]]);
       }));
 
       function getStorageUsed() {
@@ -2763,49 +2944,49 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "loadFileMeta",
     value: function () {
-      var _loadFileMeta = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10() {
-        var _yield$localforage$ge;
+      var _loadFileMeta = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+        var _ref2;
 
-        return regeneratorRuntime.wrap(function _callee10$(_context10) {
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                _context10.next = 2;
-                return localforage__WEBPACK_IMPORTED_MODULE_3___default().getItem("file-meta");
+                _context13.next = 2;
+                return this.adapter.getItem("file-meta");
 
               case 2:
-                _context10.t1 = _yield$localforage$ge = _context10.sent;
-                _context10.t0 = _context10.t1 !== null;
+                _context13.t1 = _ref2 = _context13.sent;
+                _context13.t0 = _context13.t1 !== null;
 
-                if (!_context10.t0) {
-                  _context10.next = 6;
+                if (!_context13.t0) {
+                  _context13.next = 6;
                   break;
                 }
 
-                _context10.t0 = _yield$localforage$ge !== void 0;
+                _context13.t0 = _ref2 !== void 0;
 
               case 6:
-                if (!_context10.t0) {
-                  _context10.next = 10;
+                if (!_context13.t0) {
+                  _context13.next = 10;
                   break;
                 }
 
-                _context10.t2 = _yield$localforage$ge;
-                _context10.next = 11;
+                _context13.t2 = _ref2;
+                _context13.next = 11;
                 break;
 
               case 10:
-                _context10.t2 = {};
+                _context13.t2 = {};
 
               case 11:
-                this._fileMeta = _context10.t2;
+                this._fileMeta = _context13.t2;
 
               case 12:
               case "end":
-                return _context10.stop();
+                return _context13.stop();
             }
           }
-        }, _callee10, this);
+        }, _callee13, this);
       }));
 
       function loadFileMeta() {
@@ -2886,8 +3067,8 @@ var LocalForageAdapter = /*#__PURE__*/function (_StorageAdapter) {
     }
   }, {
     key: "setItem",
-    value: function setItem(id, blob) {
-      return this._imageStore.setItem(id, blob);
+    value: function setItem(id, value) {
+      return this._imageStore.setItem(id, value);
     }
   }, {
     key: "removeItem",
@@ -5778,6 +5959,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var file_saver__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(file_saver__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _storage_Server__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../storage/Server */ "./src/ts/storage/Server.ts");
 /* harmony import */ var _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../storage/DropboxStorage */ "./src/ts/storage/DropboxStorage.ts");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../config */ "./src/ts/config.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -5812,6 +5994,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 var version = "1.0.0"; //require('/package').version;
 
 var ConsoleLogHTML = __webpack_require__(/*! console-log-html */ "./node_modules/console-log-html/console-log-html.js");
+
 
 
 
@@ -5929,7 +6112,11 @@ var SettingsView = /*#__PURE__*/function (_View) {
         location.reload();
       }
     });
-    ConsoleLogHTML.connect(document.getElementById("log"), {}, true, true, true);
+
+    if (_config__WEBPACK_IMPORTED_MODULE_6__.config.useHtmlLog) {
+      ConsoleLogHTML.connect(document.getElementById("log"), {}, true, true, true);
+    }
+
     return _this;
   }
 
@@ -6407,4 +6594,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.5f0bd49b916719676866.js.map
+//# sourceMappingURL=main.4621b5d97a2b0847b0db.js.map

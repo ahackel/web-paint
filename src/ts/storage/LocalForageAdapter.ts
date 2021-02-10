@@ -9,8 +9,8 @@ export default class LocalForageAdapter extends StorageAdapter{
         return this._imageStore.getItem(id);
     }
 
-    setItem(id: string, blob: Blob): Promise<unknown> {
-        return this._imageStore.setItem(id, blob);
+    setItem(id: string, value: unknown): Promise<unknown> {
+        return this._imageStore.setItem(id, value);
     }
     
     removeItem(id: string): Promise<unknown> {

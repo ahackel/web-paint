@@ -4,10 +4,9 @@ import {imageStorage} from "../storage/ImageStorage";
 const version = "1.0.0" //require('/package').version;
 var ConsoleLogHTML = require('console-log-html');
 import { saveAs } from 'file-saver';
-import localforage from "localforage";
 import {server} from "../storage/Server";
-import {Dropbox, DropboxAuth} from 'dropbox';
 import {dropboxStorage} from "../storage/DropboxStorage";
+import {config} from "../config";
 
 export default class SettingsView extends View {
     
@@ -62,7 +61,9 @@ export default class SettingsView extends View {
             }
         });
 
-        ConsoleLogHTML.connect(document.getElementById("log"), {}, true, true, true);
+        if (config.useHtmlLog){
+            ConsoleLogHTML.connect(document.getElementById("log"), {}, true, true, true);
+        }
     }
 
     private updateButtons() {
