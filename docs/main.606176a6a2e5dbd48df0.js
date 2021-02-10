@@ -6466,30 +6466,10 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ "?e7a9":
-/*!************************!*\
-  !*** buffer (ignored) ***!
-  \************************/
-/***/ (function() {
-
-/* (ignored) */
-
-/***/ }),
-
 /***/ "?8465":
 /*!************************!*\
   !*** crypto (ignored) ***!
   \************************/
-/***/ (function() {
-
-/* (ignored) */
-
-/***/ }),
-
-/***/ "?0bed":
-/*!**********************!*\
-  !*** util (ignored) ***!
-  \**********************/
 /***/ (function() {
 
 /* (ignored) */
@@ -6510,15 +6490,12 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
 /******/ 			id: moduleId,
-/******/ 			loaded: false,
+/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -6580,15 +6557,6 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/******/ 	/* webpack/runtime/node module decorator */
-/******/ 	!function() {
-/******/ 		__webpack_require__.nmd = function(module) {
-/******/ 			module.paths = [];
-/******/ 			if (!module.children) module.children = [];
-/******/ 			return module;
 /******/ 		};
 /******/ 	}();
 /******/ 	
@@ -6686,4 +6654,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.6a357ad15bfccbf3305b.js.map
+//# sourceMappingURL=main.606176a6a2e5dbd48df0.js.map
