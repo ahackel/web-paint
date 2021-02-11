@@ -104,12 +104,17 @@ body, input, textarea {
 }
 
 .view.settings {
-    font-size: 0.5rem;
-    padding: 0.5rem 2.5rem;
+    font-size: .4rem;
     display: block;
     box-sizing: border-box;
-    padding-right: 52%;
-    line-height: 1.4em;
+    line-height: 1.5em;
+    color: #444;
+}
+
+.view.settings .left-panel{
+    width: 40%;
+    padding: 1.2rem .25rem;
+    box-sizing: border-box;
 }
 
 .view.settings input{
@@ -123,22 +128,31 @@ body, input, textarea {
     -webkit-user-select: initial;
 }
 
+.view.settings .button{
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+}
+
 .view.settings .button.text {
     width: auto;
-    border-radius: 0.5em;
-    padding: 0 0.5em;
-    margin-bottom: 0.5em;
+    border-radius: .5em;
+    padding: 0 .5em;
+    margin-bottom: .5em;
     text-align: left;
+    overflow: hidden;
+    font-size: 0.5rem;
+    background: #58b0ff;
+    color: white;
 }
 
 .view.settings label{
     display: block;
-    text-transform: uppercase;
     color: grey;
 }
 
 .view.settings #log {
-    width: 50vw;
+    width: 60%;
     background: #272727;
     color: #c7c7c7;
     overflow: scroll;

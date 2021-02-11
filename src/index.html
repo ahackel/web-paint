@@ -44,23 +44,25 @@
 
 <div class="view settings hidden" id="settings">
     <div class="button back"><i class="fas fa-times"></i></div>
-    <p id="info"></p>
-    <p class="hidden">
-        <label for="server-url">Server</label>
-        <input type="url" id="server-url"/>
-    </p>
-    <p>
-        <label for="user-id">User ID</label>
-        <input type="text" id="user-id"/>
-    </p>
-    <div class="button text connect"><i class="fas fa-plug fa-fw"></i> Connect Dropbox</div>
-    <div class="button text disconnect"><span class="fa-stack fa-fw"><i class="fas fa-plug fa-fw fa-stack-1x"></i><i class="fas fa-slash fa-fw fa-stack-1x"></i></span> Disconnect Dropbox</div>
-    <div class="button text sync"><i class="fas fa-sync fa-fw"></i> Dropbox Sync</div>
-    <br/>
-    <div class="button text export"><i class="fas fa-file-export fa-fw"></i> Export images as ZIP</div>
-    <div class="button text import"><i class="fas fa-file-import fa-fw"></i> Import images from ZIP</div>
-    <br/>
-    <div class="button text clear"><i class="fas fa-trash-alt fa-fw"></i> Reset</div>
+    <div class="left-panel">
+        <p id="info"></p>
+        <p class="hidden">
+            <label for="server-url">Server</label>
+            <input type="url" id="server-url"/>
+        </p>
+        <p>
+            <label for="user-id">User ID</label>
+            <input type="text" id="user-id"/>
+        </p>
+        <div class="button text connect"><i class="fas fa-plug fa-fw"></i> Connect Dropbox</div>
+        <div class="button text disconnect"><span class="fa-stack fa-fw"><i class="fas fa-plug fa-fw fa-stack-1x"></i><i class="fas fa-slash fa-fw fa-stack-1x"></i></span> Disconnect Dropbox</div>
+        <div class="button text sync"><i class="fas fa-sync fa-fw"></i> Dropbox Sync</div>
+        <br/>
+        <div class="button text export"><i class="fas fa-file-export fa-fw"></i> Export images as ZIP</div>
+        <div class="button text import"><i class="fas fa-file-import fa-fw"></i> Import images from ZIP</div>
+        <br/>
+        <div class="button text clear"><i class="fas fa-trash-alt fa-fw"></i> Reset</div>
+    </div>
     <ul id="log"></ul>
 </div>
 
