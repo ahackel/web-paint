@@ -20,6 +20,7 @@ interface IAppConfig{
     height: number;
     imageCount: number;
     useHtmlLog: boolean;
+    dropboxSyncInterval: number;
 }
 
 export const config: IAppConfig = {
@@ -39,5 +40,6 @@ export const config: IAppConfig = {
     width: 1024,
     height: 768,
     imageCount: 32,
-    useHtmlLog: true
+    useHtmlLog: true,
+    dropboxSyncInterval: 30
 };

@@ -43,7 +43,7 @@ export default class SelectionTool extends Tool {
         this._stampButton = <HTMLDivElement>document.getElementById("selection-stamp-button");
         Utils.addClick(this._stampButton, () => this.paintSelectionToCanvas());
         this._saveButton = <HTMLDivElement>document.getElementById("selection-save-button");
-        Utils.addClick(this._saveButton, () => this.saveSelectionAsNewStamp());
+        Utils.addClick(this._saveButton, () => this.saveSelectionAsNewShape());
         this._downloadButton = <HTMLDivElement>document.getElementById("selection-download-button");
         Utils.addClick(this._downloadButton, () => {
             this.selectionLayer.canvas.toBlob(blob => saveAs(blob, "image.png"));
@@ -188,7 +188,7 @@ export default class SelectionTool extends Tool {
         this._painter.addCanvasLayer(this.selectionLayerId, 0, 0, this._painter.width, this._painter.height, false);
         this.selectionLayer.onDoubleTap = (event: TouchEvent) => {
             if (event.altKey){
-                this.saveSelectionAsNewStamp();
+                this.saveSelectionAsNewShape();
                 return;
             }
             this.paintSelectionToCanvas();
@@ -222,22 +222,18 @@ export default class SelectionTool extends Tool {
         this._painter.recordHistoryState();
     }
 
-    private saveSelectionAsNewStamp() {
-        imageStorage.keys()
-            .then((keys: string[]) => {
-                const shapesIds = keys.filter(x => x.startsWith("Shape"));
-                if (shapesIds.length >= config.maxShapeCount){
-                    console.log("Cannot save selection as shape because there are already too many in storage.");
-                    return;
-                }
-                
-                const id = `shape${Date.now()}.png`;
-                console.log(`Saving selection as: ${id}`);
-                this.selectionLayer.canvas.toBlob(blob => imageStorage.saveImage(id, blob as Blob));
-                this.isInShapesPalette = true;
-            });
+    private async saveSelectionAsNewShape() {
+        const shapes = await imageStorage.listFolder("shapes");
+        if (shapes.length >= config.maxShapeCount){
+            console.log("Cannot save selection as shape because there are already too many in storage.");
+            return;
+        }
+        
+        const path = `shapes/${Date.now()}.png`;
+        console.log(`Saving selection as: ${path}`);
+        this.selectionLayer.canvas.toBlob(blob => imageStorage.saveImage(path, blob as Blob));
+        this.isInShapesPalette = true;
     }
-
 
     // copyToClipboard(){
     //     this.selectionLayer.canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({'image/png': blob})]));

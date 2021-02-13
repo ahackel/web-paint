@@ -1,6 +1,7 @@
 import {Dropbox, DropboxAuth, DropboxResponse, files} from "dropbox";
 import localforage from "localforage";
 import {imageStorage} from "./ImageStorage";
+import {config} from "../config";
 
 const CLIENT_ID = 'dyfw7wk3nb2utzo';
 
@@ -9,6 +10,8 @@ class DropboxStorage {
     private _isAuthorized: boolean = false;
     private _dbx: Dropbox;
     private _userId: string;
+    private _longPollStarted: boolean = false;
+    private _lastSyncDate: number = 0;
     
     SYNC_BOTH = 0;
     SYNC_UPLOAD = 1;
@@ -28,21 +31,34 @@ class DropboxStorage {
 
     set userId(value: string){
         this._userId = value;
-        localStorage.setItem("user-id", value);
+        localforage.setItem("user-id", value);
+    }
+    
+    get lastSyncDate(): number{
+        return this._lastSyncDate;
+    }
+
+    set lastSyncDate(value: number){
+        this._lastSyncDate = value;
+        localforage.setItem("last-dropbox-sync", value);
     }
     
     constructor() {
-        this._userId = localStorage.getItem("user-id") ?? "";
+        this.init();
+    }
+
+    private async init() {
+        this._userId = await localforage.getItem<string>("user-id") ?? "";
+        this._lastSyncDate = await localforage.getItem<number>("last-dropbox-sync") ?? 0;
+        
         let token = this.getAccessTokenFromUrl();
         if (token) {
             this.authorize(token);
         } else {
-            localforage.getItem('dropbox-token')
-                .then((token: string) => {
-                    if (token) {
-                        this.authorize(token)
-                    }
-                })
+            token = await localforage.getItem<string>('dropbox-token')
+            if (token) {
+                this.authorize(token);
+            }
         }
     }
 
@@ -51,7 +67,7 @@ class DropboxStorage {
         return auth.getAuthenticationUrl(location.href);
     }
 
-    async sync(){
+    async sync(): Promise<string>{
         if (!this.isAuthorized || !this.userId){
             return;
         }
@@ -59,65 +75,168 @@ class DropboxStorage {
         console.log("Sync default content:");
         await this.syncFolder("default", this.SYNC_DOWNLOAD);
         console.log("Sync user content:");
-        await this.syncFolder(this.userId, this.SYNC_BOTH);
+        const cursor = await this.syncFolder(this.userId, this.SYNC_BOTH);
+        this.lastSyncDate = Date.now();
+        
+        await this.startLongPoll(cursor);
+        return cursor;
     }
     
-    async syncFolder(path: string, mode: number = this.SYNC_BOTH){
+    async syncFolder(path: string, mode: number = this.SYNC_BOTH): Promise<string> {
         try{
-            const serverFiles = await this.listFolder(path);
+            var res = await this.dbx.filesListFolder({
+                path: "/" + path,
+                recursive: true,
+            });
+            
+            const serverFiles:files.FileMetadataReference[] = <files.FileMetadataReference[]><unknown>res.result.entries.filter(x => x.name.endsWith(".png") && x[".tag"] == "file");
+            const serverPaths = serverFiles.map(x => x.path_display);
+            let cursor = res.result.cursor;
+
+            const keys = <string[]>await imageStorage.keys();
+            let localPaths: string[] = [];
+            for (let localPath of keys) {
+                if (!localPath.endsWith(".png")) {
+                    continue;
+                }
+
+                const fullPath = "/" + path + "/" + localPath;
+                localPaths.push(fullPath);
+            }
+            
+            const pathsOnBoth = serverPaths.filter(x => localPaths.includes(x));
+            const pathsOnServerOnly = serverPaths.filter(x => !pathsOnBoth.includes(x));
+            const pathsOnLocalOnly = localPaths.filter(x => !pathsOnBoth.includes(x));
+            
             if (serverFiles && (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH)) {
-                // download from server:
-                for (let file of serverFiles) {
-                    if (file[".tag"] != "file") {
-                        continue;
+                // update local files first:
+                
+                // delete local files that existed before last sync and don't exist on server
+                for (let fullPath of pathsOnLocalOnly) {
+                    const storagePath = fullPath.substring(path.length + 2);
+                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
+                    if (localChangeDate < this.lastSyncDate){
+                        console.log("deleting " + fullPath);
+                        await imageStorage.deleteImage(storagePath);
                     }
-                    if (!file.name.endsWith(".png")) {
-                        continue;
-                    }
+                }
 
-                    const imagePath = file.path_display.substring(path.length + 2);
-                    const changeDate = new Date(file.server_modified).getTime();
-                    if (await imageStorage.GetFileChangeDate(imagePath) >= changeDate) {
-                        continue;
+                // download new files that exist only on server 
+                for (let fullPath of pathsOnServerOnly) {
+                    const storagePath = fullPath.substring(path.length + 2);
+                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
+                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
+                    if (serverChangeDate > this.lastSyncDate) {
+                        console.log("download " + fullPath);
+                        await this.downloadImage(fullPath, storagePath, serverChangeDate);
                     }
+                }
 
-                    console.log("getting " + imagePath);
-                    this.downloadImage(file.path_lower, imagePath, changeDate);
+                // download newer files that exist on both 
+                for (let fullPath of pathsOnBoth) {
+                    const storagePath = fullPath.substring(path.length + 2);
+                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
+                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
+                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
+                    if (serverChangeDate > localChangeDate) {
+                        console.log("download " + fullPath);
+                        await this.downloadImage(fullPath, storagePath, serverChangeDate);
+                    }
                 }
             }
 
             if (mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH) {
-                // upload:
+                // update files on server:
                 
+                let updateCursor: boolean = false;
                 if (!serverFiles){
-                    await this.createDirectory(path);
+                    // user folder does not exist
+                    //await this.createDirectory(path);
                 }
-                
-                const keys = <string[]>await imageStorage.keys();
 
-                for (let id of keys) {
-                    const existingEntry = <files.FileMetadataReference>serverFiles?.find(x => x.name == id);
-                    if (existingEntry){
-                        const existingChangeDate = new Date(existingEntry.server_modified).getTime();
-                        if (existingChangeDate >= await imageStorage.GetFileChangeDate(id)){
+                // delete server files that existed before last sync and don't exist on local
+                for (let fullPath of pathsOnServerOnly) {
+                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
+                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
+                    if (serverChangeDate < this.lastSyncDate){
+                        console.log("deleting on dropbox " + fullPath);
+                        await this.dbx.filesDeleteV2({path: fullPath});
+                        updateCursor = true;
+                    }
+                }
+
+                // upload new files that exist only on local 
+                for (let fullPath of pathsOnLocalOnly) {
+                    const storagePath = fullPath.substring(path.length + 2);
+                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
+                    if (localChangeDate > this.lastSyncDate) {
+                        const url = await imageStorage.loadImageUrl(storagePath);
+                        const blob = await fetch(url).then(r => r.blob());
+                        if (!blob) {
                             continue;
                         }
+                        console.log("upload: " + fullPath);
+                        await this.postImage(blob, fullPath);
+                        updateCursor = true;
                     }
+                }
 
-                    const url = await imageStorage.loadImageUrl(id);
-                    const blob = await fetch(url).then(r => r.blob());
-                    if (!blob) {
-                        continue;
+                // upload newer files that exist on both 
+                for (let fullPath of pathsOnBoth) {
+                    const storagePath = fullPath.substring(path.length + 2);
+                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
+                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
+                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
+                    if (serverChangeDate < localChangeDate) {
+                        const url = await imageStorage.loadImageUrl(storagePath);
+                        const blob = await fetch(url).then(r => r.blob());
+                        if (!blob) {
+                            continue;
+                        }
+                        console.log("upload: " + fullPath);
+                        await this.postImage(blob, fullPath);
+                        updateCursor = true;
                     }
-                    let fileName = "/" + path + "/" + id;
-                    console.log("posting: " + fileName);
-                    await this.postImage(blob, fileName);
+                }
+                
+                if (updateCursor){
+                    // refresh cursor because we don't want to get updates from dropbox about the files we just posted:
+                    const res = await this.dbx.filesListFolderGetLatestCursor({path: "/" + path, recursive: true});
+                    cursor = res.result.cursor;
                 }
             }
+            return cursor;
         }
         catch (error){
             console.log(error);
         }
+        return null;
+    }
+    
+    public async startLongPoll(cursor: string) {
+        if (this._longPollStarted){
+            return;
+        }
+        
+        this._longPollStarted = true;
+        await this.longPoll(cursor);
+    }
+
+    private async longPoll(cursor: string) {
+        if (!cursor){
+            this._longPollStarted = false;
+            return;
+        }
+        
+        const res = await this.dbx.filesListFolderLongpoll({cursor: cursor, timeout: config.dropboxSyncInterval});
+        if (res.result.changes || imageStorage.hasChanges) {
+            console.log("There are changes:");
+            cursor = await this.sync();
+            imageStorage.hasChanges = false;
+        }
+        const timeout = res.result.backoff ?? config.dropboxSyncInterval;
+        console.log("Next dropbox poll in " + timeout);
+        setTimeout(() => this.longPoll(cursor), timeout);
     }
 
     private async listFolder(path: string) {

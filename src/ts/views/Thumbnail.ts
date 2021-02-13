@@ -44,10 +44,8 @@ export default class Thumbnail {
         }, true);
 
         imageStorage.addChangeListener((change: string, path: string) => {
-            if (change == "save"){
-                if (path == this.path || path == imageStorage.getOverlayPath(this.path)) {
-                    this.loadImage();
-                }
+            if (path == this.path || path == imageStorage.getOverlayPath(this.path)) {
+                this.loadImage();
             }
         });
         

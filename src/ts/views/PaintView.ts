@@ -576,7 +576,7 @@ export class PaintView extends View {
     }
 
     private saveImage() {
-        Utils.log("Saving image");
+        Utils.log("Saving " + this._imageId);
         this.baseLayer.canvas.toBlob(blob => imageStorage.saveImage(this._imageId, blob as Blob));
         this._isDirty = false;
         this._lastSaveTimestamp = Date.now();

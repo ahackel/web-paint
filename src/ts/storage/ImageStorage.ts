@@ -15,6 +15,7 @@ class ImageStorage {
 	private _changeListeners: Function[];
 	private _urls: { [id: string]: string }
 	private _fileMeta: IFileMetaList
+	hasChanges: boolean = false;
 	
 	constructor() {
 		this.loadFileMeta();
@@ -58,6 +59,7 @@ class ImageStorage {
 	async SetFileChangeDate(id: string, date: number){
 		this._fileMeta[id] = { changeDate: date };
 		await this.adapter.setItem("file-meta", this._fileMeta);
+		this.hasChanges = true;
 	}
 
 	public async loadImage(id: string): Promise<HTMLImageElement> {
@@ -105,6 +107,7 @@ class ImageStorage {
 		try{
 			await this.adapter.setItem(id, blob);
 			await this.SetFileChangeDate(id, changeDate);
+			this.hasChanges = true;
 		}
 		catch (e) {
 		}
