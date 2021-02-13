@@ -128,7 +128,7 @@ class DropboxStorage {
                     const serverChangeDate = new Date(serverEntry.server_modified).getTime();
                     if (serverChangeDate > this.lastSyncDate) {
                         console.log("download " + fullPath);
-                        await this.downloadImage(fullPath, storagePath, serverChangeDate);
+                        await this.downloadImage(fullPath, storagePath);
                     }
                 }
 
@@ -140,7 +140,7 @@ class DropboxStorage {
                     const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
                     if (serverChangeDate > localChangeDate) {
                         console.log("download " + fullPath);
-                        await this.downloadImage(fullPath, storagePath, serverChangeDate);
+                        await this.downloadImage(fullPath, storagePath);
                     }
                 }
             }
@@ -249,7 +249,7 @@ class DropboxStorage {
         }
     }
 
-    private async downloadImage(path: string, imageId: string, changeDate: number) {
+    private async downloadImage(path: string, imageId: string, changeDate: number = Date.now()) {
         const res = await this.dbx.filesDownload({path: path});
         if (res.status == 200){
             // fileBlob exists:

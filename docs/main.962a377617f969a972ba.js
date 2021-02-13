@@ -2181,7 +2181,7 @@ var DropboxStorage = /*#__PURE__*/function () {
 
                           console.log("download " + fullPath);
                           _context3.next = 8;
-                          return _this.downloadImage(fullPath, storagePath, serverChangeDate);
+                          return _this.downloadImage(fullPath, storagePath);
 
                         case 8:
                         case "end":
@@ -2251,7 +2251,7 @@ var DropboxStorage = /*#__PURE__*/function () {
 
                           console.log("download " + fullPath);
                           _context4.next = 11;
-                          return _this.downloadImage(fullPath, storagePath, serverChangeDate);
+                          return _this.downloadImage(fullPath, storagePath);
 
                         case 11:
                         case "end":
@@ -2734,18 +2734,22 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "downloadImage",
     value: function () {
-      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(path, imageId, changeDate) {
-        var res, blob;
+      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(path, imageId) {
+        var changeDate,
+            res,
+            blob,
+            _args11 = arguments;
         return regeneratorRuntime.wrap(function _callee7$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                _context11.next = 2;
+                changeDate = _args11.length > 2 && _args11[2] !== undefined ? _args11[2] : Date.now();
+                _context11.next = 3;
                 return this.dbx.filesDownload({
                   path: path
                 });
 
-              case 2:
+              case 3:
                 res = _context11.sent;
 
                 if (res.status == 200) {
@@ -2758,7 +2762,7 @@ var DropboxStorage = /*#__PURE__*/function () {
                   }
                 }
 
-              case 4:
+              case 5:
               case "end":
                 return _context11.stop();
             }
@@ -2766,7 +2770,7 @@ var DropboxStorage = /*#__PURE__*/function () {
         }, _callee7, this);
       }));
 
-      function downloadImage(_x5, _x6, _x7) {
+      function downloadImage(_x5, _x6) {
         return _downloadImage.apply(this, arguments);
       }
 
@@ -2796,7 +2800,7 @@ var DropboxStorage = /*#__PURE__*/function () {
         }, _callee8, this);
       }));
 
-      function postImage(_x8, _x9) {
+      function postImage(_x7, _x8) {
         return _postImage.apply(this, arguments);
       }
 
@@ -2822,7 +2826,7 @@ var DropboxStorage = /*#__PURE__*/function () {
         }, _callee9, this);
       }));
 
-      function createDirectory(_x10) {
+      function createDirectory(_x9) {
         return _createDirectory.apply(this, arguments);
       }
 
@@ -7449,4 +7453,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.b3cb3a553262341bbe4d.js.map
+//# sourceMappingURL=main.962a377617f969a972ba.js.map
