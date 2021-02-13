@@ -11,28 +11,26 @@ export default class ShapePalette extends Palette {
         super(id, [], true);
         this._shapeIds = {};
         this.selectedIndex = 0;
-
-        imageStorage.keys()
-            .then((keys: string[]) => {
-                const shapesIds = keys.filter(x => x.startsWith("shape"));
-                for (let shapeId of shapesIds) {
-                    this.addShapeFromImageId(shapeId);
-                }
-            });
+        this.addShapes();
 
         imageStorage.addChangeListener((change: string, id: string) => {
-            if (change == "save" && id.startsWith("shape")) {
-                this.addShapeFromImageId(id);
+            if (change == "save" && id.startsWith("shapes/")) {
+                this.addShape(id);
             }
         });
     }
 
-    private addShapeFromImageId(stampId: string) {
-        imageStorage.loadImageUrl(stampId)
-            .then(url => {
-                this._shapeIds[url] = stampId;
-                this.addOption(url);
-            })
+    private async addShapes() {
+        const shapesPaths = await imageStorage.listFolder("shapes");
+        for (let path of shapesPaths) {
+            await this.addShape(path);
+        }
+    }
+
+    private async addShape(path: string) {
+        const url = await imageStorage.loadImageUrl(path);
+        this._shapeIds[url] = path;
+        this.addOption(url);
     }
 
     protected optionLongClicked(event: TouchEvent, option: any, index: number) {

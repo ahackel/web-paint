@@ -180,28 +180,43 @@ class ImageStorage {
 		})
 	}
 	
+	private async renameImage(oldId: string, newId: string){
+		const data = <Blob>await this.adapter.getItem(oldId);
+		if (!data){
+			return;
+		}
+		await this.adapter.setItem(newId, data);
+		await this.adapter.removeItem(oldId);
+	}
+	
 	private async migrate(){
 		let needsRefresh = false;
 		var keys = <string[]> await this.keys();
 
 		for (let id of keys) {
-			if (!id.startsWith("image") && !id.startsWith("Shape")){
+			if (id.includes("/")){
 				continue;
 			}
-
-			if (id.endsWith(".png")){
-				continue;
+			
+			if (id.startsWith("image")){
+				await this.renameImage(id, id.replace("image", "images/"));
+				needsRefresh = true;
 			}
-
-			const newId = id.replace("Shape", "shape") + ".png";
-			const data = <Blob>await this.adapter.getItem(id);
-			await this.adapter.setItem(newId, data);
-			await this.adapter.removeItem(id);
-			console.log(`Migrated ${id} to ${newId}.`);
-			needsRefresh = true;
+			else if (id.startsWith("shape-")){
+				await this.renameImage(id, id.replace("shape-", "shapes/"));
+				needsRefresh = true;
+			}
+			else if (id.startsWith("shape")){
+				await this.renameImage(id, id.replace("shape", "shapes/"));
+				needsRefresh = true;
+			}
+			else if (id.startsWith("overlay-image")){
+				await this.renameImage(id, id.replace("overlay-image", "overlays/"));
+				needsRefresh = true;
+			}
 		}
 		if (needsRefresh){
-			location.reload();
+			//location.reload();
 		}
 	}
 	
@@ -221,6 +236,23 @@ class ImageStorage {
 
 	private async loadFileMeta() {
 		this._fileMeta = <IFileMetaList> await this.adapter.getItem("file-meta") ?? {};
+	}
+
+	getFilenameFromPath(path: string): string{
+		return path.substring(path.lastIndexOf('/')+1);
+	}		
+	
+	getImagePath(i: number): string {
+		return "images/" + String(i + 1).padStart(2, "0") + ".png";
+	}
+
+	getOverlayPath(imageId: string): string {
+		return "overlays/" + this.getFilenameFromPath(imageId);
+	}
+	
+	async listFolder(path: string): Promise<string[]> {
+		const keys = <string[]>await this.adapter.keys();
+		return keys.filter(x => x.startsWith(path + "/"));
 	}
 }
 

@@ -7,7 +7,7 @@ export default class Thumbnail {
     private _imageUrl: string;
     private _overlayUrl: string;
     
-    get id() { return this._element.id; }
+    get path() { return this._element.id; }
     set imageUrl(src: string){
         this._imageUrl = src;
         this._element.style.opacity = "1";
@@ -18,10 +18,10 @@ export default class Thumbnail {
         this.updateBackgroundImages();
     }
 
-    constructor(parent: HTMLElement, id: string, onImageSelected: Function | undefined) {
+    constructor(parent: HTMLElement, path: string, onImageSelected: Function | undefined) {
         let element = <HTMLDivElement>document.createElement("div");
         this._element = element;
-        element.id = id;
+        element.id = path;
         element.classList.add("thumbnail");
         this._element.style.opacity = "0";
         
@@ -39,13 +39,15 @@ export default class Thumbnail {
         
         Utils.addClick(element, () => {
             if (onImageSelected) {
-                onImageSelected(id);
+                onImageSelected(path);
             }
         }, true);
 
-        imageStorage.addChangeListener((change: string, id: string) => {
-            if (change == "save" && id == this.id) {
-                this.loadImage();
+        imageStorage.addChangeListener((change: string, path: string) => {
+            if (change == "save"){
+                if (path == this.path || path == imageStorage.getOverlayPath(this.path)) {
+                    this.loadImage();
+                }
             }
         });
         
@@ -62,11 +64,11 @@ export default class Thumbnail {
     }
 
     private loadImage() {
-        imageStorage.loadImageUrl(this.id)
+        imageStorage.loadImageUrl(this.path)
             .then(url => {
                 this.imageUrl = url;
             });
-        imageStorage.loadImageUrl("overlay-" + this.id)
+        imageStorage.loadImageUrl(imageStorage.getOverlayPath(this.path))
             .then(url => {
                 this.overlayUrl = url;
             });

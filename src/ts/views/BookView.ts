@@ -3,6 +3,7 @@ import {config} from "../config";
 import Thumbnail from "./Thumbnail";
 import PeerToPeer from "../PeerToPeer";
 import * as Utils from "../utils/Utils";
+import {imageStorage} from "../storage/ImageStorage";
 
 
 export default class BookView extends View {
@@ -33,7 +34,7 @@ export default class BookView extends View {
         this._thumbnails = [];
         
         for (let i=0; i<config.imageCount; i++) {
-            const imageId = `image${("" + (i + 1)).padStart(2, "0")}.png`;
+            const imageId = imageStorage.getImagePath(i);
             let thumbnail = new Thumbnail(this._element, imageId, (id: string) => this.onImageSelected(id))
             this._thumbnails.push(thumbnail);
         }

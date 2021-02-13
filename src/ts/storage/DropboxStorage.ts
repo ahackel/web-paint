@@ -67,23 +67,22 @@ class DropboxStorage {
             const serverFiles = await this.listFolder(path);
             if (serverFiles && (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH)) {
                 // download from server:
-                for (let path of serverFiles) {
-                    console.log(path.name)
-                    if (path[".tag"] != "file") {
+                for (let file of serverFiles) {
+                    if (file[".tag"] != "file") {
                         continue;
                     }
-                    if (!path.name.endsWith(".png")) {
-                        continue;
-                    }
-
-                    const imageId = path.name;
-                    const changeDate = new Date(path.server_modified).getTime();
-                    if (await imageStorage.GetFileChangeDate(imageId) >= changeDate) {
+                    if (!file.name.endsWith(".png")) {
                         continue;
                     }
 
-                    console.log("getting " + imageId);
-                    this.downloadImage(path.path_lower, imageId, changeDate);
+                    const imagePath = file.path_display.substring(path.length + 2);
+                    const changeDate = new Date(file.server_modified).getTime();
+                    if (await imageStorage.GetFileChangeDate(imagePath) >= changeDate) {
+                        continue;
+                    }
+
+                    console.log("getting " + imagePath);
+                    this.downloadImage(file.path_lower, imagePath, changeDate);
                 }
             }
 
@@ -123,7 +122,7 @@ class DropboxStorage {
 
     private async listFolder(path: string) {
         try{
-            var res = await this.dbx.filesListFolder({path: "/" + path});
+            var res = await this.dbx.filesListFolder({path: "/" + path, recursive: true});
             return res.result.entries;
         }
         catch(error){

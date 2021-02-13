@@ -1454,6 +1454,10 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -1490,29 +1494,12 @@ var ShapePalette = /*#__PURE__*/function (_Palette) {
     _this = _super.call(this, id, [], true);
     _this._shapeIds = {};
     _this.selectedIndex = 0;
-    _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.keys().then(function (keys) {
-      var shapesIds = keys.filter(function (x) {
-        return x.startsWith("shape");
-      });
 
-      var _iterator = _createForOfIteratorHelper(shapesIds),
-          _step;
+    _this.addShapes();
 
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var shapeId = _step.value;
-
-          _this.addShapeFromImageId(shapeId);
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-    });
     _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.addChangeListener(function (change, id) {
-      if (change == "save" && id.startsWith("shape")) {
-        _this.addShapeFromImageId(id);
+      if (change == "save" && id.startsWith("shapes/")) {
+        _this.addShape(id);
       }
     });
     return _this;
@@ -1524,16 +1511,101 @@ var ShapePalette = /*#__PURE__*/function (_Palette) {
       return this.selectedOption;
     }
   }, {
-    key: "addShapeFromImageId",
-    value: function addShapeFromImageId(stampId) {
-      var _this2 = this;
+    key: "addShapes",
+    value: function () {
+      var _addShapes = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var shapesPaths, _iterator, _step, path;
 
-      _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.loadImageUrl(stampId).then(function (url) {
-        _this2._shapeIds[url] = stampId;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.listFolder("shapes");
 
-        _this2.addOption(url);
-      });
-    }
+              case 2:
+                shapesPaths = _context.sent;
+                _iterator = _createForOfIteratorHelper(shapesPaths);
+                _context.prev = 4;
+
+                _iterator.s();
+
+              case 6:
+                if ((_step = _iterator.n()).done) {
+                  _context.next = 12;
+                  break;
+                }
+
+                path = _step.value;
+                _context.next = 10;
+                return this.addShape(path);
+
+              case 10:
+                _context.next = 6;
+                break;
+
+              case 12:
+                _context.next = 17;
+                break;
+
+              case 14:
+                _context.prev = 14;
+                _context.t0 = _context["catch"](4);
+
+                _iterator.e(_context.t0);
+
+              case 17:
+                _context.prev = 17;
+
+                _iterator.f();
+
+                return _context.finish(17);
+
+              case 20:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[4, 14, 17, 20]]);
+      }));
+
+      function addShapes() {
+        return _addShapes.apply(this, arguments);
+      }
+
+      return addShapes;
+    }()
+  }, {
+    key: "addShape",
+    value: function () {
+      var _addShape = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(path) {
+        var url;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.loadImageUrl(path);
+
+              case 2:
+                url = _context2.sent;
+                this._shapeIds[url] = path;
+                this.addOption(url);
+
+              case 5:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function addShape(_x) {
+        return _addShape.apply(this, arguments);
+      }
+
+      return addShape;
+    }()
   }, {
     key: "optionLongClicked",
     value: function optionLongClicked(event, option, index) {
@@ -1552,7 +1624,7 @@ var ShapePalette = /*#__PURE__*/function (_Palette) {
   }, {
     key: "deleteShape",
     value: function deleteShape(index) {
-      var _this3 = this;
+      var _this2 = this;
 
       var option = this._options[index];
       var stampId = this._shapeIds[option];
@@ -1562,13 +1634,13 @@ var ShapePalette = /*#__PURE__*/function (_Palette) {
       }
 
       _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.deleteImage(stampId).then(function () {
-        delete _this3._shapeIds[option];
+        delete _this2._shapeIds[option];
 
-        _this3.removeOption(index);
+        _this2.removeOption(index);
 
-        if (_this3.selectedIndex == index) {
+        if (_this2.selectedIndex == index) {
           // select the following item that now has the same index
-          _this3.selectedIndex = index;
+          _this2.selectedIndex = index;
         }
       });
     }
@@ -1792,8 +1864,8 @@ var DropboxStorage = /*#__PURE__*/function () {
             serverFiles,
             _iterator,
             _step,
-            _path,
-            imageId,
+            file,
+            imagePath,
             changeDate,
             keys,
             _iterator2,
@@ -1815,7 +1887,7 @@ var DropboxStorage = /*#__PURE__*/function () {
                 serverFiles = _context3.sent;
 
                 if (!(serverFiles && (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH))) {
-                  _context3.next = 36;
+                  _context3.next = 35;
                   break;
                 }
 
@@ -1827,92 +1899,91 @@ var DropboxStorage = /*#__PURE__*/function () {
 
               case 9:
                 if ((_step = _iterator.n()).done) {
-                  _context3.next = 28;
+                  _context3.next = 27;
                   break;
                 }
 
-                _path = _step.value;
-                console.log(_path.name);
+                file = _step.value;
 
-                if (!(_path[".tag"] != "file")) {
-                  _context3.next = 14;
+                if (!(file[".tag"] != "file")) {
+                  _context3.next = 13;
                   break;
                 }
 
-                return _context3.abrupt("continue", 26);
+                return _context3.abrupt("continue", 25);
 
-              case 14:
-                if (_path.name.endsWith(".png")) {
-                  _context3.next = 16;
+              case 13:
+                if (file.name.endsWith(".png")) {
+                  _context3.next = 15;
                   break;
                 }
 
-                return _context3.abrupt("continue", 26);
+                return _context3.abrupt("continue", 25);
 
-              case 16:
-                imageId = _path.name;
-                changeDate = new Date(_path.server_modified).getTime();
-                _context3.next = 20;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(imageId);
+              case 15:
+                imagePath = file.path_display.substring(path.length + 2);
+                changeDate = new Date(file.server_modified).getTime();
+                _context3.next = 19;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(imagePath);
 
-              case 20:
+              case 19:
                 _context3.t0 = _context3.sent;
                 _context3.t1 = changeDate;
 
                 if (!(_context3.t0 >= _context3.t1)) {
-                  _context3.next = 24;
+                  _context3.next = 23;
                   break;
                 }
 
-                return _context3.abrupt("continue", 26);
+                return _context3.abrupt("continue", 25);
 
-              case 24:
-                console.log("getting " + imageId);
-                this.downloadImage(_path.path_lower, imageId, changeDate);
+              case 23:
+                console.log("getting " + imagePath);
+                this.downloadImage(file.path_lower, imagePath, changeDate);
 
-              case 26:
+              case 25:
                 _context3.next = 9;
                 break;
 
-              case 28:
-                _context3.next = 33;
+              case 27:
+                _context3.next = 32;
                 break;
 
-              case 30:
-                _context3.prev = 30;
+              case 29:
+                _context3.prev = 29;
                 _context3.t2 = _context3["catch"](7);
 
                 _iterator.e(_context3.t2);
 
-              case 33:
-                _context3.prev = 33;
+              case 32:
+                _context3.prev = 32;
 
                 _iterator.f();
 
-                return _context3.finish(33);
+                return _context3.finish(32);
 
-              case 36:
+              case 35:
                 if (!(mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH)) {
-                  _context3.next = 62;
+                  _context3.next = 61;
                   break;
                 }
 
                 if (serverFiles) {
-                  _context3.next = 40;
+                  _context3.next = 39;
                   break;
                 }
 
-                _context3.next = 40;
+                _context3.next = 39;
                 return this.createDirectory(path);
 
-              case 40:
-                _context3.next = 42;
+              case 39:
+                _context3.next = 41;
                 return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.keys();
 
-              case 42:
+              case 41:
                 keys = _context3.sent;
                 _iterator2 = _createForOfIteratorHelper(keys);
-                _context3.prev = 44;
+                _context3.prev = 43;
                 _loop = /*#__PURE__*/regeneratorRuntime.mark(function _loop() {
                   var id, existingEntry, existingChangeDate, url, blob, fileName;
                   return regeneratorRuntime.wrap(function _loop$(_context2) {
@@ -1981,60 +2052,60 @@ var DropboxStorage = /*#__PURE__*/function () {
 
                 _iterator2.s();
 
-              case 47:
+              case 46:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context3.next = 54;
+                  _context3.next = 53;
                   break;
                 }
 
-                return _context3.delegateYield(_loop(), "t3", 49);
+                return _context3.delegateYield(_loop(), "t3", 48);
 
-              case 49:
+              case 48:
                 _ret = _context3.t3;
 
                 if (!(_ret === "continue")) {
-                  _context3.next = 52;
+                  _context3.next = 51;
                   break;
                 }
 
-                return _context3.abrupt("continue", 52);
+                return _context3.abrupt("continue", 51);
 
-              case 52:
-                _context3.next = 47;
+              case 51:
+                _context3.next = 46;
                 break;
 
-              case 54:
-                _context3.next = 59;
+              case 53:
+                _context3.next = 58;
                 break;
 
-              case 56:
-                _context3.prev = 56;
-                _context3.t4 = _context3["catch"](44);
+              case 55:
+                _context3.prev = 55;
+                _context3.t4 = _context3["catch"](43);
 
                 _iterator2.e(_context3.t4);
 
-              case 59:
-                _context3.prev = 59;
+              case 58:
+                _context3.prev = 58;
 
                 _iterator2.f();
 
-                return _context3.finish(59);
+                return _context3.finish(58);
 
-              case 62:
-                _context3.next = 67;
+              case 61:
+                _context3.next = 66;
                 break;
 
-              case 64:
-                _context3.prev = 64;
+              case 63:
+                _context3.prev = 63;
                 _context3.t5 = _context3["catch"](1);
                 console.log(_context3.t5);
 
-              case 67:
+              case 66:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee2, this, [[1, 64], [7, 30, 33, 36], [44, 56, 59, 62]]);
+        }, _callee2, this, [[1, 63], [7, 29, 32, 35], [43, 55, 58, 61]]);
       }));
 
       function syncFolder(_x) {
@@ -2055,7 +2126,8 @@ var DropboxStorage = /*#__PURE__*/function () {
                 _context4.prev = 0;
                 _context4.next = 3;
                 return this.dbx.filesListFolder({
-                  path: "/" + path
+                  path: "/" + path,
+                  recursive: true
                 });
 
               case 3:
@@ -2821,99 +2893,170 @@ var ImageStorage = /*#__PURE__*/function () {
       return importBackupArchive;
     }()
   }, {
-    key: "migrate",
+    key: "renameImage",
     value: function () {
-      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11() {
-        var needsRefresh, keys, _iterator3, _step3, _id2, newId, data;
-
+      var _renameImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(oldId, newId) {
+        var data;
         return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
+                _context11.next = 2;
+                return this.adapter.getItem(oldId);
+
+              case 2:
+                data = _context11.sent;
+
+                if (data) {
+                  _context11.next = 5;
+                  break;
+                }
+
+                return _context11.abrupt("return");
+
+              case 5:
+                _context11.next = 7;
+                return this.adapter.setItem(newId, data);
+
+              case 7:
+                _context11.next = 9;
+                return this.adapter.removeItem(oldId);
+
+              case 9:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function renameImage(_x12, _x13) {
+        return _renameImage.apply(this, arguments);
+      }
+
+      return renameImage;
+    }()
+  }, {
+    key: "migrate",
+    value: function () {
+      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12() {
+        var needsRefresh, keys, _iterator3, _step3, _id2;
+
+        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
                 needsRefresh = false;
-                _context11.next = 3;
+                _context12.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context11.sent;
+                keys = _context12.sent;
                 _iterator3 = _createForOfIteratorHelper(keys);
-                _context11.prev = 5;
+                _context12.prev = 5;
 
                 _iterator3.s();
 
               case 7:
                 if ((_step3 = _iterator3.n()).done) {
-                  _context11.next = 25;
+                  _context12.next = 35;
                   break;
                 }
 
                 _id2 = _step3.value;
 
-                if (!(!_id2.startsWith("image") && !_id2.startsWith("Shape"))) {
-                  _context11.next = 11;
+                if (!_id2.includes("/")) {
+                  _context12.next = 11;
                   break;
                 }
 
-                return _context11.abrupt("continue", 23);
+                return _context12.abrupt("continue", 33);
 
               case 11:
-                if (!_id2.endsWith(".png")) {
-                  _context11.next = 13;
+                if (!_id2.startsWith("image")) {
+                  _context12.next = 17;
                   break;
                 }
 
-                return _context11.abrupt("continue", 23);
+                _context12.next = 14;
+                return this.renameImage(_id2, _id2.replace("image", "images/"));
 
-              case 13:
-                newId = _id2.replace("Shape", "shape") + ".png";
-                _context11.next = 16;
-                return this.adapter.getItem(_id2);
-
-              case 16:
-                data = _context11.sent;
-                _context11.next = 19;
-                return this.adapter.setItem(newId, data);
-
-              case 19:
-                _context11.next = 21;
-                return this.adapter.removeItem(_id2);
-
-              case 21:
-                console.log("Migrated ".concat(_id2, " to ").concat(newId, "."));
+              case 14:
                 needsRefresh = true;
+                _context12.next = 33;
+                break;
+
+              case 17:
+                if (!_id2.startsWith("shape-")) {
+                  _context12.next = 23;
+                  break;
+                }
+
+                _context12.next = 20;
+                return this.renameImage(_id2, _id2.replace("shape-", "shapes/"));
+
+              case 20:
+                needsRefresh = true;
+                _context12.next = 33;
+                break;
 
               case 23:
-                _context11.next = 7;
+                if (!_id2.startsWith("shape")) {
+                  _context12.next = 29;
+                  break;
+                }
+
+                _context12.next = 26;
+                return this.renameImage(_id2, _id2.replace("shape", "shapes/"));
+
+              case 26:
+                needsRefresh = true;
+                _context12.next = 33;
                 break;
 
-              case 25:
-                _context11.next = 30;
+              case 29:
+                if (!_id2.startsWith("overlay-image")) {
+                  _context12.next = 33;
+                  break;
+                }
+
+                _context12.next = 32;
+                return this.renameImage(_id2, _id2.replace("overlay-image", "overlays/"));
+
+              case 32:
+                needsRefresh = true;
+
+              case 33:
+                _context12.next = 7;
                 break;
 
-              case 27:
-                _context11.prev = 27;
-                _context11.t0 = _context11["catch"](5);
+              case 35:
+                _context12.next = 40;
+                break;
 
-                _iterator3.e(_context11.t0);
+              case 37:
+                _context12.prev = 37;
+                _context12.t0 = _context12["catch"](5);
 
-              case 30:
-                _context11.prev = 30;
+                _iterator3.e(_context12.t0);
+
+              case 40:
+                _context12.prev = 40;
 
                 _iterator3.f();
 
-                return _context11.finish(30);
+                return _context12.finish(40);
 
-              case 33:
-                if (needsRefresh) {
-                  location.reload();
+              case 43:
+                if (needsRefresh) {//location.reload();
                 }
 
-              case 34:
+              case 44:
               case "end":
-                return _context11.stop();
+                return _context12.stop();
             }
           }
-        }, _callee11, this, [[5, 27, 30, 33]]);
+        }, _callee12, this, [[5, 37, 40, 43]]);
       }));
 
       function migrate() {
@@ -2925,84 +3068,84 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "getStorageUsed",
     value: function () {
-      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12() {
+      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
         var amount, keys, _iterator4, _step4, _id3, url, blob;
 
-        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
                 amount = 0;
-                _context12.next = 3;
+                _context13.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context12.sent;
+                keys = _context13.sent;
                 _iterator4 = _createForOfIteratorHelper(keys);
-                _context12.prev = 5;
+                _context13.prev = 5;
 
                 _iterator4.s();
 
               case 7:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context12.next = 20;
+                  _context13.next = 20;
                   break;
                 }
 
                 _id3 = _step4.value;
-                _context12.next = 11;
+                _context13.next = 11;
                 return this.loadImageUrl(_id3);
 
               case 11:
-                url = _context12.sent;
-                _context12.next = 14;
+                url = _context13.sent;
+                _context13.next = 14;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
 
               case 14:
-                blob = _context12.sent;
+                blob = _context13.sent;
 
                 if (blob) {
-                  _context12.next = 17;
+                  _context13.next = 17;
                   break;
                 }
 
-                return _context12.abrupt("continue", 18);
+                return _context13.abrupt("continue", 18);
 
               case 17:
                 amount += blob.size;
 
               case 18:
-                _context12.next = 7;
+                _context13.next = 7;
                 break;
 
               case 20:
-                _context12.next = 25;
+                _context13.next = 25;
                 break;
 
               case 22:
-                _context12.prev = 22;
-                _context12.t0 = _context12["catch"](5);
+                _context13.prev = 22;
+                _context13.t0 = _context13["catch"](5);
 
-                _iterator4.e(_context12.t0);
+                _iterator4.e(_context13.t0);
 
               case 25:
-                _context12.prev = 25;
+                _context13.prev = 25;
 
                 _iterator4.f();
 
-                return _context12.finish(25);
+                return _context13.finish(25);
 
               case 28:
-                return _context12.abrupt("return", amount);
+                return _context13.abrupt("return", amount);
 
               case 29:
               case "end":
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this, [[5, 22, 25, 28]]);
+        }, _callee13, this, [[5, 22, 25, 28]]);
       }));
 
       function getStorageUsed() {
@@ -3014,49 +3157,49 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "loadFileMeta",
     value: function () {
-      var _loadFileMeta = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+      var _loadFileMeta = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
         var _ref2;
 
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
-                _context13.next = 2;
+                _context14.next = 2;
                 return this.adapter.getItem("file-meta");
 
               case 2:
-                _context13.t1 = _ref2 = _context13.sent;
-                _context13.t0 = _context13.t1 !== null;
+                _context14.t1 = _ref2 = _context14.sent;
+                _context14.t0 = _context14.t1 !== null;
 
-                if (!_context13.t0) {
-                  _context13.next = 6;
+                if (!_context14.t0) {
+                  _context14.next = 6;
                   break;
                 }
 
-                _context13.t0 = _ref2 !== void 0;
+                _context14.t0 = _ref2 !== void 0;
 
               case 6:
-                if (!_context13.t0) {
-                  _context13.next = 10;
+                if (!_context14.t0) {
+                  _context14.next = 10;
                   break;
                 }
 
-                _context13.t2 = _ref2;
-                _context13.next = 11;
+                _context14.t2 = _ref2;
+                _context14.next = 11;
                 break;
 
               case 10:
-                _context13.t2 = {};
+                _context14.t2 = {};
 
               case 11:
-                this._fileMeta = _context13.t2;
+                this._fileMeta = _context14.t2;
 
               case 12:
               case "end":
-                return _context13.stop();
+                return _context14.stop();
             }
           }
-        }, _callee13, this);
+        }, _callee14, this);
       }));
 
       function loadFileMeta() {
@@ -3064,6 +3207,53 @@ var ImageStorage = /*#__PURE__*/function () {
       }
 
       return loadFileMeta;
+    }()
+  }, {
+    key: "getFilenameFromPath",
+    value: function getFilenameFromPath(path) {
+      return path.substring(path.lastIndexOf('/') + 1);
+    }
+  }, {
+    key: "getImagePath",
+    value: function getImagePath(i) {
+      return "images/" + String(i + 1).padStart(2, "0") + ".png";
+    }
+  }, {
+    key: "getOverlayPath",
+    value: function getOverlayPath(imageId) {
+      return "overlays/" + this.getFilenameFromPath(imageId);
+    }
+  }, {
+    key: "listFolder",
+    value: function () {
+      var _listFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(path) {
+        var keys;
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+          while (1) {
+            switch (_context15.prev = _context15.next) {
+              case 0:
+                _context15.next = 2;
+                return this.adapter.keys();
+
+              case 2:
+                keys = _context15.sent;
+                return _context15.abrupt("return", keys.filter(function (x) {
+                  return x.startsWith(path + "/");
+                }));
+
+              case 4:
+              case "end":
+                return _context15.stop();
+            }
+          }
+        }, _callee15, this);
+      }));
+
+      function listFolder(_x14) {
+        return _listFolder.apply(this, arguments);
+      }
+
+      return listFolder;
     }()
   }]);
 
@@ -5004,6 +5194,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./src/ts/config.ts");
 /* harmony import */ var _Thumbnail__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Thumbnail */ "./src/ts/views/Thumbnail.ts");
 /* harmony import */ var _utils_Utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Utils */ "./src/ts/utils/Utils.ts");
+/* harmony import */ var _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../storage/ImageStorage */ "./src/ts/storage/ImageStorage.ts");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -5027,6 +5218,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 
 
 
@@ -5074,7 +5266,7 @@ var BookView = /*#__PURE__*/function (_View) {
       this._thumbnails = [];
 
       for (var i = 0; i < _config__WEBPACK_IMPORTED_MODULE_1__.config.imageCount; i++) {
-        var imageId = "image".concat(("" + (i + 1)).padStart(2, "0"), ".png");
+        var imageId = _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_4__.imageStorage.getImagePath(i);
         var thumbnail = new _Thumbnail__WEBPACK_IMPORTED_MODULE_2__.default(this._element, imageId, function (id) {
           return _this2.onImageSelected(id);
         });
@@ -6252,14 +6444,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var Thumbnail = /*#__PURE__*/function () {
-  function Thumbnail(parent, id, onImageSelected) {
+  function Thumbnail(parent, path, onImageSelected) {
     var _this = this;
 
     _classCallCheck(this, Thumbnail);
 
     var element = document.createElement("div");
     this._element = element;
-    element.id = id;
+    element.id = path;
     element.classList.add("thumbnail");
     this._element.style.opacity = "0"; // Utils.addLongClick(element, () => {
     //     if (!this._image || !PeerToPeer.instance || !PeerToPeer.instance.loggedIn || PeerToPeer.instance.peerList.length < 2){
@@ -6275,12 +6467,14 @@ var Thumbnail = /*#__PURE__*/function () {
 
     _utils_Utils__WEBPACK_IMPORTED_MODULE_0__.addClick(element, function () {
       if (onImageSelected) {
-        onImageSelected(id);
+        onImageSelected(path);
       }
     }, true);
-    _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.addChangeListener(function (change, id) {
-      if (change == "save" && id == _this.id) {
-        _this.loadImage();
+    _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.addChangeListener(function (change, path) {
+      if (change == "save") {
+        if (path == _this.path || path == _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.getOverlayPath(_this.path)) {
+          _this.loadImage();
+        }
       }
     });
     parent.appendChild(element);
@@ -6288,7 +6482,7 @@ var Thumbnail = /*#__PURE__*/function () {
   }
 
   _createClass(Thumbnail, [{
-    key: "id",
+    key: "path",
     get: function get() {
       return this._element.id;
     }
@@ -6320,10 +6514,10 @@ var Thumbnail = /*#__PURE__*/function () {
     value: function loadImage() {
       var _this2 = this;
 
-      _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.loadImageUrl(this.id).then(function (url) {
+      _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.loadImageUrl(this.path).then(function (url) {
         _this2.imageUrl = url;
       });
-      _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.loadImageUrl("overlay-" + this.id).then(function (url) {
+      _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.loadImageUrl(_storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.getOverlayPath(this.path)).then(function (url) {
         _this2.overlayUrl = url;
       });
     }
@@ -6654,4 +6848,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.7e80b6b9f8dcd570e0a3.js.map
+//# sourceMappingURL=main.bd19c09b681e7d7e83a9.js.map
