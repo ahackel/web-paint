@@ -72,8 +72,8 @@ class DropboxStorage {
             return;
         }
 
-        console.log("Sync default content:");
-        await this.syncFolder("default", this.SYNC_DOWNLOAD);
+        // console.log("Sync default content:");
+        // await this.syncFolder("default", this.SYNC_DOWNLOAD);
         console.log("Sync user content:");
         const cursor = await this.syncFolder(this.userId, this.SYNC_BOTH);
         this.lastSyncDate = Date.now();

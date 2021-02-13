@@ -1937,25 +1937,22 @@ var DropboxStorage = /*#__PURE__*/function () {
                 return _context2.abrupt("return");
 
               case 2:
-                console.log("Sync default content:");
-                _context2.next = 5;
-                return this.syncFolder("default", this.SYNC_DOWNLOAD);
-
-              case 5:
+                // console.log("Sync default content:");
+                // await this.syncFolder("default", this.SYNC_DOWNLOAD);
                 console.log("Sync user content:");
-                _context2.next = 8;
+                _context2.next = 5;
                 return this.syncFolder(this.userId, this.SYNC_BOTH);
 
-              case 8:
+              case 5:
                 cursor = _context2.sent;
                 this.lastSyncDate = Date.now();
-                _context2.next = 12;
+                _context2.next = 9;
                 return this.startLongPoll(cursor);
 
-              case 12:
+              case 9:
                 return _context2.abrupt("return", cursor);
 
-              case 13:
+              case 10:
               case "end":
                 return _context2.stop();
             }
@@ -7453,4 +7450,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.962a377617f969a972ba.js.map
+//# sourceMappingURL=main.d55143e8e0ed215e9de5.js.map
