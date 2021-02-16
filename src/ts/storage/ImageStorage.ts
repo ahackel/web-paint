@@ -2,9 +2,10 @@ import 'whatwg-fetch';
 import LocalForageAdapter from "./LocalForageAdapter";
 import StorageAdapter from "./StorageAdapter";
 import JSZip from "jszip";
+import sha256 from 'crypto-js/sha256';
 
 interface IFileMeta {
-	changeDate: number
+	hash: string;
 }
 
 type IFileMetaList = { [id: string]: IFileMeta };
@@ -36,30 +37,9 @@ class ImageStorage {
 		return this._urls;
 	}
 	
-	async GetFileChangeDate(id: string){
-		if (id in this._fileMeta){
-			return this._fileMeta[id].changeDate;
-		}
-		
-		if (await this.ContainsImage(id)){
-			// add missing entry
-			const newChangeDate = Date.now();
-			this.SetFileChangeDate(id, newChangeDate);
-			return newChangeDate;
-		}
-		
-		return 0;
-	}
-	
 	async ContainsImage(id: string){
 		var keys = <string[]> await this.keys();
 		return keys.includes(id);
-	}
-
-	async SetFileChangeDate(id: string, date: number){
-		this._fileMeta[id] = { changeDate: date };
-		await this.adapter.setItem("file-meta", this._fileMeta);
-		this.hasChanges = true;
 	}
 
 	public async loadImage(id: string): Promise<HTMLImageElement> {
@@ -103,10 +83,10 @@ class ImageStorage {
 		return <Promise<Blob>>this.adapter.getItem(id)
 	}
 
-	public async saveImage(id: string, blob: Blob, changeDate: number = Date.now()){
+	public async saveImage(id: string, blob: Blob, hash?: string){
 		try{
 			await this.adapter.setItem(id, blob);
-			await this.SetFileChangeDate(id, changeDate);
+			await this.setHash(id, hash ?? await this.generateContentHash(blob));
 			this.hasChanges = true;
 		}
 		catch (e) {
@@ -193,36 +173,42 @@ class ImageStorage {
 	}
 	
 	private async migrate(){
-		let needsRefresh = false;
 		var keys = <string[]> await this.keys();
 
 		for (let id of keys) {
-			if (id.includes("/")){
-				continue;
+			if (!id.includes("/")) {
+				await this.migrateLooseFilesIntoFolders(id);
 			}
-			
-			if (id.startsWith("image")){
-				await this.renameImage(id, id.replace("image", "images/"));
-				needsRefresh = true;
+			if (id.startsWith("images/") ||
+				id.startsWith("shapes/")){
+				await this.renameImage(id, "user/" + id);
 			}
-			else if (id.startsWith("shape-")){
-				await this.renameImage(id, id.replace("shape-", "shapes/"));
-				needsRefresh = true;
+			if (id.startsWith("overlays/")){
+				await this.renameImage(id, "default/" + id);
 			}
-			else if (id.startsWith("shape")){
-				await this.renameImage(id, id.replace("shape", "shapes/"));
-				needsRefresh = true;
-			}
-			else if (id.startsWith("overlay-image")){
-				await this.renameImage(id, id.replace("overlay-image", "overlays/"));
-				needsRefresh = true;
-			}
-		}
-		if (needsRefresh){
-			//location.reload();
 		}
 	}
-	
+
+	private async migrateLooseFilesIntoFolders(id: string) {
+		if (id.startsWith("image")) {
+			await this.renameImage(id, id.replace("image", "user/images/"));
+			return true;
+		}
+		if (id.startsWith("shape-")) {
+			await this.renameImage(id, id.replace("shape-", "user/shapes/"));
+			return true;
+		}
+		if (id.startsWith("shape")) {
+			await this.renameImage(id, id.replace("shape", "user/shapes/"));
+			return true;
+		}
+		if (id.startsWith("overlay-image")) {
+			await this.renameImage(id, id.replace("overlay-image", "default/overlays/"));
+			return true;
+		}
+		return false;
+	}
+
 	public async getStorageUsed(): Promise<number> {
 		let amount = 0;
 		var keys = <string[]> await this.keys();
@@ -246,16 +232,51 @@ class ImageStorage {
 	}		
 	
 	getImagePath(i: number): string {
-		return "images/" + String(i + 1).padStart(2, "0") + ".png";
+		return "user/images/" + String(i + 1).padStart(2, "0") + ".png";
 	}
 
 	getOverlayPath(imageId: string): string {
-		return "overlays/" + this.getFilenameFromPath(imageId);
+		return "default/overlays/" + this.getFilenameFromPath(imageId);
 	}
 	
 	async listFolder(path: string): Promise<string[]> {
 		const keys = <string[]>await this.adapter.keys();
 		return keys.filter(x => x.startsWith(path + "/"));
+	}	
+
+	async getHash(id: string): Promise<string> {
+		if (id in this._fileMeta){
+			return this._fileMeta[id].hash;
+		}
+		return null;
+	}
+
+	private async setHash(id: string, hash: string) {
+		this._fileMeta[id] = { hash: hash };
+		await this.adapter.setItem("file-meta", this._fileMeta);
+	}
+
+	private async generateContentHash(blob: Blob): Promise<string> {
+		return Date.now().toString();
+		
+		// const BLOCK_SIZE = 4 * 1024 * 1024;
+		// let hash = CryptoJS.algo.SHA256.create();
+		// for (let p = 0; p < blob.size; p += BLOCK_SIZE) {
+		// 	let blobChunk = blob.slice(p, p + BLOCK_SIZE).;
+		// 	hash.update(sha256(blobChunk));
+		// }
+		// return hash.finalize().toString();
+		
+		// const reader = new FileReader();
+		// const p = new Promise((resolve, reject) => {
+		// 	reader.onload = () => resolve(reader.result);
+		// 	reader.onerror = reject;
+		// 	reader.readAsBinaryString(blob);
+		// });
+		//
+		// await p;
+		//
+		// return sha256(reader.result.toString()).toString();
 	}
 }
 

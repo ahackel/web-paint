@@ -39,9 +39,11 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
+    "@types/crypto-js": "^4.0.1",
     "blueimp-canvas-to-blob": "^3.28.0",
     "console-log-html": "^2.0.2",
     "core-js": "^3.8.3",
+    "crypto-js": "^4.0.0",
     "dropbox": "^8.3.0",
     "file-saver": "^2.0.5",
     "jszip": "^3.5.0",

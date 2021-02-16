@@ -55,7 +55,7 @@ export default class SettingsView extends View {
 
         let clearButton = this._element.querySelector<HTMLDivElement>(".button.clear");
         Utils.addClick(clearButton, () => {
-            if (confirm("Really clear all iamges?")){
+            if (confirm("Really clear all images?")){
                 imageStorage.clear();
                 location.reload();
             }
@@ -67,7 +67,6 @@ export default class SettingsView extends View {
     }
 
     private updateButtons() {
-        console.log(dropboxStorage.isAuthorized)
         this._connectButton.classList.toggle('hidden', dropboxStorage.isAuthorized);
         this._disconnectButton.classList.toggle('hidden', !dropboxStorage.isAuthorized);
         this._syncButton.classList.toggle("disabled", !dropboxStorage.isAuthorized);

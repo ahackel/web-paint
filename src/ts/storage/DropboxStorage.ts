@@ -2,8 +2,188 @@ import {Dropbox, DropboxAuth, DropboxResponse, files} from "dropbox";
 import localforage from "localforage";
 import {imageStorage} from "./ImageStorage";
 import {config} from "../config";
+import {FileSync, IFileSet, IFileStatusEntry, IFileSyncStatus} from "../utils/FileSync";
+import ILayer from "../ILayer";
 
 const CLIENT_ID = 'dyfw7wk3nb2utzo';
+
+
+interface IFile {
+    hash: string
+}
+
+abstract class FileSet implements IFileSet {
+    protected _files: Map<string, IFile>;
+    
+    async copyTo(itemId: string, filesB: IFileSet): Promise<void>{
+        await (<FileSet>filesB).add(itemId, await this.load(itemId), this.getHash(itemId));
+    }
+
+    abstract load(id: string): Promise<Blob>;
+    
+    abstract add(id: string, content: Blob, hash: string): Promise<void>;
+
+    abstract delete(id: string): Promise<void>;
+
+    getHash(id: string): string {
+        return this._files.get(id)?.hash;
+    }
+
+    has(id: string): boolean {
+        return this._files.has(id);
+    }
+
+    getAll(): IterableIterator<string>{
+        return this._files.keys();
+    }
+}
+
+class clientFileSet extends FileSet {
+    private _rootPath: string;
+
+    async setPath(path: string){
+        this._rootPath = path;
+        const ids = await imageStorage.listFolder(path);
+        this._files = new Map<string, IFile>();
+        for (let id of ids) {
+            this._files.set(id, {hash: await imageStorage.getHash(id)});
+        }
+    }
+    
+    async add(id: string, content: Blob, hash: string): Promise<void> {
+        console.log("save " + id);
+        await imageStorage.saveImage(id, content, hash);
+    }
+
+    async delete(id: string): Promise<void> {
+        console.log("delete " + id);
+        await imageStorage.deleteImage(id);
+    }
+
+    async load(id: string): Promise<Blob> {
+        const url = await imageStorage.loadImageUrl(id);
+        return fetch(url).then(r => r.blob());
+    }
+}
+
+class serverFileSet extends FileSet {
+    private _dbx: Dropbox;
+    private _serverRoot: string;
+    private _clientRoot: string;
+    private _cursor: string;
+    
+    constructor(dbx: Dropbox) {
+        super();
+        this._dbx = dbx;
+    }
+    
+    getCursor(){
+        return this._cursor;
+    }
+    
+    async setPath(serverRootPath: string, clientRootPath: string){
+        this._serverRoot = "/" + serverRootPath;
+        this._clientRoot = clientRootPath;
+        this._files = new Map<string, IFile>();
+
+        let res = await this._dbx.filesListFolder({
+            path: this._serverRoot,
+            recursive: true,
+        });
+        this.addServerEntries(<files.FileMetadataReference[]><unknown>res.result.entries);
+
+        while (res.result.has_more){
+            console.log("more")
+            res = await this._dbx.filesListFolderContinue({
+                cursor: res.result.cursor
+            });
+            this.addServerEntries(<files.FileMetadataReference[]><unknown>res.result.entries);
+        }
+        
+        this._cursor = res.result.cursor;
+    }
+
+    private addServerEntries(entries: files.FileMetadataReference[]) {
+        const serverFiles: files.FileMetadataReference[] = entries
+            .filter(x => x.name.endsWith(".png") && x[".tag"] == "file");
+
+        for (let file of serverFiles) {
+            const itemId = this.serverToClientPath(file.path_display);
+            this._files.set(itemId, {hash: file.content_hash});
+        }
+    }
+    
+    private serverToClientPath(serverPath: string){
+        return serverPath.replace(this._serverRoot, this._clientRoot);
+    }
+
+    private clientToServerPath(clientPath: string){
+        return clientPath.replace(this._clientRoot, this._serverRoot);
+    }
+
+    async add(itemId: string, contents: Blob, hash: string): Promise<void> {
+        console.log("upload " + itemId);
+        const serverPath = this.clientToServerPath(itemId);
+        console.log("upload " + itemId + " > " + serverPath);
+        await this._dbx.filesUpload({path: serverPath, contents: contents, mode: { ".tag": "overwrite" }})
+    }
+    
+    async delete(itemId: string): Promise<void> {
+        const serverPath = this.clientToServerPath(itemId);
+        console.log("delete " + serverPath + " from dropbox");
+        await this._dbx.filesDeleteV2({path: serverPath});
+    }
+
+    async load(itemId: string): Promise<Blob> {
+        const serverPath = this.clientToServerPath(itemId);
+        console.log("download " + serverPath + " > " + itemId);
+        const res = await this._dbx.filesDownload({path: serverPath});
+        if (res.status == 200) {
+            // @ts-ignore
+            return res.result.fileBlob;
+        }
+    }
+}
+
+class FileSyncStatus implements IFileSyncStatus{
+    private _entries: Map<string, IFileStatusEntry>;
+    private _rootPath: string;
+    
+    async setPath(path: string){
+        this._rootPath = path;
+        await this.loadEntries();
+    }
+
+    async set(itemId: string, hashA: string, hashB: string): Promise<void> {
+        this._entries.set(itemId, {hashA: hashA, hashB: hashB});
+    }
+
+    async delete(itemId: string): Promise<void> {
+        this._entries.delete(itemId);
+    }
+
+    get(itemId: string): IFileStatusEntry {
+        return this._entries.get(itemId);
+    }
+
+    has(itemId: string): boolean {
+        return this._entries.has(itemId);
+    }
+
+    private async loadEntries() {
+        const pairs: [string, IFileStatusEntry][] = await localforage.getItem("file-sync-status-" + this._rootPath) ?? [];
+        this._entries = new Map(pairs);
+    }
+
+    public async saveEntries() {
+        const pairs = [...this._entries];
+        await localforage.setItem("file-sync-status-" + this._rootPath, pairs);
+    }
+
+    getAll(): IterableIterator<string> {
+        return this._entries.keys();
+    }
+}
 
 class DropboxStorage {
     
@@ -28,7 +208,7 @@ class DropboxStorage {
     get userId(): string{
         return this._userId;
     }
-
+    
     set userId(value: string){
         this._userId = value;
         localforage.setItem("user-id", value);
@@ -72,139 +252,38 @@ class DropboxStorage {
             return;
         }
 
-        // console.log("Sync default content:");
-        // await this.syncFolder("default", this.SYNC_DOWNLOAD);
+        console.log("Sync default content:");
+        await this.syncFolder("default", "default");
         console.log("Sync user content:");
-        const cursor = await this.syncFolder(this.userId, this.SYNC_BOTH);
-        this.lastSyncDate = Date.now();
+        const cursor = await this.syncFolder(this.userId, "user");
         
         await this.startLongPoll(cursor);
         return cursor;
     }
     
-    async syncFolder(path: string, mode: number = this.SYNC_BOTH): Promise<string> {
+    async syncFolder(serverPath: string, clientPath: string): Promise<string> {
         try{
-            var res = await this.dbx.filesListFolder({
-                path: "/" + path,
-                recursive: true,
+            const clientFiles = new clientFileSet();
+            await clientFiles.setPath(clientPath);
+            const serverFiles = new serverFileSet(this.dbx);
+            await serverFiles.setPath(serverPath, clientPath);
+            const fileSyncStatus = new FileSyncStatus();
+            await fileSyncStatus.setPath(clientPath);
+            
+            const fileSync = new FileSync(clientFiles, serverFiles, fileSyncStatus, async id => {
+                // in doubt keep the files of the client:
+                await clientFiles.copyTo(id, serverFiles);
+                await fileSyncStatus.set(id, clientFiles.getHash(id), serverFiles.getHash(id));
             });
+            await fileSync.syncFiles();
+            await fileSyncStatus.saveEntries();
             
-            const serverFiles:files.FileMetadataReference[] = <files.FileMetadataReference[]><unknown>res.result.entries.filter(x => x.name.endsWith(".png") && x[".tag"] == "file");
-            const serverPaths = serverFiles.map(x => x.path_display);
-            let cursor = res.result.cursor;
-
-            const keys = <string[]>await imageStorage.keys();
-            let localPaths: string[] = [];
-            for (let localPath of keys) {
-                if (!localPath.endsWith(".png")) {
-                    continue;
-                }
-
-                const fullPath = "/" + path + "/" + localPath;
-                localPaths.push(fullPath);
-            }
-            
-            const pathsOnBoth = serverPaths.filter(x => localPaths.includes(x));
-            const pathsOnServerOnly = serverPaths.filter(x => !pathsOnBoth.includes(x));
-            const pathsOnLocalOnly = localPaths.filter(x => !pathsOnBoth.includes(x));
-            
-            if (serverFiles && (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH)) {
-                // update local files first:
-                
-                // delete local files that existed before last sync and don't exist on server
-                for (let fullPath of pathsOnLocalOnly) {
-                    const storagePath = fullPath.substring(path.length + 2);
-                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
-                    if (localChangeDate < this.lastSyncDate){
-                        console.log("deleting " + fullPath);
-                        await imageStorage.deleteImage(storagePath);
-                    }
-                }
-
-                // download new files that exist only on server 
-                for (let fullPath of pathsOnServerOnly) {
-                    const storagePath = fullPath.substring(path.length + 2);
-                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
-                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
-                    if (serverChangeDate > this.lastSyncDate) {
-                        console.log("download " + fullPath);
-                        await this.downloadImage(fullPath, storagePath);
-                    }
-                }
-
-                // download newer files that exist on both 
-                for (let fullPath of pathsOnBoth) {
-                    const storagePath = fullPath.substring(path.length + 2);
-                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
-                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
-                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
-                    if (serverChangeDate > localChangeDate) {
-                        console.log("download " + fullPath);
-                        await this.downloadImage(fullPath, storagePath);
-                    }
-                }
-            }
-
-            if (mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH) {
-                // update files on server:
-                
-                let updateCursor: boolean = false;
-                if (!serverFiles){
-                    // user folder does not exist
-                    //await this.createDirectory(path);
-                }
-
-                // delete server files that existed before last sync and don't exist on local
-                for (let fullPath of pathsOnServerOnly) {
-                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
-                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
-                    if (serverChangeDate < this.lastSyncDate){
-                        console.log("deleting on dropbox " + fullPath);
-                        await this.dbx.filesDeleteV2({path: fullPath});
-                        updateCursor = true;
-                    }
-                }
-
-                // upload new files that exist only on local 
-                for (let fullPath of pathsOnLocalOnly) {
-                    const storagePath = fullPath.substring(path.length + 2);
-                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
-                    if (localChangeDate > this.lastSyncDate) {
-                        const url = await imageStorage.loadImageUrl(storagePath);
-                        const blob = await fetch(url).then(r => r.blob());
-                        if (!blob) {
-                            continue;
-                        }
-                        console.log("upload: " + fullPath);
-                        await this.postImage(blob, fullPath);
-                        updateCursor = true;
-                    }
-                }
-
-                // upload newer files that exist on both 
-                for (let fullPath of pathsOnBoth) {
-                    const storagePath = fullPath.substring(path.length + 2);
-                    const serverEntry = serverFiles.find(x => x.path_display == fullPath);
-                    const serverChangeDate = new Date(serverEntry.server_modified).getTime();
-                    const localChangeDate = await imageStorage.GetFileChangeDate(storagePath);
-                    if (serverChangeDate < localChangeDate) {
-                        const url = await imageStorage.loadImageUrl(storagePath);
-                        const blob = await fetch(url).then(r => r.blob());
-                        if (!blob) {
-                            continue;
-                        }
-                        console.log("upload: " + fullPath);
-                        await this.postImage(blob, fullPath);
-                        updateCursor = true;
-                    }
-                }
-                
-                if (updateCursor){
-                    // refresh cursor because we don't want to get updates from dropbox about the files we just posted:
-                    const res = await this.dbx.filesListFolderGetLatestCursor({path: "/" + path, recursive: true});
-                    cursor = res.result.cursor;
-                }
-            }
+            let cursor = serverFiles.getCursor();
+            // if (fileSync.modified){
+            //     // refresh cursor because we don't want to get updates from dropbox about the files we just posted:
+            //     const res = await this.dbx.filesListFolderGetLatestCursor({path: "/" + path, recursive: true});
+            //     cursor = res.result.cursor;
+            // }
             return cursor;
         }
         catch (error){
@@ -227,46 +306,15 @@ class DropboxStorage {
             this._longPollStarted = false;
             return;
         }
-        
+
+        console.log("polling:");
         const res = await this.dbx.filesListFolderLongpoll({cursor: cursor, timeout: config.dropboxSyncInterval});
         if (res.result.changes || imageStorage.hasChanges) {
-            console.log("There are changes:");
             cursor = await this.sync();
             imageStorage.hasChanges = false;
         }
         const timeout = res.result.backoff ?? config.dropboxSyncInterval;
-        console.log("Next dropbox poll in " + timeout);
         setTimeout(() => this.longPoll(cursor), timeout);
-    }
-
-    private async listFolder(path: string) {
-        try{
-            var res = await this.dbx.filesListFolder({path: "/" + path, recursive: true});
-            return res.result.entries;
-        }
-        catch(error){
-            return null;
-        }
-    }
-
-    private async downloadImage(path: string, imageId: string, changeDate: number = Date.now()) {
-        const res = await this.dbx.filesDownload({path: path});
-        if (res.status == 200){
-            // fileBlob exists:
-            // @ts-ignore
-            var blob = res.result.fileBlob;
-            if (blob){
-                imageStorage.saveImage(imageId, blob, changeDate);
-            }
-        }
-    }
-
-    async postImage(blob: Blob, path: string){
-        return this.dbx.filesUpload({path: path, contents: blob, mode: { ".tag": "overwrite" }})
-    }
-
-    private async createDirectory(path: string) {
-        return this.dbx.filesCreateFolderV2({path: "/" + path});
     }
     
     private getAccessTokenFromUrl() {
@@ -330,7 +378,6 @@ class DropboxStorage {
                 localforage.removeItem('dropbox-token');
             });
     }
-
 }
 
 export const dropboxStorage = new DropboxStorage();

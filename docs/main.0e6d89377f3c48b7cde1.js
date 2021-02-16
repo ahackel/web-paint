@@ -1744,11 +1744,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var localforage__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(localforage__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _ImageStorage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ImageStorage */ "./src/ts/storage/ImageStorage.ts");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../config */ "./src/ts/config.ts");
+/* harmony import */ var _utils_FileSync__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/FileSync */ "./src/ts/utils/FileSync.ts");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -1764,7 +1787,652 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 var CLIENT_ID = 'dyfw7wk3nb2utzo';
+
+var FileSet = /*#__PURE__*/function () {
+  function FileSet() {
+    _classCallCheck(this, FileSet);
+  }
+
+  _createClass(FileSet, [{
+    key: "copyTo",
+    value: function () {
+      var _copyTo = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(itemId, filesB) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.t0 = filesB;
+                _context.t1 = itemId;
+                _context.next = 4;
+                return this.load(itemId);
+
+              case 4:
+                _context.t2 = _context.sent;
+                _context.t3 = this.getHash(itemId);
+                _context.next = 8;
+                return _context.t0.add.call(_context.t0, _context.t1, _context.t2, _context.t3);
+
+              case 8:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function copyTo(_x, _x2) {
+        return _copyTo.apply(this, arguments);
+      }
+
+      return copyTo;
+    }()
+  }, {
+    key: "getHash",
+    value: function getHash(id) {
+      var _this$_files$get;
+
+      return (_this$_files$get = this._files.get(id)) === null || _this$_files$get === void 0 ? void 0 : _this$_files$get.hash;
+    }
+  }, {
+    key: "has",
+    value: function has(id) {
+      return this._files.has(id);
+    }
+  }, {
+    key: "getAll",
+    value: function getAll() {
+      return this._files.keys();
+    }
+  }]);
+
+  return FileSet;
+}();
+
+var clientFileSet = /*#__PURE__*/function (_FileSet) {
+  _inherits(clientFileSet, _FileSet);
+
+  var _super = _createSuper(clientFileSet);
+
+  function clientFileSet() {
+    _classCallCheck(this, clientFileSet);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(clientFileSet, [{
+    key: "setPath",
+    value: function () {
+      var _setPath = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(path) {
+        var ids, _iterator, _step, _id;
+
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this._rootPath = path;
+                _context2.next = 3;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.listFolder(path);
+
+              case 3:
+                ids = _context2.sent;
+                this._files = new Map();
+                _iterator = _createForOfIteratorHelper(ids);
+                _context2.prev = 6;
+
+                _iterator.s();
+
+              case 8:
+                if ((_step = _iterator.n()).done) {
+                  _context2.next = 19;
+                  break;
+                }
+
+                _id = _step.value;
+                _context2.t0 = this._files;
+                _context2.t1 = _id;
+                _context2.next = 14;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.getHash(_id);
+
+              case 14:
+                _context2.t2 = _context2.sent;
+                _context2.t3 = {
+                  hash: _context2.t2
+                };
+
+                _context2.t0.set.call(_context2.t0, _context2.t1, _context2.t3);
+
+              case 17:
+                _context2.next = 8;
+                break;
+
+              case 19:
+                _context2.next = 24;
+                break;
+
+              case 21:
+                _context2.prev = 21;
+                _context2.t4 = _context2["catch"](6);
+
+                _iterator.e(_context2.t4);
+
+              case 24:
+                _context2.prev = 24;
+
+                _iterator.f();
+
+                return _context2.finish(24);
+
+              case 27:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this, [[6, 21, 24, 27]]);
+      }));
+
+      function setPath(_x3) {
+        return _setPath.apply(this, arguments);
+      }
+
+      return setPath;
+    }()
+  }, {
+    key: "add",
+    value: function () {
+      var _add = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id, content, hash) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                console.log("save " + id);
+                _context3.next = 3;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.saveImage(id, content, hash);
+
+              case 3:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }));
+
+      function add(_x4, _x5, _x6) {
+        return _add.apply(this, arguments);
+      }
+
+      return add;
+    }()
+  }, {
+    key: "delete",
+    value: function () {
+      var _delete2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                console.log("delete " + id);
+                _context4.next = 3;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.deleteImage(id);
+
+              case 3:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }));
+
+      function _delete(_x7) {
+        return _delete2.apply(this, arguments);
+      }
+
+      return _delete;
+    }()
+  }, {
+    key: "load",
+    value: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(id) {
+        var url;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
+                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.loadImageUrl(id);
+
+              case 2:
+                url = _context5.sent;
+                return _context5.abrupt("return", fetch(url).then(function (r) {
+                  return r.blob();
+                }));
+
+              case 4:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
+      }));
+
+      function load(_x8) {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }()
+  }]);
+
+  return clientFileSet;
+}(FileSet);
+
+var serverFileSet = /*#__PURE__*/function (_FileSet2) {
+  _inherits(serverFileSet, _FileSet2);
+
+  var _super2 = _createSuper(serverFileSet);
+
+  function serverFileSet(dbx) {
+    var _this;
+
+    _classCallCheck(this, serverFileSet);
+
+    _this = _super2.call(this);
+    _this._dbx = dbx;
+    return _this;
+  }
+
+  _createClass(serverFileSet, [{
+    key: "getCursor",
+    value: function getCursor() {
+      return this._cursor;
+    }
+  }, {
+    key: "setPath",
+    value: function () {
+      var _setPath2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(serverRootPath, clientRootPath) {
+        var res;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                this._serverRoot = "/" + serverRootPath;
+                this._clientRoot = clientRootPath;
+                this._files = new Map();
+                _context6.next = 5;
+                return this._dbx.filesListFolder({
+                  path: this._serverRoot,
+                  recursive: true
+                });
+
+              case 5:
+                res = _context6.sent;
+                this.addServerEntries(res.result.entries);
+
+              case 7:
+                if (!res.result.has_more) {
+                  _context6.next = 15;
+                  break;
+                }
+
+                console.log("more");
+                _context6.next = 11;
+                return this._dbx.filesListFolderContinue({
+                  cursor: res.result.cursor
+                });
+
+              case 11:
+                res = _context6.sent;
+                this.addServerEntries(res.result.entries);
+                _context6.next = 7;
+                break;
+
+              case 15:
+                this._cursor = res.result.cursor;
+
+              case 16:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      function setPath(_x9, _x10) {
+        return _setPath2.apply(this, arguments);
+      }
+
+      return setPath;
+    }()
+  }, {
+    key: "addServerEntries",
+    value: function addServerEntries(entries) {
+      var serverFiles = entries.filter(function (x) {
+        return x.name.endsWith(".png") && x[".tag"] == "file";
+      });
+
+      var _iterator2 = _createForOfIteratorHelper(serverFiles),
+          _step2;
+
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var file = _step2.value;
+          var itemId = this.serverToClientPath(file.path_display);
+
+          this._files.set(itemId, {
+            hash: file.content_hash
+          });
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+    }
+  }, {
+    key: "serverToClientPath",
+    value: function serverToClientPath(serverPath) {
+      return serverPath.replace(this._serverRoot, this._clientRoot);
+    }
+  }, {
+    key: "clientToServerPath",
+    value: function clientToServerPath(clientPath) {
+      return clientPath.replace(this._clientRoot, this._serverRoot);
+    }
+  }, {
+    key: "add",
+    value: function () {
+      var _add2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(itemId, contents, hash) {
+        var serverPath;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                console.log("upload " + itemId);
+                serverPath = this.clientToServerPath(itemId);
+                console.log("upload " + itemId + " > " + serverPath);
+                _context7.next = 5;
+                return this._dbx.filesUpload({
+                  path: serverPath,
+                  contents: contents,
+                  mode: {
+                    ".tag": "overwrite"
+                  }
+                });
+
+              case 5:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function add(_x11, _x12, _x13) {
+        return _add2.apply(this, arguments);
+      }
+
+      return add;
+    }()
+  }, {
+    key: "delete",
+    value: function () {
+      var _delete3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(itemId) {
+        var serverPath;
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                serverPath = this.clientToServerPath(itemId);
+                console.log("delete " + serverPath + " from dropbox");
+                _context8.next = 4;
+                return this._dbx.filesDeleteV2({
+                  path: serverPath
+                });
+
+              case 4:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function _delete(_x14) {
+        return _delete3.apply(this, arguments);
+      }
+
+      return _delete;
+    }()
+  }, {
+    key: "load",
+    value: function () {
+      var _load2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(itemId) {
+        var serverPath, res;
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                serverPath = this.clientToServerPath(itemId);
+                console.log("download " + serverPath + " > " + itemId);
+                _context9.next = 4;
+                return this._dbx.filesDownload({
+                  path: serverPath
+                });
+
+              case 4:
+                res = _context9.sent;
+
+                if (!(res.status == 200)) {
+                  _context9.next = 7;
+                  break;
+                }
+
+                return _context9.abrupt("return", res.result.fileBlob);
+
+              case 7:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function load(_x15) {
+        return _load2.apply(this, arguments);
+      }
+
+      return load;
+    }()
+  }]);
+
+  return serverFileSet;
+}(FileSet);
+
+var FileSyncStatus = /*#__PURE__*/function () {
+  function FileSyncStatus() {
+    _classCallCheck(this, FileSyncStatus);
+  }
+
+  _createClass(FileSyncStatus, [{
+    key: "setPath",
+    value: function () {
+      var _setPath3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10(path) {
+        return regeneratorRuntime.wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                this._rootPath = path;
+                _context10.next = 3;
+                return this.loadEntries();
+
+              case 3:
+              case "end":
+                return _context10.stop();
+            }
+          }
+        }, _callee10, this);
+      }));
+
+      function setPath(_x16) {
+        return _setPath3.apply(this, arguments);
+      }
+
+      return setPath;
+    }()
+  }, {
+    key: "set",
+    value: function () {
+      var _set = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(itemId, hashA, hashB) {
+        return regeneratorRuntime.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                this._entries.set(itemId, {
+                  hashA: hashA,
+                  hashB: hashB
+                });
+
+              case 1:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function set(_x17, _x18, _x19) {
+        return _set.apply(this, arguments);
+      }
+
+      return set;
+    }()
+  }, {
+    key: "delete",
+    value: function () {
+      var _delete4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(itemId) {
+        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
+                this._entries.delete(itemId);
+
+              case 1:
+              case "end":
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this);
+      }));
+
+      function _delete(_x20) {
+        return _delete4.apply(this, arguments);
+      }
+
+      return _delete;
+    }()
+  }, {
+    key: "get",
+    value: function get(itemId) {
+      return this._entries.get(itemId);
+    }
+  }, {
+    key: "has",
+    value: function has(itemId) {
+      return this._entries.has(itemId);
+    }
+  }, {
+    key: "loadEntries",
+    value: function () {
+      var _loadEntries = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+        var _yield$localforage$ge;
+
+        var pairs;
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                _context13.next = 2;
+                return localforage__WEBPACK_IMPORTED_MODULE_1___default().getItem("file-sync-status-" + this._rootPath);
+
+              case 2:
+                _context13.t1 = _yield$localforage$ge = _context13.sent;
+                _context13.t0 = _context13.t1 !== null;
+
+                if (!_context13.t0) {
+                  _context13.next = 6;
+                  break;
+                }
+
+                _context13.t0 = _yield$localforage$ge !== void 0;
+
+              case 6:
+                if (!_context13.t0) {
+                  _context13.next = 10;
+                  break;
+                }
+
+                _context13.t2 = _yield$localforage$ge;
+                _context13.next = 11;
+                break;
+
+              case 10:
+                _context13.t2 = [];
+
+              case 11:
+                pairs = _context13.t2;
+                this._entries = new Map(pairs);
+
+              case 13:
+              case "end":
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this);
+      }));
+
+      function loadEntries() {
+        return _loadEntries.apply(this, arguments);
+      }
+
+      return loadEntries;
+    }()
+  }, {
+    key: "saveEntries",
+    value: function () {
+      var _saveEntries = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
+        var pairs;
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+          while (1) {
+            switch (_context14.prev = _context14.next) {
+              case 0:
+                pairs = _toConsumableArray(this._entries);
+                _context14.next = 3;
+                return localforage__WEBPACK_IMPORTED_MODULE_1___default().setItem("file-sync-status-" + this._rootPath, pairs);
+
+              case 3:
+              case "end":
+                return _context14.stop();
+            }
+          }
+        }, _callee14, this);
+      }));
+
+      function saveEntries() {
+        return _saveEntries.apply(this, arguments);
+      }
+
+      return saveEntries;
+    }()
+  }, {
+    key: "getAll",
+    value: function getAll() {
+      return this._entries.keys();
+    }
+  }]);
+
+  return FileSyncStatus;
+}();
 
 var DropboxStorage = /*#__PURE__*/function () {
   function DropboxStorage() {
@@ -1810,89 +2478,89 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "init",
     value: function () {
-      var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var _yield$localforage$ge, _yield$localforage$ge2;
+      var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15() {
+        var _yield$localforage$ge2, _yield$localforage$ge3;
 
         var token;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
-                _context.next = 2;
+                _context15.next = 2;
                 return localforage__WEBPACK_IMPORTED_MODULE_1___default().getItem("user-id");
 
               case 2:
-                _context.t1 = _yield$localforage$ge = _context.sent;
-                _context.t0 = _context.t1 !== null;
+                _context15.t1 = _yield$localforage$ge2 = _context15.sent;
+                _context15.t0 = _context15.t1 !== null;
 
-                if (!_context.t0) {
-                  _context.next = 6;
+                if (!_context15.t0) {
+                  _context15.next = 6;
                   break;
                 }
 
-                _context.t0 = _yield$localforage$ge !== void 0;
+                _context15.t0 = _yield$localforage$ge2 !== void 0;
 
               case 6:
-                if (!_context.t0) {
-                  _context.next = 10;
+                if (!_context15.t0) {
+                  _context15.next = 10;
                   break;
                 }
 
-                _context.t2 = _yield$localforage$ge;
-                _context.next = 11;
+                _context15.t2 = _yield$localforage$ge2;
+                _context15.next = 11;
                 break;
 
               case 10:
-                _context.t2 = "";
+                _context15.t2 = "";
 
               case 11:
-                this._userId = _context.t2;
-                _context.next = 14;
+                this._userId = _context15.t2;
+                _context15.next = 14;
                 return localforage__WEBPACK_IMPORTED_MODULE_1___default().getItem("last-dropbox-sync");
 
               case 14:
-                _context.t4 = _yield$localforage$ge2 = _context.sent;
-                _context.t3 = _context.t4 !== null;
+                _context15.t4 = _yield$localforage$ge3 = _context15.sent;
+                _context15.t3 = _context15.t4 !== null;
 
-                if (!_context.t3) {
-                  _context.next = 18;
+                if (!_context15.t3) {
+                  _context15.next = 18;
                   break;
                 }
 
-                _context.t3 = _yield$localforage$ge2 !== void 0;
+                _context15.t3 = _yield$localforage$ge3 !== void 0;
 
               case 18:
-                if (!_context.t3) {
-                  _context.next = 22;
+                if (!_context15.t3) {
+                  _context15.next = 22;
                   break;
                 }
 
-                _context.t5 = _yield$localforage$ge2;
-                _context.next = 23;
+                _context15.t5 = _yield$localforage$ge3;
+                _context15.next = 23;
                 break;
 
               case 22:
-                _context.t5 = 0;
+                _context15.t5 = 0;
 
               case 23:
-                this._lastSyncDate = _context.t5;
+                this._lastSyncDate = _context15.t5;
                 token = this.getAccessTokenFromUrl();
 
                 if (!token) {
-                  _context.next = 29;
+                  _context15.next = 29;
                   break;
                 }
 
                 this.authorize(token);
-                _context.next = 33;
+                _context15.next = 33;
                 break;
 
               case 29:
-                _context.next = 31;
+                _context15.next = 31;
                 return localforage__WEBPACK_IMPORTED_MODULE_1___default().getItem('dropbox-token');
 
               case 31:
-                token = _context.sent;
+                token = _context15.sent;
 
                 if (token) {
                   this.authorize(token);
@@ -1900,10 +2568,10 @@ var DropboxStorage = /*#__PURE__*/function () {
 
               case 33:
               case "end":
-                return _context.stop();
+                return _context15.stop();
             }
           }
-        }, _callee, this);
+        }, _callee15, this);
       }));
 
       function init() {
@@ -1923,41 +2591,43 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "sync",
     value: function () {
-      var _sync = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+      var _sync = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee16() {
         var cursor;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
                 if (!(!this.isAuthorized || !this.userId)) {
-                  _context2.next = 2;
+                  _context16.next = 2;
                   break;
                 }
 
-                return _context2.abrupt("return");
+                return _context16.abrupt("return");
 
               case 2:
-                // console.log("Sync default content:");
-                // await this.syncFolder("default", this.SYNC_DOWNLOAD);
-                console.log("Sync user content:");
-                _context2.next = 5;
-                return this.syncFolder(this.userId, this.SYNC_BOTH);
+                console.log("Sync default content:");
+                _context16.next = 5;
+                return this.syncFolder("default", "default");
 
               case 5:
-                cursor = _context2.sent;
-                this.lastSyncDate = Date.now();
-                _context2.next = 9;
+                console.log("Sync user content:");
+                _context16.next = 8;
+                return this.syncFolder(this.userId, "user");
+
+              case 8:
+                cursor = _context16.sent;
+                _context16.next = 11;
                 return this.startLongPoll(cursor);
 
-              case 9:
-                return _context2.abrupt("return", cursor);
+              case 11:
+                return _context16.abrupt("return", cursor);
 
-              case 10:
+              case 12:
               case "end":
-                return _context2.stop();
+                return _context16.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee16, this);
       }));
 
       function sync() {
@@ -1969,623 +2639,86 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "syncFolder",
     value: function () {
-      var _syncFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(path) {
-        var _this = this;
-
-        var mode,
-            res,
-            serverFiles,
-            serverPaths,
-            cursor,
-            keys,
-            localPaths,
-            _iterator,
-            _step,
-            localPath,
-            _fullPath2,
-            pathsOnBoth,
-            pathsOnServerOnly,
-            pathsOnLocalOnly,
-            _iterator2,
-            _step2,
-            fullPath,
-            storagePath,
-            localChangeDate,
-            _iterator3,
-            _step3,
-            _loop,
-            _iterator4,
-            _step4,
-            _loop2,
-            updateCursor,
-            _iterator5,
-            _step5,
-            _loop3,
-            _iterator6,
-            _step6,
-            _fullPath,
-            _storagePath,
-            _localChangeDate,
-            url,
-            blob,
-            _iterator7,
-            _step7,
-            _loop4,
-            _ret,
-            _res,
-            _args7 = arguments;
-
-        return regeneratorRuntime.wrap(function _callee3$(_context7) {
+      var _syncFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee18(serverPath, clientPath) {
+        var clientFiles, serverFiles, fileSyncStatus, fileSync, cursor;
+        return regeneratorRuntime.wrap(function _callee18$(_context18) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context18.prev = _context18.next) {
               case 0:
-                mode = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : this.SYNC_BOTH;
-                _context7.prev = 1;
-                _context7.next = 4;
-                return this.dbx.filesListFolder({
-                  path: "/" + path,
-                  recursive: true
-                });
+                _context18.prev = 0;
+                clientFiles = new clientFileSet();
+                _context18.next = 4;
+                return clientFiles.setPath(clientPath);
 
               case 4:
-                res = _context7.sent;
-                serverFiles = res.result.entries.filter(function (x) {
-                  return x.name.endsWith(".png") && x[".tag"] == "file";
-                });
-                serverPaths = serverFiles.map(function (x) {
-                  return x.path_display;
-                });
-                cursor = res.result.cursor;
-                _context7.next = 10;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.keys();
+                serverFiles = new serverFileSet(this.dbx);
+                _context18.next = 7;
+                return serverFiles.setPath(serverPath, clientPath);
+
+              case 7:
+                fileSyncStatus = new FileSyncStatus();
+                _context18.next = 10;
+                return fileSyncStatus.setPath(clientPath);
 
               case 10:
-                keys = _context7.sent;
-                localPaths = [];
-                _iterator = _createForOfIteratorHelper(keys);
-                _context7.prev = 13;
+                fileSync = new _utils_FileSync__WEBPACK_IMPORTED_MODULE_4__.FileSync(clientFiles, serverFiles, fileSyncStatus, /*#__PURE__*/function () {
+                  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee17(id) {
+                    return regeneratorRuntime.wrap(function _callee17$(_context17) {
+                      while (1) {
+                        switch (_context17.prev = _context17.next) {
+                          case 0:
+                            _context17.next = 2;
+                            return clientFiles.copyTo(id, serverFiles);
 
-                _iterator.s();
+                          case 2:
+                            _context17.next = 4;
+                            return fileSyncStatus.set(id, clientFiles.getHash(id), serverFiles.getHash(id));
+
+                          case 4:
+                          case "end":
+                            return _context17.stop();
+                        }
+                      }
+                    }, _callee17);
+                  }));
+
+                  return function (_x23) {
+                    return _ref.apply(this, arguments);
+                  };
+                }());
+                _context18.next = 13;
+                return fileSync.syncFiles();
+
+              case 13:
+                _context18.next = 15;
+                return fileSyncStatus.saveEntries();
 
               case 15:
-                if ((_step = _iterator.n()).done) {
-                  _context7.next = 23;
-                  break;
-                }
+                cursor = serverFiles.getCursor(); // if (fileSync.modified){
+                //     // refresh cursor because we don't want to get updates from dropbox about the files we just posted:
+                //     const res = await this.dbx.filesListFolderGetLatestCursor({path: "/" + path, recursive: true});
+                //     cursor = res.result.cursor;
+                // }
 
-                localPath = _step.value;
-
-                if (localPath.endsWith(".png")) {
-                  _context7.next = 19;
-                  break;
-                }
-
-                return _context7.abrupt("continue", 21);
+                return _context18.abrupt("return", cursor);
 
               case 19:
-                _fullPath2 = "/" + path + "/" + localPath;
-                localPaths.push(_fullPath2);
+                _context18.prev = 19;
+                _context18.t0 = _context18["catch"](0);
+                console.log(_context18.t0);
 
-              case 21:
-                _context7.next = 15;
-                break;
+              case 22:
+                return _context18.abrupt("return", null);
 
               case 23:
-                _context7.next = 28;
-                break;
-
-              case 25:
-                _context7.prev = 25;
-                _context7.t0 = _context7["catch"](13);
-
-                _iterator.e(_context7.t0);
-
-              case 28:
-                _context7.prev = 28;
-
-                _iterator.f();
-
-                return _context7.finish(28);
-
-              case 31:
-                pathsOnBoth = serverPaths.filter(function (x) {
-                  return localPaths.includes(x);
-                });
-                pathsOnServerOnly = serverPaths.filter(function (x) {
-                  return !pathsOnBoth.includes(x);
-                });
-                pathsOnLocalOnly = localPaths.filter(function (x) {
-                  return !pathsOnBoth.includes(x);
-                });
-
-                if (!(serverFiles && (mode == this.SYNC_DOWNLOAD || mode == this.SYNC_BOTH))) {
-                  _context7.next = 90;
-                  break;
-                }
-
-                // update local files first:
-                // delete local files that existed before last sync and don't exist on server
-                _iterator2 = _createForOfIteratorHelper(pathsOnLocalOnly);
-                _context7.prev = 36;
-
-                _iterator2.s();
-
-              case 38:
-                if ((_step2 = _iterator2.n()).done) {
-                  _context7.next = 50;
-                  break;
-                }
-
-                fullPath = _step2.value;
-                storagePath = fullPath.substring(path.length + 2);
-                _context7.next = 43;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(storagePath);
-
-              case 43:
-                localChangeDate = _context7.sent;
-
-                if (!(localChangeDate < this.lastSyncDate)) {
-                  _context7.next = 48;
-                  break;
-                }
-
-                console.log("deleting " + fullPath);
-                _context7.next = 48;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.deleteImage(storagePath);
-
-              case 48:
-                _context7.next = 38;
-                break;
-
-              case 50:
-                _context7.next = 55;
-                break;
-
-              case 52:
-                _context7.prev = 52;
-                _context7.t1 = _context7["catch"](36);
-
-                _iterator2.e(_context7.t1);
-
-              case 55:
-                _context7.prev = 55;
-
-                _iterator2.f();
-
-                return _context7.finish(55);
-
-              case 58:
-                // download new files that exist only on server 
-                _iterator3 = _createForOfIteratorHelper(pathsOnServerOnly);
-                _context7.prev = 59;
-                _loop = /*#__PURE__*/regeneratorRuntime.mark(function _loop() {
-                  var fullPath, storagePath, serverEntry, serverChangeDate;
-                  return regeneratorRuntime.wrap(function _loop$(_context3) {
-                    while (1) {
-                      switch (_context3.prev = _context3.next) {
-                        case 0:
-                          fullPath = _step3.value;
-                          storagePath = fullPath.substring(path.length + 2);
-                          serverEntry = serverFiles.find(function (x) {
-                            return x.path_display == fullPath;
-                          });
-                          serverChangeDate = new Date(serverEntry.server_modified).getTime();
-
-                          if (!(serverChangeDate > _this.lastSyncDate)) {
-                            _context3.next = 8;
-                            break;
-                          }
-
-                          console.log("download " + fullPath);
-                          _context3.next = 8;
-                          return _this.downloadImage(fullPath, storagePath);
-
-                        case 8:
-                        case "end":
-                          return _context3.stop();
-                      }
-                    }
-                  }, _loop);
-                });
-
-                _iterator3.s();
-
-              case 62:
-                if ((_step3 = _iterator3.n()).done) {
-                  _context7.next = 66;
-                  break;
-                }
-
-                return _context7.delegateYield(_loop(), "t2", 64);
-
-              case 64:
-                _context7.next = 62;
-                break;
-
-              case 66:
-                _context7.next = 71;
-                break;
-
-              case 68:
-                _context7.prev = 68;
-                _context7.t3 = _context7["catch"](59);
-
-                _iterator3.e(_context7.t3);
-
-              case 71:
-                _context7.prev = 71;
-
-                _iterator3.f();
-
-                return _context7.finish(71);
-
-              case 74:
-                // download newer files that exist on both 
-                _iterator4 = _createForOfIteratorHelper(pathsOnBoth);
-                _context7.prev = 75;
-                _loop2 = /*#__PURE__*/regeneratorRuntime.mark(function _loop2() {
-                  var fullPath, storagePath, serverEntry, serverChangeDate, localChangeDate;
-                  return regeneratorRuntime.wrap(function _loop2$(_context4) {
-                    while (1) {
-                      switch (_context4.prev = _context4.next) {
-                        case 0:
-                          fullPath = _step4.value;
-                          storagePath = fullPath.substring(path.length + 2);
-                          serverEntry = serverFiles.find(function (x) {
-                            return x.path_display == fullPath;
-                          });
-                          serverChangeDate = new Date(serverEntry.server_modified).getTime();
-                          _context4.next = 6;
-                          return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(storagePath);
-
-                        case 6:
-                          localChangeDate = _context4.sent;
-
-                          if (!(serverChangeDate > localChangeDate)) {
-                            _context4.next = 11;
-                            break;
-                          }
-
-                          console.log("download " + fullPath);
-                          _context4.next = 11;
-                          return _this.downloadImage(fullPath, storagePath);
-
-                        case 11:
-                        case "end":
-                          return _context4.stop();
-                      }
-                    }
-                  }, _loop2);
-                });
-
-                _iterator4.s();
-
-              case 78:
-                if ((_step4 = _iterator4.n()).done) {
-                  _context7.next = 82;
-                  break;
-                }
-
-                return _context7.delegateYield(_loop2(), "t4", 80);
-
-              case 80:
-                _context7.next = 78;
-                break;
-
-              case 82:
-                _context7.next = 87;
-                break;
-
-              case 84:
-                _context7.prev = 84;
-                _context7.t5 = _context7["catch"](75);
-
-                _iterator4.e(_context7.t5);
-
-              case 87:
-                _context7.prev = 87;
-
-                _iterator4.f();
-
-                return _context7.finish(87);
-
-              case 90:
-                if (!(mode == this.SYNC_UPLOAD || mode == this.SYNC_BOTH)) {
-                  _context7.next = 165;
-                  break;
-                }
-
-                // update files on server:
-                updateCursor = false;
-
-                if (!serverFiles) {// user folder does not exist
-                  //await this.createDirectory(path);
-                } // delete server files that existed before last sync and don't exist on local
-
-
-                _iterator5 = _createForOfIteratorHelper(pathsOnServerOnly);
-                _context7.prev = 94;
-                _loop3 = /*#__PURE__*/regeneratorRuntime.mark(function _loop3() {
-                  var fullPath, serverEntry, serverChangeDate;
-                  return regeneratorRuntime.wrap(function _loop3$(_context5) {
-                    while (1) {
-                      switch (_context5.prev = _context5.next) {
-                        case 0:
-                          fullPath = _step5.value;
-                          serverEntry = serverFiles.find(function (x) {
-                            return x.path_display == fullPath;
-                          });
-                          serverChangeDate = new Date(serverEntry.server_modified).getTime();
-
-                          if (!(serverChangeDate < _this.lastSyncDate)) {
-                            _context5.next = 8;
-                            break;
-                          }
-
-                          console.log("deleting on dropbox " + fullPath);
-                          _context5.next = 7;
-                          return _this.dbx.filesDeleteV2({
-                            path: fullPath
-                          });
-
-                        case 7:
-                          updateCursor = true;
-
-                        case 8:
-                        case "end":
-                          return _context5.stop();
-                      }
-                    }
-                  }, _loop3);
-                });
-
-                _iterator5.s();
-
-              case 97:
-                if ((_step5 = _iterator5.n()).done) {
-                  _context7.next = 101;
-                  break;
-                }
-
-                return _context7.delegateYield(_loop3(), "t6", 99);
-
-              case 99:
-                _context7.next = 97;
-                break;
-
-              case 101:
-                _context7.next = 106;
-                break;
-
-              case 103:
-                _context7.prev = 103;
-                _context7.t7 = _context7["catch"](94);
-
-                _iterator5.e(_context7.t7);
-
-              case 106:
-                _context7.prev = 106;
-
-                _iterator5.f();
-
-                return _context7.finish(106);
-
-              case 109:
-                // upload new files that exist only on local 
-                _iterator6 = _createForOfIteratorHelper(pathsOnLocalOnly);
-                _context7.prev = 110;
-
-                _iterator6.s();
-
-              case 112:
-                if ((_step6 = _iterator6.n()).done) {
-                  _context7.next = 133;
-                  break;
-                }
-
-                _fullPath = _step6.value;
-                _storagePath = _fullPath.substring(path.length + 2);
-                _context7.next = 117;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(_storagePath);
-
-              case 117:
-                _localChangeDate = _context7.sent;
-
-                if (!(_localChangeDate > this.lastSyncDate)) {
-                  _context7.next = 131;
-                  break;
-                }
-
-                _context7.next = 121;
-                return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.loadImageUrl(_storagePath);
-
-              case 121:
-                url = _context7.sent;
-                _context7.next = 124;
-                return fetch(url).then(function (r) {
-                  return r.blob();
-                });
-
-              case 124:
-                blob = _context7.sent;
-
-                if (blob) {
-                  _context7.next = 127;
-                  break;
-                }
-
-                return _context7.abrupt("continue", 131);
-
-              case 127:
-                console.log("upload: " + _fullPath);
-                _context7.next = 130;
-                return this.postImage(blob, _fullPath);
-
-              case 130:
-                updateCursor = true;
-
-              case 131:
-                _context7.next = 112;
-                break;
-
-              case 133:
-                _context7.next = 138;
-                break;
-
-              case 135:
-                _context7.prev = 135;
-                _context7.t8 = _context7["catch"](110);
-
-                _iterator6.e(_context7.t8);
-
-              case 138:
-                _context7.prev = 138;
-
-                _iterator6.f();
-
-                return _context7.finish(138);
-
-              case 141:
-                // upload newer files that exist on both 
-                _iterator7 = _createForOfIteratorHelper(pathsOnBoth);
-                _context7.prev = 142;
-                _loop4 = /*#__PURE__*/regeneratorRuntime.mark(function _loop4() {
-                  var fullPath, storagePath, serverEntry, serverChangeDate, localChangeDate, _url, _blob;
-
-                  return regeneratorRuntime.wrap(function _loop4$(_context6) {
-                    while (1) {
-                      switch (_context6.prev = _context6.next) {
-                        case 0:
-                          fullPath = _step7.value;
-                          storagePath = fullPath.substring(path.length + 2);
-                          serverEntry = serverFiles.find(function (x) {
-                            return x.path_display == fullPath;
-                          });
-                          serverChangeDate = new Date(serverEntry.server_modified).getTime();
-                          _context6.next = 6;
-                          return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.GetFileChangeDate(storagePath);
-
-                        case 6:
-                          localChangeDate = _context6.sent;
-
-                          if (!(serverChangeDate < localChangeDate)) {
-                            _context6.next = 20;
-                            break;
-                          }
-
-                          _context6.next = 10;
-                          return _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.loadImageUrl(storagePath);
-
-                        case 10:
-                          _url = _context6.sent;
-                          _context6.next = 13;
-                          return fetch(_url).then(function (r) {
-                            return r.blob();
-                          });
-
-                        case 13:
-                          _blob = _context6.sent;
-
-                          if (_blob) {
-                            _context6.next = 16;
-                            break;
-                          }
-
-                          return _context6.abrupt("return", "continue");
-
-                        case 16:
-                          console.log("upload: " + fullPath);
-                          _context6.next = 19;
-                          return _this.postImage(_blob, fullPath);
-
-                        case 19:
-                          updateCursor = true;
-
-                        case 20:
-                        case "end":
-                          return _context6.stop();
-                      }
-                    }
-                  }, _loop4);
-                });
-
-                _iterator7.s();
-
-              case 145:
-                if ((_step7 = _iterator7.n()).done) {
-                  _context7.next = 152;
-                  break;
-                }
-
-                return _context7.delegateYield(_loop4(), "t9", 147);
-
-              case 147:
-                _ret = _context7.t9;
-
-                if (!(_ret === "continue")) {
-                  _context7.next = 150;
-                  break;
-                }
-
-                return _context7.abrupt("continue", 150);
-
-              case 150:
-                _context7.next = 145;
-                break;
-
-              case 152:
-                _context7.next = 157;
-                break;
-
-              case 154:
-                _context7.prev = 154;
-                _context7.t10 = _context7["catch"](142);
-
-                _iterator7.e(_context7.t10);
-
-              case 157:
-                _context7.prev = 157;
-
-                _iterator7.f();
-
-                return _context7.finish(157);
-
-              case 160:
-                if (!updateCursor) {
-                  _context7.next = 165;
-                  break;
-                }
-
-                _context7.next = 163;
-                return this.dbx.filesListFolderGetLatestCursor({
-                  path: "/" + path,
-                  recursive: true
-                });
-
-              case 163:
-                _res = _context7.sent;
-                cursor = _res.result.cursor;
-
-              case 165:
-                return _context7.abrupt("return", cursor);
-
-              case 168:
-                _context7.prev = 168;
-                _context7.t11 = _context7["catch"](1);
-                console.log(_context7.t11);
-
-              case 171:
-                return _context7.abrupt("return", null);
-
-              case 172:
               case "end":
-                return _context7.stop();
+                return _context18.stop();
             }
           }
-        }, _callee3, this, [[1, 168], [13, 25, 28, 31], [36, 52, 55, 58], [59, 68, 71, 74], [75, 84, 87, 90], [94, 103, 106, 109], [110, 135, 138, 141], [142, 154, 157, 160]]);
+        }, _callee18, this, [[0, 19]]);
       }));
 
-      function syncFolder(_x) {
+      function syncFolder(_x21, _x22) {
         return _syncFolder.apply(this, arguments);
       }
 
@@ -2594,32 +2727,32 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "startLongPoll",
     value: function () {
-      var _startLongPoll = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(cursor) {
-        return regeneratorRuntime.wrap(function _callee4$(_context8) {
+      var _startLongPoll = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee19(cursor) {
+        return regeneratorRuntime.wrap(function _callee19$(_context19) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context19.prev = _context19.next) {
               case 0:
                 if (!this._longPollStarted) {
-                  _context8.next = 2;
+                  _context19.next = 2;
                   break;
                 }
 
-                return _context8.abrupt("return");
+                return _context19.abrupt("return");
 
               case 2:
                 this._longPollStarted = true;
-                _context8.next = 5;
+                _context19.next = 5;
                 return this.longPoll(cursor);
 
               case 5:
               case "end":
-                return _context8.stop();
+                return _context19.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee19, this);
       }));
 
-      function startLongPoll(_x2) {
+      function startLongPoll(_x24) {
         return _startLongPoll.apply(this, arguments);
       }
 
@@ -2628,206 +2761,65 @@ var DropboxStorage = /*#__PURE__*/function () {
   }, {
     key: "longPoll",
     value: function () {
-      var _longPoll = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(cursor) {
+      var _longPoll = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee20(cursor) {
         var _res$result$backoff,
             _this2 = this;
 
         var res, timeout;
-        return regeneratorRuntime.wrap(function _callee5$(_context9) {
+        return regeneratorRuntime.wrap(function _callee20$(_context20) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context20.prev = _context20.next) {
               case 0:
                 if (cursor) {
-                  _context9.next = 3;
+                  _context20.next = 3;
                   break;
                 }
 
                 this._longPollStarted = false;
-                return _context9.abrupt("return");
+                return _context20.abrupt("return");
 
               case 3:
-                _context9.next = 5;
+                console.log("polling:");
+                _context20.next = 6;
                 return this.dbx.filesListFolderLongpoll({
                   cursor: cursor,
                   timeout: _config__WEBPACK_IMPORTED_MODULE_3__.config.dropboxSyncInterval
                 });
 
-              case 5:
-                res = _context9.sent;
+              case 6:
+                res = _context20.sent;
 
                 if (!(res.result.changes || _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.hasChanges)) {
-                  _context9.next = 12;
+                  _context20.next = 12;
                   break;
                 }
 
-                console.log("There are changes:");
-                _context9.next = 10;
+                _context20.next = 10;
                 return this.sync();
 
               case 10:
-                cursor = _context9.sent;
+                cursor = _context20.sent;
                 _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.hasChanges = false;
 
               case 12:
                 timeout = (_res$result$backoff = res.result.backoff) !== null && _res$result$backoff !== void 0 ? _res$result$backoff : _config__WEBPACK_IMPORTED_MODULE_3__.config.dropboxSyncInterval;
-                console.log("Next dropbox poll in " + timeout);
                 setTimeout(function () {
                   return _this2.longPoll(cursor);
                 }, timeout);
 
-              case 15:
+              case 14:
               case "end":
-                return _context9.stop();
+                return _context20.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee20, this);
       }));
 
-      function longPoll(_x3) {
+      function longPoll(_x25) {
         return _longPoll.apply(this, arguments);
       }
 
       return longPoll;
-    }()
-  }, {
-    key: "listFolder",
-    value: function () {
-      var _listFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(path) {
-        var res;
-        return regeneratorRuntime.wrap(function _callee6$(_context10) {
-          while (1) {
-            switch (_context10.prev = _context10.next) {
-              case 0:
-                _context10.prev = 0;
-                _context10.next = 3;
-                return this.dbx.filesListFolder({
-                  path: "/" + path,
-                  recursive: true
-                });
-
-              case 3:
-                res = _context10.sent;
-                return _context10.abrupt("return", res.result.entries);
-
-              case 7:
-                _context10.prev = 7;
-                _context10.t0 = _context10["catch"](0);
-                return _context10.abrupt("return", null);
-
-              case 10:
-              case "end":
-                return _context10.stop();
-            }
-          }
-        }, _callee6, this, [[0, 7]]);
-      }));
-
-      function listFolder(_x4) {
-        return _listFolder.apply(this, arguments);
-      }
-
-      return listFolder;
-    }()
-  }, {
-    key: "downloadImage",
-    value: function () {
-      var _downloadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(path, imageId) {
-        var changeDate,
-            res,
-            blob,
-            _args11 = arguments;
-        return regeneratorRuntime.wrap(function _callee7$(_context11) {
-          while (1) {
-            switch (_context11.prev = _context11.next) {
-              case 0:
-                changeDate = _args11.length > 2 && _args11[2] !== undefined ? _args11[2] : Date.now();
-                _context11.next = 3;
-                return this.dbx.filesDownload({
-                  path: path
-                });
-
-              case 3:
-                res = _context11.sent;
-
-                if (res.status == 200) {
-                  // fileBlob exists:
-                  // @ts-ignore
-                  blob = res.result.fileBlob;
-
-                  if (blob) {
-                    _ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.saveImage(imageId, blob, changeDate);
-                  }
-                }
-
-              case 5:
-              case "end":
-                return _context11.stop();
-            }
-          }
-        }, _callee7, this);
-      }));
-
-      function downloadImage(_x5, _x6) {
-        return _downloadImage.apply(this, arguments);
-      }
-
-      return downloadImage;
-    }()
-  }, {
-    key: "postImage",
-    value: function () {
-      var _postImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(blob, path) {
-        return regeneratorRuntime.wrap(function _callee8$(_context12) {
-          while (1) {
-            switch (_context12.prev = _context12.next) {
-              case 0:
-                return _context12.abrupt("return", this.dbx.filesUpload({
-                  path: path,
-                  contents: blob,
-                  mode: {
-                    ".tag": "overwrite"
-                  }
-                }));
-
-              case 1:
-              case "end":
-                return _context12.stop();
-            }
-          }
-        }, _callee8, this);
-      }));
-
-      function postImage(_x7, _x8) {
-        return _postImage.apply(this, arguments);
-      }
-
-      return postImage;
-    }()
-  }, {
-    key: "createDirectory",
-    value: function () {
-      var _createDirectory = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(path) {
-        return regeneratorRuntime.wrap(function _callee9$(_context13) {
-          while (1) {
-            switch (_context13.prev = _context13.next) {
-              case 0:
-                return _context13.abrupt("return", this.dbx.filesCreateFolderV2({
-                  path: "/" + path
-                }));
-
-              case 1:
-              case "end":
-                return _context13.stop();
-            }
-          }
-        }, _callee9, this);
-      }));
-
-      function createDirectory(_x9) {
-        return _createDirectory.apply(this, arguments);
-      }
-
-      return createDirectory;
     }()
   }, {
     key: "getAccessTokenFromUrl",
@@ -2968,40 +2960,22 @@ var ImageStorage = /*#__PURE__*/function () {
       return this._urls;
     }
   }, {
-    key: "GetFileChangeDate",
+    key: "ContainsImage",
     value: function () {
-      var _GetFileChangeDate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id) {
-        var newChangeDate;
+      var _ContainsImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id) {
+        var keys;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (!(id in this._fileMeta)) {
-                  _context.next = 2;
-                  break;
-                }
-
-                return _context.abrupt("return", this._fileMeta[id].changeDate);
+                _context.next = 2;
+                return this.keys();
 
               case 2:
-                _context.next = 4;
-                return this.ContainsImage(id);
+                keys = _context.sent;
+                return _context.abrupt("return", keys.includes(id));
 
               case 4:
-                if (!_context.sent) {
-                  _context.next = 8;
-                  break;
-                }
-
-                // add missing entry
-                newChangeDate = Date.now();
-                this.SetFileChangeDate(id, newChangeDate);
-                return _context.abrupt("return", newChangeDate);
-
-              case 8:
-                return _context.abrupt("return", 0);
-
-              case 9:
               case "end":
                 return _context.stop();
             }
@@ -3009,94 +2983,33 @@ var ImageStorage = /*#__PURE__*/function () {
         }, _callee, this);
       }));
 
-      function GetFileChangeDate(_x) {
-        return _GetFileChangeDate.apply(this, arguments);
-      }
-
-      return GetFileChangeDate;
-    }()
-  }, {
-    key: "ContainsImage",
-    value: function () {
-      var _ContainsImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
-        var keys;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.next = 2;
-                return this.keys();
-
-              case 2:
-                keys = _context2.sent;
-                return _context2.abrupt("return", keys.includes(id));
-
-              case 4:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function ContainsImage(_x2) {
+      function ContainsImage(_x) {
         return _ContainsImage.apply(this, arguments);
       }
 
       return ContainsImage;
     }()
   }, {
-    key: "SetFileChangeDate",
-    value: function () {
-      var _SetFileChangeDate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id, date) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                this._fileMeta[id] = {
-                  changeDate: date
-                };
-                _context3.next = 3;
-                return this.adapter.setItem("file-meta", this._fileMeta);
-
-              case 3:
-                this.hasChanges = true;
-
-              case 4:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function SetFileChangeDate(_x3, _x4) {
-        return _SetFileChangeDate.apply(this, arguments);
-      }
-
-      return SetFileChangeDate;
-    }()
-  }, {
     key: "loadImage",
     value: function () {
-      var _loadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id) {
+      var _loadImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
         var url, img;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                _context4.next = 2;
+                _context2.next = 2;
                 return this.loadImageUrl(id);
 
               case 2:
-                url = _context4.sent;
+                url = _context2.sent;
 
                 if (url) {
-                  _context4.next = 5;
+                  _context2.next = 5;
                   break;
                 }
 
-                return _context4.abrupt("return", null);
+                return _context2.abrupt("return", null);
 
               case 5:
                 img = new Image();
@@ -3104,18 +3017,18 @@ var ImageStorage = /*#__PURE__*/function () {
                 img.src = url;
 
                 if (!(img.decode != null)) {
-                  _context4.next = 12;
+                  _context2.next = 12;
                   break;
                 }
 
-                _context4.next = 11;
+                _context2.next = 11;
                 return img.decode();
 
               case 11:
-                return _context4.abrupt("return", img);
+                return _context2.abrupt("return", img);
 
               case 12:
-                return _context4.abrupt("return", new Promise(function (resolve) {
+                return _context2.abrupt("return", new Promise(function (resolve) {
                   img.onload = function () {
                     return resolve(img);
                   };
@@ -3123,13 +3036,13 @@ var ImageStorage = /*#__PURE__*/function () {
 
               case 13:
               case "end":
-                return _context4.stop();
+                return _context2.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee2, this);
       }));
 
-      function loadImage(_x5) {
+      function loadImage(_x2) {
         return _loadImage.apply(this, arguments);
       }
 
@@ -3138,47 +3051,47 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "loadImageUrl",
     value: function () {
-      var _loadImageUrl = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(id) {
+      var _loadImageUrl = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id) {
         var blob, url;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 if (!(id in this.urls)) {
-                  _context5.next = 2;
+                  _context3.next = 2;
                   break;
                 }
 
-                return _context5.abrupt("return", this.urls[id]);
+                return _context3.abrupt("return", this.urls[id]);
 
               case 2:
-                _context5.next = 4;
+                _context3.next = 4;
                 return this.loadBlob(id);
 
               case 4:
-                blob = _context5.sent;
+                blob = _context3.sent;
 
                 if (blob) {
-                  _context5.next = 7;
+                  _context3.next = 7;
                   break;
                 }
 
-                return _context5.abrupt("return", null);
+                return _context3.abrupt("return", null);
 
               case 7:
                 url = URL.createObjectURL(blob);
                 this.urls[id] = url;
-                return _context5.abrupt("return", url);
+                return _context3.abrupt("return", url);
 
               case 10:
               case "end":
-                return _context5.stop();
+                return _context3.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee3, this);
       }));
 
-      function loadImageUrl(_x6) {
+      function loadImageUrl(_x3) {
         return _loadImageUrl.apply(this, arguments);
       }
 
@@ -3192,32 +3105,50 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "saveImage",
     value: function () {
-      var _saveImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(id, blob) {
-        var changeDate,
-            _args6 = arguments;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      var _saveImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id, blob, hash) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                changeDate = _args6.length > 2 && _args6[2] !== undefined ? _args6[2] : Date.now();
-                _context6.prev = 1;
-                _context6.next = 4;
+                _context4.prev = 0;
+                _context4.next = 3;
                 return this.adapter.setItem(id, blob);
 
-              case 4:
-                _context6.next = 6;
-                return this.SetFileChangeDate(id, changeDate);
+              case 3:
+                _context4.t0 = this;
+                _context4.t1 = id;
 
-              case 6:
-                this.hasChanges = true;
-                _context6.next = 11;
+                if (!(hash !== null && hash !== void 0)) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                _context4.t2 = hash;
+                _context4.next = 12;
                 break;
 
               case 9:
-                _context6.prev = 9;
-                _context6.t0 = _context6["catch"](1);
+                _context4.next = 11;
+                return this.generateContentHash(blob);
 
               case 11:
+                _context4.t2 = _context4.sent;
+
+              case 12:
+                _context4.t3 = _context4.t2;
+                _context4.next = 15;
+                return _context4.t0.setHash.call(_context4.t0, _context4.t1, _context4.t3);
+
+              case 15:
+                this.hasChanges = true;
+                _context4.next = 20;
+                break;
+
+              case 18:
+                _context4.prev = 18;
+                _context4.t4 = _context4["catch"](0);
+
+              case 20:
                 if (id in this.urls) {
                   URL.revokeObjectURL(this.urls[id]);
                 }
@@ -3225,15 +3156,15 @@ var ImageStorage = /*#__PURE__*/function () {
                 this.urls[id] = URL.createObjectURL(blob);
                 this.dispatchChangeEvent("save", id);
 
-              case 14:
+              case 23:
               case "end":
-                return _context6.stop();
+                return _context4.stop();
             }
           }
-        }, _callee6, this, [[1, 9]]);
+        }, _callee4, this, [[0, 18]]);
       }));
 
-      function saveImage(_x7, _x8) {
+      function saveImage(_x4, _x5, _x6) {
         return _saveImage.apply(this, arguments);
       }
 
@@ -3256,27 +3187,27 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "keys",
     value: function () {
-      var _keys = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+      var _keys = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
         var keys;
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context7.next = 2;
+                _context5.next = 2;
                 return this.adapter.keys();
 
               case 2:
-                keys = _context7.sent;
-                return _context7.abrupt("return", keys.filter(function (x) {
+                keys = _context5.sent;
+                return _context5.abrupt("return", keys.filter(function (x) {
                   return x != "file-meta";
                 }));
 
               case 4:
               case "end":
-                return _context7.stop();
+                return _context5.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee5, this);
       }));
 
       function keys() {
@@ -3317,96 +3248,96 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "generateBackupArchive",
     value: function () {
-      var _generateBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
+      var _generateBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
         var count, keys, zip, _iterator2, _step2, _id, url, blob;
 
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 count = 0;
-                _context8.next = 3;
+                _context6.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context8.sent;
+                keys = _context6.sent;
                 zip = new (jszip__WEBPACK_IMPORTED_MODULE_2___default())();
                 _iterator2 = _createForOfIteratorHelper(keys);
-                _context8.prev = 6;
+                _context6.prev = 6;
 
                 _iterator2.s();
 
               case 8:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context8.next = 22;
+                  _context6.next = 22;
                   break;
                 }
 
                 _id = _step2.value;
-                _context8.next = 12;
+                _context6.next = 12;
                 return this.loadImageUrl(_id);
 
               case 12:
-                url = _context8.sent;
-                _context8.next = 15;
+                url = _context6.sent;
+                _context6.next = 15;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
 
               case 15:
-                blob = _context8.sent;
+                blob = _context6.sent;
 
                 if (blob) {
-                  _context8.next = 18;
+                  _context6.next = 18;
                   break;
                 }
 
-                return _context8.abrupt("continue", 20);
+                return _context6.abrupt("continue", 20);
 
               case 18:
                 zip.file(_id, blob);
                 count += 1;
 
               case 20:
-                _context8.next = 8;
+                _context6.next = 8;
                 break;
 
               case 22:
-                _context8.next = 27;
+                _context6.next = 27;
                 break;
 
               case 24:
-                _context8.prev = 24;
-                _context8.t0 = _context8["catch"](6);
+                _context6.prev = 24;
+                _context6.t0 = _context6["catch"](6);
 
-                _iterator2.e(_context8.t0);
+                _iterator2.e(_context6.t0);
 
               case 27:
-                _context8.prev = 27;
+                _context6.prev = 27;
 
                 _iterator2.f();
 
-                return _context8.finish(27);
+                return _context6.finish(27);
 
               case 30:
                 if (!(count == 0)) {
-                  _context8.next = 32;
+                  _context6.next = 32;
                   break;
                 }
 
-                return _context8.abrupt("return");
+                return _context6.abrupt("return");
 
               case 32:
-                return _context8.abrupt("return", zip.generateAsync({
+                return _context6.abrupt("return", zip.generateAsync({
                   type: "blob"
                 }));
 
               case 33:
               case "end":
-                return _context8.stop();
+                return _context6.stop();
             }
           }
-        }, _callee8, this, [[6, 24, 27, 30]]);
+        }, _callee6, this, [[6, 24, 27, 30]]);
       }));
 
       function generateBackupArchive() {
@@ -3418,31 +3349,31 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "importBackupArchive",
     value: function () {
-      var _importBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10(zipFile) {
+      var _importBackupArchive = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(zipFile) {
         var _this2 = this;
 
         var zip;
-        return regeneratorRuntime.wrap(function _callee10$(_context10) {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
-                _context10.next = 2;
+                _context8.next = 2;
                 return jszip__WEBPACK_IMPORTED_MODULE_2___default().loadAsync(zipFile);
 
               case 2:
-                zip = _context10.sent;
+                zip = _context8.sent;
                 zip.forEach( /*#__PURE__*/function () {
-                  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(path, file) {
+                  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(path, file) {
                     var buffer, blob;
-                    return regeneratorRuntime.wrap(function _callee9$(_context9) {
+                    return regeneratorRuntime.wrap(function _callee7$(_context7) {
                       while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context7.prev = _context7.next) {
                           case 0:
-                            _context9.next = 2;
+                            _context7.next = 2;
                             return file.async("arraybuffer");
 
                           case 2:
-                            buffer = _context9.sent;
+                            buffer = _context7.sent;
                             blob = new Blob([buffer], {
                               "type": "image/png"
                             });
@@ -3451,26 +3382,26 @@ var ImageStorage = /*#__PURE__*/function () {
 
                           case 5:
                           case "end":
-                            return _context9.stop();
+                            return _context7.stop();
                         }
                       }
-                    }, _callee9);
+                    }, _callee7);
                   }));
 
-                  return function (_x10, _x11) {
+                  return function (_x8, _x9) {
                     return _ref.apply(this, arguments);
                   };
                 }());
 
               case 4:
               case "end":
-                return _context10.stop();
+                return _context8.stop();
             }
           }
-        }, _callee10);
+        }, _callee8);
       }));
 
-      function importBackupArchive(_x9) {
+      function importBackupArchive(_x7) {
         return _importBackupArchive.apply(this, arguments);
       }
 
@@ -3479,42 +3410,42 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "renameImage",
     value: function () {
-      var _renameImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(oldId, newId) {
+      var _renameImage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(oldId, newId) {
         var data;
-        return regeneratorRuntime.wrap(function _callee11$(_context11) {
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context11.prev = _context11.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
-                _context11.next = 2;
+                _context9.next = 2;
                 return this.adapter.getItem(oldId);
 
               case 2:
-                data = _context11.sent;
+                data = _context9.sent;
 
                 if (data) {
-                  _context11.next = 5;
+                  _context9.next = 5;
                   break;
                 }
 
-                return _context11.abrupt("return");
+                return _context9.abrupt("return");
 
               case 5:
-                _context11.next = 7;
+                _context9.next = 7;
                 return this.adapter.setItem(newId, data);
 
               case 7:
-                _context11.next = 9;
+                _context9.next = 9;
                 return this.adapter.removeItem(oldId);
 
               case 9:
               case "end":
-                return _context11.stop();
+                return _context9.stop();
             }
           }
-        }, _callee11, this);
+        }, _callee9, this);
       }));
 
-      function renameImage(_x12, _x13) {
+      function renameImage(_x10, _x11) {
         return _renameImage.apply(this, arguments);
       }
 
@@ -3523,124 +3454,84 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "migrate",
     value: function () {
-      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12() {
-        var needsRefresh, keys, _iterator3, _step3, _id2;
+      var _migrate = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10() {
+        var keys, _iterator3, _step3, _id2;
 
-        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+        return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
-                needsRefresh = false;
-                _context12.next = 3;
+                _context10.next = 2;
                 return this.keys();
 
-              case 3:
-                keys = _context12.sent;
+              case 2:
+                keys = _context10.sent;
                 _iterator3 = _createForOfIteratorHelper(keys);
-                _context12.prev = 5;
+                _context10.prev = 4;
 
                 _iterator3.s();
 
-              case 7:
+              case 6:
                 if ((_step3 = _iterator3.n()).done) {
-                  _context12.next = 35;
+                  _context10.next = 19;
                   break;
                 }
 
                 _id2 = _step3.value;
 
-                if (!_id2.includes("/")) {
-                  _context12.next = 11;
+                if (_id2.includes("/")) {
+                  _context10.next = 11;
                   break;
                 }
 
-                return _context12.abrupt("continue", 33);
+                _context10.next = 11;
+                return this.migrateLooseFilesIntoFolders(_id2);
 
               case 11:
-                if (!_id2.startsWith("image")) {
-                  _context12.next = 17;
+                if (!(_id2.startsWith("images/") || _id2.startsWith("shapes/"))) {
+                  _context10.next = 14;
                   break;
                 }
 
-                _context12.next = 14;
-                return this.renameImage(_id2, _id2.replace("image", "images/"));
+                _context10.next = 14;
+                return this.renameImage(_id2, "user/" + _id2);
 
               case 14:
-                needsRefresh = true;
-                _context12.next = 33;
-                break;
+                if (!_id2.startsWith("overlays/")) {
+                  _context10.next = 17;
+                  break;
+                }
+
+                _context10.next = 17;
+                return this.renameImage(_id2, "default/" + _id2);
 
               case 17:
-                if (!_id2.startsWith("shape-")) {
-                  _context12.next = 23;
-                  break;
-                }
-
-                _context12.next = 20;
-                return this.renameImage(_id2, _id2.replace("shape-", "shapes/"));
-
-              case 20:
-                needsRefresh = true;
-                _context12.next = 33;
+                _context10.next = 6;
                 break;
 
-              case 23:
-                if (!_id2.startsWith("shape")) {
-                  _context12.next = 29;
-                  break;
-                }
-
-                _context12.next = 26;
-                return this.renameImage(_id2, _id2.replace("shape", "shapes/"));
-
-              case 26:
-                needsRefresh = true;
-                _context12.next = 33;
+              case 19:
+                _context10.next = 24;
                 break;
 
-              case 29:
-                if (!_id2.startsWith("overlay-image")) {
-                  _context12.next = 33;
-                  break;
-                }
+              case 21:
+                _context10.prev = 21;
+                _context10.t0 = _context10["catch"](4);
 
-                _context12.next = 32;
-                return this.renameImage(_id2, _id2.replace("overlay-image", "overlays/"));
+                _iterator3.e(_context10.t0);
 
-              case 32:
-                needsRefresh = true;
-
-              case 33:
-                _context12.next = 7;
-                break;
-
-              case 35:
-                _context12.next = 40;
-                break;
-
-              case 37:
-                _context12.prev = 37;
-                _context12.t0 = _context12["catch"](5);
-
-                _iterator3.e(_context12.t0);
-
-              case 40:
-                _context12.prev = 40;
+              case 24:
+                _context10.prev = 24;
 
                 _iterator3.f();
 
-                return _context12.finish(40);
+                return _context10.finish(24);
 
-              case 43:
-                if (needsRefresh) {//location.reload();
-                }
-
-              case 44:
+              case 27:
               case "end":
-                return _context12.stop();
+                return _context10.stop();
             }
           }
-        }, _callee12, this, [[5, 37, 40, 43]]);
+        }, _callee10, this, [[4, 21, 24, 27]]);
       }));
 
       function migrate() {
@@ -3650,86 +3541,158 @@ var ImageStorage = /*#__PURE__*/function () {
       return migrate;
     }()
   }, {
+    key: "migrateLooseFilesIntoFolders",
+    value: function () {
+      var _migrateLooseFilesIntoFolders = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(id) {
+        return regeneratorRuntime.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                if (!id.startsWith("image")) {
+                  _context11.next = 4;
+                  break;
+                }
+
+                _context11.next = 3;
+                return this.renameImage(id, id.replace("image", "user/images/"));
+
+              case 3:
+                return _context11.abrupt("return", true);
+
+              case 4:
+                if (!id.startsWith("shape-")) {
+                  _context11.next = 8;
+                  break;
+                }
+
+                _context11.next = 7;
+                return this.renameImage(id, id.replace("shape-", "user/shapes/"));
+
+              case 7:
+                return _context11.abrupt("return", true);
+
+              case 8:
+                if (!id.startsWith("shape")) {
+                  _context11.next = 12;
+                  break;
+                }
+
+                _context11.next = 11;
+                return this.renameImage(id, id.replace("shape", "user/shapes/"));
+
+              case 11:
+                return _context11.abrupt("return", true);
+
+              case 12:
+                if (!id.startsWith("overlay-image")) {
+                  _context11.next = 16;
+                  break;
+                }
+
+                _context11.next = 15;
+                return this.renameImage(id, id.replace("overlay-image", "default/overlays/"));
+
+              case 15:
+                return _context11.abrupt("return", true);
+
+              case 16:
+                return _context11.abrupt("return", false);
+
+              case 17:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function migrateLooseFilesIntoFolders(_x12) {
+        return _migrateLooseFilesIntoFolders.apply(this, arguments);
+      }
+
+      return migrateLooseFilesIntoFolders;
+    }()
+  }, {
     key: "getStorageUsed",
     value: function () {
-      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+      var _getStorageUsed = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12() {
         var amount, keys, _iterator4, _step4, _id3, url, blob;
 
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+        return regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context12.prev = _context12.next) {
               case 0:
                 amount = 0;
-                _context13.next = 3;
+                _context12.next = 3;
                 return this.keys();
 
               case 3:
-                keys = _context13.sent;
+                keys = _context12.sent;
                 _iterator4 = _createForOfIteratorHelper(keys);
-                _context13.prev = 5;
+                _context12.prev = 5;
 
                 _iterator4.s();
 
               case 7:
                 if ((_step4 = _iterator4.n()).done) {
-                  _context13.next = 20;
+                  _context12.next = 20;
                   break;
                 }
 
                 _id3 = _step4.value;
-                _context13.next = 11;
+                _context12.next = 11;
                 return this.loadImageUrl(_id3);
 
               case 11:
-                url = _context13.sent;
-                _context13.next = 14;
+                url = _context12.sent;
+                _context12.next = 14;
                 return fetch(url).then(function (r) {
                   return r.blob();
                 });
 
               case 14:
-                blob = _context13.sent;
+                blob = _context12.sent;
 
                 if (blob) {
-                  _context13.next = 17;
+                  _context12.next = 17;
                   break;
                 }
 
-                return _context13.abrupt("continue", 18);
+                return _context12.abrupt("continue", 18);
 
               case 17:
                 amount += blob.size;
 
               case 18:
-                _context13.next = 7;
+                _context12.next = 7;
                 break;
 
               case 20:
-                _context13.next = 25;
+                _context12.next = 25;
                 break;
 
               case 22:
-                _context13.prev = 22;
-                _context13.t0 = _context13["catch"](5);
+                _context12.prev = 22;
+                _context12.t0 = _context12["catch"](5);
 
-                _iterator4.e(_context13.t0);
+                _iterator4.e(_context12.t0);
 
               case 25:
-                _context13.prev = 25;
+                _context12.prev = 25;
 
                 _iterator4.f();
 
-                return _context13.finish(25);
+                return _context12.finish(25);
 
               case 28:
-                return _context13.abrupt("return", amount);
+                return _context12.abrupt("return", amount);
 
               case 29:
               case "end":
-                return _context13.stop();
+                return _context12.stop();
             }
           }
-        }, _callee13, this, [[5, 22, 25, 28]]);
+        }, _callee12, this, [[5, 22, 25, 28]]);
       }));
 
       function getStorageUsed() {
@@ -3741,49 +3704,49 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "loadFileMeta",
     value: function () {
-      var _loadFileMeta = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
+      var _loadFileMeta = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
         var _ref2;
 
-        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                _context14.next = 2;
+                _context13.next = 2;
                 return this.adapter.getItem("file-meta");
 
               case 2:
-                _context14.t1 = _ref2 = _context14.sent;
-                _context14.t0 = _context14.t1 !== null;
+                _context13.t1 = _ref2 = _context13.sent;
+                _context13.t0 = _context13.t1 !== null;
 
-                if (!_context14.t0) {
-                  _context14.next = 6;
+                if (!_context13.t0) {
+                  _context13.next = 6;
                   break;
                 }
 
-                _context14.t0 = _ref2 !== void 0;
+                _context13.t0 = _ref2 !== void 0;
 
               case 6:
-                if (!_context14.t0) {
-                  _context14.next = 10;
+                if (!_context13.t0) {
+                  _context13.next = 10;
                   break;
                 }
 
-                _context14.t2 = _ref2;
-                _context14.next = 11;
+                _context13.t2 = _ref2;
+                _context13.next = 11;
                 break;
 
               case 10:
-                _context14.t2 = {};
+                _context13.t2 = {};
 
               case 11:
-                this._fileMeta = _context14.t2;
+                this._fileMeta = _context13.t2;
 
               case 12:
               case "end":
-                return _context14.stop();
+                return _context13.stop();
             }
           }
-        }, _callee14, this);
+        }, _callee13, this);
       }));
 
       function loadFileMeta() {
@@ -3800,32 +3763,64 @@ var ImageStorage = /*#__PURE__*/function () {
   }, {
     key: "getImagePath",
     value: function getImagePath(i) {
-      return "images/" + String(i + 1).padStart(2, "0") + ".png";
+      return "user/images/" + String(i + 1).padStart(2, "0") + ".png";
     }
   }, {
     key: "getOverlayPath",
     value: function getOverlayPath(imageId) {
-      return "overlays/" + this.getFilenameFromPath(imageId);
+      return "default/overlays/" + this.getFilenameFromPath(imageId);
     }
   }, {
     key: "listFolder",
     value: function () {
-      var _listFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(path) {
+      var _listFolder = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14(path) {
         var keys;
-        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
-                _context15.next = 2;
+                _context14.next = 2;
                 return this.adapter.keys();
 
               case 2:
-                keys = _context15.sent;
-                return _context15.abrupt("return", keys.filter(function (x) {
+                keys = _context14.sent;
+                return _context14.abrupt("return", keys.filter(function (x) {
                   return x.startsWith(path + "/");
                 }));
 
               case 4:
+              case "end":
+                return _context14.stop();
+            }
+          }
+        }, _callee14, this);
+      }));
+
+      function listFolder(_x13) {
+        return _listFolder.apply(this, arguments);
+      }
+
+      return listFolder;
+    }()
+  }, {
+    key: "getHash",
+    value: function () {
+      var _getHash = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(id) {
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+          while (1) {
+            switch (_context15.prev = _context15.next) {
+              case 0:
+                if (!(id in this._fileMeta)) {
+                  _context15.next = 2;
+                  break;
+                }
+
+                return _context15.abrupt("return", this._fileMeta[id].hash);
+
+              case 2:
+                return _context15.abrupt("return", null);
+
+              case 3:
               case "end":
                 return _context15.stop();
             }
@@ -3833,11 +3828,63 @@ var ImageStorage = /*#__PURE__*/function () {
         }, _callee15, this);
       }));
 
-      function listFolder(_x14) {
-        return _listFolder.apply(this, arguments);
+      function getHash(_x14) {
+        return _getHash.apply(this, arguments);
       }
 
-      return listFolder;
+      return getHash;
+    }()
+  }, {
+    key: "setHash",
+    value: function () {
+      var _setHash = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee16(id, hash) {
+        return regeneratorRuntime.wrap(function _callee16$(_context16) {
+          while (1) {
+            switch (_context16.prev = _context16.next) {
+              case 0:
+                this._fileMeta[id] = {
+                  hash: hash
+                };
+                _context16.next = 3;
+                return this.adapter.setItem("file-meta", this._fileMeta);
+
+              case 3:
+              case "end":
+                return _context16.stop();
+            }
+          }
+        }, _callee16, this);
+      }));
+
+      function setHash(_x15, _x16) {
+        return _setHash.apply(this, arguments);
+      }
+
+      return setHash;
+    }()
+  }, {
+    key: "generateContentHash",
+    value: function () {
+      var _generateContentHash = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee17(blob) {
+        return regeneratorRuntime.wrap(function _callee17$(_context17) {
+          while (1) {
+            switch (_context17.prev = _context17.next) {
+              case 0:
+                return _context17.abrupt("return", Date.now().toString());
+
+              case 1:
+              case "end":
+                return _context17.stop();
+            }
+          }
+        }, _callee17);
+      }));
+
+      function generateContentHash(_x17) {
+        return _generateContentHash.apply(this, arguments);
+      }
+
+      return generateContentHash;
     }()
   }]);
 
@@ -5196,6 +5243,388 @@ var Tool = /*#__PURE__*/function () {
 }();
 
 
+
+/***/ }),
+
+/***/ "./src/ts/utils/FileSync.ts":
+/*!**********************************!*\
+  !*** ./src/ts/utils/FileSync.ts ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "FileSync": function() { return /* binding */ FileSync; }
+/* harmony export */ });
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// inspiration: https://unterwaditzer.net/2016/sync-algorithm.html
+var FileSync = /*#__PURE__*/function () {
+  function FileSync(filesA, filesB, status, resolveConflict) {
+    _classCallCheck(this, FileSync);
+
+    this._filesA = filesA;
+    this._filesB = filesB;
+    this._status = status;
+    this._resolveConflict = resolveConflict;
+  }
+
+  _createClass(FileSync, [{
+    key: "syncFiles",
+    value: function () {
+      var _syncFiles = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var changed, files, _iterator, _step, file;
+
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                changed = false;
+                files = this.getAllFiles();
+                _iterator = _createForOfIteratorHelper(files);
+                _context.prev = 3;
+
+                _iterator.s();
+
+              case 5:
+                if ((_step = _iterator.n()).done) {
+                  _context.next = 11;
+                  break;
+                }
+
+                file = _step.value;
+                _context.next = 9;
+                return this.syncFile(file);
+
+              case 9:
+                _context.next = 5;
+                break;
+
+              case 11:
+                _context.next = 16;
+                break;
+
+              case 13:
+                _context.prev = 13;
+                _context.t0 = _context["catch"](3);
+
+                _iterator.e(_context.t0);
+
+              case 16:
+                _context.prev = 16;
+
+                _iterator.f();
+
+                return _context.finish(16);
+
+              case 19:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[3, 13, 16, 19]]);
+      }));
+
+      function syncFiles() {
+        return _syncFiles.apply(this, arguments);
+      }
+
+      return syncFiles;
+    }()
+  }, {
+    key: "syncFile",
+    value: function () {
+      var _syncFile = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(itemId) {
+        var filesA, filesB, status;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                filesA = this._filesA;
+                filesB = this._filesB;
+                status = this._status;
+
+                if (!status.has(itemId)) {
+                  _context2.next = 29;
+                  break;
+                }
+
+                if (!filesA.has(itemId)) {
+                  _context2.next = 17;
+                  break;
+                }
+
+                if (!filesB.has(itemId)) {
+                  _context2.next = 10;
+                  break;
+                }
+
+                _context2.next = 8;
+                return this.handleModification(itemId);
+
+              case 8:
+                _context2.next = 15;
+                break;
+
+              case 10:
+                _context2.next = 12;
+                return filesA.delete(itemId);
+
+              case 12:
+                _context2.next = 14;
+                return status.delete(itemId);
+
+              case 14:
+                this.modified = true;
+
+              case 15:
+                _context2.next = 27;
+                break;
+
+              case 17:
+                if (!filesB.has(itemId)) {
+                  _context2.next = 25;
+                  break;
+                }
+
+                _context2.next = 20;
+                return filesB.delete(itemId);
+
+              case 20:
+                _context2.next = 22;
+                return status.delete(itemId);
+
+              case 22:
+                this.modified = true;
+                _context2.next = 27;
+                break;
+
+              case 25:
+                _context2.next = 27;
+                return status.delete(itemId);
+
+              case 27:
+                _context2.next = 52;
+                break;
+
+              case 29:
+                if (!filesA.has(itemId)) {
+                  _context2.next = 45;
+                  break;
+                }
+
+                if (!filesB.has(itemId)) {
+                  _context2.next = 37;
+                  break;
+                }
+
+                // is on A and B but not on status. We cannot compare the hashes so we need to
+                console.log("not on status: ", itemId);
+                _context2.next = 34;
+                return this._resolveConflict(itemId);
+
+              case 34:
+                this.modified = true;
+                _context2.next = 43;
+                break;
+
+              case 37:
+                // only on A
+                console.log("only on A");
+                _context2.next = 40;
+                return filesA.copyTo(itemId, filesB);
+
+              case 40:
+                _context2.next = 42;
+                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+
+              case 42:
+                this.modified = true;
+
+              case 43:
+                _context2.next = 52;
+                break;
+
+              case 45:
+                if (!filesB.has(itemId)) {
+                  _context2.next = 52;
+                  break;
+                }
+
+                console.log("only on B"); // only on B
+
+                _context2.next = 49;
+                return filesB.copyTo(itemId, filesA);
+
+              case 49:
+                _context2.next = 51;
+                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+
+              case 51:
+                this.modified = true;
+
+              case 52:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function syncFile(_x) {
+        return _syncFile.apply(this, arguments);
+      }
+
+      return syncFile;
+    }()
+  }, {
+    key: "handleModification",
+    value: function () {
+      var _handleModification = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(itemId) {
+        var filesA, filesB, status, hashA, hashB, statusHashes;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                filesA = this._filesA;
+                filesB = this._filesB;
+                status = this._status;
+                hashA = filesA.getHash(itemId);
+                hashB = filesB.getHash(itemId);
+                statusHashes = status.get(itemId); // console.log("handleModification ", itemId)
+                // console.log("hashA ", hashA)
+                // console.log("hashB ", hashB)
+                // nothing changed
+
+                if (!(hashA == statusHashes.hashA && hashB == statusHashes.hashB)) {
+                  _context3.next = 8;
+                  break;
+                }
+
+                return _context3.abrupt("return");
+
+              case 8:
+                if (!(hashA != statusHashes.hashA && hashB == statusHashes.hashB)) {
+                  _context3.next = 17;
+                  break;
+                }
+
+                console.log("changed on A but not on B", hashA, statusHashes.hashA);
+                _context3.next = 12;
+                return filesA.copyTo(itemId, filesB);
+
+              case 12:
+                _context3.next = 14;
+                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+
+              case 14:
+                this.modified = true;
+                _context3.next = 30;
+                break;
+
+              case 17:
+                if (!(hashA == statusHashes.hashA && hashB != statusHashes.hashB)) {
+                  _context3.next = 26;
+                  break;
+                }
+
+                console.log("changed on B but not on A", hashB, statusHashes.hashB);
+                _context3.next = 21;
+                return filesB.copyTo(itemId, filesA);
+
+              case 21:
+                _context3.next = 23;
+                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+
+              case 23:
+                this.modified = true;
+                _context3.next = 30;
+                break;
+
+              case 26:
+                if (!(hashA != statusHashes.hashA && hashB != statusHashes.hashB)) {
+                  _context3.next = 30;
+                  break;
+                }
+
+                _context3.next = 29;
+                return this._resolveConflict(itemId);
+
+              case 29:
+                this.modified = true;
+
+              case 30:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function handleModification(_x2) {
+        return _handleModification.apply(this, arguments);
+      }
+
+      return handleModification;
+    }()
+  }, {
+    key: "getAllFiles",
+    value: function getAllFiles() {
+      var allFiles = new Set(this._status.getAll());
+
+      var filesA = this._filesA.getAll();
+
+      var filesB = this._filesB.getAll();
+
+      var _iterator2 = _createForOfIteratorHelper(filesA),
+          _step2;
+
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var file = _step2.value;
+          allFiles.add(file);
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+
+      var _iterator3 = _createForOfIteratorHelper(filesB),
+          _step3;
+
+      try {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var _file = _step3.value;
+          allFiles.add(_file);
+        }
+      } catch (err) {
+        _iterator3.e(err);
+      } finally {
+        _iterator3.f();
+      }
+
+      return Array.from(allFiles);
+    }
+  }]);
+
+  return FileSync;
+}();
 
 /***/ }),
 
@@ -6973,7 +7402,7 @@ var SettingsView = /*#__PURE__*/function (_View) {
     var clearButton = _this._element.querySelector(".button.clear");
 
     _utils_Utils__WEBPACK_IMPORTED_MODULE_1__.addClick(clearButton, function () {
-      if (confirm("Really clear all iamges?")) {
+      if (confirm("Really clear all images?")) {
         _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_2__.imageStorage.clear();
         location.reload();
       }
@@ -6989,8 +7418,6 @@ var SettingsView = /*#__PURE__*/function (_View) {
   _createClass(SettingsView, [{
     key: "updateButtons",
     value: function updateButtons() {
-      console.log(_storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.isAuthorized);
-
       this._connectButton.classList.toggle('hidden', _storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.isAuthorized);
 
       this._disconnectButton.classList.toggle('hidden', !_storage_DropboxStorage__WEBPACK_IMPORTED_MODULE_5__.dropboxStorage.isAuthorized);
@@ -7450,4 +7877,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.d55143e8e0ed215e9de5.js.map
+//# sourceMappingURL=main.0e6d89377f3c48b7cde1.js.map
