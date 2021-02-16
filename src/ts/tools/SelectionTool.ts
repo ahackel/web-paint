@@ -223,13 +223,13 @@ export default class SelectionTool extends Tool {
     }
 
     private async saveSelectionAsNewShape() {
-        const shapes = await imageStorage.listFolder("shapes");
+        const shapes = await imageStorage.listFolder("user/shapes");
         if (shapes.length >= config.maxShapeCount){
             console.log("Cannot save selection as shape because there are already too many in storage.");
             return;
         }
         
-        const path = `shapes/${Date.now()}.png`;
+        const path = `user/shapes/${Date.now()}.png`;
         console.log(`Saving selection as: ${path}`);
         this.selectionLayer.canvas.toBlob(blob => imageStorage.saveImage(path, blob as Blob));
         this.isInShapesPalette = true;

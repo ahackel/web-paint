@@ -1499,7 +1499,7 @@ var ShapePalette = /*#__PURE__*/function (_Palette) {
     _this.addShapes();
 
     _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.addChangeListener(function (change, id) {
-      if (change == "save" && id.startsWith("shapes/")) {
+      if (change == "save" && id.startsWith("user/shapes/")) {
         _this.addShape(id);
       }
     });
@@ -1522,7 +1522,7 @@ var ShapePalette = /*#__PURE__*/function (_Palette) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.listFolder("shapes");
+                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_1__.imageStorage.listFolder("user/shapes");
 
               case 2:
                 shapesPaths = _context.sent;
@@ -5068,7 +5068,7 @@ var SelectionTool = /*#__PURE__*/function (_Tool) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_3__.imageStorage.listFolder("shapes");
+                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_3__.imageStorage.listFolder("user/shapes");
 
               case 2:
                 shapes = _context2.sent;
@@ -5082,7 +5082,7 @@ var SelectionTool = /*#__PURE__*/function (_Tool) {
                 return _context2.abrupt("return");
 
               case 6:
-                path = "shapes/".concat(Date.now(), ".png");
+                path = "user/shapes/".concat(Date.now(), ".png");
                 console.log("Saving selection as: ".concat(path));
                 this.selectionLayer.canvas.toBlob(function (blob) {
                   return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_3__.imageStorage.saveImage(path, blob);
@@ -7877,4 +7877,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.0e6d89377f3c48b7cde1.js.map
+//# sourceMappingURL=main.63f18b5fb49b6f021239.js.map

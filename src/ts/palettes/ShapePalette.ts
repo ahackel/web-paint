@@ -14,14 +14,14 @@ export default class ShapePalette extends Palette {
         this.addShapes();
 
         imageStorage.addChangeListener((change: string, id: string) => {
-            if (change == "save" && id.startsWith("shapes/")) {
+            if (change == "save" && id.startsWith("user/shapes/")) {
                 this.addShape(id);
             }
         });
     }
 
     private async addShapes() {
-        const shapesPaths = await imageStorage.listFolder("shapes");
+        const shapesPaths = await imageStorage.listFolder("user/shapes");
         for (let path of shapesPaths) {
             await this.addShape(path);
         }
