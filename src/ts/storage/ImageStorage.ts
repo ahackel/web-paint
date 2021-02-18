@@ -2,7 +2,6 @@ import 'whatwg-fetch';
 import LocalForageAdapter from "./LocalForageAdapter";
 import StorageAdapter from "./StorageAdapter";
 import JSZip from "jszip";
-import sha256 from 'crypto-js/sha256';
 
 interface IFileMeta {
 	hash: string;
@@ -256,27 +255,25 @@ class ImageStorage {
 		await this.adapter.setItem("file-meta", this._fileMeta);
 	}
 
-	private async generateContentHash(blob: Blob): Promise<string> {
-		return Date.now().toString();
+	public async generateContentHash(blob: Blob): Promise<string> {
+		const BLOCK_SIZE = 4 * 1024 * 1024;
 		
-		// const BLOCK_SIZE = 4 * 1024 * 1024;
-		// let hash = CryptoJS.algo.SHA256.create();
-		// for (let p = 0; p < blob.size; p += BLOCK_SIZE) {
-		// 	let blobChunk = blob.slice(p, p + BLOCK_SIZE).;
-		// 	hash.update(sha256(blobChunk));
-		// }
-		// return hash.finalize().toString();
+		const tempBuffer = new Uint8Array(Math.ceil(blob.size / BLOCK_SIZE) * 32);
+		let tempPos = 0;
 		
-		// const reader = new FileReader();
-		// const p = new Promise((resolve, reject) => {
-		// 	reader.onload = () => resolve(reader.result);
-		// 	reader.onerror = reject;
-		// 	reader.readAsBinaryString(blob);
-		// });
-		//
-		// await p;
-		//
-		// return sha256(reader.result.toString()).toString();
+		for (let p = 0; p < blob.size; p += BLOCK_SIZE) {
+			const blobChunk = blob.slice(p, p + BLOCK_SIZE);
+			const buf = await blob.arrayBuffer();
+			const hashBuffer = await crypto.subtle.digest('SHA-256', buf);
+			tempBuffer.set(new Uint8Array(hashBuffer), tempPos);
+			tempPos += 32;
+		}
+
+		const hashBuffer = await crypto.subtle.digest('SHA-256', tempBuffer);
+		const hashArray = Array.from(new Uint8Array(hashBuffer));
+		const hashHex2 = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+		
+		return hashHex2;
 	}
 }
 

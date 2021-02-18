@@ -93,7 +93,7 @@ export class FileSync{
                     // only on A
                     console.log("only on A")
                     await filesA.copyTo(itemId, filesB);
-                    await status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+                    await status.set(itemId, filesA.getHash(itemId), filesA.getHash(itemId));
                     this.modified = true;
                 }
             }
@@ -103,7 +103,7 @@ export class FileSync{
                     console.log("only on B")
                     // only on B
                     await filesB.copyTo(itemId, filesA);
-                    await status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+                    await status.set(itemId, filesB.getHash(itemId), filesB.getHash(itemId));
                     this.modified = true;
                 }
                 // else it's on none
@@ -133,14 +133,14 @@ export class FileSync{
         if (hashA != statusHashes.hashA && hashB == statusHashes.hashB) {
             console.log("changed on A but not on B", hashA, statusHashes.hashA)
             await filesA.copyTo(itemId, filesB);
-            await status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+            await status.set(itemId, filesA.getHash(itemId), filesA.getHash(itemId));
             this.modified = true;
         }
         // changed on B but not on A
         else if (hashA == statusHashes.hashA && hashB != statusHashes.hashB) {
             console.log("changed on B but not on A", hashB, statusHashes.hashB)
             await filesB.copyTo(itemId, filesA);
-            await status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+            await status.set(itemId, filesB.getHash(itemId), filesB.getHash(itemId));
             this.modified = true;
         }
         // changed on both

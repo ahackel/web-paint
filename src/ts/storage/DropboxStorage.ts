@@ -273,7 +273,7 @@ class DropboxStorage {
             const fileSync = new FileSync(clientFiles, serverFiles, fileSyncStatus, async id => {
                 // in doubt keep the files of the client:
                 await clientFiles.copyTo(id, serverFiles);
-                await fileSyncStatus.set(id, clientFiles.getHash(id), serverFiles.getHash(id));
+                await fileSyncStatus.set(id, clientFiles.getHash(id), clientFiles.getHash(id));
             });
             await fileSync.syncFiles();
             await fileSyncStatus.saveEntries();

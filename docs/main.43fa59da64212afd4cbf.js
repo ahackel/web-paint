@@ -781,6 +781,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _views_PaintView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./views/PaintView */ "./src/ts/views/PaintView.ts");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./config */ "./src/ts/config.ts");
 /* harmony import */ var _views_SettingsView__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./views/SettingsView */ "./src/ts/views/SettingsView.ts");
+/* harmony import */ var _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./storage/ImageStorage */ "./src/ts/storage/ImageStorage.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -802,6 +803,7 @@ __webpack_require__(/*! blueimp-canvas-to-blob/js/canvas-to-blob */ "./node_modu
 
 _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_1__.library.add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_2__.fas);
 _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_1__.dom.watch(); // required to make 'async' work on old devices: 
+
 
 
 
@@ -891,6 +893,52 @@ var App = /*#__PURE__*/function () {
 
       this._activeView.show();
     }
+  }, {
+    key: "hash",
+    value: function () {
+      var _hash = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
+        var path, url, blob, hash;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                path = _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__.imageStorage.getImagePath(id);
+                console.log(path);
+                _context2.next = 4;
+                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__.imageStorage.loadImageUrl(path);
+
+              case 4:
+                url = _context2.sent;
+                console.log(url);
+                _context2.next = 8;
+                return fetch(url).then(function (r) {
+                  return r.blob();
+                });
+
+              case 8:
+                blob = _context2.sent;
+                console.log(blob);
+                _context2.next = 12;
+                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__.imageStorage.generateContentHash(blob);
+
+              case 12:
+                hash = _context2.sent;
+                console.log(hash);
+
+              case 14:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }));
+
+      function hash(_x) {
+        return _hash.apply(this, arguments);
+      }
+
+      return hash;
+    }()
   }], [{
     key: "preventOverScroll",
     value: function preventOverScroll() {
@@ -2672,7 +2720,7 @@ var DropboxStorage = /*#__PURE__*/function () {
 
                           case 2:
                             _context17.next = 4;
-                            return fileSyncStatus.set(id, clientFiles.getHash(id), serverFiles.getHash(id));
+                            return fileSyncStatus.set(id, clientFiles.getHash(id), clientFiles.getHash(id));
 
                           case 4:
                           case "end":
@@ -3866,13 +3914,55 @@ var ImageStorage = /*#__PURE__*/function () {
     key: "generateContentHash",
     value: function () {
       var _generateContentHash = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee17(blob) {
+        var BLOCK_SIZE, tempBuffer, tempPos, p, blobChunk, buf, _hashBuffer, hashBuffer, hashArray, hashHex2;
+
         return regeneratorRuntime.wrap(function _callee17$(_context17) {
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
-                return _context17.abrupt("return", Date.now().toString());
+                BLOCK_SIZE = 4 * 1024 * 1024;
+                tempBuffer = new Uint8Array(Math.ceil(blob.size / BLOCK_SIZE) * 32);
+                tempPos = 0;
+                p = 0;
 
-              case 1:
+              case 4:
+                if (!(p < blob.size)) {
+                  _context17.next = 17;
+                  break;
+                }
+
+                blobChunk = blob.slice(p, p + BLOCK_SIZE);
+                _context17.next = 8;
+                return blob.arrayBuffer();
+
+              case 8:
+                buf = _context17.sent;
+                _context17.next = 11;
+                return crypto.subtle.digest('SHA-256', buf);
+
+              case 11:
+                _hashBuffer = _context17.sent;
+                tempBuffer.set(new Uint8Array(_hashBuffer), tempPos);
+                tempPos += 32;
+
+              case 14:
+                p += BLOCK_SIZE;
+                _context17.next = 4;
+                break;
+
+              case 17:
+                _context17.next = 19;
+                return crypto.subtle.digest('SHA-256', tempBuffer);
+
+              case 19:
+                hashBuffer = _context17.sent;
+                hashArray = Array.from(new Uint8Array(hashBuffer));
+                hashHex2 = hashArray.map(function (b) {
+                  return b.toString(16).padStart(2, '0');
+                }).join('');
+                return _context17.abrupt("return", hashHex2);
+
+              case 23:
               case "end":
                 return _context17.stop();
             }
@@ -5451,7 +5541,7 @@ var FileSync = /*#__PURE__*/function () {
 
               case 40:
                 _context2.next = 42;
-                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+                return status.set(itemId, filesA.getHash(itemId), filesA.getHash(itemId));
 
               case 42:
                 this.modified = true;
@@ -5473,7 +5563,7 @@ var FileSync = /*#__PURE__*/function () {
 
               case 49:
                 _context2.next = 51;
-                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+                return status.set(itemId, filesB.getHash(itemId), filesB.getHash(itemId));
 
               case 51:
                 this.modified = true;
@@ -5530,7 +5620,7 @@ var FileSync = /*#__PURE__*/function () {
 
               case 12:
                 _context3.next = 14;
-                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+                return status.set(itemId, filesA.getHash(itemId), filesA.getHash(itemId));
 
               case 14:
                 this.modified = true;
@@ -5549,7 +5639,7 @@ var FileSync = /*#__PURE__*/function () {
 
               case 21:
                 _context3.next = 23;
-                return status.set(itemId, filesA.getHash(itemId), filesB.getHash(itemId));
+                return status.set(itemId, filesB.getHash(itemId), filesB.getHash(itemId));
 
               case 23:
                 this.modified = true;
@@ -7877,4 +7967,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.63f18b5fb49b6f021239.js.map
+//# sourceMappingURL=main.43fa59da64212afd4cbf.js.map

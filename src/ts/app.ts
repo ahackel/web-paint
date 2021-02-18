@@ -19,6 +19,7 @@ import DropboxAuthView from "./views/DropboxAuthView";
 import {config} from "./config";
 import PeerToPeer from "./PeerToPeer";
 import SettingsView from "./views/SettingsView";
+import { imageStorage } from "./storage/ImageStorage";
 
 class App {
     private _activeView: View;
@@ -104,6 +105,17 @@ class App {
         }
         this._activeView = view;
         this._activeView.show();
+    }
+    
+    async hash(id: number){
+        const path = imageStorage.getImagePath(id);
+        console.log(path)
+        const url = await imageStorage.loadImageUrl(path);
+        console.log(url)
+        const blob = await fetch(url).then(r => r.blob());
+        console.log(blob)
+        var hash = await imageStorage.generateContentHash(blob);
+        console.log(hash);
     }
 }
 
