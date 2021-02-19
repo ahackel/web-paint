@@ -15,7 +15,7 @@ export class Palette extends View {
     get selectedIndex(){ return this._selectedIndex }
     set selectedIndex(value){
         this._selectedIndex = Math.max(0, Math.min(this._options.length - 1, value));
-        this.updateSelectedOptionElement(this._selectedElement, this.selectedOption);
+        this.updateSelectedOption();
     }
     
     get selectedOption(){ return this._options[this._selectedIndex] }
@@ -64,6 +64,9 @@ export class Palette extends View {
 
     expand() {
         Palette.collapseAll();
+        if (this._options.length == 0){
+            return;
+        }
         this._element.classList.remove("collapsed");
         Palette._expandedPalette = this;
     }
@@ -77,10 +80,13 @@ export class Palette extends View {
         }
     }
     
-    addOption(value: any){
+    addOption(value: any): number {
         this._options.push(value);
-        this.addOptionElement(this._options.length - 1, value);
+        let index = this._options.length - 1;
+        this.addOptionElement(index, value);
         this.updateOptionsWidth();
+        this.updateSelectedOption();
+        return index;
     }
 
     removeOption(index: number){
@@ -90,6 +96,9 @@ export class Palette extends View {
         
         // update the index assigned to each element:
         this.recreateOptions();
+        if (this._options.length == 0){
+            this.collapse();
+        }
     }
 
     private addSelectedOption() {
@@ -97,7 +106,7 @@ export class Palette extends View {
         element.classList.add("option");
         this._selectedElement = element;
         Utils.addClick(element, () => this.toggle());
-        this.updateSelectedOptionElement(element, this.selectedOption);
+        this.updateSelectedOption();
         this._element.appendChild(element);
     }
     
@@ -153,5 +162,9 @@ export class Palette extends View {
 
     protected updateSelectedOptionElement(element: HTMLDivElement, option: any) {
         this.updateOptionElement(element, option);
+    }
+    
+    protected updateSelectedOption() {
+        this.updateSelectedOptionElement(this._selectedElement, this.selectedOption);
     }
 }

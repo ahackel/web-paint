@@ -20,6 +20,8 @@ import ImageLayer from "../ImageLayer ";
 import SelectionTool from "../tools/SelectionTool";
 import {Toolbar} from "../Toolbar";
 import {History} from "../History";
+import GiftPalette from "../palettes/GiftPalette";
+import SendPalette from "../palettes/SendPalette";
 
 // var Pressure = require('pressure');
 export interface IPointerData {
@@ -53,6 +55,7 @@ export class PaintView extends View {
     private _colorPalette: ColorPalette;
     private _sizePalette: SizePalette;
     private _shapePalette: ShapePalette;
+    private _giftPalette: GiftPalette;
     private _tools: Tool[];
     private _currentTouchId: number = 0;
     private _history: History;
@@ -61,7 +64,7 @@ export class PaintView extends View {
     private _lastPointerData: IPointerData;
     private _tickTimeStamp: number;
     private _autoMaskCaptured: boolean;
-    private _stamp: string;
+    private _shape: string;
     private _layers: { [id : string] : ILayer } = {};
     private _sheet: HTMLElement;
     private _importImageButton: HTMLDivElement;
@@ -69,7 +72,7 @@ export class PaintView extends View {
     private _lastSaveTimestamp: number = 0;
 
     get color(): string { return this._color; }
-    get stamp(): string { return this._stamp; }
+    get shape(): string { return this._shape; }
     get opacity(): number { return this._opacity; }
     get lineWidth(): number { return this._lineWidth; }
     get autoMaskCtx(): CanvasRenderingContext2D { return this._autoMaskCtx; }
@@ -221,13 +224,20 @@ export class PaintView extends View {
         this._colorPalette.onSelectionChanged = (color: string) => this._color = color;
         this._color = this._colorPalette.color;
 
-        this._shapePalette = new ShapePalette("stamp-palette");
-        this._shapePalette.onSelectionChanged = (stamp: string) => {
-            this._stamp = stamp;
+        this._shapePalette = new ShapePalette("shape-palette");
+        this._shapePalette.onSelectionChanged = (shape: string) => {
+            this._shape = shape;
             this.setTool(this.selectionTool);
-            this.selectionTool.setImageUrl(this.stamp);
+            this.selectionTool.setImageUrl(this.shape);
         }
-        this._stamp = this._shapePalette.stamp;
+        this._shape = this._shapePalette.stamp;
+
+        this._giftPalette = new GiftPalette("gift-palette");
+        this._giftPalette.onSelectionChanged = (path: string) => {
+            this.setTool(this.selectionTool);
+            this.selectionTool.setImagePath(path);
+            imageStorage.deleteImage(path);
+        }
 
         this._opacity = 1;
     }

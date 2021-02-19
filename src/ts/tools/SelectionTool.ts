@@ -7,6 +7,8 @@ import * as Utils from "../utils/Utils";
 import {PaintView, IPointerData} from "../views/PaintView";
 import {config} from "../config";
 import {saveAs} from "file-saver";
+import SendPalette from "../palettes/SendPalette";
+import { dropboxStorage } from "../storage/DropboxStorage";
 
 // Provides a floating selection the user can manipulate 
 export default class SelectionTool extends Tool {
@@ -35,6 +37,7 @@ export default class SelectionTool extends Tool {
     private _stampButton: HTMLDivElement;
     private _saveButton: HTMLDivElement;
     private _downloadButton: HTMLDivElement;
+    private _sendPalette: SendPalette;
 
     constructor(painter: PaintView, buttonId: string) {
         super(painter, buttonId);
@@ -49,6 +52,11 @@ export default class SelectionTool extends Tool {
             this.selectionLayer.canvas.toBlob(blob => saveAs(blob, "image.png"));
         });
         
+        this._sendPalette = new SendPalette("send-palette");
+        this._sendPalette.onSelectionChanged = (receipient: string) => {
+            this.selectionLayer.canvas.toBlob(blob => dropboxStorage.sendGift(blob, receipient));
+        }
+        
         this.hasFloatingSelection = false;
         this._position = new Vector(0, 0);
     }
@@ -58,6 +66,7 @@ export default class SelectionTool extends Tool {
         this._stampButton.classList.toggle("hidden", !visible);
         this._downloadButton.classList.toggle("hidden", !visible);
         this._saveButton.classList.toggle("hidden", !visible);
+        this._sendPalette.setVisible(visible);
     }
 
     enable() {
@@ -154,6 +163,11 @@ export default class SelectionTool extends Tool {
                 resolve(img);
             }
         });
+    }
+
+    async setImagePath(path: string): Promise<HTMLImageElement>{
+        const url = await imageStorage.loadImageUrl(path);
+        return this.setImageUrl(url);
     }
 
     private requestDrawSelectionOutline() {

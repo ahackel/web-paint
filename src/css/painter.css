@@ -377,6 +377,14 @@ body, input, textarea {
     border-top: none;
 }
 
+#send-palette .options{
+    width: auto!important;
+}
+
+#send-palette .option{
+    width: auto;
+}
+
 .toolbar.left .palette .options{
     left: 2.25rem;
     top: 50%;

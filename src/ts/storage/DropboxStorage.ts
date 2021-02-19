@@ -359,6 +359,13 @@ class DropboxStorage {
         return ret;
     }
 
+    async sendGift(blob: Blob, receipient: string) {
+        const id = Date.now().toString() + ".png";
+        const path = "/" + receipient + "/gifts/" + id;
+        console.log("Sending gift to " + path);
+        await this._dbx.filesUpload({path: path, contents: blob, mode: { ".tag": "overwrite" }})
+    }
+
     private authorize(token: string) {
         this._isAuthorized = !!token;
 
