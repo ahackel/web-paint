@@ -232,14 +232,14 @@ class DropboxStorage {
         this._lastSyncDate = await localforage.getItem<number>("last-dropbox-sync") ?? 0;
         
         let token = this.getAccessTokenFromUrl();
-        if (token) {
-            this.authorize(token);
-        } else {
+        if (!token) {
             token = await localforage.getItem<string>('dropbox-token')
-            if (token) {
-                this.authorize(token);
+            if (!token) {
+                return;
             }
         }
+        this.authorize(token);
+        this.sync();
     }
 
     getAuthenticationUrl(): string{
@@ -358,8 +358,17 @@ class DropboxStorage {
     
         return ret;
     }
+    
+    async getGiftCount(receipient: string): Promise<number>{
+        const res = await this._dbx.filesListFolder({path: "/" + receipient + "/gifts"});
+        return res.result.entries.length;
+    }
 
     async sendGift(blob: Blob, receipient: string) {
+        if (await this.getGiftCount(receipient) >= 10){
+            return;
+        }
+        
         const id = Date.now().toString() + ".png";
         const path = "/" + receipient + "/gifts/" + id;
         console.log("Sending gift to " + path);

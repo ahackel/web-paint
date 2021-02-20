@@ -3015,25 +3015,27 @@ var DropboxStorage = /*#__PURE__*/function () {
                 this._lastSyncDate = _context15.t5;
                 token = this.getAccessTokenFromUrl();
 
-                if (!token) {
-                  _context15.next = 29;
+                if (token) {
+                  _context15.next = 31;
                   break;
                 }
 
-                this.authorize(token);
-                _context15.next = 33;
-                break;
-
-              case 29:
-                _context15.next = 31;
+                _context15.next = 28;
                 return localforage__WEBPACK_IMPORTED_MODULE_1___default().getItem('dropbox-token');
 
-              case 31:
+              case 28:
                 token = _context15.sent;
 
                 if (token) {
-                  this.authorize(token);
+                  _context15.next = 31;
+                  break;
                 }
+
+                return _context15.abrupt("return");
+
+              case 31:
+                this.authorize(token);
+                this.sync();
 
               case 33:
               case "end":
@@ -3332,18 +3334,64 @@ var DropboxStorage = /*#__PURE__*/function () {
       return ret;
     }
   }, {
-    key: "sendGift",
+    key: "getGiftCount",
     value: function () {
-      var _sendGift = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee21(blob, receipient) {
-        var id, path;
+      var _getGiftCount = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee21(receipient) {
+        var res;
         return regeneratorRuntime.wrap(function _callee21$(_context21) {
           while (1) {
             switch (_context21.prev = _context21.next) {
               case 0:
+                _context21.next = 2;
+                return this._dbx.filesListFolder({
+                  path: "/" + receipient + "/gifts"
+                });
+
+              case 2:
+                res = _context21.sent;
+                return _context21.abrupt("return", res.result.entries.length);
+
+              case 4:
+              case "end":
+                return _context21.stop();
+            }
+          }
+        }, _callee21, this);
+      }));
+
+      function getGiftCount(_x26) {
+        return _getGiftCount.apply(this, arguments);
+      }
+
+      return getGiftCount;
+    }()
+  }, {
+    key: "sendGift",
+    value: function () {
+      var _sendGift = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee22(blob, receipient) {
+        var id, path;
+        return regeneratorRuntime.wrap(function _callee22$(_context22) {
+          while (1) {
+            switch (_context22.prev = _context22.next) {
+              case 0:
+                _context22.next = 2;
+                return this.getGiftCount(receipient);
+
+              case 2:
+                _context22.t0 = _context22.sent;
+
+                if (!(_context22.t0 >= 10)) {
+                  _context22.next = 5;
+                  break;
+                }
+
+                return _context22.abrupt("return");
+
+              case 5:
                 id = Date.now().toString() + ".png";
                 path = "/" + receipient + "/gifts/" + id;
                 console.log("Sending gift to " + path);
-                _context21.next = 5;
+                _context22.next = 10;
                 return this._dbx.filesUpload({
                   path: path,
                   contents: blob,
@@ -3352,15 +3400,15 @@ var DropboxStorage = /*#__PURE__*/function () {
                   }
                 });
 
-              case 5:
+              case 10:
               case "end":
-                return _context21.stop();
+                return _context22.stop();
             }
           }
-        }, _callee21, this);
+        }, _callee22, this);
       }));
 
-      function sendGift(_x26, _x27) {
+      function sendGift(_x27, _x28) {
         return _sendGift.apply(this, arguments);
       }
 
@@ -8478,4 +8526,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.cb8d13e20952580b15e1.js.map
+//# sourceMappingURL=main.7f9079e848a7ab325ce4.js.map
