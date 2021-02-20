@@ -3378,21 +3378,27 @@ var DropboxStorage = /*#__PURE__*/function () {
           while (1) {
             switch (_context21.prev = _context21.next) {
               case 0:
-                _context21.next = 2;
+                _context21.prev = 0;
+                _context21.next = 3;
                 return this._dbx.filesListFolder({
                   path: "/" + receipient + "/gifts"
                 });
 
-              case 2:
+              case 3:
                 res = _context21.sent;
                 return _context21.abrupt("return", res.result.entries.length);
 
-              case 4:
+              case 7:
+                _context21.prev = 7;
+                _context21.t0 = _context21["catch"](0);
+                return _context21.abrupt("return", 0);
+
+              case 10:
               case "end":
                 return _context21.stop();
             }
           }
-        }, _callee21, this);
+        }, _callee21, this, [[0, 7]]);
       }));
 
       function getGiftCount(_x25) {
@@ -3410,24 +3416,25 @@ var DropboxStorage = /*#__PURE__*/function () {
           while (1) {
             switch (_context22.prev = _context22.next) {
               case 0:
-                _context22.next = 2;
+                id = Date.now().toString() + ".png";
+                path = "/" + receipient + "/gifts/" + id;
+                _context22.next = 4;
                 return this.getGiftCount(receipient);
 
-              case 2:
+              case 4:
                 _context22.t0 = _context22.sent;
 
                 if (!(_context22.t0 >= 10)) {
-                  _context22.next = 5;
+                  _context22.next = 8;
                   break;
                 }
 
+                console.log("Cannot send gift to " + path + ". Limit reached.");
                 return _context22.abrupt("return");
 
-              case 5:
-                id = Date.now().toString() + ".png";
-                path = "/" + receipient + "/gifts/" + id;
+              case 8:
                 console.log("Sending gift to " + path);
-                _context22.next = 10;
+                _context22.next = 11;
                 return this._dbx.filesUpload({
                   path: path,
                   contents: blob,
@@ -3436,7 +3443,7 @@ var DropboxStorage = /*#__PURE__*/function () {
                   }
                 });
 
-              case 10:
+              case 11:
               case "end":
                 return _context22.stop();
             }
@@ -8565,4 +8572,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.c38abb55c7946116a629.js.map
+//# sourceMappingURL=main.aac0b460869095e61250.js.map
