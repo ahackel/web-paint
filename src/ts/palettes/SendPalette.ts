@@ -12,10 +12,9 @@ export default class SendPalette extends Palette {
 
     private async addRecipients() {
         const userId = await localforage.getItem<string>("user-id") ?? "";
-        const receipients = ["Andreas", "Juri", "Lila"].filter(x => x != userId);
+        const receipients = ["Andreas", "Juri", "Jutta", "Lila"].filter(x => x != userId);
 
         for (let receipient of receipients) {
-            console.log(receipient)
             this.addOption(receipient);
         }
     }

@@ -88,7 +88,6 @@ export class PaintView extends View {
 
         this.width = config.width;
         this.height = config.height;
-        Utils.log(`Setting PaintView size to ${this.width} x ${this.height}`);
 
         this.addCanvasLayer("base-layer", 0, 0, this.width, this.height,false);
         this.addEventListeners();

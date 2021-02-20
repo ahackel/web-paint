@@ -39,7 +39,10 @@ export default class SettingsView extends View {
         });
 
         this._syncButton = this._element.querySelector<HTMLDivElement>(".button.sync");
-        Utils.addClick(this._syncButton, async () => dropboxStorage.sync());
+        Utils.addClick(this._syncButton, async () => {
+            dropboxStorage.toggleSync();
+            this.updateButtons();
+        });
 
         let exportButton = this._element.querySelector<HTMLDivElement>(".button.export");
         Utils.addClick(exportButton, async () => {
@@ -70,6 +73,7 @@ export default class SettingsView extends View {
         this._connectButton.classList.toggle('hidden', dropboxStorage.isAuthorized);
         this._disconnectButton.classList.toggle('hidden', !dropboxStorage.isAuthorized);
         this._syncButton.classList.toggle("disabled", !dropboxStorage.isAuthorized);
+        this._syncButton.innerHTML = '<i class="fas fa-sync fa-fw"></i> ' + (dropboxStorage.isSyncing ? "Stop Sync" : "Start Sync");
     }
 
     show(){

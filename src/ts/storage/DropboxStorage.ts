@@ -190,7 +190,7 @@ class DropboxStorage {
     private _isAuthorized: boolean = false;
     private _dbx: Dropbox;
     private _userId: string;
-    private _longPollStarted: boolean = false;
+    private _isSyncing: boolean = false;
     private _lastSyncDate: number = 0;
     
     SYNC_BOTH = 0;
@@ -199,6 +199,10 @@ class DropboxStorage {
 
     get isAuthorized(): boolean {
         return this._isAuthorized;
+    }
+    
+    get isSyncing(): boolean{
+        return this._isSyncing;
     }
     
     get dbx(): Dropbox {
@@ -239,12 +243,36 @@ class DropboxStorage {
             }
         }
         this.authorize(token);
-        this.sync();
+        this.startSync();
     }
 
     getAuthenticationUrl(): string{
         const auth = new DropboxAuth({ clientId: CLIENT_ID });
         return auth.getAuthenticationUrl(location.href);
+    }
+    
+    async startSync(){
+        if (this._isSyncing){
+            return;
+        }
+
+        console.log("Starting Dropbox Sync.");
+        this._isSyncing = true;
+        const cursor = await this.sync();
+        this.longPoll(cursor);
+    }
+    
+    stopSync(){
+        this._isSyncing = false;
+        console.log("Stopping Dropbox Sync.");
+    }
+    
+    toggleSync(){
+        if (this._isSyncing){
+            this.stopSync();
+        } else {
+            this.startSync();
+        }
     }
 
     async sync(): Promise<string>{
@@ -252,16 +280,14 @@ class DropboxStorage {
             return;
         }
 
-        console.log("Sync default content:");
         await this.syncFolder("default", "default");
-        console.log("Sync user content:");
         const cursor = await this.syncFolder(this.userId, "user");
         
-        await this.startLongPoll(cursor);
         return cursor;
     }
     
     async syncFolder(serverPath: string, clientPath: string): Promise<string> {
+        console.log("Sync " + serverPath + " (Server) <-> " + clientPath + " (Client)");
         try{
             const clientFiles = new clientFileSet();
             await clientFiles.setPath(clientPath);
@@ -291,24 +317,24 @@ class DropboxStorage {
         }
         return null;
     }
-    
-    public async startLongPoll(cursor: string) {
-        if (this._longPollStarted){
+
+    private async longPoll(cursor: string) {
+        if (!this._isSyncing){
             return;
         }
         
-        this._longPollStarted = true;
-        await this.longPoll(cursor);
-    }
-
-    private async longPoll(cursor: string) {
         if (!cursor){
-            this._longPollStarted = false;
+            this.stopSync();
             return;
         }
 
-        console.log("polling:");
+        console.log("Polling.");
         const res = await this.dbx.filesListFolderLongpoll({cursor: cursor, timeout: config.dropboxSyncInterval});
+
+        if (!this._isSyncing){
+            return;
+        }
+        
         if (res.result.changes || imageStorage.hasChanges) {
             cursor = await this.sync();
             imageStorage.hasChanges = false;

@@ -354,6 +354,12 @@ body, input, textarea {
     background-repeat: no-repeat;
     background-position: center;
 }
+.palette.button .option {
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    margin: 0;
+}
 
 .palette .options .option {
     margin: 0.125em;
@@ -381,8 +387,11 @@ body, input, textarea {
     width: auto!important;
 }
 
-#send-palette .option{
+#send-palette .options .option{
     width: auto;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    height: 1rem;
 }
 
 .toolbar.left .palette .options{
