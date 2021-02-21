@@ -6,6 +6,7 @@ export default class SendPalette extends Palette {
 
     constructor(id: string) {
         super(id, [], true);
+        this.hideWhenEmpty = false;
         this.selectedIndex = 0;
         this.addRecipients();
     }

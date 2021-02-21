@@ -14,6 +14,7 @@ export default class GiftPalette extends Palette {
             if (id.startsWith(GIFT_PATH)){
                 if (change == "save") {
                     this.addGift(id);
+                    this.bounce();
                 }
                 else if (change == "delete") {
                     this.removeGift(id);
@@ -57,6 +58,5 @@ export default class GiftPalette extends Palette {
 
     updateSelectedOptionElement(element: HTMLDivElement, option: any) {
         element.innerHTML = '<i class="fas fa-gift"></i>';
-        element.classList.toggle('hidden', this._options.length == 0);
     }
 }

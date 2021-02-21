@@ -3,6 +3,7 @@ import * as Utils from "../utils/Utils";
 
 // base class for palettes
 export class Palette extends View {
+    public hideWhenEmpty: boolean = true;
     public onSelectionChanged: Function | undefined;
     private _selectedElement: HTMLDivElement;
     private _optionsElement: HTMLDivElement;
@@ -99,6 +100,13 @@ export class Palette extends View {
         if (this._options.length == 0){
             this.collapse();
         }
+        this.updateSelectedOption();
+    }
+    
+    bounce(){
+        this._selectedElement.classList.remove("bounce");
+        void this._selectedElement.offsetWidth;
+        this._selectedElement.classList.add("bounce");
     }
 
     private addSelectedOption() {
@@ -166,5 +174,8 @@ export class Palette extends View {
     
     protected updateSelectedOption() {
         this.updateSelectedOptionElement(this._selectedElement, this.selectedOption);
+        if (this.hideWhenEmpty){
+            this._element.classList.toggle('hidden', this._options.length == 0);
+        }
     }
 }
