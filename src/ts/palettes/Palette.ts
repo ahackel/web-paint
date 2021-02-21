@@ -109,6 +109,12 @@ export class Palette extends View {
         this._selectedElement.classList.add("bounce");
     }
 
+    shake(){
+        this._selectedElement.classList.remove("shake");
+        void this._selectedElement.offsetWidth;
+        this._selectedElement.classList.add("shake");
+    }
+
     private addSelectedOption() {
         let element = <HTMLDivElement>document.createElement("div");
         element.classList.add("option");

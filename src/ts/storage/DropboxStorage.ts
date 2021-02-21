@@ -395,17 +395,23 @@ class DropboxStorage {
         }
     }
 
-    async sendGift(blob: Blob, receipient: string) {
+    async sendGift(blob: Blob, receipient: string): Promise<boolean> {
         const id = Date.now().toString() + ".png";
         const path = "/" + receipient + "/gifts/" + id;
 
         if (await this.getGiftCount(receipient) >= 10){
             console.log("Cannot send gift to " + path + ". Limit reached.");
-            return;
+            return false;
         }
         
         console.log("Sending gift to " + path);
-        await this._dbx.filesUpload({path: path, contents: blob, mode: { ".tag": "overwrite" }})
+        try{
+            await this._dbx.filesUpload({path: path, contents: blob, mode: { ".tag": "overwrite" }})
+            return true;
+        }
+        catch{
+            return false;
+        }
     }
 
     private authorize(token: string) {

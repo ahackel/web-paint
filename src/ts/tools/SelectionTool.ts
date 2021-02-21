@@ -54,7 +54,13 @@ export default class SelectionTool extends Tool {
         
         this._sendPalette = new SendPalette("send-palette");
         this._sendPalette.onSelectionChanged = (receipient: string) => {
-            this.selectionLayer.canvas.toBlob(blob => dropboxStorage.sendGift(blob, receipient));
+            this.selectionLayer.canvas.toBlob(async blob => {
+                if (await dropboxStorage.sendGift(blob, receipient)){
+                    this._sendPalette.bounce();
+                } else {
+                    this._sendPalette.shake();
+                }
+            });
         }
         
         this.hasFloatingSelection = false;
