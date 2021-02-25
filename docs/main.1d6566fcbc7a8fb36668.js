@@ -897,7 +897,8 @@ var App = /*#__PURE__*/function () {
   }, {
     key: "socketInit",
     value: function socketInit() {
-      this._socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_9__.io)("http://192.168.178.20:3002");
+      //        this._socket = io("http://192.168.178.20:3002");
+      this._socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_9__.io)("https://nas.andreashackel.de:3005");
 
       this._socket.on("TestMsg", function (msg) {
         return console.log(msg);
@@ -8609,4 +8610,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.3a346ab0d1730777af3d.js.map
+//# sourceMappingURL=main.1d6566fcbc7a8fb36668.js.map
