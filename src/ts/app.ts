@@ -20,7 +20,7 @@ import {config} from "./config";
 import PeerToPeer from "./PeerToPeer";
 import SettingsView from "./views/SettingsView";
 import { imageStorage } from "./storage/ImageStorage";
-import { io } from "socket.io-client";
+import ioclient from "socket.io-client";
 
 class App {
     private _activeView: View;
@@ -113,7 +113,7 @@ class App {
     
     socketInit(){
 //        this._socket = io("http://192.168.178.20:3002");
-        this._socket = io("https://nas.andreashackel.de:3005");
+        this._socket = ioclient("https://nas.andreashackel.de:3005");
         this._socket.on("TestMsg", (msg: string) => console.log(msg));
     }
 
