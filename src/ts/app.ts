@@ -20,7 +20,7 @@ import {config} from "./config";
 import PeerToPeer from "./PeerToPeer";
 import SettingsView from "./views/SettingsView";
 import { imageStorage } from "./storage/ImageStorage";
-import ioclient from "socket.io-client";
+//import ioclient from "socket.io-client";
 
 class App {
     private _activeView: View;
@@ -32,7 +32,7 @@ class App {
     _socket: SocketIOClient.Socket;
 
     constructor() {
-        this.socketInit();
+        //this.socketInit();
         
         // App.preventOverScroll();
         
@@ -111,15 +111,14 @@ class App {
         this._activeView.show();
     }
     
-    socketInit(){
-//        this._socket = io("http://192.168.178.20:3002");
-        this._socket = ioclient("https://nas.andreashackel.de:3005");
-        this._socket.on("TestMsg", (msg: string) => console.log(msg));
-    }
-
-    socketTest(){
-        this._socket.emit("TestMsg", "Test");
-    }
+    // socketInit(){
+    //     this._socket = ioclient("https://nas.andreashackel.de:3005");
+    //     this._socket.on("TestMsg", (msg: string) => console.log(msg));
+    // }
+    //
+    // socketTest(){
+    //     this._socket.emit("TestMsg", "Test");
+    // }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
