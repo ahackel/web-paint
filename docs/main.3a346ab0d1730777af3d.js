@@ -781,7 +781,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _views_PaintView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./views/PaintView */ "./src/ts/views/PaintView.ts");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./config */ "./src/ts/config.ts");
 /* harmony import */ var _views_SettingsView__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./views/SettingsView */ "./src/ts/views/SettingsView.ts");
-/* harmony import */ var _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./storage/ImageStorage */ "./src/ts/storage/ImageStorage.ts");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/wrapper.mjs");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -818,8 +818,9 @@ var App = /*#__PURE__*/function () {
 
     _classCallCheck(this, App);
 
-    // App.preventOverScroll();
+    this.socketInit(); // App.preventOverScroll();
     //PeerToPeer.createInstance();
+
     this._settingsView = new _views_SettingsView__WEBPACK_IMPORTED_MODULE_8__.default("settings", function () {
       _this.openView(_this._bookView);
     });
@@ -894,51 +895,19 @@ var App = /*#__PURE__*/function () {
       this._activeView.show();
     }
   }, {
-    key: "hash",
-    value: function () {
-      var _hash = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id) {
-        var path, url, blob, hash;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                path = _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__.imageStorage.getImagePath(id);
-                console.log(path);
-                _context2.next = 4;
-                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__.imageStorage.loadImageUrl(path);
+    key: "socketInit",
+    value: function socketInit() {
+      this._socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_9__.io)("http://192.168.178.20:3002");
 
-              case 4:
-                url = _context2.sent;
-                console.log(url);
-                _context2.next = 8;
-                return fetch(url).then(function (r) {
-                  return r.blob();
-                });
-
-              case 8:
-                blob = _context2.sent;
-                console.log(blob);
-                _context2.next = 12;
-                return _storage_ImageStorage__WEBPACK_IMPORTED_MODULE_9__.imageStorage.generateContentHash(blob);
-
-              case 12:
-                hash = _context2.sent;
-                console.log(hash);
-
-              case 14:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2);
-      }));
-
-      function hash(_x) {
-        return _hash.apply(this, arguments);
-      }
-
-      return hash;
-    }()
+      this._socket.on("TestMsg", function (msg) {
+        return console.log(msg);
+      });
+    }
+  }, {
+    key: "socketTest",
+    value: function socketTest() {
+      this._socket.emit("TestMsg", "Test");
+    }
   }], [{
     key: "preventOverScroll",
     value: function preventOverScroll() {
@@ -8558,7 +8527,7 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 		};
 /******/ 		
 /******/ 		var deferredModules = [
-/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-235257"]
+/******/ 			["./src/ts/app.ts","vendors-node_modules_fortawesome_fontawesome-svg-core_index_es_js-node_modules_fortawesome_fr-359767"]
 /******/ 		];
 /******/ 		// no chunk on demand loading
 /******/ 		
@@ -8640,4 +8609,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.550fb735256ea912c822.js.map
+//# sourceMappingURL=main.3a346ab0d1730777af3d.js.map

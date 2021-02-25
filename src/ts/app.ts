@@ -20,6 +20,7 @@ import {config} from "./config";
 import PeerToPeer from "./PeerToPeer";
 import SettingsView from "./views/SettingsView";
 import { imageStorage } from "./storage/ImageStorage";
+import { io } from "socket.io-client";
 
 class App {
     private _activeView: View;
@@ -28,8 +29,11 @@ class App {
     private _settingsView: SettingsView;
     private dropboxAuthView: DropboxAuthView;
     private _sheet: HTMLElement;
+    _socket: SocketIOClient.Socket;
 
     constructor() {
+        this.socketInit();
+        
         // App.preventOverScroll();
         
         //PeerToPeer.createInstance();
@@ -107,15 +111,13 @@ class App {
         this._activeView.show();
     }
     
-    async hash(id: number){
-        const path = imageStorage.getImagePath(id);
-        console.log(path)
-        const url = await imageStorage.loadImageUrl(path);
-        console.log(url)
-        const blob = await fetch(url).then(r => r.blob());
-        console.log(blob)
-        var hash = await imageStorage.generateContentHash(blob);
-        console.log(hash);
+    socketInit(){
+        this._socket = io("http://192.168.178.20:3002");
+        this._socket.on("TestMsg", (msg: string) => console.log(msg));
+    }
+
+    socketTest(){
+        this._socket.emit("TestMsg", "Test");
     }
 }
 

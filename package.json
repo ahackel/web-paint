@@ -11,7 +11,7 @@
   },
   "scripts": {
     "clean": "rm -rf docs",
-    "start": "webpack serve --open",
+    "start": "webpack serve --port 1234 --host 0.0.0.0",
     "build": "webpack",
     "publish": "git push"
   },
@@ -40,6 +40,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@types/crypto-js": "^4.0.1",
+    "@types/socket.io-client": "^1.4.35",
     "blueimp-canvas-to-blob": "^3.28.0",
     "console-log-html": "^2.0.2",
     "core-js": "^3.8.3",
@@ -52,6 +53,7 @@
     "pressure": "^2.2.0",
     "process": "^0.11.10",
     "regenerator-runtime": "^0.13.7",
+    "socket.io-client": "^3.1.1",
     "util": "^0.12.3",
     "whatwg-fetch": "^3.5.0"
   },

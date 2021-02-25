@@ -8,10 +8,6 @@ module.exports = {
     mode: 'development',
     entry: './src/ts/app.ts',
     devtool: 'source-map',
-    devServer: {
-        port: 1234,
-        contentBase: './docs',
-    },
     module: {
         rules: [
             {
