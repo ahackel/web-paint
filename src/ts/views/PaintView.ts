@@ -578,7 +578,7 @@ export class PaintView extends View {
                     this.baseLayer.drawImage(image);
                 }
                 
-                this.setOverlay("overlay-" + id);
+                this.setOverlay(imageStorage.getOverlayPath(id));
                 this.ResetHistory();
                 this._isDirty = false;
             })

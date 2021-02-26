@@ -7794,7 +7794,7 @@ var PaintView = /*#__PURE__*/function (_View) {
           _this6.baseLayer.drawImage(image);
         }
 
-        _this6.setOverlay("overlay-" + id);
+        _this6.setOverlay(_storage_ImageStorage__WEBPACK_IMPORTED_MODULE_7__.imageStorage.getOverlayPath(id));
 
         _this6.ResetHistory();
 
@@ -8602,4 +8602,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	__webpack_require__.x();
 /******/ })()
 ;
-//# sourceMappingURL=main.c01b0fe8da0e6cc5bfdd.js.map
+//# sourceMappingURL=main.4f9c3f1d042cd513a013.js.map
